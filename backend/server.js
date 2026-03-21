@@ -32,14 +32,14 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/college', require('./routes/college'));
-app.use('/api/student', require('./routes/student'));
-app.use('/api/jd', require('./routes/jd'));
-app.use('/api/notification', require('./routes/notification'));
+app.use('/auth', require('./routes/auth'));
+app.use('/college', require('./routes/college'));
+app.use('/student', require('./routes/student'));
+app.use('/jd', require('./routes/jd'));
+app.use('/notification', require('./routes/notification'));
 
 // Health check
-app.get('/api/health', (req, res) => {
+app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
