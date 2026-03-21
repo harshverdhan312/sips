@@ -10,6 +10,7 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:5137',
   'http://localhost:5173',
+  'https://sips-six.vercel.app',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 

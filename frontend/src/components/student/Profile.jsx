@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getProfile, updateProfile, uploadResume } from '../../api';
+import { getProfile, updateProfile, uploadResume, BACKEND_URL } from '../../api';
 
 const Profile = () => {
   const [profile, setProfile] = useState(null);
@@ -147,7 +147,7 @@ const Profile = () => {
         {profile?.resumeUrl ? (
           <div className="flex items-center gap-3 mb-3">
             <span className="text-green-400 text-xs">✓ Resume uploaded</span>
-            <a href={`http://localhost:5000${profile.resumeUrl}`} target="_blank" rel="noopener noreferrer" className="text-indigo-400 text-xs hover:text-indigo-300">
+            <a href={`${BACKEND_URL}${profile.resumeUrl}`} target="_blank" rel="noopener noreferrer" className="text-indigo-400 text-xs hover:text-indigo-300">
               View Resume
             </a>
           </div>
