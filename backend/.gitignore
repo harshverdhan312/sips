@@ -1,0 +1,56 @@
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+
+# Build outputs
+dist/
+build/
+out/
+
+# Coverage
+coverage/
+
+# Cache
+.cache/
+.tmp/
+
+# MongoDB
+*.db
+*.sqlite
+
+# Misc
+*.tgz
+*.bak
+
+# Docker
+docker-compose.override.yml
+
+# Secrets
+config/secrets.json
