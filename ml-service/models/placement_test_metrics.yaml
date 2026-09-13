@@ -1,0 +1,30 @@
+model:
+  name: "Tuned XGBoost with isotonic calibration"
+  decision_threshold: 0.50
+
+test_set:
+  rows: 424
+  not_placed: 190
+  placed: 234
+
+metrics:
+  accuracy: 0.8467
+  precision: 0.9669
+  recall: 0.7479
+  f1: 0.8434
+  roc_auc: 0.9007
+  pr_auc: 0.9359
+  brier_score: 0.1138
+  log_loss: 0.3432
+  ece: 0.0480
+
+confusion_matrix:
+  true_negative: 184
+  false_positive: 6
+  false_negative: 59
+  true_positive: 175
+
+notes:
+  - "These metrics were obtained from the held-out test set after model, calibration, and threshold selection were finalized."
+  - "The test set must not be used for further model tuning or threshold selection."
+  - "Results are specific to the available placement dataset and should not be interpreted as universal placement performance."

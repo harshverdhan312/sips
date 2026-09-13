@@ -1,0 +1,38 @@
+target:
+  name: PlacedOrNot
+  type: binary
+  mapping:
+    0: not_placed
+    1: placed
+
+prediction_point:
+  description: "Before final campus recruitment outcome is known."
+
+model_features:
+  - name: Age
+    role: predictor
+    available_before_outcome: true
+
+  - name: Stream
+    role: predictor
+    available_before_outcome: true
+
+  - name: Internships
+    role: predictor
+    available_before_outcome: true
+
+  - name: CGPA
+    role: predictor
+    available_before_outcome: true
+
+  - name: Hostel
+    role: predictor
+    available_before_outcome: true
+
+  - name: HistoryOfBacklogs
+    role: predictor
+    available_before_outcome: true
+
+audit_only_features:
+  - name: Gender
+    reason: "Sensitive demographic attribute; retained for fairness evaluation, excluded from prediction."
