@@ -1,0 +1,13 @@
+project:
+  name: "SIPS"
+  service_name: "ml-service"
+
+runtime:
+  random_state: 42
+
+paths:
+  raw_data: "data/raw"
+  interim_data: "data/interim"
+  processed_data: "data/processed"
+  external_data: "data/external"
+  models: "models"

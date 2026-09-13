@@ -1,0 +1,17 @@
+calibration:
+  method: "isotonic"
+  decision_threshold: 0.50
+  threshold_selection:
+    metric: "f1"
+    validation_optimal_range: [0.47, 0.56]
+    rationale: "Thresholds 0.47 through 0.56 produced identical maximum validation F1; 0.50 was selected as the simplest representative decision boundary."
+  validation:
+    brier_score: 0.11599548706076333
+    log_loss: 0.34903173353019223
+    ece: 0.0435
+    roc_auc: 0.8905
+    pr_auc: 0.9288
+  notes:
+    - "Isotonic calibration produced modest improvements in Brier score, log loss, and ECE compared with raw XGBoost scores."
+    - "Calibration slightly reduced ROC-AUC and PR-AUC."
+    - "Calibration and threshold selection used validation data only; the test set remained untouched."

@@ -1,0 +1,72 @@
+SIPS Placement Prediction - EDA Summary
+=======================================
+
+Dataset
+-------
+Rows: 2966
+Columns: 8
+Target: PlacedOrNot
+Placed: 1639 (55.26%)
+Not placed: 1327 (44.74%)
+Missing values: None
+
+Main Findings
+-------------
+1. CGPA is the strongest individual predictor observed during EDA.
+   Pearson correlation with PlacedOrNot: 0.589.
+
+2. Placement rate by CGPA:
+   CGPA 5: 7.29%
+   CGPA 6: 32.37%
+   CGPA 7: 29.50%
+   CGPA 8: 100.00%
+   CGPA 9: 100.00%
+
+3. The 100% placement rate for CGPA 8 and 9 occurs across every Stream.
+   This unusually deterministic pattern is an important dataset limitation
+   and must be considered when evaluating model performance.
+
+4. Internships show meaningful association with placement.
+   0 internships: 49.14%
+   1 internship: 53.65%
+   2 internships: 80.57%
+   3 internships: 80.39%
+   The 3-internship group is small and should not be overinterpreted.
+
+5. Stream shows moderate differences in placement rates.
+   ECE and IT have the highest observed rates, while Civil and Mechanical
+   have lower observed rates. Stream may interact with CGPA.
+
+6. Age, Hostel, and HistoryOfBacklogs show weak individual associations
+   with placement, but they are retained for later model evaluation because
+   weak univariate association does not imply no predictive value.
+
+7. Predictor-to-predictor linear correlations are low.
+   The strongest absolute numeric predictor correlation is Age-CGPA: 0.120.
+   No obvious severe numeric multicollinearity was observed.
+
+8. Duplicate sensitivity is important.
+   Total rows: 2966
+   Unique complete rows: 1137
+   Overall placement rate:
+     All rows: 55.26%
+     Unique complete rows: 57.96%
+   Duplicate records affect some observed distributions, especially CGPA
+   groups 6 and 7. Exact duplicates will not be blindly removed because
+   there is no student identifier proving that they represent duplicate
+   students. Split strategy must account for repeated predictor profiles.
+
+9. Gender is excluded from production model inputs and retained only for
+   fairness auditing.
+   Female records: 491, placement rate 56.01%
+   Male records: 2475, placement rate 55.11%
+   Outcome rates are similar, but representation is substantially unequal.
+
+Important Interpretation
+------------------------
+EDA identifies associations, not causal relationships.
+No feature will be removed solely because of low univariate correlation.
+Model performance must be compared against simple baselines, including the
+strong CGPA-based pattern observed in this dataset.
+The dataset should be treated as a proof-of-concept placement dataset rather
+than evidence for universal real-world placement behavior.

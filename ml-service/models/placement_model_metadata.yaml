@@ -1,0 +1,35 @@
+model:
+  name: "SIPS Placement Predictor"
+  version: "1.0.0"
+  algorithm: "XGBoost"
+  calibration: "isotonic"
+  artifact_path: "models/placement_model.joblib"
+
+prediction:
+  target: "PlacedOrNot"
+  positive_class: 1
+  positive_label: "placed"
+  negative_class: 0
+  negative_label: "not_placed"
+  decision_threshold: 0.50
+
+features:
+  model_features:
+    - Age
+    - Internships
+    - CGPA
+    - Hostel
+    - HistoryOfBacklogs
+    - Stream
+  audit_only_features:
+    - Gender
+
+training:
+  random_state: 42
+  split_strategy: "profile-group-aware stratified split"
+  test_set_used_for_tuning: false
+
+limitations:
+  - "Model performance is specific to the available engineering placement dataset."
+  - "Predictions must not be interpreted as guarantees of real-world placement."
+  - "SHAP explanations describe model behavior and associations, not causation."
