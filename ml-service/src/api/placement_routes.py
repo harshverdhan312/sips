@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from src.placement.service import predict_placement
 
@@ -11,6 +11,7 @@ router = APIRouter(
 
 
 class PlacementRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     Age: int = Field(..., ge=19, le=30)
     Internships: int = Field(..., ge=0, le=3)
     CGPA: float = Field(..., ge=5, le=9)
