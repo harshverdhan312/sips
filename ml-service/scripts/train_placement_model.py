@@ -11,7 +11,7 @@ from src.placement.calibration import build_calibrated_model
 from src.placement.persistence import save_model
 
 DATA_PATH = PROJECT_ROOT / "data" / "raw" / "collegePlace.csv"
-MODEL_PATH = PROJECT_ROOT / "models" / "placement_model_rebuilt.joblib"
+MODEL_PATH = PROJECT_ROOT / "models" / "placement_model.joblib"
 
 
 def train_and_save_model():
