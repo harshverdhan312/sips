@@ -124,5 +124,22 @@ export const adminService = {
     return [
       { id: "log_init", action: "Tenant Environment Active", actor: "System", target: "SIPS Database", timestamp: "Today" }
     ];
+  },
+
+  /**
+   * Bulk import students via CSV text or file
+   */
+  async uploadStudentsCSV(csvData) {
+    let payload;
+    if (typeof csvData === 'string') {
+      payload = { csvText: csvData };
+    } else if (csvData instanceof FormData) {
+      payload = csvData;
+    } else {
+      payload = { csvText: String(csvData) };
+    }
+
+    const res = await api.post('/api/admin/students/upload', payload);
+    return res;
   }
 };

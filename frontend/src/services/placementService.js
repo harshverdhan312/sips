@@ -190,5 +190,46 @@ export const placementService = {
       historyTrend: historicalPlacementTrend,
       quadrant: technicalVsSoftSkillQuadrant
     };
+  },
+
+  /**
+   * Fetch candidate matches for a job from backend
+   */
+  async getJobMatches(jobId, filters = {}) {
+    try {
+      const minScore = filters.minScore || 0;
+      const res = await api.get(`/api/admin/jobs/${jobId}/matches?minScore=${minScore}`);
+      if (res && res.matches) {
+        return {
+          job: res.job,
+          totalMatches: res.totalMatches || res.matches.length,
+          matches: res.matches.map((m) => ({
+            rank: m.rank,
+            score: m.score,
+            matchedSkills: m.matchedSkills || [],
+            missingSkills: m.missingSkills || [],
+            student: m.student ? {
+              id: m.student._id || m.student.id,
+              _id: m.student._id || m.student.id,
+              name: m.student.name,
+              rollNo: m.student.rollNo,
+              usn: m.student.usn || m.student.rollNo,
+              email: m.student.email,
+              branch: m.student.branch,
+              batch: m.student.batch,
+              cgpa: m.student.cgpa || 7.5,
+              placementStatus: m.student.placementStatus || "UNPLACED",
+              readinessScore: m.student.readinessScore || 65,
+              skills: m.student.skills || [],
+              avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(m.student.name)}`
+            } : null
+          })).filter(m => m.student !== null)
+        };
+      }
+    } catch (e) {
+      console.warn(`Could not fetch matches for job ${jobId}:`, e.message);
+      throw e;
+    }
+    return { job: null, totalMatches: 0, matches: [] };
   }
 };
