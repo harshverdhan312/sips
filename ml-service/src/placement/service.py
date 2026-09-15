@@ -35,7 +35,6 @@ def load_placement_model():
 
 
 METADATA = load_metadata()
-MODEL = load_placement_model()
 
 
 def validate_student_input(student_data):
@@ -110,8 +109,10 @@ def predict_placement(student_data):
         columns=feature_order,
     )
 
+    model = load_placement_model()
+
     probability = float(
-        MODEL.predict_proba(input_df)[0, 1]
+        model.predict_proba(input_df)[0, 1]
     )
 
     threshold = float(
