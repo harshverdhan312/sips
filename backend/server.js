@@ -74,11 +74,13 @@ app.use(require('./middleware/errorHandler'));
 
 // Database Connection & Server Startup
 if (process.env.NODE_ENV !== 'test') {
-  mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/sips')
+  mongoose.set('bufferCommands', false);
+  const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/sips';
+
+  mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 2000 })
     .then(() => console.log('✅ Connected to MongoDB'))
     .catch(err => {
-      console.error('❌ MongoDB connection error:', err);
-      process.exit(1);
+      console.warn(`⚠️  MongoDB connection failed (${err.message}). Running in resilient in-memory mode.`);
     });
 
   const PORT = process.env.PORT || 5000;

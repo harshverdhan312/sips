@@ -80,8 +80,17 @@ export function LoginPage() {
 
     const domains = regAcceptedDomains
       .split(",")
-      .map((d) => d.trim().toLowerCase())
+      .map((d) => d.trim().toLowerCase().replace(/^@/, ''))
       .filter(Boolean);
+
+    // Auto-include admin email domain so admin can always access their institution
+    const emailParts = regAdminEmail.trim().split('@');
+    if (emailParts.length === 2) {
+      const adminDomain = emailParts[1].toLowerCase().trim();
+      if (adminDomain && !domains.includes(adminDomain)) {
+        domains.push(adminDomain);
+      }
+    }
 
     if (domains.length === 0) {
       addToast("Please provide at least one accepted email domain for students.", "warning");

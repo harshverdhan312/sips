@@ -2,6 +2,7 @@ const Student = require('../models/Student');
 const JobDescription = require('../models/JobDescription');
 const Alert = require('../models/Alert');
 const AuditLog = require('../models/AuditLog');
+const memoryDb = require('../utils/memoryDb');
 
 /**
  * GET /api/admin/overview
@@ -10,6 +11,33 @@ const AuditLog = require('../models/AuditLog');
 exports.getOverview = async (req, res) => {
   try {
     const collegeId = req.collegeId;
+
+    if (!memoryDb.isMongoConnected()) {
+      const stats = memoryDb.getOverview(collegeId);
+      return res.json({
+        success: true,
+        data: {
+          totalStudents: stats.totalStudents,
+          eligibleStudents: stats.eligibleStudents,
+          placedStudents: stats.placedStudents,
+          unplacedStudents: stats.unplacedStudents,
+          inProcessStudents: stats.inProcessStudents,
+          optedOutStudents: stats.optedOutStudents,
+          placementRate: stats.placementRate,
+          avgReadinessScore: stats.avgReadiness,
+          avgTechnicalScore: stats.avgTechnical,
+          avgSoftSkillScore: stats.avgSoftSkill,
+          avgResumeScore: stats.avgResume,
+          avgCgpa: stats.avgCgpa,
+          atRiskCount: stats.atRiskCount,
+          readyCount: stats.readyCount,
+          needsImprovementCount: stats.needsImprovementCount,
+          activeJobsCount: stats.activeJobsCount,
+          activeAlertsCount: stats.activeAlertsCount,
+          recentActivity: []
+        }
+      });
+    }
 
     const [
       totalStudents,

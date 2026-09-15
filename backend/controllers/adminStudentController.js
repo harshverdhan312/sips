@@ -3,6 +3,7 @@ const Match = require('../models/Match');
 const AuditLog = require('../models/AuditLog');
 const bcrypt = require('bcryptjs');
 const { parseCSV } = require('../utils/csvParser');
+const memoryDb = require('../utils/memoryDb');
 
 /**
  * GET /api/admin/students
@@ -21,6 +22,20 @@ exports.getStudents = async (req, res) => {
       sortBy = 'name',
       sortOrder = 'asc'
     } = req.query;
+
+    if (!memoryDb.isMongoConnected()) {
+      const allStudents = memoryDb.getStudents(req.collegeId, { search, branch, status, readiness });
+      return res.json({
+        success: true,
+        students: allStudents,
+        pagination: {
+          total: allStudents.length,
+          page: 1,
+          limit: 20,
+          totalPages: 1
+        }
+      });
+    }
 
     const query = { collegeId: req.collegeId };
 
@@ -105,6 +120,18 @@ exports.getStudents = async (req, res) => {
  */
 exports.getStudentById = async (req, res) => {
   try {
+    if (!memoryDb.isMongoConnected()) {
+      const student = memoryDb.findStudentById(req.params.id);
+      if (!student) {
+        return res.status(404).json({ message: 'Student not found' });
+      }
+      return res.json({
+        success: true,
+        student,
+        matches: []
+      });
+    }
+
     const student = await Student.findOne({
       _id: req.params.id,
       collegeId: req.collegeId
@@ -154,6 +181,18 @@ exports.getStudentById = async (req, res) => {
  */
 exports.updateStudent = async (req, res) => {
   try {
+    if (!memoryDb.isMongoConnected()) {
+      const updated = memoryDb.updateStudent(req.params.id, req.body);
+      if (!updated) {
+        return res.status(404).json({ message: 'Student not found' });
+      }
+      return res.json({
+        success: true,
+        message: 'Student updated successfully',
+        student: updated
+      });
+    }
+
     const student = await Student.findOne({
       _id: req.params.id,
       collegeId: req.collegeId
@@ -251,6 +290,17 @@ exports.updateStudent = async (req, res) => {
  */
 exports.deleteStudent = async (req, res) => {
   try {
+    if (!memoryDb.isMongoConnected()) {
+      const deleted = memoryDb.deleteStudent(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ message: 'Student not found' });
+      }
+      return res.json({
+        success: true,
+        message: 'Student deleted successfully'
+      });
+    }
+
     const student = await Student.findOneAndDelete({
       _id: req.params.id,
       collegeId: req.collegeId
@@ -312,6 +362,42 @@ exports.uploadStudentsCSV = async (req, res) => {
     };
 
     const salt = await bcrypt.genSalt(10);
+
+    if (!memoryDb.isMongoConnected()) {
+      for (const s of parsedStudents) {
+        const cleanEmail = (s.email || '').toLowerCase().trim();
+        const cleanRoll = (s.rollNo || s.usn || '').trim();
+        const existing = memoryDb.findStudentByEmail(cleanEmail, req.collegeId) ||
+          memoryDb.findStudentByRollNo(cleanRoll, req.collegeId);
+
+        if (existing) {
+          results.failed++;
+          results.errors.push(`${s.email} / ${s.rollNo}: Student already exists`);
+          continue;
+        }
+
+        const passwordHash = await bcrypt.hash(cleanRoll || '123456', salt);
+        memoryDb.saveStudent({
+          collegeId: req.collegeId,
+          name: s.name,
+          rollNo: cleanRoll,
+          usn: s.usn || cleanRoll,
+          email: cleanEmail,
+          passwordHash,
+          branch: s.branch,
+          batch: s.batch,
+          cgpa: s.cgpa !== undefined ? s.cgpa : 7.5,
+          skills: s.skills || []
+        });
+        results.success++;
+      }
+
+      return res.json({
+        success: true,
+        message: `Imported ${results.success} of ${results.total} students`,
+        results
+      });
+    }
 
     for (const s of parsedStudents) {
       try {
@@ -443,6 +529,60 @@ exports.createStudent = async (req, res) => {
 
     const emailClean = email.toLowerCase().trim();
     const finalRollNo = (rollNo || usn).trim();
+
+    if (!memoryDb.isMongoConnected()) {
+      const existingEmail = memoryDb.findStudentByEmail(emailClean, req.collegeId);
+      const existingRoll = memoryDb.findStudentByRollNo(finalRollNo, req.collegeId);
+
+      if (existingEmail) {
+        return res.status(409).json({ message: 'A student with this email is already registered in your institution.' });
+      }
+      if (existingRoll) {
+        return res.status(409).json({ message: 'A student with this roll number/USN is already registered in your institution.' });
+      }
+
+      const initialPassword = (password && password.trim().length >= 4) ? password.trim() : finalRollNo;
+      const salt = await bcrypt.genSalt(10);
+      const passwordHash = await bcrypt.hash(initialPassword, salt);
+
+      const student = memoryDb.saveStudent({
+        collegeId: req.collegeId,
+        name: name.trim(),
+        rollNo: finalRollNo,
+        usn: (usn || finalRollNo).trim(),
+        email: emailClean,
+        passwordHash,
+        branch: (branch || 'Computer Science & Engineering').trim(),
+        batch: (batch || '2025').trim(),
+        cgpa: cgpa !== undefined ? Math.max(0, Math.min(10, parseFloat(cgpa) || 7.0)) : 7.0,
+        skills: Array.isArray(skills) ? skills.map(s => s.trim()).filter(Boolean) : [],
+        placementStatus: 'UNPLACED',
+        readinessScore: 65,
+        technicalScore: 65,
+        softSkillScore: 65,
+        resumeScore: 65
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: 'Student account created successfully',
+        student: {
+          id: student._id,
+          _id: student._id,
+          name: student.name,
+          email: student.email,
+          rollNo: student.rollNo,
+          usn: student.usn,
+          branch: student.branch,
+          batch: student.batch,
+          cgpa: student.cgpa,
+          placementStatus: student.placementStatus,
+          readinessScore: student.readinessScore,
+          skills: student.skills,
+          initialPassword: initialPassword
+        }
+      });
+    }
 
     // Check for duplicate email or roll number within this college
     const existing = await Student.findOne({

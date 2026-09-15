@@ -2,6 +2,7 @@ const College = require('../models/College');
 const Student = require('../models/Student');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const memoryDb = require('../utils/memoryDb');
 
 const generateToken = (payload) => {
   const secret = process.env.JWT_SECRET || 'sips-dev-secret-key-2025';
@@ -19,6 +20,109 @@ exports.login = async (req, res) => {
 
     if (!loginId || !password) {
       return res.status(400).json({ message: 'Email/ID and password are required' });
+    }
+
+    // ----------------------------------------------------
+    // Resilient In-Memory Mode (when MongoDB is offline)
+    // ----------------------------------------------------
+    if (!memoryDb.isMongoConnected()) {
+      if (loginId.includes('@')) {
+        const parts = loginId.split('@');
+        if (parts.length !== 2) {
+          return res.status(400).json({ message: 'Invalid email format' });
+        }
+        const domain = parts[1];
+        const college = memoryDb.findCollegeByDomain(domain) || (collegeSlug ? memoryDb.findCollegeBySlug(collegeSlug) : null);
+
+        if (!college) {
+          return res.status(401).json({ 
+            message: 'This email domain is not registered with any college.' 
+          });
+        }
+
+        if (loginId === college.adminEmail) {
+          const isMatch = await bcrypt.compare(password, college.masterPasswordHash);
+          if (!isMatch) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+          }
+
+          const token = generateToken({
+            id: college._id,
+            role: 'COLLEGE_ADMIN',
+            collegeId: college._id,
+            collegeSlug: college.slug
+          });
+
+          return res.json({
+            token,
+            role: 'COLLEGE_ADMIN',
+            collegeSlug: college.slug,
+            collegeName: college.name,
+            userId: college._id
+          });
+        }
+
+        const student = memoryDb.findStudentByEmail(loginId, college._id);
+        if (!student) {
+          return res.status(401).json({ 
+            message: 'Student account not found in your institution. Please contact your Placement Cell.' 
+          });
+        }
+
+        const isMatch = await bcrypt.compare(password, student.passwordHash);
+        if (!isMatch) {
+          return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        const token = generateToken({
+          id: student._id,
+          role: 'STUDENT',
+          collegeId: college._id,
+          collegeSlug: college.slug
+        });
+
+        return res.json({
+          token,
+          role: 'STUDENT',
+          collegeSlug: college.slug,
+          collegeName: college.name,
+          userId: student._id,
+          studentName: student.name
+        });
+      }
+
+      // Login by Roll No / USN
+      const college = collegeSlug ? memoryDb.findCollegeBySlug(collegeSlug) : null;
+      const student = memoryDb.findStudentByRollNo(loginId, college ? college._id : null);
+
+      if (!student) {
+        return res.status(401).json({ 
+          message: 'No student found with this Roll Number or USN. Please contact your Placement Cell.' 
+        });
+      }
+
+      const isMatch = await bcrypt.compare(password, student.passwordHash);
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+
+      const studentCollege = memoryDb.findCollegeById(student.collegeId) || college;
+
+      const token = generateToken({
+        id: student._id,
+        role: 'STUDENT',
+        collegeId: student.collegeId,
+        collegeSlug: studentCollege ? studentCollege.slug : ''
+      });
+
+      return res.json({
+        token,
+        role: 'STUDENT',
+        collegeSlug: studentCollege ? studentCollege.slug : '',
+        collegeName: studentCollege ? studentCollege.name : 'College',
+        userId: student._id,
+        studentName: student.name
+      });
     }
 
     // 1. Check if loginId is an email address

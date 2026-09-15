@@ -3,6 +3,7 @@ const Student = require('../models/Student');
 const Match = require('../models/Match');
 const AuditLog = require('../models/AuditLog');
 const { calculateMatch, extractSkillsFromText } = require('../utils/matchingEngine');
+const memoryDb = require('../utils/memoryDb');
 
 /**
  * Helper to compute eligible and matched count for a JD
@@ -34,6 +35,16 @@ const computeJobStats = async (collegeId, jd) => {
 exports.getJobs = async (req, res) => {
   try {
     const { status, search } = req.query;
+
+    if (!memoryDb.isMongoConnected()) {
+      const jobs = memoryDb.getJobs(req.collegeId, { status, search });
+      return res.json({
+        success: true,
+        count: jobs.length,
+        jobs
+      });
+    }
+
     const query = { collegeId: req.collegeId };
 
     if (status && status !== 'All') {
@@ -104,6 +115,33 @@ exports.createJob = async (req, res) => {
     const branches = Array.isArray(allowedBranches)
       ? allowedBranches.map(b => b.trim()).filter(Boolean)
       : (allowedBranches ? String(allowedBranches).split(',').map(b => b.trim()).filter(Boolean) : []);
+
+    if (!memoryDb.isMongoConnected()) {
+      const job = memoryDb.saveJob({
+        collegeId: req.collegeId,
+        title: title.trim(),
+        role: (role || title).trim(),
+        company: company.trim(),
+        description: description.trim(),
+        department: (department || 'Engineering').trim(),
+        location: (location || 'Flexible / Campus').trim(),
+        ctc: (ctc || '').trim(),
+        ctcValue: parseFloat(ctcValue) || (ctc ? parseFloat(ctc) || 0 : 0),
+        type: type || 'Full-time',
+        deadline: deadline ? new Date(deadline) : undefined,
+        driveDate: driveDate ? new Date(driveDate) : undefined,
+        minCgpa: parsedMinCgpa,
+        allowedBranches: branches,
+        requiredSkills: (skills || []).map(s => s.trim().toLowerCase()).filter(Boolean),
+        status: (status || 'ACTIVE').toUpperCase()
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: 'Job / Drive created successfully',
+        job
+      });
+    }
 
     const jd = new JobDescription({
       collegeId: req.collegeId,
@@ -184,6 +222,19 @@ exports.createJob = async (req, res) => {
  */
 exports.getJobById = async (req, res) => {
   try {
+    if (!memoryDb.isMongoConnected()) {
+      const job = memoryDb.findJobById(req.params.id);
+      if (!job) return res.status(404).json({ message: 'Job not found' });
+      return res.json({
+        success: true,
+        job: {
+          ...job,
+          batchEligibleCount: 0,
+          batchMatchedCount: 0
+        }
+      });
+    }
+
     const jd = await JobDescription.findOne({
       _id: req.params.id,
       collegeId: req.collegeId
@@ -215,6 +266,16 @@ exports.getJobById = async (req, res) => {
  */
 exports.updateJob = async (req, res) => {
   try {
+    if (!memoryDb.isMongoConnected()) {
+      const job = memoryDb.updateJob(req.params.id, req.body);
+      if (!job) return res.status(404).json({ message: 'Job not found' });
+      return res.json({
+        success: true,
+        message: 'Job updated successfully',
+        job
+      });
+    }
+
     const jd = await JobDescription.findOne({
       _id: req.params.id,
       collegeId: req.collegeId
@@ -327,6 +388,12 @@ exports.updateJob = async (req, res) => {
  */
 exports.deleteJob = async (req, res) => {
   try {
+    if (!memoryDb.isMongoConnected()) {
+      const job = memoryDb.deleteJob(req.params.id);
+      if (!job) return res.status(404).json({ message: 'Job not found' });
+      return res.json({ success: true, message: 'Job deleted successfully' });
+    }
+
     const jd = await JobDescription.findOneAndDelete({
       _id: req.params.id,
       collegeId: req.collegeId
