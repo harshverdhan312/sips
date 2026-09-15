@@ -1,6 +1,7 @@
 const College = require('../models/College');
 const Student = require('../models/Student');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const { parseCSV } = require('../utils/csvParser');
 
 /**
@@ -65,9 +66,27 @@ exports.registerCollege = async (req, res) => {
 
     await college.save();
 
+    const secret = process.env.JWT_SECRET || 'sips-dev-secret-key-2025';
+    const token = jwt.sign(
+      {
+        id: college._id,
+        role: 'COLLEGE_ADMIN',
+        collegeId: college._id,
+        collegeSlug: college.slug,
+        email: college.adminEmail
+      },
+      secret,
+      { expiresIn: '7d' }
+    );
+
     res.status(201).json({ 
+      success: true,
       message: 'College registered successfully',
-      collegeSlug: college.slug 
+      token,
+      role: 'COLLEGE_ADMIN',
+      collegeSlug: college.slug,
+      collegeName: college.name,
+      userId: college._id
     });
   } catch (error) {
     console.error('Registration error:', error);

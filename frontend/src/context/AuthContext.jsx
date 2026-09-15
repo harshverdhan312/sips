@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { mockUsers } from "../data/mockUsers";
+import { authService } from "../services/authService";
 
 const AuthContext = createContext(null);
 
@@ -60,6 +61,47 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("sips_auth_user");
   };
 
+  const register = async (studentData) => {
+    const apiResult = await authService.registerStudent(studentData);
+    if (apiResult && apiResult.token) {
+      localStorage.setItem("sips_token", apiResult.token);
+    }
+    const newUser = {
+      id: apiResult?.userId || "usr_" + Date.now(),
+      name: studentData.name,
+      email: studentData.email,
+      role: "student",
+      department: studentData.branch || "Computer Science & Engineering",
+      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      status: "Active",
+      rollNo: studentData.rollNo,
+      batch: studentData.batch || "2025"
+    };
+    setUser(newUser);
+    setRole("student");
+    return newUser;
+  };
+
+  const registerCollege = async (collegeData) => {
+    const apiResult = await authService.registerCollege(collegeData);
+    if (apiResult && apiResult.token) {
+      localStorage.setItem("sips_token", apiResult.token);
+    }
+    const newAdmin = {
+      id: apiResult?.userId || "col_" + Date.now(),
+      name: (collegeData.name || "College") + " Placement Cell",
+      email: collegeData.adminEmail,
+      role: "placement",
+      department: "Placement & Training Division",
+      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+      status: "Active",
+      collegeSlug: collegeData.slug
+    };
+    setUser(newAdmin);
+    setRole("placement");
+    return newAdmin;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -68,6 +110,8 @@ export function AuthProvider({ children }) {
         isAuthenticated: !!user,
         login,
         demoLogin,
+        register,
+        registerCollege,
         switchRole,
         logout
       }}

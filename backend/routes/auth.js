@@ -6,6 +6,10 @@ const collegeController = require('../controllers/collegeController');
 // POST /api/auth/login — domain-based login (public)
 router.post('/login', authController.login);
 
+// POST /api/auth/register — student registration (public)
+router.post('/register', authController.register);
+router.post('/register-student', authController.register);
+
 // POST /api/auth/register-college — register new college (public)
 router.post('/register-college', collegeController.registerCollege);
 
