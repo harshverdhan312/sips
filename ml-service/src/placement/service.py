@@ -1,3 +1,4 @@
+from functools import lru_cache
 from pathlib import Path
 
 import pandas as pd
@@ -6,8 +7,9 @@ import yaml
 from src.placement.persistence import load_model
 
 
-MODEL_PATH = Path("models/placement_model.joblib")
-METADATA_PATH = Path("models/placement_model_metadata.yaml")
+ML_SERVICE_ROOT = Path(__file__).resolve().parents[2]
+MODEL_PATH = ML_SERVICE_ROOT / "models" / "placement_model.joblib"
+METADATA_PATH = ML_SERVICE_ROOT / "models" / "placement_model_metadata.yaml"
 
 VALID_STREAMS = {
     "Civil",
@@ -17,6 +19,10 @@ VALID_STREAMS = {
     "Information Technology",
     "Mechanical",
 }
+
+
+class PlacementModelUnavailableError(RuntimeError):
+    """Raised when the placement model artifact is unavailable."""
 
 
 def load_metadata():
@@ -29,8 +35,15 @@ def load_metadata():
         return yaml.safe_load(file)
 
 
+@lru_cache(maxsize=1)
 def load_placement_model():
     """Load the persisted placement model."""
+    if not MODEL_PATH.is_file():
+        raise PlacementModelUnavailableError(
+            "Placement model artifact is unavailable. "
+            "Run the placement model training script before prediction."
+        )
+
     return load_model(MODEL_PATH)
 
 

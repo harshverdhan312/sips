@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 from src.api.main import app
+from src.placement import service as placement_service
 
 
 client = TestClient(app)
@@ -82,3 +83,36 @@ def test_extra_field_returns_422():
     )
 
     assert response.status_code == 422
+
+
+def test_health_does_not_require_model_artifact(monkeypatch, tmp_path):
+    monkeypatch.setattr(
+        placement_service,
+        "MODEL_PATH",
+        tmp_path / "missing-model.joblib",
+    )
+
+    response = client.get("/health")
+
+    assert response.status_code == 200
+
+
+def test_missing_model_returns_503(monkeypatch, tmp_path):
+    placement_service.load_placement_model.cache_clear()
+
+    monkeypatch.setattr(
+        placement_service,
+        "MODEL_PATH",
+        tmp_path / "missing-model.joblib",
+    )
+
+    response = client.post(
+        "/placement/predict",
+        json=VALID_STUDENT,
+    )
+
+    assert response.status_code == 503
+    assert response.json()["detail"] == (
+        "Placement model artifact is unavailable. "
+        "Run the placement model training script before prediction."
+    )

@@ -1,7 +1,10 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 
-from src.placement.service import predict_placement
+from src.placement.service import (
+    PlacementModelUnavailableError,
+    predict_placement,
+)
 
 
 router = APIRouter(
@@ -42,5 +45,10 @@ def placement_prediction(
     except ValueError as error:
         raise HTTPException(
             status_code=422,
+            detail=str(error),
+        ) from error
+    except PlacementModelUnavailableError as error:
+        raise HTTPException(
+            status_code=503,
             detail=str(error),
         ) from error
