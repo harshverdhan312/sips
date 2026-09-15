@@ -135,9 +135,13 @@ exports.uploadStudents = async (req, res) => {
           collegeId,
           name: s.name.trim(),
           rollNo: s.rollNo.trim(),
+          usn: s.usn || s.rollNo.trim(),
           email: s.email.toLowerCase().trim(),
           passwordHash,
-          skills: [],
+          branch: s.branch || 'Computer Science & Engineering',
+          batch: s.batch || '2025',
+          cgpa: s.cgpa !== undefined ? s.cgpa : 7.5,
+          skills: s.skills || [],
           github: '',
           resumeUrl: ''
         });
