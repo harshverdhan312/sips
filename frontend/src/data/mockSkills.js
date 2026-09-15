@@ -1,0 +1,193 @@
+export const skillCategories = [
+  "All",
+  "Programming",
+  "Frontend",
+  "Backend",
+  "Database",
+  "Cloud & DevOps",
+  "AI & ML",
+  "Soft Skills"
+];
+
+export const mockSkillsData = [
+  {
+    id: "sk_py",
+    name: "Python",
+    category: "Programming",
+    currentLevel: 88,
+    requiredLevel: 85,
+    gap: 0,
+    status: "Strong",
+    priority: "Low",
+    confidence: "High",
+    roadmap: "Advanced Concurrency & AsyncIO patterns",
+    endorsements: 14
+  },
+  {
+    id: "sk_react",
+    name: "React.js",
+    category: "Frontend",
+    currentLevel: 85,
+    requiredLevel: 80,
+    gap: 0,
+    status: "Strong",
+    priority: "Low",
+    confidence: "High",
+    roadmap: "Next.js SSR & Server Components",
+    endorsements: 19
+  },
+  {
+    id: "sk_js",
+    name: "JavaScript (ES6+)",
+    category: "Programming",
+    currentLevel: 82,
+    requiredLevel: 85,
+    gap: 3,
+    status: "Proficient",
+    priority: "Medium",
+    confidence: "High",
+    roadmap: "Master Event Loop, Prototype & Closures",
+    endorsements: 16
+  },
+  {
+    id: "sk_sql",
+    name: "SQL & Query Optimization",
+    category: "Database",
+    currentLevel: 72,
+    requiredLevel: 85,
+    gap: 13,
+    status: "Needs Improvement",
+    priority: "High",
+    confidence: "Medium",
+    roadmap: "Indexes, Window Functions & Execution Plans",
+    endorsements: 8
+  },
+  {
+    id: "sk_docker",
+    name: "Docker & Containerization",
+    category: "Cloud & DevOps",
+    currentLevel: 55,
+    requiredLevel: 75,
+    gap: 20,
+    status: "Needs Improvement",
+    priority: "High",
+    confidence: "Low",
+    roadmap: "Multi-stage builds, compose networks, volumes",
+    endorsements: 5
+  },
+  {
+    id: "sk_aws",
+    name: "AWS Cloud Services",
+    category: "Cloud & DevOps",
+    currentLevel: 50,
+    requiredLevel: 70,
+    gap: 20,
+    status: "Needs Improvement",
+    priority: "High",
+    confidence: "Low",
+    roadmap: "EC2, S3, Lambda, IAM policies & VPC basics",
+    endorsements: 4
+  },
+  {
+    id: "sk_sys_design",
+    name: "System Design & Scalability",
+    category: "Backend",
+    currentLevel: 58,
+    requiredLevel: 80,
+    gap: 22,
+    status: "Needs Improvement",
+    priority: "High",
+    confidence: "Low",
+    roadmap: "Caching (Redis), Load Balancing, Sharding & CAP theorem",
+    endorsements: 6
+  },
+  {
+    id: "sk_node",
+    name: "Node.js & Express",
+    category: "Backend",
+    currentLevel: 76,
+    requiredLevel: 80,
+    gap: 4,
+    status: "Proficient",
+    priority: "Medium",
+    confidence: "Medium",
+    roadmap: "Microservices design & Streams API",
+    endorsements: 11
+  },
+  {
+    id: "sk_git",
+    name: "Git & Version Control",
+    category: "DevOps",
+    currentLevel: 90,
+    requiredLevel: 80,
+    gap: 0,
+    status: "Strong",
+    priority: "Low",
+    confidence: "High",
+    roadmap: "Rebase workflows, cherry-pick & bisect",
+    endorsements: 22
+  },
+  {
+    id: "sk_aiml",
+    name: "Machine Learning & Scikit-Learn",
+    category: "AI & ML",
+    currentLevel: 68,
+    requiredLevel: 75,
+    gap: 7,
+    status: "Proficient",
+    priority: "Medium",
+    confidence: "Medium",
+    roadmap: "Feature engineering, cross-validation & hyperparameter tuning",
+    endorsements: 9
+  },
+  {
+    id: "sk_comm",
+    name: "Verbal Communication",
+    category: "Soft Skills",
+    currentLevel: 72,
+    requiredLevel: 85,
+    gap: 13,
+    status: "Needs Improvement",
+    priority: "High",
+    confidence: "Medium",
+    roadmap: "Speech pacing (target 130-150 WPM) & concise articulation",
+    endorsements: 12
+  },
+  {
+    id: "sk_star",
+    name: "STAR Behavioral Structuring",
+    category: "Soft Skills",
+    currentLevel: 65,
+    requiredLevel: 85,
+    gap: 20,
+    status: "Needs Improvement",
+    priority: "High",
+    confidence: "Medium",
+    roadmap: "Quantifiable Result framing with impact metrics",
+    endorsements: 7
+  },
+  {
+    id: "sk_team",
+    name: "Team Collaboration & Conflict",
+    category: "Soft Skills",
+    currentLevel: 82,
+    requiredLevel: 80,
+    gap: 0,
+    status: "Strong",
+    priority: "Low",
+    confidence: "High",
+    roadmap: "Cross-functional leadership scenarios",
+    endorsements: 15
+  }
+];
+
+export const radarSkillCategoryData = [
+  { subject: "Programming", A: 85, B: 85, fullMark: 100 },
+  { subject: "Frontend", A: 85, B: 80, fullMark: 100 },
+  { subject: "Backend", A: 67, B: 80, fullMark: 100 },
+  { subject: "Database", A: 72, B: 85, fullMark: 100 },
+  { subject: "Cloud/DevOps", A: 55, B: 75, fullMark: 100 },
+  { subject: "AI/ML", A: 68, B: 75, fullMark: 100 },
+  { subject: "Communication", A: 72, B: 85, fullMark: 100 },
+  { subject: "Behavioral", A: 70, B: 85, fullMark: 100 }
+];
