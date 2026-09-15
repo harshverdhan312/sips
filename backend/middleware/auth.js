@@ -8,7 +8,8 @@ module.exports = (req, res, next) => {
 
   const token = authHeader.split(' ')[1];
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const secret = process.env.JWT_SECRET || 'sips-dev-secret-key-2025';
+    const decoded = jwt.verify(token, secret);
     // decoded: { id, role, collegeId, collegeSlug }
     req.user = decoded;
     next();

@@ -1,7 +1,9 @@
 const College = require('../models/College');
 const Student = require('../models/Student');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const { parseCSV } = require('../utils/csvParser');
+const memoryDb = require('../utils/memoryDb');
 
 /**
  * POST /api/auth/register-college
@@ -12,69 +14,147 @@ exports.registerCollege = async (req, res) => {
     const { name, slug, adminEmail, masterPassword, acceptedDomains } = req.body;
 
     // Validate required fields
-    if (!name || !slug || !adminEmail || !masterPassword || !acceptedDomains?.length) {
+    if (!name || !adminEmail || !masterPassword) {
       return res.status(400).json({ 
-        message: 'All fields are required: name, slug, adminEmail, masterPassword, acceptedDomains' 
+        message: 'Name, admin email, and master password are required' 
       });
     }
 
-    // Validate slug format
-    if (!/^[a-z0-9-]+$/.test(slug)) {
-      return res.status(400).json({ 
-        message: 'Slug must contain only lowercase letters, numbers, and hyphens' 
+    if (masterPassword.length < 4) {
+      return res.status(400).json({
+        message: 'Password must be at least 4 characters long'
       });
     }
 
-    // Validate admin email domain matches one of the accepted domains
-    const adminDomain = adminEmail.toLowerCase().split('@')[1];
-    const normalizedDomains = acceptedDomains.map(d => d.toLowerCase().trim());
+    // Auto-sanitize slug (lowercase, alphanumeric, hyphens)
+    const cleanSlug = (slug || name || 'college')
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9-]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+
+    // Normalize accepted domains
+    const rawDomains = Array.isArray(acceptedDomains) 
+      ? acceptedDomains 
+      : String(acceptedDomains || '').split(',');
     
+    const normalizedDomains = rawDomains
+      .map(d => d.toLowerCase().trim().replace(/^@/, ''))
+      .filter(Boolean);
+
+    const emailParts = adminEmail.toLowerCase().trim().split('@');
+    if (emailParts.length !== 2) {
+      return res.status(400).json({ message: 'Invalid admin email address format' });
+    }
+    const adminDomain = emailParts[1];
+
+    // Admin domain must match one of the accepted domains
     if (!normalizedDomains.includes(adminDomain)) {
       return res.status(400).json({ 
-        message: 'Admin email domain must match one of the accepted domains' 
+        message: `Admin email domain must match one of the accepted domains (${normalizedDomains.join(', ')})` 
       });
     }
 
-    // Check slug uniqueness
-    const existingSlug = await College.findOne({ slug: slug.toLowerCase() });
-    if (existingSlug) {
-      return res.status(400).json({ message: 'This slug is already taken' });
-    }
-
-    // Check domain uniqueness across all colleges
-    const existingDomain = await College.findOne({ 
-      acceptedDomains: { $in: normalizedDomains } 
-    });
-    if (existingDomain) {
-      return res.status(400).json({ 
-        message: 'One or more domains are already registered by another college' 
-      });
-    }
-
-    // Hash master password
-    const salt = await bcrypt.genSalt(12);
+    const salt = await bcrypt.genSalt(10);
     const masterPasswordHash = await bcrypt.hash(masterPassword, salt);
+    const secret = process.env.JWT_SECRET || 'sips-dev-secret-key-2025';
 
-    const college = new College({
+    // 1. Mongoose Connected Mode
+    if (memoryDb.isMongoConnected()) {
+      const existingSlug = await College.findOne({ slug: cleanSlug });
+      if (existingSlug) {
+        return res.status(400).json({ 
+          message: `Institution slug "${cleanSlug}" is already registered. Please choose a different slug or sign in.` 
+        });
+      }
+
+      const existingDomain = await College.findOne({ 
+        acceptedDomains: { $in: normalizedDomains } 
+      });
+      if (existingDomain && existingDomain.adminEmail !== adminEmail.toLowerCase().trim()) {
+        return res.status(400).json({ 
+          message: 'One or more of these domains are already registered by another institution.' 
+        });
+      }
+
+      const college = new College({
+        name: name.trim(),
+        slug: cleanSlug,
+        adminEmail: adminEmail.toLowerCase().trim(),
+        masterPasswordHash,
+        acceptedDomains: normalizedDomains
+      });
+
+      await college.save();
+
+      const token = jwt.sign(
+        {
+          id: college._id,
+          role: 'COLLEGE_ADMIN',
+          collegeId: college._id,
+          collegeSlug: college.slug,
+          email: college.adminEmail
+        },
+        secret,
+        { expiresIn: '7d' }
+      );
+
+      return res.status(201).json({ 
+        success: true,
+        message: 'College registered successfully',
+        token,
+        role: 'COLLEGE_ADMIN',
+        collegeSlug: college.slug,
+        collegeName: college.name,
+        userId: college._id
+      });
+    }
+
+    // 2. Resilient In-Memory Mode (when MongoDB is offline)
+    const existingMemorySlug = memoryDb.findCollegeBySlug(cleanSlug);
+    if (existingMemorySlug && existingMemorySlug.adminEmail !== adminEmail.toLowerCase().trim()) {
+      return res.status(400).json({ 
+        message: `Institution slug "${cleanSlug}" is already registered. Please sign in or use a different slug.` 
+      });
+    }
+
+    const memoryCollege = memoryDb.saveCollege({
       name: name.trim(),
-      slug: slug.toLowerCase().trim(),
+      slug: cleanSlug,
       adminEmail: adminEmail.toLowerCase().trim(),
       masterPasswordHash,
       acceptedDomains: normalizedDomains
     });
 
-    await college.save();
+    const token = jwt.sign(
+      {
+        id: memoryCollege._id,
+        role: 'COLLEGE_ADMIN',
+        collegeId: memoryCollege._id,
+        collegeSlug: memoryCollege.slug,
+        email: memoryCollege.adminEmail
+      },
+      secret,
+      { expiresIn: '7d' }
+    );
 
-    res.status(201).json({ 
+    return res.status(201).json({ 
+      success: true,
       message: 'College registered successfully',
-      collegeSlug: college.slug 
+      token,
+      role: 'COLLEGE_ADMIN',
+      collegeSlug: memoryCollege.slug,
+      collegeName: memoryCollege.name,
+      userId: memoryCollege._id
     });
+
   } catch (error) {
     console.error('Registration error:', error);
     if (error.code === 11000) {
-      return res.status(400).json({ message: 'College name, slug, or domain already exists' });
+      return res.status(400).json({ message: 'College name, slug, or domain already exists. Please choose another.' });
     }
-    res.status(500).json({ message: 'Server error during registration' });
+    res.status(500).json({ message: 'Server error during registration: ' + (error.message || error) });
   }
 };
 
@@ -85,6 +165,63 @@ exports.registerCollege = async (req, res) => {
 exports.uploadStudents = async (req, res) => {
   try {
     const collegeId = req.collegeId;
+
+    if (!memoryDb.isMongoConnected()) {
+      const college = memoryDb.findCollegeById(collegeId);
+      if (!college) {
+        return res.status(404).json({ message: 'College not found' });
+      }
+
+      let studentsData;
+      let parseErrors = [];
+
+      if (req.body.csvText) {
+        const parsed = parseCSV(req.body.csvText);
+        studentsData = parsed.students;
+        parseErrors = parsed.errors;
+      } else if (req.body.students && Array.isArray(req.body.students)) {
+        studentsData = req.body.students;
+      } else {
+        return res.status(400).json({ message: 'Provide csvText or students array' });
+      }
+
+      const results = { success: 0, failed: 0, errors: [...parseErrors], total: studentsData.length };
+      const salt = await bcrypt.genSalt(10);
+
+      for (const s of studentsData) {
+        const domain = (s.email || '').toLowerCase().split('@')[1];
+        if (college.acceptedDomains.length > 0 && !college.acceptedDomains.includes(domain)) {
+          results.failed++;
+          results.errors.push(`${s.email}: Domain "${domain}" not in accepted domains`);
+          continue;
+        }
+
+        const existing = memoryDb.findStudentByEmail(s.email, collegeId);
+        if (existing) {
+          results.failed++;
+          results.errors.push(`${s.email}: Already exists`);
+          continue;
+        }
+
+        const passwordHash = await bcrypt.hash(s.rollNo, salt);
+        memoryDb.saveStudent({
+          collegeId,
+          name: s.name.trim(),
+          rollNo: s.rollNo.trim(),
+          usn: s.usn || s.rollNo.trim(),
+          email: s.email.toLowerCase().trim(),
+          passwordHash,
+          branch: s.branch || 'Computer Science & Engineering',
+          batch: s.batch || '2025',
+          cgpa: s.cgpa !== undefined ? s.cgpa : 7.5,
+          skills: s.skills || []
+        });
+        results.success++;
+      }
+
+      return res.json(results);
+    }
+
     const college = await College.findById(collegeId);
     if (!college) {
       return res.status(404).json({ message: 'College not found' });
@@ -135,9 +272,13 @@ exports.uploadStudents = async (req, res) => {
           collegeId,
           name: s.name.trim(),
           rollNo: s.rollNo.trim(),
+          usn: s.usn || s.rollNo.trim(),
           email: s.email.toLowerCase().trim(),
           passwordHash,
-          skills: [],
+          branch: s.branch || 'Computer Science & Engineering',
+          batch: s.batch || '2025',
+          cgpa: s.cgpa !== undefined ? s.cgpa : 7.5,
+          skills: s.skills || [],
           github: '',
           resumeUrl: ''
         });
@@ -163,6 +304,11 @@ exports.uploadStudents = async (req, res) => {
  */
 exports.getStudents = async (req, res) => {
   try {
+    if (!memoryDb.isMongoConnected()) {
+      const students = memoryDb.getStudents(req.collegeId);
+      return res.json(students);
+    }
+
     const students = await Student.find({ collegeId: req.collegeId })
       .select('-passwordHash')
       .sort({ name: 1 });
@@ -179,6 +325,18 @@ exports.getStudents = async (req, res) => {
  */
 exports.getCollegeBySlug = async (req, res) => {
   try {
+    if (!memoryDb.isMongoConnected()) {
+      const college = memoryDb.findCollegeBySlug(req.params.slug);
+      if (!college) {
+        return res.status(404).json({ message: 'College not found' });
+      }
+      return res.json({
+        name: college.name,
+        slug: college.slug,
+        acceptedDomains: college.acceptedDomains
+      });
+    }
+
     const college = await College.findOne({ slug: req.params.slug })
       .select('name slug acceptedDomains');
     if (!college) {

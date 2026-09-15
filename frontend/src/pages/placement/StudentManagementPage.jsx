@@ -2,9 +2,12 @@ import React, { useState, useEffect } from "react";
 import {
   Users,
   Download,
-  Eye
+  Eye,
+  UserPlus,
+  KeyRound
 } from "lucide-react";
 import { placementService } from "../../services/placementService";
+import { adminService } from "../../services/adminService";
 import { DataTable } from "../../components/common/DataTable";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
@@ -20,6 +23,19 @@ export function StudentManagementPage() {
   // Selected student modal
   const [activeStudent, setActiveStudent] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+
+  // Add Student modal
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [savingStudent, setSavingStudent] = useState(false);
+  const [newStudent, setNewStudent] = useState({
+    name: "",
+    email: "",
+    rollNo: "",
+    branch: "Computer Science & Engineering",
+    batch: "2025",
+    cgpa: "7.5",
+    password: ""
+  });
 
   useEffect(() => {
     async function load() {
@@ -37,7 +53,42 @@ export function StudentManagementPage() {
   }, [selectedBranch, selectedStatus]);
 
   const handleExportCsv = () => {
-    addToast("Exporting 480 Student Placement Readiness records to CSV...", "info");
+    addToast("Exporting Student Placement Readiness records to CSV...", "info");
+  };
+
+  const handleCreateStudent = async (e) => {
+    e.preventDefault();
+    if (!newStudent.name || !newStudent.email || !newStudent.rollNo) {
+      addToast("Please fill in Name, Email, and Roll No / USN", "warning");
+      return;
+    }
+
+    setSavingStudent(true);
+    try {
+      const res = await adminService.createStudent(newStudent);
+      addToast(`Student ${res.student.name} created! Password: ${res.student.initialPassword}`, "success");
+      setAddModalOpen(false);
+      setNewStudent({
+        name: "",
+        email: "",
+        rollNo: "",
+        branch: "Computer Science & Engineering",
+        batch: "2025",
+        cgpa: "7.5",
+        password: ""
+      });
+
+      // Reload students from backend
+      const data = await placementService.getStudents({
+        branch: selectedBranch,
+        status: selectedStatus
+      });
+      setStudents(data);
+    } catch (err) {
+      addToast(err.message || "Failed to create student account", "error");
+    } finally {
+      setSavingStudent(false);
+    }
   };
 
   const handleViewStudent = (student) => {
@@ -171,9 +222,19 @@ export function StudentManagementPage() {
           </p>
         </div>
 
-        <Button variant="secondary" size="sm" icon={Download} onClick={handleExportCsv}>
-          Export Roster (CSV)
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="primary"
+            size="sm"
+            icon={UserPlus}
+            onClick={() => setAddModalOpen(true)}
+          >
+            Add Student
+          </Button>
+          <Button variant="secondary" size="sm" icon={Download} onClick={handleExportCsv}>
+            Export Roster (CSV)
+          </Button>
+        </div>
       </div>
 
       {/* Filter Bar and DataTable */}
@@ -354,6 +415,149 @@ export function StudentManagementPage() {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Add Student Modal */}
+      <Modal
+        isOpen={addModalOpen}
+        onClose={() => setAddModalOpen(false)}
+        maxWidth="max-w-xl"
+        title="Provision New Student Account"
+        subtitle="Create an individual student account with institutional login credentials"
+      >
+        <form onSubmit={handleCreateStudent} className="space-y-4">
+          <div>
+            <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+              Full Name *
+            </label>
+            <input
+              type="text"
+              required
+              value={newStudent.name}
+              onChange={(e) => setNewStudent({ ...newStudent, name: e.target.value })}
+              placeholder="e.g. Aarav Sharma"
+              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+              Institutional Email *
+            </label>
+            <input
+              type="email"
+              required
+              value={newStudent.email}
+              onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
+              placeholder="e.g. aarav@rvce.edu"
+              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                Roll No / USN *
+              </label>
+              <input
+                type="text"
+                required
+                value={newStudent.rollNo}
+                onChange={(e) => setNewStudent({ ...newStudent, rollNo: e.target.value })}
+                placeholder="1RV21CS001"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                Batch *
+              </label>
+              <select
+                value={newStudent.batch}
+                onChange={(e) => setNewStudent({ ...newStudent, batch: e.target.value })}
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+              >
+                <option value="2025">Batch 2025</option>
+                <option value="2026">Batch 2026</option>
+                <option value="2027">Batch 2027</option>
+                <option value="2024">Batch 2024</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                Department / Branch *
+              </label>
+              <select
+                value={newStudent.branch}
+                onChange={(e) => setNewStudent({ ...newStudent, branch: e.target.value })}
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+              >
+                <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                <option value="Information Science & Engineering">Information Science & Engineering</option>
+                <option value="Electronics & Communication Engineering">Electronics & Communication Engineering</option>
+                <option value="Electrical & Electronics Engineering">Electrical & Electronics Engineering</option>
+                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                <option value="Civil Engineering">Civil Engineering</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                CGPA (0 - 10)
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                max="10"
+                value={newStudent.cgpa}
+                onChange={(e) => setNewStudent({ ...newStudent, cgpa: e.target.value })}
+                placeholder="7.5"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1 flex items-center justify-between">
+              <span>Initial Password</span>
+              <span className="text-[10px] text-slate-400 lowercase font-normal">
+                (defaults to Roll No / USN if blank)
+              </span>
+            </label>
+            <input
+              type="text"
+              value={newStudent.password}
+              onChange={(e) => setNewStudent({ ...newStudent, password: e.target.value })}
+              placeholder="Leave blank to use Roll No as password"
+              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+            />
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setAddModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              loading={savingStudent}
+              icon={UserPlus}
+            >
+              Create Student Account
+            </Button>
+          </div>
+        </form>
       </Modal>
     </div>
   );
