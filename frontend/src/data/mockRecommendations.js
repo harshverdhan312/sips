@@ -1,0 +1,80 @@
+export const mockRecommendationsList = [
+  {
+    id: "rec_01",
+    category: "skills",
+    title: "Master Docker Multi-Stage Builds & Compose",
+    provider: "SIPS Skill Engine",
+    reason: "Docker is required in 82% of target Cloud SDE drives. Your current score is 55/100.",
+    difficulty: "Intermediate",
+    estTime: "6 hours",
+    priority: "High",
+    impact: "+6% Employability Index",
+    actionText: "Start Learning Path",
+    status: "In Progress"
+  },
+  {
+    id: "rec_02",
+    category: "courses",
+    title: "Distributed Systems & System Design Primer",
+    provider: "Coursera / Alex Xu",
+    reason: "Addresses 22% gap in backend scalability. Highly recommended before Google/Amazon rounds.",
+    difficulty: "Advanced",
+    estTime: "12 hours",
+    priority: "High",
+    impact: "+8% Placement Probability",
+    actionText: "View Course",
+    status: "Recommended"
+  },
+  {
+    id: "rec_03",
+    category: "practice",
+    title: "SQL Window Functions & Indexing Speed Drill",
+    provider: "LeetCode Database 50",
+    reason: "Your SQL score is 72/100; Morgan Stanley and Microsoft test complex joins and execution plans.",
+    difficulty: "Intermediate",
+    estTime: "3 hours",
+    priority: "Medium",
+    impact: "+4% Technical Score",
+    actionText: "Solve 15 Problems",
+    status: "Recommended"
+  },
+  {
+    id: "rec_04",
+    category: "interviews",
+    title: "Simulated Amazon Leadership Principles Behavioral Round",
+    provider: "SIPS AI Mock Interviewer",
+    reason: "Strengthen STAR responses for 'Customer Obsession' and 'Deliver Results' scenarios.",
+    difficulty: "Medium",
+    estTime: "30 mins",
+    priority: "High",
+    impact: "+7% Soft Skill Index",
+    actionText: "Start AI Mock",
+    status: "Recommended"
+  },
+  {
+    id: "rec_05",
+    category: "jobs",
+    title: "Google Early Career Software Engineer (Campus 2025)",
+    provider: "Google India",
+    reason: "92% profile compatibility. Exceeds CGPA threshold (8.74 vs 8.0).",
+    difficulty: "Competitive",
+    estTime: "Apply before Apr 15",
+    priority: "High",
+    impact: "38 LPA Opportunity",
+    actionText: "Review & Apply",
+    status: "Drive Active"
+  },
+  {
+    id: "rec_06",
+    category: "skills",
+    title: "AWS S3, Lambda & DynamoDB Serverless Patterns",
+    provider: "AWS Skill Builder",
+    reason: "Bridge your 20% cloud proficiency gap with hands-on serverless microservices.",
+    difficulty: "Intermediate",
+    estTime: "8 hours",
+    priority: "Medium",
+    impact: "+5% Employability Index",
+    actionText: "Explore Labs",
+    status: "Recommended"
+  }
+];
