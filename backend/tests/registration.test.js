@@ -36,110 +36,19 @@ describe('Registration Functionality (Student & College)', () => {
   });
 
   describe('Student Registration (authController.register)', () => {
-    test('should register student successfully and return token with role STUDENT', async () => {
-      const mockCollege = {
-        _id: mockCollegeId,
-        name: 'RV College of Engineering',
-        slug: 'rvce',
-        acceptedDomains: ['rvce.edu']
-      };
-
-      College.findOne.mockResolvedValue(mockCollege);
-      Student.findOne.mockResolvedValue(null);
-
-      const mockSavedStudent = {
-        _id: '507f1f77bcf86cd799439099',
-        name: 'Aarav Sharma',
-        rollNo: '1RV21CS001',
-        usn: '1RV21CS001',
-        email: 'aarav@rvce.edu',
-        branch: 'Computer Science & Engineering',
-        batch: '2025',
-        placementStatus: 'UNPLACED',
-        save: jest.fn().mockResolvedValue(true)
-      };
-
-      Student.mockImplementation(() => mockSavedStudent);
-
+    test('should reject student self-registration with 403 (disabled per requirements)', async () => {
       const req = createMockReq({
         name: 'Aarav Sharma',
         email: 'aarav@rvce.edu',
         password: 'Password123',
-        rollNo: '1RV21CS001',
-        branch: 'Computer Science & Engineering',
-        batch: '2025'
+        rollNo: '1RV21CS001'
       });
       const res = createMockRes();
 
       await authController.register(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.body.success).toBe(true);
-      expect(res.body.token).toBeDefined();
-      expect(res.body.role).toBe('STUDENT');
-      expect(res.body.student.name).toBe('Aarav Sharma');
-      expect(mockSavedStudent.save).toHaveBeenCalled();
-    });
-
-    test('should reject registration if required fields are missing', async () => {
-      const req = createMockReq({ name: 'Aarav', email: 'aarav@rvce.edu' });
-      const res = createMockRes();
-
-      await authController.register(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.body.message).toContain('required');
-    });
-
-    test('should reject registration if password is under 6 characters', async () => {
-      const req = createMockReq({
-        name: 'Aarav',
-        email: 'aarav@rvce.edu',
-        password: '123',
-        rollNo: 'CS01'
-      });
-      const res = createMockRes();
-
-      await authController.register(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.body.message).toContain('6 characters');
-    });
-
-    test('should reject if email domain is not registered with any college', async () => {
-      College.findOne.mockResolvedValue(null);
-
-      const req = createMockReq({
-        name: 'Aarav',
-        email: 'aarav@unknowncollege.edu',
-        password: 'Password123',
-        rollNo: 'CS01'
-      });
-      const res = createMockRes();
-
-      await authController.register(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.body.message).toContain('not registered with any institution');
-    });
-
-    test('should reject if student with email already exists in college with 409', async () => {
-      const mockCollege = { _id: mockCollegeId, slug: 'rvce' };
-      College.findOne.mockResolvedValue(mockCollege);
-      Student.findOne.mockResolvedValue({ email: 'aarav@rvce.edu', rollNo: 'CS01' });
-
-      const req = createMockReq({
-        name: 'Aarav',
-        email: 'aarav@rvce.edu',
-        password: 'Password123',
-        rollNo: 'CS01'
-      });
-      const res = createMockRes();
-
-      await authController.register(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(409);
-      expect(res.body.message).toContain('already registered');
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.body.message).toContain('Student self-registration is disabled');
     });
   });
 

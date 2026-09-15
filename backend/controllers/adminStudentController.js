@@ -416,3 +416,105 @@ exports.exportStudentsCSV = async (req, res) => {
     res.status(500).json({ message: 'Server error exporting students' });
   }
 };
+
+/**
+ * POST /api/admin/students
+ * Placement Administrator provisions an individual student account with initial password
+ */
+exports.createStudent = async (req, res) => {
+  try {
+    const {
+      name,
+      email,
+      rollNo,
+      usn,
+      password,
+      branch,
+      batch,
+      cgpa,
+      skills
+    } = req.body;
+
+    if (!name || !email || (!rollNo && !usn)) {
+      return res.status(400).json({
+        message: 'Name, email, and roll number (or USN) are required'
+      });
+    }
+
+    const emailClean = email.toLowerCase().trim();
+    const finalRollNo = (rollNo || usn).trim();
+
+    // Check for duplicate email or roll number within this college
+    const existing = await Student.findOne({
+      $or: [
+        { email: emailClean, collegeId: req.collegeId },
+        { rollNo: finalRollNo, collegeId: req.collegeId }
+      ]
+    });
+
+    if (existing) {
+      if (existing.email === emailClean) {
+        return res.status(409).json({ message: 'A student with this email is already registered in your institution.' });
+      }
+      return res.status(409).json({ message: 'A student with this roll number/USN is already registered in your institution.' });
+    }
+
+    // Default password to provided password or student roll number
+    const initialPassword = (password && password.trim().length >= 4) ? password.trim() : finalRollNo;
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(initialPassword, salt);
+
+    const student = new Student({
+      collegeId: req.collegeId,
+      name: name.trim(),
+      rollNo: finalRollNo,
+      usn: (usn || finalRollNo).trim(),
+      email: emailClean,
+      passwordHash,
+      branch: (branch || 'Computer Science & Engineering').trim(),
+      batch: (batch || '2025').trim(),
+      cgpa: cgpa !== undefined ? Math.max(0, Math.min(10, parseFloat(cgpa) || 7.0)) : 7.0,
+      skills: Array.isArray(skills) ? skills.map(s => s.trim()).filter(Boolean) : [],
+      placementStatus: 'UNPLACED',
+      readinessScore: 65,
+      technicalScore: 65,
+      softSkillScore: 65,
+      resumeScore: 65
+    });
+
+    await student.save();
+
+    // Log administrative action
+    await AuditLog.create({
+      collegeId: req.collegeId,
+      action: 'CREATE_STUDENT',
+      actor: req.user?.email || 'Placement Admin',
+      target: `${student.name} (${student.email})`,
+      details: { rollNo: student.rollNo, branch: student.branch, batch: student.batch }
+    }).catch(err => console.error('AuditLog error:', err));
+
+    res.status(201).json({
+      success: true,
+      message: 'Student account created successfully',
+      student: {
+        id: student._id,
+        _id: student._id,
+        name: student.name,
+        email: student.email,
+        rollNo: student.rollNo,
+        usn: student.usn,
+        branch: student.branch,
+        batch: student.batch,
+        cgpa: student.cgpa,
+        placementStatus: student.placementStatus,
+        readinessScore: student.readinessScore,
+        skills: student.skills,
+        initialPassword: initialPassword
+      }
+    });
+  } catch (error) {
+    console.error('Admin createStudent error:', error);
+    res.status(500).json({ message: 'Server error creating student' });
+  }
+};
+

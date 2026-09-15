@@ -17,7 +17,7 @@ import { useNotifications } from "../../context/NotificationContext";
 import { cn } from "../../utils/cn";
 
 export function TopNavbar({ onMenuClick }) {
-  const { user, role, switchRole, logout } = useAuth();
+  const { user, role, logout } = useAuth();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const navigate = useNavigate();
 
@@ -39,11 +39,6 @@ export function TopNavbar({ onMenuClick }) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  const handleRoleChange = (newRole) => {
-    switchRole(newRole);
-    navigate(`/${newRole}/dashboard`);
-  };
 
   return (
     <header className="sticky top-0 z-30 h-16 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 flex items-center justify-between gap-4">
@@ -69,48 +64,13 @@ export function TopNavbar({ onMenuClick }) {
 
       {/* Right items: Role Switcher, Notifications, Profile */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Quick Role Switcher Pill - Crucial for Paired/Demo Testing */}
-        <div className="hidden md:flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200/60">
-          <span className="text-[11px] font-semibold text-slate-400 px-2 uppercase tracking-wider">
-            Role:
-          </span>
-          <button
-            onClick={() => handleRoleChange("student")}
-            className={cn(
-              "px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5",
-              role === "student"
-                ? "bg-white text-indigo-700 shadow-xs"
-                : "text-slate-600 hover:text-slate-900"
-            )}
-          >
-            <GraduationCap className="w-3.5 h-3.5" />
-            Student
-          </button>
-          <button
-            onClick={() => handleRoleChange("placement")}
-            className={cn(
-              "px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5",
-              role === "placement"
-                ? "bg-white text-indigo-700 shadow-xs"
-                : "text-slate-600 hover:text-slate-900"
-            )}
-          >
-            <Building2 className="w-3.5 h-3.5" />
-            Placement
-          </button>
-          <button
-            onClick={() => handleRoleChange("admin")}
-            className={cn(
-              "px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5",
-              role === "admin"
-                ? "bg-white text-indigo-700 shadow-xs"
-                : "text-slate-600 hover:text-slate-900"
-            )}
-          >
-            <Shield className="w-3.5 h-3.5" />
-            Admin
-          </button>
-        </div>
+        {/* Institutional Campus Badge */}
+        {user?.collegeName && (
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-slate-100 rounded-xl text-xs font-semibold text-slate-700 border border-slate-200/60">
+            <Building2 className="w-3.5 h-3.5 text-indigo-600" />
+            <span className="truncate max-w-[160px]">{user.collegeName}</span>
+          </div>
+        )}
 
         {/* Notifications Dropdown */}
         <div className="relative" ref={notifRef}>

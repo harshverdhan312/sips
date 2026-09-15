@@ -1,105 +1,122 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { mockUsers } from "../data/mockUsers";
 import { authService } from "../services/authService";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem("sips_auth_user");
-    if (saved) {
+    const token = localStorage.getItem("sips_token");
+    const savedUser = localStorage.getItem("sips_auth_user");
+    if (token && savedUser) {
       try {
-        return JSON.parse(saved);
+        return JSON.parse(savedUser);
       } catch (e) {
-        console.error(e);
+        console.error("Failed to parse saved auth user:", e);
       }
     }
-    // Default to student demo user
-    return mockUsers[0];
+    return null;
   });
 
-  const [role, setRole] = useState(() => user?.role || "student");
+  const [role, setRole] = useState(() => user?.role || null);
 
   useEffect(() => {
-    if (user) {
+    if (user && localStorage.getItem("sips_token")) {
       localStorage.setItem("sips_auth_user", JSON.stringify(user));
       setRole(user.role);
     } else {
       localStorage.removeItem("sips_auth_user");
+      setRole(null);
     }
   }, [user]);
 
-  const login = (email, password, chosenRole) => {
-    // Look up mock user or match by role
-    let found = mockUsers.find((u) => u.email.toLowerCase() === email.toLowerCase());
-    if (!found) {
-      found = mockUsers.find((u) => u.role === chosenRole) || mockUsers[0];
+  /**
+   * Real authenticated login via backend API
+   */
+  const login = async (identifier, password) => {
+    const data = await authService.login(identifier, password);
+
+    if (!data || !data.token) {
+      throw new Error(data?.message || "Authentication failed");
     }
-    setUser(found);
-    setRole(found.role);
-    return found;
+
+    localStorage.setItem("sips_token", data.token);
+
+    let mappedRole = "student";
+    let userData = {};
+
+    if (data.role === "COLLEGE_ADMIN") {
+      mappedRole = "placement";
+      userData = {
+        id: data.userId,
+        name: data.collegeName ? `${data.collegeName} Placement Cell` : "Placement Administration",
+        email: identifier.includes("@") ? identifier : `${data.collegeSlug || "admin"}@college.edu`,
+        role: "placement",
+        backendRole: data.role,
+        collegeSlug: data.collegeSlug,
+        collegeName: data.collegeName,
+        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
+        status: "Active"
+      };
+    } else {
+      mappedRole = "student";
+      userData = {
+        id: data.userId,
+        name: data.studentName || "Student Candidate",
+        email: identifier.includes("@") ? identifier : "",
+        rollNo: !identifier.includes("@") ? identifier : "",
+        role: "student",
+        backendRole: data.role,
+        collegeSlug: data.collegeSlug,
+        collegeName: data.collegeName,
+        avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+        status: "Active"
+      };
+    }
+
+    localStorage.setItem("sips_auth_user", JSON.stringify(userData));
+    setUser(userData);
+    setRole(mappedRole);
+
+    return { user: userData, role: mappedRole };
   };
 
-  const demoLogin = (targetRole) => {
-    const found = mockUsers.find((u) => u.role === targetRole) || mockUsers[0];
-    setUser(found);
-    setRole(found.role);
-    return found;
-  };
+  /**
+   * Register a new institution / college placement cell
+   */
+  const registerCollege = async (collegeData) => {
+    const data = await authService.registerCollege(collegeData);
 
-  const switchRole = (newRole) => {
-    const found = mockUsers.find((u) => u.role === newRole);
-    if (found) {
-      setUser(found);
-      setRole(found.role);
+    if (!data || !data.token) {
+      throw new Error(data?.message || "College registration failed");
     }
+
+    localStorage.setItem("sips_token", data.token);
+
+    const newAdmin = {
+      id: data.college?._id || data.userId || "col_" + Date.now(),
+      name: `${collegeData.name} Placement Cell`,
+      email: collegeData.adminEmail,
+      role: "placement",
+      backendRole: "COLLEGE_ADMIN",
+      collegeSlug: collegeData.slug,
+      collegeName: collegeData.name,
+      department: "Placement & Training Division",
+      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+      status: "Active"
+    };
+
+    localStorage.setItem("sips_auth_user", JSON.stringify(newAdmin));
+    setUser(newAdmin);
+    setRole("placement");
+
+    return newAdmin;
   };
 
   const logout = () => {
+    localStorage.removeItem("sips_token");
+    localStorage.removeItem("sips_auth_user");
     setUser(null);
     setRole(null);
-    localStorage.removeItem("sips_auth_user");
-  };
-
-  const register = async (studentData) => {
-    const apiResult = await authService.registerStudent(studentData);
-    if (apiResult && apiResult.token) {
-      localStorage.setItem("sips_token", apiResult.token);
-    }
-    const newUser = {
-      id: apiResult?.userId || "usr_" + Date.now(),
-      name: studentData.name,
-      email: studentData.email,
-      role: "student",
-      department: studentData.branch || "Computer Science & Engineering",
-      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
-      status: "Active",
-      rollNo: studentData.rollNo,
-      batch: studentData.batch || "2025"
-    };
-    setUser(newUser);
-    setRole("student");
-    return newUser;
-  };
-
-  const registerCollege = async (collegeData) => {
-    const apiResult = await authService.registerCollege(collegeData);
-    if (apiResult && apiResult.token) {
-      localStorage.setItem("sips_token", apiResult.token);
-    }
-    const newAdmin = {
-      id: apiResult?.userId || "col_" + Date.now(),
-      name: (collegeData.name || "College") + " Placement Cell",
-      email: collegeData.adminEmail,
-      role: "placement",
-      department: "Placement & Training Division",
-      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
-      status: "Active",
-      collegeSlug: collegeData.slug
-    };
-    setUser(newAdmin);
-    setRole("placement");
-    return newAdmin;
   };
 
   return (
@@ -107,12 +124,9 @@ export function AuthProvider({ children }) {
       value={{
         user,
         role,
-        isAuthenticated: !!user,
+        isAuthenticated: !!user && !!localStorage.getItem("sips_token"),
         login,
-        demoLogin,
-        register,
         registerCollege,
-        switchRole,
         logout
       }}
     >

@@ -2,7 +2,7 @@ export const currentStudent = {
   id: "std_01",
   name: "Khushi Sharma",
   usn: "1SI21CS045",
-  email: "student@sips.demo",
+  email: "student@institution.edu",
   branch: "Computer Science & Engineering",
   batch: "2021-2025",
   semester: "8th Semester",

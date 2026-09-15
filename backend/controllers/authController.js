@@ -14,59 +14,103 @@ const generateToken = (payload) => {
  */
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, identifier, password, collegeSlug } = req.body;
+    const loginId = (email || identifier || '').toLowerCase().trim();
 
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required' });
+    if (!loginId || !password) {
+      return res.status(400).json({ message: 'Email/ID and password are required' });
     }
 
-    // 1. Extract domain from email
-    const parts = email.toLowerCase().trim().split('@');
-    if (parts.length !== 2) {
-      return res.status(400).json({ message: 'Invalid email format' });
-    }
-    const domain = parts[1];
+    // 1. Check if loginId is an email address
+    if (loginId.includes('@')) {
+      const parts = loginId.split('@');
+      if (parts.length !== 2) {
+        return res.status(400).json({ message: 'Invalid email format' });
+      }
+      const domain = parts[1];
 
-    // 2. Find college by domain
-    const college = await College.findOne({ acceptedDomains: domain });
-    if (!college) {
-      return res.status(401).json({ 
-        message: 'This email domain is not registered with any college.' 
+      // Find college by domain
+      const college = await College.findOne({ acceptedDomains: domain });
+      if (!college) {
+        return res.status(401).json({ 
+          message: 'This email domain is not registered with any college.' 
+        });
+      }
+
+      // Check if this is an admin login
+      if (loginId === college.adminEmail) {
+        const isMatch = await bcrypt.compare(password, college.masterPasswordHash);
+        if (!isMatch) {
+          return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        const token = generateToken({
+          id: college._id,
+          role: 'COLLEGE_ADMIN',
+          collegeId: college._id,
+          collegeSlug: college.slug
+        });
+
+        return res.json({
+          token,
+          role: 'COLLEGE_ADMIN',
+          collegeSlug: college.slug,
+          collegeName: college.name,
+          userId: college._id
+        });
+      }
+
+      // Student login by email
+      const student = await Student.findOne({ 
+        email: loginId, 
+        collegeId: college._id 
       });
-    }
 
-    // 3. Check if this is an admin login
-    if (email.toLowerCase().trim() === college.adminEmail) {
-      const isMatch = await bcrypt.compare(password, college.masterPasswordHash);
+      if (!student) {
+        return res.status(401).json({ 
+          message: 'Student account not found in your institution. Please contact your Placement Cell.' 
+        });
+      }
+
+      const isMatch = await student.comparePassword(password);
       if (!isMatch) {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
       const token = generateToken({
-        id: college._id,
-        role: 'COLLEGE_ADMIN',
+        id: student._id,
+        role: 'STUDENT',
         collegeId: college._id,
         collegeSlug: college.slug
       });
 
       return res.json({
         token,
-        role: 'COLLEGE_ADMIN',
+        role: 'STUDENT',
         collegeSlug: college.slug,
         collegeName: college.name,
-        userId: college._id
+        userId: student._id,
+        studentName: student.name
       });
     }
 
-    // 4. Student login
-    const student = await Student.findOne({ 
-      email: email.toLowerCase().trim(), 
-      collegeId: college._id 
-    });
+    // 2. Otherwise, loginId is a Roll Number or USN
+    const studentQuery = {
+      $or: [
+        { rollNo: new RegExp(`^${loginId}$`, 'i') },
+        { usn: new RegExp(`^${loginId}$`, 'i') }
+      ]
+    };
 
+    if (collegeSlug) {
+      const col = await College.findOne({ slug: collegeSlug.toLowerCase().trim() });
+      if (col) studentQuery.collegeId = col._id;
+    }
+
+    const student = await Student.findOne(studentQuery);
     if (!student) {
       return res.status(401).json({ 
-        message: 'You are not authorized by your college.' 
+        message: 'No student found with this Roll Number or USN. Please contact your Placement Cell.' 
       });
     }
 
@@ -75,18 +119,20 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
+    const college = await College.findById(student.collegeId);
+
     const token = generateToken({
       id: student._id,
       role: 'STUDENT',
-      collegeId: college._id,
-      collegeSlug: college.slug
+      collegeId: student.collegeId,
+      collegeSlug: college ? college.slug : ''
     });
 
     return res.json({
       token,
       role: 'STUDENT',
-      collegeSlug: college.slug,
-      collegeName: college.name,
+      collegeSlug: college ? college.slug : '',
+      collegeName: college ? college.name : 'College',
       userId: student._id,
       studentName: student.name
     });
@@ -99,115 +145,15 @@ exports.login = async (req, res) => {
 
 /**
  * POST /api/auth/register
- * Student self-registration (public)
- * Accepts: name, email, password, rollNo, usn, branch, batch, collegeSlug
+ * Student self-registration is disabled per institutional requirements.
+ * Students are provisioned by the Placement Administrator.
  */
 exports.register = async (req, res) => {
-  try {
-    const { name, email, password, rollNo, usn, branch, batch, collegeSlug } = req.body;
-
-    // 1. Validation
-    if (!name || !email || !password || (!rollNo && !usn)) {
-      return res.status(400).json({
-        message: 'Name, email, password, and roll number (or USN) are required'
-      });
-    }
-
-    if (password.length < 6) {
-      return res.status(400).json({
-        message: 'Password must be at least 6 characters long'
-      });
-    }
-
-    const emailClean = email.toLowerCase().trim();
-    const parts = emailClean.split('@');
-    if (parts.length !== 2) {
-      return res.status(400).json({ message: 'Invalid email format' });
-    }
-    const domain = parts[1];
-
-    // 2. Find college by domain or fallback to collegeSlug
-    let college = await College.findOne({ acceptedDomains: domain });
-    if (!college && collegeSlug) {
-      college = await College.findOne({ slug: collegeSlug.toLowerCase().trim() });
-    }
-
-    if (!college) {
-      return res.status(400).json({
-        message: `Email domain "@${domain}" is not registered with any institution in SIPS. Please register your college first or contact your placement cell.`
-      });
-    }
-
-    const finalRollNo = (rollNo || usn).trim();
-
-    // 3. Check for duplicates within this college
-    const existing = await Student.findOne({
-      $or: [
-        { email: emailClean, collegeId: college._id },
-        { rollNo: finalRollNo, collegeId: college._id }
-      ]
-    });
-
-    if (existing) {
-      if (existing.email === emailClean) {
-        return res.status(409).json({ message: 'A student with this email is already registered.' });
-      }
-      return res.status(409).json({ message: 'A student with this roll number/USN is already registered.' });
-    }
-
-    // 4. Hash password
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(password, salt);
-
-    // 5. Create student
-    const student = new Student({
-      collegeId: college._id,
-      name: name.trim(),
-      rollNo: finalRollNo,
-      usn: (usn || finalRollNo).trim(),
-      email: emailClean,
-      passwordHash,
-      branch: (branch || 'Computer Science & Engineering').trim(),
-      batch: (batch || '2025').trim(),
-      placementStatus: 'UNPLACED',
-      skills: []
-    });
-
-    await student.save();
-
-    // 6. Generate JWT token
-    const token = generateToken({
-      id: student._id,
-      role: 'STUDENT',
-      collegeId: college._id,
-      collegeSlug: college.slug
-    });
-
-    res.status(201).json({
-      success: true,
-      message: 'Student registered successfully',
-      token,
-      role: 'STUDENT',
-      collegeSlug: college.slug,
-      collegeName: college.name,
-      userId: student._id,
-      studentName: student.name,
-      student: {
-        id: student._id,
-        name: student.name,
-        rollNo: student.rollNo,
-        usn: student.usn,
-        email: student.email,
-        branch: student.branch,
-        batch: student.batch,
-        placementStatus: student.placementStatus
-      }
-    });
-  } catch (error) {
-    console.error('Student registration error:', error);
-    res.status(500).json({ message: 'Server error during student registration' });
-  }
+  return res.status(403).json({
+    message: 'Student self-registration is disabled. Please contact your College Placement Administrator to obtain your login ID and password.'
+  });
 };
 
 exports.registerStudent = exports.register;
+
 

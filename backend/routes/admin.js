@@ -23,6 +23,7 @@ router.get('/overview', adminAnalyticsController.getOverview);
 // 2. Student Management & Bulk Operations
 // ==========================================
 router.get('/students', adminStudentController.getStudents);
+router.post('/students', adminStudentController.createStudent);
 router.post('/students/upload', adminStudentController.uploadStudentsCSV);
 router.get('/students/export', adminStudentController.exportStudentsCSV);
 router.get('/students/:id', adminStudentController.getStudentById);

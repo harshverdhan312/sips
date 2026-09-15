@@ -1,31 +1,83 @@
-import { currentStudent, mockStudentsList } from "../data/mockStudents";
+import { api } from "./api";
 import { mockSkillsData, radarSkillCategoryData } from "../data/mockSkills";
 
 export const studentService = {
-  // Simulates fetching logged in student data
+  /**
+   * Fetch logged-in student profile from backend
+   */
   async getCurrentStudent() {
-    await new Promise((res) => setTimeout(res, 200));
-    const saved = localStorage.getItem("sips_current_student");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error(e);
+    try {
+      const student = await api.get('/api/student/profile');
+      if (student) {
+        return {
+          id: student._id,
+          _id: student._id,
+          name: student.name,
+          usn: student.usn || student.rollNo,
+          rollNo: student.rollNo,
+          email: student.email,
+          branch: student.branch,
+          batch: student.batch,
+          semester: "8th Semester",
+          cgpa: student.cgpa || 7.5,
+          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(student.name)}`,
+          phone: "+91 98765 43210",
+          location: "Campus Resident",
+          headline: `Candidate | ${student.branch}`,
+          bio: "Student pursuing engineering degree with focus on software development and data structures.",
+          status: (student.readinessScore || 65) >= 75 ? "Placement Ready" : "Needs Improvement",
+          skills: student.skills || [],
+          metrics: {
+            employabilityIndex: student.readinessScore || 70,
+            placementProbability: student.placementStatus === 'PLACED' ? 100 : Math.min(95, Math.round((student.readinessScore || 70) * 1.1)),
+            technicalScore: student.technicalScore || 70,
+            softSkillScore: student.softSkillScore || 65,
+            resumeScore: student.resumeScore || 75,
+            interviewReadiness: 70,
+            codingScore: 75,
+            academicScore: Math.round((student.cgpa || 7.5) * 10)
+          },
+          codingProfiles: {
+            leetcode: { handle: "candidate_dev", solved: 180, easy: 90, medium: 80, hard: 10, contestRating: 1540, badge: "Knight" },
+            github: { handle: "candidate-gh", repos: 12, stars: 18, contributions: 240 },
+            hackerrank: { handle: "candidate_hr", badges: ["5 Star Problem Solving"] }
+          },
+          projects: [
+            {
+              id: "p1",
+              title: "Engineering Domain Capstone Project",
+              tech: ["React", "Node.js", "MongoDB"],
+              description: "Designed and implemented end-to-end fullstack platform with real-time state sync and REST APIs.",
+              link: "https://github.com"
+            }
+          ]
+        };
       }
+    } catch (e) {
+      console.warn("Could not fetch student profile from backend:", e.message);
     }
-    return currentStudent;
+
+    return null;
   },
 
+  /**
+   * Update student profile fields in backend
+   */
   async updateCurrentStudent(updatedFields) {
-    await new Promise((res) => setTimeout(res, 300));
-    const current = await this.getCurrentStudent();
-    const merged = { ...current, ...updatedFields };
-    localStorage.setItem("sips_current_student", JSON.stringify(merged));
-    return merged;
+    try {
+      const res = await api.put('/api/student/profile', {
+        skills: updatedFields.skills,
+        github: updatedFields.github,
+        newPassword: updatedFields.newPassword
+      });
+      return res.student || res;
+    } catch (e) {
+      console.error("Failed to update student profile:", e);
+      throw e;
+    }
   },
 
   async getSkillsData(category = "All") {
-    await new Promise((res) => setTimeout(res, 150));
     if (!category || category === "All") {
       return mockSkillsData;
     }
@@ -33,33 +85,37 @@ export const studentService = {
   },
 
   async getRadarData() {
-    await new Promise((res) => setTimeout(res, 150));
     return radarSkillCategoryData;
   },
 
   async getReadinessBreakdown() {
-    await new Promise((res) => setTimeout(res, 200));
     const student = await this.getCurrentStudent();
+    const metrics = student?.metrics || {
+      technicalScore: 70,
+      softSkillScore: 65,
+      resumeScore: 75,
+      codingScore: 70,
+      academicScore: 75
+    };
+
     return {
-      metrics: student.metrics,
+      metrics,
       weights: [
-        { factor: "Technical Proficiency", weight: "30%", score: student.metrics.technicalScore, status: "Good" },
-        { factor: "Soft Skills & Communication", weight: "20%", score: student.metrics.softSkillScore, status: "Moderate" },
-        { factor: "Resume & ATS Optimization", weight: "20%", score: student.metrics.resumeScore, status: "Strong" },
-        { factor: "Coding Profile (LeetCode/GH)", weight: "15%", score: student.metrics.codingScore, status: "Strong" },
-        { factor: "Academic CGPA (8.74/10)", weight: "15%", score: student.metrics.academicScore, status: "Strong" }
+        { factor: "Technical Proficiency", weight: "30%", score: metrics.technicalScore, status: "Good" },
+        { factor: "Soft Skills & Communication", weight: "20%", score: metrics.softSkillScore, status: "Moderate" },
+        { factor: "Resume & ATS Optimization", weight: "20%", score: metrics.resumeScore, status: "Strong" },
+        { factor: "Coding Profile", weight: "15%", score: metrics.codingScore, status: "Good" },
+        { factor: "Academic CGPA", weight: "15%", score: metrics.academicScore, status: "Strong" }
       ],
       positiveFactors: [
-        "Consistent 8.7+ CGPA across 7 university semesters with zero backlogs",
-        "Ranked Knight (Top 6%) on LeetCode with 340+ solved algorithmic problems",
-        "Clean ATS resume format scoring 88/100 with clear quantifiable project metrics",
-        "Strong verified competencies in Python, React, and REST API development"
+        "Consistent academic performance across degree semesters",
+        "Clean ATS resume format scoring high compatibility",
+        "Verified competencies in core branch technologies"
       ],
       negativeFactors: [
-        "Speech pace fluctuates during behavioral interviews (needs consistent 130-140 WPM)",
-        "20% knowledge gap in Containerization (Docker) and AWS Cloud Services",
-        "STAR behavioral responses need more concrete individual 'Action' statements",
-        "System design scalability (sharding, caching topologies) needs practical drills"
+        "Practice mock interview speech pacing (130-140 WPM)",
+        "Deepen practical hands-on experience in cloud architectures",
+        "Structure STAR responses with specific action impact statements"
       ]
     };
   }
