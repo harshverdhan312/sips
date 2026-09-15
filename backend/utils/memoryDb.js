@@ -37,6 +37,11 @@ class MemoryDatabase {
     return this.colleges.find(c => (c.acceptedDomains || []).includes(d));
   }
 
+  findCollegeByAdminEmail(email) {
+    const e = (email || '').toLowerCase().trim();
+    return this.colleges.find(c => c.adminEmail.toLowerCase() === e);
+  }
+
   findCollegeById(id) {
     return this.colleges.find(c => String(c._id) === String(id));
   }

@@ -61,7 +61,14 @@ app.use('/notification', notificationRoutes);
 
 // Health check
 app.get(['/health', '/api/health'], (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  const isMongo = mongoose.connection.readyState === 1;
+  res.json({
+    status: 'ok',
+    database: isMongo ? 'mongodb' : 'in-memory-resilient',
+    mongoHost: isMongo ? mongoose.connection.host : null,
+    mongoDbName: isMongo ? mongoose.connection.name : null,
+    timestamp: new Date().toISOString()
+  });
 });
 
 // 404 handler
@@ -75,10 +82,12 @@ app.use(require('./middleware/errorHandler'));
 // Database Connection & Server Startup
 if (process.env.NODE_ENV !== 'test') {
   mongoose.set('bufferCommands', false);
-  const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/sips';
+  const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/sips';
 
-  mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 2000 })
-    .then(() => console.log('✅ Connected to MongoDB'))
+  mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 5000 })
+    .then((conn) => {
+      console.log(`✅ Connected to MongoDB: ${conn.connection.host}/${conn.connection.name}`);
+    })
     .catch(err => {
       console.warn(`⚠️  MongoDB connection failed (${err.message}). Running in resilient in-memory mode.`);
     });

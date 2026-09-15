@@ -32,7 +32,10 @@ exports.login = async (req, res) => {
           return res.status(400).json({ message: 'Invalid email format' });
         }
         const domain = parts[1];
-        const college = memoryDb.findCollegeByDomain(domain) || (collegeSlug ? memoryDb.findCollegeBySlug(collegeSlug) : null);
+        let college = memoryDb.findCollegeByDomain(domain) || (collegeSlug ? memoryDb.findCollegeBySlug(collegeSlug) : null);
+        if (!college) {
+          college = memoryDb.findCollegeByAdminEmail(loginId);
+        }
 
         if (!college) {
           return res.status(401).json({ 
@@ -50,7 +53,8 @@ exports.login = async (req, res) => {
             id: college._id,
             role: 'COLLEGE_ADMIN',
             collegeId: college._id,
-            collegeSlug: college.slug
+            collegeSlug: college.slug,
+            email: college.adminEmail
           });
 
           return res.json({
@@ -133,8 +137,12 @@ exports.login = async (req, res) => {
       }
       const domain = parts[1];
 
-      // Find college by domain
-      const college = await College.findOne({ acceptedDomains: domain });
+      // Find college by accepted domain, or fallback to adminEmail
+      let college = await College.findOne({ acceptedDomains: domain });
+      if (!college) {
+        college = await College.findOne({ adminEmail: loginId });
+      }
+
       if (!college) {
         return res.status(401).json({ 
           message: 'This email domain is not registered with any college.' 
@@ -152,7 +160,8 @@ exports.login = async (req, res) => {
           id: college._id,
           role: 'COLLEGE_ADMIN',
           collegeId: college._id,
-          collegeSlug: college.slug
+          collegeSlug: college.slug,
+          email: college.adminEmail
         });
 
         return res.json({
