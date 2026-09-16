@@ -115,7 +115,7 @@ void main() {
       expect(profile.email, 'aarav@rvce.edu');
       expect(profile.cgpa, 8.85);
       expect(profile.readinessScore, 82);
-      expect(profile.tier, 'Tier-1 Contender');
+      expect(profile.tier, 'Tier-1 Contender • Placement Ready');
       expect(profile.skills, contains('React'));
       expect(profile.resumeUrl, '/uploads/aarav_resume.pdf');
       expect(profile.resumeVersion, 'Uploaded Resume');

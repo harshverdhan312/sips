@@ -22,8 +22,7 @@ void main() {
       final mockClient = MockClient((request) async {
         if (request.method == 'PUT' && request.url.path == '/api/student/profile') {
           capturedRequest = request;
-          final req = request as http.Request;
-          final parsed = jsonDecode(req.body) as Map<String, dynamic>;
+          final parsed = jsonDecode(request.body) as Map<String, dynamic>;
           return http.Response(
             jsonEncode({
               'message': 'Profile updated',

@@ -49,7 +49,13 @@ class StudentProfile {
 
   factory StudentProfile.fromBackendJson(Map<String, dynamic> json, {String collegeName = ''}) {
     final readiness = (json['readinessScore'] as num?)?.toInt() ?? 0;
-    final tier = readiness >= 80 ? 'Tier-1 Contender' : (readiness >= 60 ? 'Tier-2 Candidate' : 'Developing Contender');
+    // Shared Cross-Platform Frontend Presentation Standard:
+    // >= 80 -> Tier-1 Contender • Placement Ready
+    // >= 60 -> Tier-2 Candidate • Developing
+    // < 60  -> Tier-3 • Needs Preparation
+    final tier = readiness >= 80
+        ? 'Tier-1 Contender • Placement Ready'
+        : (readiness >= 60 ? 'Tier-2 Candidate • Developing' : 'Tier-3 • Needs Preparation');
     final rawSkills = json['skills'];
     final skillsList = rawSkills is List ? rawSkills.map((s) => s.toString()).toList() : <String>[];
     final cgpaVal = (json['cgpa'] as num?)?.toDouble() ?? 7.5;
