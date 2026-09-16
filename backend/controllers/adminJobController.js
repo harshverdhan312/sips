@@ -431,6 +431,34 @@ exports.deleteJob = async (req, res) => {
  */
 exports.getJobMatches = async (req, res) => {
   try {
+    const { minScore = 0 } = req.query;
+
+    if (!memoryDb.isMongoConnected()) {
+      const job = memoryDb.findJobById(req.params.id);
+      if (!job) return res.status(404).json({ message: 'Job not found' });
+      const students = memoryDb.getStudents(req.collegeId);
+      const ranked = students
+        .map(s => {
+          const result = calculateMatch(s.skills || [], job.requiredSkills || []);
+          return {
+            student: s,
+            score: result.score,
+            matchedSkills: result.matchedSkills,
+            missingSkills: result.missingSkills
+          };
+        })
+        .filter(m => m.score >= (parseInt(minScore, 10) || 0))
+        .sort((a, b) => b.score - a.score)
+        .map((m, idx) => ({ rank: idx + 1, ...m }));
+
+      return res.json({
+        success: true,
+        job,
+        totalMatches: ranked.length,
+        matches: ranked
+      });
+    }
+
     const jd = await JobDescription.findOne({
       _id: req.params.id,
       collegeId: req.collegeId
@@ -439,8 +467,6 @@ exports.getJobMatches = async (req, res) => {
     if (!jd) {
       return res.status(404).json({ message: 'Job not found' });
     }
-
-    const { minScore = 0 } = req.query;
 
     const matches = await Match.find({
       jdId: jd._id,
