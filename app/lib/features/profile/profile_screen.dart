@@ -162,8 +162,36 @@ class ProfileScreen extends ConsumerWidget {
 
                 const SizedBox(height: 20),
 
-                // ATS Resume Hub
-                SectionHeader(title: 'Resume & Documents'),
+                // Verified Skills
+                SectionHeader(
+                  title: 'Verified Technical Skills',
+                  badge: SipsBadge(
+                    label: '${profile.skills.length} VERIFIED',
+                    variant: SipsBadgeVariant.emerald,
+                    isSmall: true,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SipsCard(
+                  padding: const EdgeInsets.all(16),
+                  child: profile.skills.isNotEmpty
+                      ? Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: profile.skills
+                              .map((s) => SkillChip(label: s, status: SkillStatus.strong))
+                              .toList(),
+                        )
+                      : Text(
+                          'No skills listed yet. Skills added here will auto-calculate match percentages with active placement drives.',
+                          style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AppColors.onSurfaceVariant),
+                        ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Resume Hub
+                SectionHeader(title: 'Placement Resume'),
                 const SizedBox(height: 8),
                 SipsCard(
                   padding: const EdgeInsets.all(16),
@@ -184,7 +212,9 @@ class ProfileScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Aarav_Sharma_Resume_2026.pdf',
+                              profile.resumeUrl.isNotEmpty
+                                  ? profile.resumeUrl.split('/').last
+                                  : 'No resume uploaded yet',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
@@ -192,24 +222,17 @@ class ProfileScreen extends ConsumerWidget {
                               ),
                             ),
                             Text(
-                              'ATS Score: ${profile.atsScore}/100 • ${profile.resumeVersion}',
+                              profile.resumeUrl.isNotEmpty
+                                  ? 'Stored on Placement Server • Ready for drives'
+                                  : 'Upload PDF (Max 5MB) for campus drives',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 11,
-                                color: const Color(0xFF047857),
+                                color: profile.resumeUrl.isNotEmpty ? const Color(0xFF047857) : AppColors.outline,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
                         ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.refresh_rounded, color: AppColors.primary),
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Resume ATS audit refreshed!')),
-                          );
-                        },
-                        tooltip: 'Re-audit ATS Score',
                       ),
                     ],
                   ),

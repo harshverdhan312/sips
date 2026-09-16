@@ -27,22 +27,40 @@ class AlertsScreen extends ConsumerWidget {
       ),
       body: alertsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
-        error: (err, _) => Center(child: Text('Error loading alerts: $err')),
+        error: (err, _) => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.notifications_off_outlined, size: 48, color: AppColors.outline),
+              const SizedBox(height: 12),
+              Text('Unable to load alerts', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 8),
+              SipsButton(
+                label: 'Retry',
+                size: SipsButtonSize.small,
+                onPressed: () => ref.read(alertsProvider.notifier).loadAlerts(),
+              ),
+            ],
+          ),
+        ),
         data: (alerts) {
           final unreadCount = alerts.where((a) => !a.isRead).length;
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Top Intel Digest Card
-                SipsCard(
-                  padding: const EdgeInsets.all(18),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 44,
+          return RefreshIndicator(
+            onRefresh: () => ref.read(alertsProvider.notifier).loadAlerts(),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Top Intel Digest Card
+                  SipsCard(
+                    padding: const EdgeInsets.all(18),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 44,
                         height: 44,
                         decoration: BoxDecoration(
                           color: AppColors.primaryFixed,
@@ -84,8 +102,9 @@ class AlertsScreen extends ConsumerWidget {
                 ...alerts.map((alert) => _buildAlertCard(context, ref, alert)),
               ],
             ),
-          );
-        },
+          ),
+        );
+      },
       ),
     );
   }

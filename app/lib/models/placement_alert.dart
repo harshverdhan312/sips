@@ -29,6 +29,37 @@ class PlacementAlert {
     this.isUrgent = false,
   });
 
+  factory PlacementAlert.fromBackendJson(Map<String, dynamic> json) {
+    final message = json['message'] as String? ?? 'Placement Notification';
+    String title = 'Campus Placement Notice';
+    String description = message;
+
+    if (message.contains(':')) {
+      final parts = message.split(':');
+      title = parts[0].trim();
+      description = parts.sublist(1).join(':').trim();
+    }
+
+    String timeFormatted = 'Recent';
+    final createdAt = json['createdAt'];
+    if (createdAt != null) {
+      try {
+        final dt = DateTime.parse(createdAt.toString());
+        timeFormatted = '${dt.day}/${dt.month}/${dt.year}';
+      } catch (_) {}
+    }
+
+    return PlacementAlert(
+      id: json['_id'] as String? ?? json['id'] as String? ?? '',
+      title: title,
+      description: description,
+      timestamp: timeFormatted,
+      type: AlertType.campusDrive,
+      isRead: false,
+      isUrgent: false,
+    );
+  }
+
   PlacementAlert copyWith({
     String? id,
     String? title,

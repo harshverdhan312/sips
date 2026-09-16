@@ -17,6 +17,9 @@ class StudentProfile {
   final String resumeVersion;
   final List<String> targetRoles;
   final List<String> preferredLocations;
+  final List<String> skills;
+  final String resumeUrl;
+  final int readinessScore;
   final bool isVerified;
 
   const StudentProfile({
@@ -38,8 +41,40 @@ class StudentProfile {
     this.resumeVersion = 'v3.4 (ATS Parsed)',
     this.targetRoles = const ['Software Development Engineer', 'Full Stack Developer', 'Cloud / Backend Engineer'],
     this.preferredLocations = const ['Bengaluru', 'Hyderabad', 'Remote / Hybrid'],
+    this.skills = const [],
+    this.resumeUrl = '',
+    this.readinessScore = 0,
     this.isVerified = true,
   });
+
+  factory StudentProfile.fromBackendJson(Map<String, dynamic> json, {String collegeName = ''}) {
+    final readiness = (json['readinessScore'] as num?)?.toInt() ?? 0;
+    final tier = readiness >= 80 ? 'Tier-1 Contender' : (readiness >= 60 ? 'Tier-2 Candidate' : 'Developing Contender');
+    final rawSkills = json['skills'];
+    final skillsList = rawSkills is List ? rawSkills.map((s) => s.toString()).toList() : <String>[];
+    final cgpaVal = (json['cgpa'] as num?)?.toDouble() ?? 7.5;
+    final resumeUrl = json['resumeUrl'] as String? ?? '';
+
+    return StudentProfile(
+      id: json['_id'] as String? ?? json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      email: json['email'] as String? ?? '',
+      college: collegeName.isNotEmpty ? collegeName : 'Engineering College',
+      branch: json['branch'] as String? ?? 'Computer Science & Engineering',
+      graduationYear: json['batch'] as String? ?? '2025',
+      cgpa: cgpaVal,
+      backlogs: 0,
+      tier: tier,
+      avatarUrl: json['avatarUrl'] as String? ?? '',
+      githubHandle: json['github'] as String? ?? '',
+      atsScore: (json['resumeScore'] as num?)?.toInt() ?? (json['readinessScore'] as num?)?.toInt() ?? 80,
+      resumeVersion: resumeUrl.isNotEmpty ? 'Uploaded Resume' : 'No Resume Uploaded',
+      skills: skillsList,
+      resumeUrl: resumeUrl,
+      readinessScore: readiness,
+      isVerified: true,
+    );
+  }
 
   StudentProfile copyWith({
     String? id,
@@ -60,6 +95,9 @@ class StudentProfile {
     String? resumeVersion,
     List<String>? targetRoles,
     List<String>? preferredLocations,
+    List<String>? skills,
+    String? resumeUrl,
+    int? readinessScore,
     bool? isVerified,
   }) {
     return StudentProfile(
@@ -81,6 +119,9 @@ class StudentProfile {
       resumeVersion: resumeVersion ?? this.resumeVersion,
       targetRoles: targetRoles ?? this.targetRoles,
       preferredLocations: preferredLocations ?? this.preferredLocations,
+      skills: skills ?? this.skills,
+      resumeUrl: resumeUrl ?? this.resumeUrl,
+      readinessScore: readinessScore ?? this.readinessScore,
       isVerified: isVerified ?? this.isVerified,
     );
   }

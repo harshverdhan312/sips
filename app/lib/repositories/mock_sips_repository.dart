@@ -141,4 +141,13 @@ class MockSipsRepository implements SipsRepository {
       return a;
     }).toList();
   }
+
+  @override
+  Future<String> uploadResume(List<int> bytes, String filename) async {
+    _profile = _profile.copyWith(
+      resumeUrl: '/uploads/$filename',
+      resumeVersion: 'v3.5 (Uploaded $filename)',
+    );
+    return _profile.resumeUrl;
+  }
 }

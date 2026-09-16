@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/network/api_client.dart';
+import '../core/network/api_exception.dart';
 import '../models/growth_task.dart';
 import '../models/job_opportunity.dart';
 import '../models/mock_interview.dart';
@@ -8,12 +10,22 @@ import '../models/readiness_metric.dart';
 import '../models/roadmap_milestone.dart';
 import '../models/skill_intelligence.dart';
 import '../models/student_profile.dart';
-import '../repositories/mock_sips_repository.dart';
+import '../repositories/api_sips_repository.dart';
 import '../repositories/sips_repository.dart';
 
+// --- API Client Provider ---
+final Provider<ApiClient> apiClientProvider = Provider<ApiClient>((ref) {
+  final client = ApiClient();
+  client.onUnauthorized = () {
+    ref.read(authProvider.notifier).signOut();
+  };
+  return client;
+});
+
 // --- Repository Provider ---
-final sipsRepositoryProvider = Provider<SipsRepository>((ref) {
-  return MockSipsRepository();
+final Provider<SipsRepository> sipsRepositoryProvider = Provider<SipsRepository>((ref) {
+  final apiClient = ref.watch(apiClientProvider);
+  return ApiSipsRepository(apiClient);
 });
 
 // --- Auth State & Provider ---
@@ -21,58 +33,143 @@ class AuthState {
   final bool isAuthenticated;
   final bool isOnboardingCompleted;
   final String userEmail;
+  final String userName;
+  final String collegeName;
+  final String userId;
   final bool isLoading;
+  final String? errorMessage;
 
   const AuthState({
-    this.isAuthenticated = true, // default authenticated for seamless exploration
+    this.isAuthenticated = false,
     this.isOnboardingCompleted = true,
-    this.userEmail = 'aarav.sharma@nit.ac.in',
+    this.userEmail = '',
+    this.userName = '',
+    this.collegeName = '',
+    this.userId = '',
     this.isLoading = false,
+    this.errorMessage,
   });
 
   AuthState copyWith({
     bool? isAuthenticated,
     bool? isOnboardingCompleted,
     String? userEmail,
+    String? userName,
+    String? collegeName,
+    String? userId,
     bool? isLoading,
+    String? errorMessage,
+    bool clearError = false,
   }) {
     return AuthState(
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
       isOnboardingCompleted: isOnboardingCompleted ?? this.isOnboardingCompleted,
       userEmail: userEmail ?? this.userEmail,
+      userName: userName ?? this.userName,
+      collegeName: collegeName ?? this.collegeName,
+      userId: userId ?? this.userId,
       isLoading: isLoading ?? this.isLoading,
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
     );
   }
 }
 
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier() : super(const AuthState());
+  final ApiClient _apiClient;
+  final Ref _ref;
 
-  Future<void> signIn(String email, String password) async {
-    state = state.copyWith(isLoading: true);
-    await Future.delayed(const Duration(milliseconds: 600));
-    state = state.copyWith(
-      isAuthenticated: true,
-      userEmail: email.isEmpty ? 'aarav.sharma@nit.ac.in' : email,
-      isLoading: false,
-    );
+  AuthNotifier(this._apiClient, this._ref) : super(const AuthState()) {
+    checkInitialAuth();
+  }
+
+  Future<void> checkInitialAuth() async {
+    final token = await _apiClient.getToken();
+    if (token != null && token.isNotEmpty) {
+      state = state.copyWith(isAuthenticated: true);
+    }
+  }
+
+  Future<bool> signIn(String identifier, String password) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final body = <String, dynamic>{
+        'identifier': identifier.trim(),
+        'password': password,
+      };
+
+      final response = await _apiClient.post('/api/auth/login', body: body);
+
+      if (response is Map<String, dynamic>) {
+        final token = response['token'] as String?;
+        final role = response['role'] as String?;
+        final studentName = response['studentName'] as String? ?? response['name'] as String? ?? '';
+        final collegeName = response['collegeName'] as String? ?? '';
+        final userId = response['userId'] as String? ?? '';
+
+        if (token == null || token.isEmpty) {
+          throw const ApiException(message: 'Authentication token missing from response');
+        }
+
+        // Enforce Student Role Validation
+        if (role != 'STUDENT') {
+          throw const ApiException(
+            message: 'Access restricted: This portal is for students only. Please use the Admin Portal for placement administration.',
+            statusCode: 403,
+          );
+        }
+
+        await _apiClient.saveToken(token);
+
+        state = state.copyWith(
+          isAuthenticated: true,
+          userEmail: identifier,
+          userName: studentName,
+          collegeName: collegeName,
+          userId: userId,
+          isLoading: false,
+          clearError: true,
+        );
+
+        // Reload fresh live data
+        _ref.read(studentProfileProvider.notifier).loadProfile();
+        _ref.read(opportunitiesProvider.notifier).loadJobs();
+        _ref.read(alertsProvider.notifier).loadAlerts();
+        _ref.read(readinessProvider.notifier).loadReadiness();
+
+        return true;
+      }
+      throw const ApiException(message: 'Invalid server response structure');
+    } catch (e) {
+      final errorMsg = e is ApiException ? e.message : 'Sign in failed: ${e.toString()}';
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: errorMsg,
+      );
+      return false;
+    }
   }
 
   void completeOnboarding() {
     state = state.copyWith(isOnboardingCompleted: true);
   }
 
-  void signOut() {
+  Future<void> signOut() async {
+    await _apiClient.clearToken();
     state = const AuthState(
       isAuthenticated: false,
       isOnboardingCompleted: false,
       userEmail: '',
+      userName: '',
+      collegeName: '',
+      userId: '',
     );
   }
 }
 
-final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier();
+final StateNotifierProvider<AuthNotifier, AuthState> authProvider =
+    StateNotifierProvider<AuthNotifier, AuthState>((ref) {
+  final apiClient = ref.watch(apiClientProvider);
+  return AuthNotifier(apiClient, ref);
 });
 
 // --- Student Profile Provider ---
@@ -102,6 +199,12 @@ class ProfileNotifier extends StateNotifier<AsyncValue<StudentProfile>> {
       state = AsyncValue.error(e, st);
     }
   }
+
+  Future<String> uploadResume(List<int> bytes, String filename) async {
+    final url = await _repository.uploadResume(bytes, filename);
+    await loadProfile();
+    return url;
+  }
 }
 
 final studentProfileProvider = StateNotifierProvider<ProfileNotifier, AsyncValue<StudentProfile>>((ref) {
@@ -128,8 +231,10 @@ class ReadinessNotifier extends StateNotifier<AsyncValue<ReadinessMetric>> {
   }
 
   void recalculate() async {
-    final data = await _repository.getReadinessMetric();
-    state = AsyncValue.data(data);
+    try {
+      final data = await _repository.getReadinessMetric();
+      state = AsyncValue.data(data);
+    } catch (_) {}
   }
 }
 
@@ -181,7 +286,7 @@ final opportunitiesProvider =
   return OpportunitiesNotifier(repo);
 });
 
-// --- Growth Tasks Provider ---
+// --- Growth Tasks Provider (Local/Mock) ---
 class GrowthTasksNotifier extends StateNotifier<AsyncValue<List<GrowthTask>>> {
   final SipsRepository _repository;
   final Ref _ref;
@@ -217,13 +322,13 @@ final growthTasksProvider = StateNotifierProvider<GrowthTasksNotifier, AsyncValu
   return GrowthTasksNotifier(repo, ref);
 });
 
-// --- Roadmap Provider ---
+// --- Roadmap Provider (Local/Mock) ---
 final roadmapProvider = FutureProvider<List<RoadmapMilestone>>((ref) async {
   final repo = ref.watch(sipsRepositoryProvider);
   return repo.getRoadmapMilestones();
 });
 
-// --- Mock Interview Runner Provider ---
+// --- Mock Interview Runner Provider (Local/Mock) ---
 class InterviewSessionState {
   final int currentQuestionIndex;
   final List<InterviewQuestion> questions;
@@ -300,13 +405,13 @@ final interviewSessionProvider =
   return InterviewSessionNotifier(repo);
 });
 
-// --- Interview Diagnostic Provider ---
+// --- Interview Diagnostic Provider (Local/Mock) ---
 final interviewDiagnosticProvider = FutureProvider<InterviewDiagnosticReport>((ref) async {
   final repo = ref.watch(sipsRepositoryProvider);
   return repo.getDiagnosticReport();
 });
 
-// --- Peer Matching Provider ---
+// --- Peer Matching Provider (Local/Mock) ---
 final peerMatchingProvider = FutureProvider<List<PeerMatch>>((ref) async {
   final repo = ref.watch(sipsRepositoryProvider);
   return repo.getPeerMatches();

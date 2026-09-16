@@ -17,11 +17,10 @@ class AuthScreen extends ConsumerStatefulWidget {
 }
 
 class _AuthScreenState extends ConsumerState<AuthScreen> {
-  final _emailController = TextEditingController(text: 'aarav.sharma@nit.ac.in');
-  final _passwordController = TextEditingController(text: '••••••••••••');
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   int _selectedTab = 0; // 0: University Email, 1: Roll No OTP
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -31,11 +30,29 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   }
 
   Future<void> _handleLogin() async {
-    setState(() => _isLoading = true);
-    await ref.read(authProvider.notifier).signIn(_emailController.text, _passwordController.text);
-    if (mounted) {
-      setState(() => _isLoading = false);
+    final identifier = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (identifier.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter your email or Roll No and password.')),
+      );
+      return;
+    }
+
+    final success = await ref.read(authProvider.notifier).signIn(identifier, password);
+    if (!mounted) return;
+
+    if (success) {
       context.go('/home');
+    } else {
+      final error = ref.read(authProvider).errorMessage ?? 'Login failed. Please check your credentials.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error),
+          backgroundColor: AppColors.error,
+        ),
+      );
     }
   }
 
@@ -165,7 +182,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       label: 'Sign In to Workspace',
                       isFullWidth: true,
                       size: SipsButtonSize.large,
-                      isLoading: _isLoading,
+                      isLoading: ref.watch(authProvider).isLoading,
                       onPressed: _handleLogin,
                     ),
                   ],

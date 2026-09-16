@@ -32,4 +32,5 @@ abstract class SipsRepository {
 
   Future<List<PlacementAlert>> getPlacementAlerts();
   Future<void> markAlertAsRead(String alertId);
+  Future<String> uploadResume(List<int> bytes, String filename);
 }
