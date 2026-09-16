@@ -1,30 +1,42 @@
-import { initialNotifications } from "../data/mockNotifications";
+import { api } from "./api";
 
 export const notificationService = {
+  /**
+   * Fetch live college notifications from backend
+   */
   async getNotifications() {
-    await new Promise((res) => setTimeout(res, 150));
-    const saved = localStorage.getItem("sips_notifications");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error(e);
+    try {
+      const data = await api.get('/api/notification');
+      if (Array.isArray(data)) {
+        return data.map((n) => {
+          const id = n._id || n.id;
+          const createdAt = n.createdAt ? new Date(n.createdAt) : new Date();
+          const target = n.target || 'ALL';
+          const title = target === 'ALL'
+            ? 'Placement Announcement'
+            : `${target} Batch Alert`;
+
+          return {
+            id,
+            _id: id,
+            title,
+            message: n.message || '',
+            target,
+            timestamp: createdAt.toLocaleDateString(undefined, {
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            }),
+            time: createdAt.toLocaleDateString(),
+            createdAt: n.createdAt,
+            read: false
+          };
+        });
       }
+    } catch (e) {
+      console.warn("Could not fetch notifications from backend:", e.message);
     }
-    return initialNotifications;
-  },
-
-  async markAsRead(id) {
-    const notifs = await this.getNotifications();
-    const updated = notifs.map((n) => (n.id === id ? { ...n, read: true } : n));
-    localStorage.setItem("sips_notifications", JSON.stringify(updated));
-    return updated;
-  },
-
-  async markAllAsRead() {
-    const notifs = await this.getNotifications();
-    const updated = notifs.map((n) => ({ ...n, read: true }));
-    localStorage.setItem("sips_notifications", JSON.stringify(updated));
-    return updated;
+    return [];
   }
 };

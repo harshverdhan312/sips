@@ -1,36 +1,68 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { initialNotifications } from "../data/mockNotifications";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { notificationService } from "../services/notificationService";
 
 const NotificationContext = createContext(null);
 
 export function NotificationProvider({ children }) {
-  const [notifications, setNotifications] = useState(() => {
-    const saved = localStorage.getItem("sips_notifications");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    return initialNotifications;
-  });
-
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [toasts, setToasts] = useState([]);
 
+  // Load read notification IDs from localStorage
+  const getReadIds = useCallback(() => {
+    try {
+      const saved = localStorage.getItem("sips_read_notification_ids");
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  }, []);
+
+  const saveReadIds = useCallback((ids) => {
+    try {
+      localStorage.setItem("sips_read_notification_ids", JSON.stringify(ids));
+    } catch (e) {
+      console.error("Could not save read notification IDs:", e);
+    }
+  }, []);
+
+  const loadNotifications = useCallback(async () => {
+    try {
+      setLoading(true);
+      const notifs = await notificationService.getNotifications();
+      const readIds = getReadIds();
+      const mapped = notifs.map((n) => ({
+        ...n,
+        read: readIds.includes(n.id)
+      }));
+      setNotifications(mapped);
+    } catch (e) {
+      console.error("Failed to load notifications:", e);
+    } finally {
+      setLoading(false);
+    }
+  }, [getReadIds]);
+
   useEffect(() => {
-    localStorage.setItem("sips_notifications", JSON.stringify(notifications));
-  }, [notifications]);
+    loadNotifications();
+  }, [loadNotifications]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const markAsRead = (id) => {
+    const readIds = getReadIds();
+    if (!readIds.includes(id)) {
+      const updated = [...readIds, id];
+      saveReadIds(updated);
+    }
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read: true } : n))
     );
   };
 
   const markAllAsRead = () => {
+    const allIds = notifications.map((n) => n.id);
+    saveReadIds(allIds);
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 
@@ -51,6 +83,8 @@ export function NotificationProvider({ children }) {
       value={{
         notifications,
         unreadCount,
+        loading,
+        refreshNotifications: loadNotifications,
         markAsRead,
         markAllAsRead,
         toasts,
