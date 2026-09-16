@@ -1,5 +1,8 @@
+import importlib
+
 from fastapi.testclient import TestClient
 
+import src.api.main as api_main
 from src.api.main import app
 from src.placement import service as placement_service
 
@@ -92,7 +95,10 @@ def test_health_does_not_require_model_artifact(monkeypatch, tmp_path):
         tmp_path / "missing-model.joblib",
     )
 
-    response = client.get("/health")
+    reloaded_main = importlib.reload(api_main)
+    reloaded_client = TestClient(reloaded_main.app)
+
+    response = reloaded_client.get("/health")
 
     assert response.status_code == 200
 
