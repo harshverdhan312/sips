@@ -39,6 +39,7 @@ export function Sidebar({ isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen
     { to: "/student/star", label: "STAR Tracker", icon: Award },
     { to: "/student/tasks", label: "Daily Behavioral", icon: CheckSquare, badge: "Streak" },
     { to: "/student/peers", label: "Peer Matching", icon: Users },
+    { to: "/student/jobs", label: "Job Opportunities", icon: Briefcase, badge: "Drives" },
     { to: "/student/recommendations", label: "Recommendations", icon: Sparkles },
     { to: "/student/profile", label: "My Profile", icon: User }
   ];

@@ -41,7 +41,7 @@ export function StudentDashboard() {
           studentService.getCurrentStudent(),
           studentService.getRadarData(),
           taskService.getTasksData(),
-          placementService.getJobs()
+          studentService.getStudentJobs()
         ]);
         setStudent(studentData);
         setRadarData(radar);
@@ -438,11 +438,20 @@ export function StudentDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Active Campus Drives */}
         <Card className="lg:col-span-2">
-          <CardHeader
-            title="Upcoming Placement Opportunities"
-            subtitle="Campus recruitment drives matching your academic and skill criteria"
-          />
-          <div className="space-y-3">
+          <div className="flex items-center justify-between px-6 pt-5 pb-2">
+            <div>
+              <h3 className="text-base font-bold text-slate-900">Upcoming Placement Opportunities</h3>
+              <p className="text-xs text-slate-500">Campus recruitment drives matching your academic and skill criteria</p>
+            </div>
+            <Button
+              variant="outline"
+              size="xs"
+              onClick={() => navigate("/student/jobs")}
+            >
+              View All Drives
+            </Button>
+          </div>
+          <div className="p-6 pt-2 space-y-3">
             {jobs.map((job) => (
               <div
                 key={job.id}
@@ -455,8 +464,17 @@ export function StudentDashboard() {
                   <div>
                     <div className="flex items-center gap-2">
                       <h4 className="font-bold text-slate-900 text-sm">{job.company}</h4>
-                      <Badge variant="primary" size="sm">
-                        {job.studentMatch}% Match
+                      <Badge
+                        variant={
+                          job.matchScore >= 80
+                            ? "success"
+                            : job.matchScore >= 60
+                            ? "primary"
+                            : "neutral"
+                        }
+                        size="sm"
+                      >
+                        {job.matchScore}% Match
                       </Badge>
                     </div>
                     <p className="text-xs text-slate-600 mt-0.5">{job.role}</p>
@@ -475,9 +493,9 @@ export function StudentDashboard() {
                 <Button
                   variant="primary"
                   size="sm"
-                  onClick={() => navigate("/student/recommendations")}
+                  onClick={() => navigate("/student/jobs")}
                 >
-                  Apply Now
+                  Explore Drive
                 </Button>
               </div>
             ))}
