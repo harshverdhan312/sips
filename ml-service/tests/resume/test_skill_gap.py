@@ -1,6 +1,6 @@
 import pytest
 
-from src.resume.skill_gap import analyze_skill_gap
+from src.resume.skill_gap import analyze_skill_gap, compare_skill_sets
 
 
 def test_analyze_skill_gap_returns_matched_missing_and_coverage():
@@ -49,3 +49,44 @@ def test_analyze_skill_gap_rejects_non_list_skills():
 def test_analyze_skill_gap_rejects_unsupported_role():
     with pytest.raises(ValueError, match="Unsupported role:"):
         analyze_skill_gap(["python"], "Cloud Engineer")
+
+
+def test_compare_skill_sets_supports_job_requirements():
+    result = compare_skill_sets(
+        ["Python", "JS", "ML"],
+        ["JavaScript", "Python", "SQL", "Machine Learning"],
+    )
+
+    assert result == {
+        "matched_skills": ["javascript", "python", "machine learning"],
+        "missing_skills": ["sql"],
+        "coverage_score": 75.0,
+    }
+
+
+def test_compare_skill_sets_normalizes_requirement_aliases_and_duplicates():
+    result = compare_skill_sets(
+        ["JavaScript", "NodeJS"],
+        ["JS", "JavaScript", "Node.js"],
+    )
+
+    assert result == {
+        "matched_skills": ["javascript", "node.js"],
+        "missing_skills": [],
+        "coverage_score": 100.0,
+    }
+
+
+def test_compare_skill_sets_handles_empty_requirements():
+    result = compare_skill_sets(["Python"], [])
+
+    assert result == {
+        "matched_skills": [],
+        "missing_skills": [],
+        "coverage_score": 0.0,
+    }
+
+
+def test_compare_skill_sets_rejects_non_list_requirements():
+    with pytest.raises(TypeError, match="Skills must be provided as a list."):
+        compare_skill_sets(["Python"], "Python")
