@@ -11,7 +11,10 @@ import {
   Clock,
   Sparkles,
   ArrowRight,
-  TrendingUp
+  TrendingUp,
+  RefreshCw,
+  Eye,
+  GraduationCap
 } from "lucide-react";
 import { placementService } from "../../services/placementService";
 import { Card, CardHeader } from "../../components/common/Card";
@@ -26,6 +29,15 @@ export function JobDescriptionsPage() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedJob, setSelectedJob] = useState(null);
+
+  // Dynamic candidate matches state
+  const [matches, setMatches] = useState([]);
+  const [matchesLoading, setMatchesLoading] = useState(false);
+  const [matchesError, setMatchesError] = useState(null);
+
+  // Candidate detail modal state
+  const [activeStudent, setActiveStudent] = useState(null);
+  const [studentModalOpen, setStudentModalOpen] = useState(false);
 
   // New JD Modal State
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -42,6 +54,7 @@ export function JobDescriptionsPage() {
     description: "Seeking energetic software engineers with passion for scalable products."
   });
 
+  // Load jobs on mount
   useEffect(() => {
     async function load() {
       try {
@@ -51,13 +64,76 @@ export function JobDescriptionsPage() {
           setSelectedJob(data[0]);
         }
       } catch (e) {
-        console.error(e);
+        console.error("Failed to load recruitment drives:", e);
+        addToast("Failed to load recruitment drives.", "error");
       } finally {
         setLoading(false);
       }
     }
     load();
   }, []);
+
+  // Fetch dynamic candidate matches whenever selectedJob changes
+  useEffect(() => {
+    let isCurrent = true;
+
+    async function fetchMatches() {
+      if (!selectedJob) {
+        setMatches([]);
+        return;
+      }
+
+      const jobId = selectedJob._id || selectedJob.id;
+      setMatchesLoading(true);
+      setMatchesError(null);
+      setMatches([]); // Reset to avoid stale candidate data
+
+      try {
+        const res = await placementService.getJobMatches(jobId);
+        if (isCurrent) {
+          setMatches(res.matches || []);
+        }
+      } catch (err) {
+        if (isCurrent) {
+          console.error(`Error loading matches for job ${jobId}:`, err);
+          setMatchesError(err.message || "Could not retrieve candidate matches");
+        }
+      } finally {
+        if (isCurrent) {
+          setMatchesLoading(false);
+        }
+      }
+    }
+
+    fetchMatches();
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [selectedJob]);
+
+  // Aggregate missing skills across matches for deficit insights
+  const aggregateSkillDeficits = () => {
+    if (!matches || matches.length === 0) return [];
+    const deficitCounts = {};
+    matches.forEach((m) => {
+      (m.missingSkills || []).forEach((sk) => {
+        const normalized = sk.toLowerCase().trim();
+        deficitCounts[normalized] = (deficitCounts[normalized] || 0) + 1;
+      });
+    });
+
+    return Object.entries(deficitCounts)
+      .map(([skill, count]) => ({
+        skill,
+        count,
+        percentage: Math.round((count / matches.length) * 100)
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 4);
+  };
+
+  const topDeficits = aggregateSkillDeficits();
 
   const handleCreateJob = async (e) => {
     e.preventDefault();
@@ -71,12 +147,24 @@ export function JobDescriptionsPage() {
       setJobs((prev) => [created, ...prev]);
       setSelectedJob(created);
       setCreateModalOpen(false);
-      addToast(`Recruitment drive created for ${created.company}! SIPS Match Engine computed 165 eligible candidates.`, "success");
+      addToast(`Recruitment drive created for ${created.company}! SIPS Match Engine computed candidate compatibility.`, "success");
     } catch (e) {
       console.error(e);
       addToast("Failed to create recruitment drive.", "error");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleViewCandidate = (candidate) => {
+    if (candidate?.student) {
+      setActiveStudent({
+        ...candidate.student,
+        matchScore: candidate.score,
+        matchedSkills: candidate.matchedSkills,
+        missingSkills: candidate.missingSkills
+      });
+      setStudentModalOpen(true);
     }
   };
 
@@ -90,7 +178,7 @@ export function JobDescriptionsPage() {
             Job Description & Campus Drive Matching Engine
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            Upload enterprise job descriptions and let SIPS automatically compute batch eligibility and skill compatibility.
+            Upload enterprise job descriptions and let SIPS automatically compute batch eligibility and candidate skill compatibility.
           </p>
         </div>
 
@@ -116,11 +204,17 @@ export function JobDescriptionsPage() {
           </div>
 
           <div className="space-y-3">
+            {jobs.length === 0 && !loading && (
+              <div className="p-8 text-center bg-white rounded-2xl border border-slate-200 text-slate-400 text-xs">
+                No recruitment drives published yet. Click "Add New Job Description" to create one.
+              </div>
+            )}
+
             {jobs.map((job) => {
-              const isSelected = selectedJob?.id === job.id;
+              const isSelected = (selectedJob?._id || selectedJob?.id) === (job._id || job.id);
               return (
                 <div
-                  key={job.id}
+                  key={job._id || job.id}
                   onClick={() => setSelectedJob(job)}
                   className={`p-4 rounded-2xl border transition-all cursor-pointer ${
                     isSelected
@@ -131,7 +225,7 @@ export function JobDescriptionsPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-700 text-base shrink-0 border border-slate-200">
-                        {job.company.charAt(0)}
+                        {job.company ? job.company.charAt(0) : "J"}
                       </div>
                       <div>
                         <h4 className="font-bold text-slate-900 text-sm">
@@ -148,7 +242,7 @@ export function JobDescriptionsPage() {
                   </div>
 
                   <div className="mt-3 flex items-center justify-between text-xs text-slate-500 border-t border-slate-100 pt-2.5">
-                    <span>Eligible: <strong className="text-slate-800">{job.batchEligibleCount}</strong> candidates</span>
+                    <span>Eligible: <strong className="text-slate-800">{job.batchEligibleCount || 0}</strong> candidates</span>
                     <span>Deadline: <strong className="text-slate-800">{job.deadline}</strong></span>
                   </div>
                 </div>
@@ -169,7 +263,7 @@ export function JobDescriptionsPage() {
                       {selectedJob.company}
                     </h3>
                     <Badge variant="success" size="sm">
-                      {selectedJob.status}
+                      {selectedJob.status || "Active Drive"}
                     </Badge>
                   </div>
                   <p className="text-sm font-semibold text-indigo-700 mt-0.5">
@@ -182,13 +276,13 @@ export function JobDescriptionsPage() {
 
                 <div className="p-3 rounded-2xl bg-indigo-50 border border-indigo-100 text-center shrink-0">
                   <span className="text-[10px] font-bold text-indigo-900 uppercase">
-                    Batch Match Index
+                    Ranked Matches
                   </span>
                   <div className="text-2xl font-black text-indigo-600">
-                    {selectedJob.batchMatchedCount}/{selectedJob.batchEligibleCount}
+                    {matches.length}
                   </div>
                   <span className="text-[10px] text-emerald-700 font-semibold">
-                    Highly Competitive
+                    {matches.length > 0 ? "Candidates Evaluated" : "Awaiting Candidates"}
                   </span>
                 </div>
               </div>
@@ -199,7 +293,7 @@ export function JobDescriptionsPage() {
                   Target Required Competencies
                 </h4>
                 <div className="flex flex-wrap gap-1.5">
-                  {selectedJob.requiredSkills.map((sk, i) => (
+                  {(selectedJob.requiredSkills || []).map((sk, i) => (
                     <span
                       key={i}
                       className="px-3 py-1 rounded-lg bg-indigo-50 text-indigo-700 font-semibold text-xs border border-indigo-200/60"
@@ -216,75 +310,137 @@ export function JobDescriptionsPage() {
                   <AlertCircle className="w-4 h-4 text-rose-600" />
                   Primary Batch Skill Deficits for This Role
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  34% of eligible CSE/ISE students meet CGPA criteria ({selectedJob.minCgpa}+) but lack verified experience in System Design or Containerization required by {selectedJob.company}.
-                </p>
-                <div className="pt-2 flex gap-2">
-                  <Badge variant="danger" size="sm">System Design (42% deficit)</Badge>
-                  <Badge variant="danger" size="sm">Docker / K8s (38% deficit)</Badge>
-                </div>
+                {topDeficits.length > 0 ? (
+                  <>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      SIPS Match Engine identified top missing competencies across candidates matching this drive:
+                    </p>
+                    <div className="pt-2 flex flex-wrap gap-2">
+                      {topDeficits.map((def, idx) => (
+                        <Badge key={idx} variant="danger" size="sm">
+                          {def.skill} ({def.percentage}% deficit)
+                        </Badge>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    {matches.length > 0
+                      ? "Evaluated candidates meet target competencies with minimal skill deficits."
+                      : "Upload student profiles to compute cohort skill deficit benchmarks."}
+                  </p>
+                )}
               </div>
 
               {/* Top Student Matches in Batch */}
               <div>
                 <div className="flex justify-between items-center mb-3">
                   <h4 className="font-bold text-slate-900 text-sm">
-                    Top Matched Candidates for {selectedJob.company}
+                    Top Matched Candidates for {selectedJob.company} ({matches.length})
                   </h4>
-                  <span className="text-xs text-indigo-600 font-semibold cursor-pointer hover:underline">
-                    View All {selectedJob.batchMatchedCount} Eligible →
-                  </span>
+                  {matches.length > 0 && (
+                    <span className="text-xs text-slate-500 font-medium">
+                      Ranked by Jaccard Skill Overlap
+                    </span>
+                  )}
                 </div>
 
-                <div className="space-y-2.5">
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center text-xs">
-                        1
-                      </span>
-                      <div>
-                        <p className="font-bold text-slate-900">Ananya Iyer</p>
-                        <span className="text-slate-500">CSE • CGPA 9.4</span>
+                {/* Loading State */}
+                {matchesLoading && (
+                  <div className="space-y-2 py-4">
+                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 animate-pulse flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-7 h-7 rounded-full bg-slate-200" />
+                        <div className="space-y-1">
+                          <div className="w-24 h-3 bg-slate-200 rounded" />
+                          <div className="w-16 h-2 bg-slate-200 rounded" />
+                        </div>
                       </div>
+                      <div className="w-16 h-6 bg-slate-200 rounded-lg" />
                     </div>
-                    <div className="flex items-center gap-3">
-                      <Badge variant="success" size="sm">96% Match</Badge>
-                      <Button variant="outline" size="xs">Profile</Button>
+                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 animate-pulse flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-7 h-7 rounded-full bg-slate-200" />
+                        <div className="space-y-1">
+                          <div className="w-24 h-3 bg-slate-200 rounded" />
+                          <div className="w-16 h-2 bg-slate-200 rounded" />
+                        </div>
+                      </div>
+                      <div className="w-16 h-6 bg-slate-200 rounded-lg" />
                     </div>
                   </div>
+                )}
 
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center text-xs">
-                        2
-                      </span>
-                      <div>
-                        <p className="font-bold text-slate-900">Khushi Sharma</p>
-                        <span className="text-slate-500">CSE • CGPA 8.74</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Badge variant="success" size="sm">92% Match</Badge>
-                      <Button variant="outline" size="xs">Profile</Button>
-                    </div>
+                {/* Error State */}
+                {matchesError && !matchesLoading && (
+                  <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center justify-between">
+                    <span>{matchesError}</span>
+                    <Button
+                      variant="outline"
+                      size="xs"
+                      icon={RefreshCw}
+                      onClick={() => {
+                        const jobId = selectedJob._id || selectedJob.id;
+                        placementService.getJobMatches(jobId).then((r) => setMatches(r.matches || []));
+                      }}
+                    >
+                      Retry
+                    </Button>
                   </div>
+                )}
 
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center text-xs">
-                        3
-                      </span>
-                      <div>
-                        <p className="font-bold text-slate-900">Vikramaditya Roy</p>
-                        <span className="text-slate-500">AI/ML • CGPA 8.9</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Badge variant="primary" size="sm">89% Match</Badge>
-                      <Button variant="outline" size="xs">Profile</Button>
-                    </div>
+                {/* Empty State */}
+                {!matchesLoading && !matchesError && matches.length === 0 && (
+                  <div className="p-8 text-center rounded-xl bg-slate-50 border border-slate-100 text-slate-400 text-xs">
+                    No matching candidates found for this drive. Ensure registered students have skills matching the target competencies.
                   </div>
-                </div>
+                )}
+
+                {/* Live Matches List */}
+                {!matchesLoading && matches.length > 0 && (
+                  <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+                    {matches.map((m, idx) => {
+                      const scoreBadgeVariant = m.score >= 80 ? "success" : m.score >= 50 ? "primary" : "warning";
+                      return (
+                        <div
+                          key={m.id || m.student?.id || m.student?._id || idx}
+                          className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs hover:bg-slate-100/70 transition-colors"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-800 font-bold flex items-center justify-center text-xs shrink-0">
+                              {m.rank || idx + 1}
+                            </span>
+                            <img
+                              src={m.student?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(m.student?.name || "Student")}`}
+                              alt={m.student?.name || "Student"}
+                              className="w-7 h-7 rounded-full object-cover border border-slate-200 shrink-0"
+                            />
+                            <div>
+                              <p className="font-bold text-slate-900">{m.student?.name || "Candidate"}</p>
+                              <span className="text-slate-500">
+                                {m.student?.branch || "Engineering"} • CGPA {m.student?.cgpa || 7.5}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 self-end sm:self-auto">
+                            <Badge variant={scoreBadgeVariant} size="sm">
+                              {m.score}% Match
+                            </Badge>
+                            <Button
+                              variant="outline"
+                              size="xs"
+                              icon={Eye}
+                              onClick={() => handleViewCandidate(m)}
+                            >
+                              Profile
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* Action */}
@@ -292,16 +448,16 @@ export function JobDescriptionsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => addToast("Shortlist broadcast email sent to top 50 matches!", "success")}
+                  onClick={() => addToast(`Shortlist broadcast notification triggered for ${matches.length} candidate matches!`, "success")}
                 >
-                  Broadcast Invitation to Matches
+                  Broadcast Invitation ({matches.length})
                 </Button>
                 <Button
                   variant="primary"
                   size="sm"
-                  onClick={() => addToast("Recruiter export packet generated with verified ATS resumes!", "success")}
+                  onClick={() => addToast("Candidate match records exported successfully.", "success")}
                 >
-                  Generate Candidate Packet
+                  Export Candidates
                 </Button>
               </div>
             </Card>
@@ -312,6 +468,88 @@ export function JobDescriptionsPage() {
           )}
         </div>
       </div>
+
+      {/* Candidate Profile Inspection Modal */}
+      <Modal
+        isOpen={studentModalOpen}
+        onClose={() => setStudentModalOpen(false)}
+        maxWidth="max-w-2xl"
+        title="Candidate Match Profile"
+        subtitle={activeStudent ? `${activeStudent.name} (${activeStudent.usn || activeStudent.rollNo})` : ""}
+      >
+        {activeStudent && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+              <img
+                src={activeStudent.avatar}
+                alt={activeStudent.name}
+                className="w-12 h-12 rounded-xl object-cover border border-slate-200"
+              />
+              <div className="flex-1">
+                <h4 className="font-bold text-slate-900 text-sm">{activeStudent.name}</h4>
+                <p className="text-xs text-slate-500">{activeStudent.branch} • Batch {activeStudent.batch || "2025"}</p>
+                <p className="text-xs text-slate-400 font-mono">{activeStudent.email}</p>
+              </div>
+              <div className="text-right">
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">Drive Match</span>
+                <Badge variant={activeStudent.matchScore >= 80 ? "success" : "primary"} size="md">
+                  {activeStudent.matchScore}% Match
+                </Badge>
+              </div>
+            </div>
+
+            {/* Academic & Readiness Stats */}
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <span className="text-[10px] text-slate-400 uppercase font-bold">CGPA</span>
+                <p className="text-base font-bold text-slate-900 mt-0.5">{activeStudent.cgpa}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <span className="text-[10px] text-slate-400 uppercase font-bold">Readiness Score</span>
+                <p className="text-base font-bold text-indigo-600 mt-0.5">{activeStudent.readinessScore || 65}/100</p>
+              </div>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <span className="text-[10px] text-slate-400 uppercase font-bold">Placement Status</span>
+                <p className="text-xs font-bold text-slate-700 mt-1">{activeStudent.placementStatus || "UNPLACED"}</p>
+              </div>
+            </div>
+
+            {/* Matched Skills */}
+            <div>
+              <h5 className="text-xs font-bold text-slate-700 uppercase mb-1.5">Matched Competencies</h5>
+              <div className="flex flex-wrap gap-1.5">
+                {(activeStudent.matchedSkills || []).length > 0 ? (
+                  activeStudent.matchedSkills.map((sk, i) => (
+                    <Badge key={i} variant="success" size="sm">{sk}</Badge>
+                  ))
+                ) : (
+                  <span className="text-xs text-slate-400">No direct skill matches</span>
+                )}
+              </div>
+            </div>
+
+            {/* Missing Skills */}
+            <div>
+              <h5 className="text-xs font-bold text-slate-700 uppercase mb-1.5">Missing Target Skills</h5>
+              <div className="flex flex-wrap gap-1.5">
+                {(activeStudent.missingSkills || []).length > 0 ? (
+                  activeStudent.missingSkills.map((sk, i) => (
+                    <Badge key={i} variant="danger" size="sm">{sk}</Badge>
+                  ))
+                ) : (
+                  <span className="text-xs text-emerald-600 font-medium">All required skills met!</span>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2 border-t border-slate-100">
+              <Button variant="outline" size="sm" onClick={() => setStudentModalOpen(false)}>
+                Close
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
 
       {/* Create Job Description Modal */}
       <Modal

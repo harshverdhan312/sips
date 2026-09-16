@@ -3,6 +3,7 @@ const Match = require('../models/Match');
 const JobDescription = require('../models/JobDescription');
 const bcrypt = require('bcryptjs');
 const { calculateMatch } = require('../utils/matchingEngine');
+const memoryDb = require('../utils/memoryDb');
 
 /**
  * GET /api/student/profile
@@ -10,6 +11,15 @@ const { calculateMatch } = require('../utils/matchingEngine');
  */
 exports.getProfile = async (req, res) => {
   try {
+    if (!memoryDb.isMongoConnected()) {
+      const student = memoryDb.findStudentById(req.user.id);
+      if (!student) {
+        return res.status(404).json({ message: 'Profile not found' });
+      }
+      const { passwordHash, ...clean } = student;
+      return res.json(clean);
+    }
+
     const student = await Student.findOne({ 
       _id: req.user.id, 
       collegeId: req.collegeId 
@@ -32,6 +42,24 @@ exports.getProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const { skills, github, newPassword } = req.body;
+
+    if (!memoryDb.isMongoConnected()) {
+      const student = memoryDb.findStudentById(req.user.id);
+      if (!student) {
+        return res.status(404).json({ message: 'Profile not found' });
+      }
+      const updates = {};
+      if (skills !== undefined) updates.skills = skills.map(s => s.trim()).filter(Boolean);
+      if (github !== undefined) updates.github = github.trim();
+      if (newPassword) {
+        const salt = await bcrypt.genSalt(10);
+        updates.passwordHash = await bcrypt.hash(newPassword, salt);
+      }
+      const updated = memoryDb.updateStudent(req.user.id, updates);
+      const { passwordHash, ...clean } = updated;
+      return res.json({ message: 'Profile updated', student: clean });
+    }
+
     const student = await Student.findOne({ 
       _id: req.user.id, 
       collegeId: req.collegeId 
@@ -92,6 +120,15 @@ exports.uploadResume = async (req, res) => {
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
+    if (!memoryDb.isMongoConnected()) {
+      const student = memoryDb.findStudentById(req.user.id);
+      if (!student) {
+        return res.status(404).json({ message: 'Profile not found' });
+      }
+      student.resumeUrl = `/uploads/${req.file.filename}`;
+      return res.json({ message: 'Resume uploaded', resumeUrl: student.resumeUrl });
+    }
+
     const student = await Student.findOne({ 
       _id: req.user.id, 
       collegeId: req.collegeId 
@@ -117,6 +154,21 @@ exports.uploadResume = async (req, res) => {
  */
 exports.getJobs = async (req, res) => {
   try {
+    if (!memoryDb.isMongoConnected()) {
+      const jds = memoryDb.getJobs(req.collegeId);
+      const student = memoryDb.findStudentById(req.user.id);
+      const jobsWithScores = jds.map(jd => {
+        const match = student ? calculateMatch(student.skills || [], jd.requiredSkills || []) : { score: 0, matchedSkills: [], missingSkills: [] };
+        return {
+          ...jd,
+          matchScore: match.score,
+          matchedSkills: match.matchedSkills,
+          missingSkills: match.missingSkills
+        };
+      });
+      return res.json(jobsWithScores);
+    }
+
     const jds = await JobDescription.find({ collegeId: req.collegeId })
       .sort({ createdAt: -1 });
 
@@ -156,6 +208,21 @@ exports.getJobs = async (req, res) => {
  */
 exports.getPreferredJobs = async (req, res) => {
   try {
+    if (!memoryDb.isMongoConnected()) {
+      const jds = memoryDb.getJobs(req.collegeId);
+      const student = memoryDb.findStudentById(req.user.id);
+      const preferred = jds.map(jd => {
+        const match = student ? calculateMatch(student.skills || [], jd.requiredSkills || []) : { score: 0, matchedSkills: [], missingSkills: [] };
+        return {
+          ...jd,
+          matchScore: match.score,
+          matchedSkills: match.matchedSkills,
+          missingSkills: match.missingSkills
+        };
+      }).filter(j => j.matchScore > 0).sort((a, b) => b.matchScore - a.matchScore);
+      return res.json(preferred);
+    }
+
     const student = await Student.findOne({ 
       _id: req.user.id, 
       collegeId: req.collegeId 
