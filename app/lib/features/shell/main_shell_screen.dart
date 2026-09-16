@@ -50,7 +50,7 @@ class MainShellScreen extends ConsumerWidget {
     final alertsAsync = ref.watch(alertsProvider);
     final int unreadAlertsCount = alertsAsync.maybeWhen(
       data: (alerts) => alerts.where((a) => !a.isRead).length,
-      orElse: () => 2,
+      orElse: () => 0,
     );
 
     return Scaffold(

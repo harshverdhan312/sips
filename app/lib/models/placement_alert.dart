@@ -49,14 +49,43 @@ class PlacementAlert {
       } catch (_) {}
     }
 
+    final lower = message.toLowerCase();
+    String actionRoute = '/opportunities';
+    String actionLabel = 'View Notice';
+    AlertType type = AlertType.campusDrive;
+
+    if (lower.contains('interview') || lower.contains('mock') || lower.contains('diagnostic') || lower.contains('feedback')) {
+      actionRoute = '/mock-interview';
+      actionLabel = 'Mock Interview';
+      type = AlertType.interviewFeedback;
+    } else if (lower.contains('skill') || lower.contains('gap') || lower.contains('radar') || lower.contains('competency')) {
+      actionRoute = '/skills';
+      actionLabel = 'Skill Radar';
+      type = AlertType.skillGap;
+    } else if (lower.contains('roadmap') || lower.contains('sprint') || lower.contains('task') || lower.contains('growth')) {
+      actionRoute = '/growth';
+      actionLabel = 'Growth Tasks';
+      type = AlertType.readinessBoost;
+    } else if (lower.contains('profile') || lower.contains('resume') || lower.contains('github') || lower.contains('account')) {
+      actionRoute = '/profile';
+      actionLabel = 'View Profile';
+      type = AlertType.system;
+    } else if (lower.contains('drive') || lower.contains('job') || lower.contains('campus') || lower.contains('hiring') || lower.contains('apply') || lower.contains('package')) {
+      actionRoute = '/opportunities';
+      actionLabel = 'View Opportunity';
+      type = AlertType.campusDrive;
+    }
+
     return PlacementAlert(
       id: json['_id'] as String? ?? json['id'] as String? ?? '',
       title: title,
       description: description,
       timestamp: timeFormatted,
-      type: AlertType.campusDrive,
+      type: type,
+      actionRoute: actionRoute,
+      actionLabel: actionLabel,
       isRead: false,
-      isUrgent: false,
+      isUrgent: lower.contains('urgent') || lower.contains('deadline') || lower.contains('today'),
     );
   }
 

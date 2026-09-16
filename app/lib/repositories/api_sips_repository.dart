@@ -20,6 +20,11 @@ class ApiSipsRepository implements SipsRepository {
   List<JobOpportunity> _cachedJobs = [];
   List<PlacementAlert> _cachedAlerts = [];
 
+  // Session state tracking across API re-fetches
+  final Set<String> _readAlertIds = {};
+  final Set<String> _appliedJobIds = {};
+  final Set<String> _bookmarkedJobIds = {};
+
   // Local state for unsupported features (Backend Gaps)
   List<GrowthTask> _localTasks = List.from(MockData.tasks);
   final List<RoadmapMilestone> _localMilestones = List.from(MockData.roadmapMilestones);
@@ -116,7 +121,13 @@ class ApiSipsRepository implements SipsRepository {
     if (response is List) {
       _cachedJobs = response
           .whereType<Map<String, dynamic>>()
-          .map((item) => JobOpportunity.fromBackendJson(item))
+          .map((item) {
+            final job = JobOpportunity.fromBackendJson(item);
+            return job.copyWith(
+              hasApplied: _appliedJobIds.contains(job.id),
+              isBookmarked: _bookmarkedJobIds.contains(job.id),
+            );
+          })
           .toList();
       return _cachedJobs;
     }
@@ -137,9 +148,14 @@ class ApiSipsRepository implements SipsRepository {
 
   @override
   Future<void> toggleJobBookmark(String jobId) async {
+    if (_bookmarkedJobIds.contains(jobId)) {
+      _bookmarkedJobIds.remove(jobId);
+    } else {
+      _bookmarkedJobIds.add(jobId);
+    }
     _cachedJobs = _cachedJobs.map((j) {
       if (j.id == jobId) {
-        return j.copyWith(isBookmarked: !j.isBookmarked);
+        return j.copyWith(isBookmarked: _bookmarkedJobIds.contains(jobId));
       }
       return j;
     }).toList();
@@ -147,6 +163,7 @@ class ApiSipsRepository implements SipsRepository {
 
   @override
   Future<void> applyForJob(String jobId) async {
+    _appliedJobIds.add(jobId);
     _cachedJobs = _cachedJobs.map((j) {
       if (j.id == jobId) {
         return j.copyWith(hasApplied: true);
@@ -164,7 +181,12 @@ class ApiSipsRepository implements SipsRepository {
     if (response is List) {
       _cachedAlerts = response
           .whereType<Map<String, dynamic>>()
-          .map((item) => PlacementAlert.fromBackendJson(item))
+          .map((item) {
+            final alert = PlacementAlert.fromBackendJson(item);
+            return alert.copyWith(
+              isRead: _readAlertIds.contains(alert.id),
+            );
+          })
           .toList();
       return _cachedAlerts;
     }
@@ -173,6 +195,7 @@ class ApiSipsRepository implements SipsRepository {
 
   @override
   Future<void> markAlertAsRead(String alertId) async {
+    _readAlertIds.add(alertId);
     _cachedAlerts = _cachedAlerts.map((a) {
       if (a.id == alertId) {
         return a.copyWith(isRead: true);

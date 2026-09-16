@@ -269,14 +269,26 @@ class OpportunitiesNotifier extends StateNotifier<AsyncValue<List<JobOpportunity
 
   Future<void> toggleBookmark(String jobId) async {
     await _repository.toggleJobBookmark(jobId);
-    final jobs = await _repository.getJobOpportunities();
-    state = AsyncValue.data(jobs);
+    state.whenData((jobs) {
+      state = AsyncValue.data(jobs.map((j) {
+        if (j.id == jobId) {
+          return j.copyWith(isBookmarked: !j.isBookmarked);
+        }
+        return j;
+      }).toList());
+    });
   }
 
   Future<void> apply(String jobId) async {
     await _repository.applyForJob(jobId);
-    final jobs = await _repository.getJobOpportunities();
-    state = AsyncValue.data(jobs);
+    state.whenData((jobs) {
+      state = AsyncValue.data(jobs.map((j) {
+        if (j.id == jobId) {
+          return j.copyWith(hasApplied: true);
+        }
+        return j;
+      }).toList());
+    });
   }
 }
 
@@ -437,8 +449,14 @@ class AlertsNotifier extends StateNotifier<AsyncValue<List<PlacementAlert>>> {
 
   Future<void> markAsRead(String alertId) async {
     await _repository.markAlertAsRead(alertId);
-    final alerts = await _repository.getPlacementAlerts();
-    state = AsyncValue.data(alerts);
+    state.whenData((alerts) {
+      state = AsyncValue.data(alerts.map((a) {
+        if (a.id == alertId) {
+          return a.copyWith(isRead: true);
+        }
+        return a;
+      }).toList());
+    });
   }
 }
 
