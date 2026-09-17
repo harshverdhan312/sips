@@ -157,14 +157,23 @@ export function TopNavbar({ onMenuClick }) {
             onClick={() => setProfileOpen(!profileOpen)}
             className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
           >
-            <img
-              src={
-                user?.avatar ||
-                "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80"
-              }
-              alt={user?.name || "User"}
-              className="w-8 h-8 rounded-full object-cover border border-slate-200"
-            />
+            {user?.avatar ? (
+              <img
+                src={user.avatar}
+                alt={user?.name || "User"}
+                className="w-8 h-8 rounded-full object-cover border border-slate-200"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center border border-indigo-700/30">
+                {(user?.name || user?.studentName || "ST")
+                  .trim()
+                  .split(/\s+/)
+                  .map((n) => n[0] || "")
+                  .slice(0, 2)
+                  .join("")
+                  .toUpperCase()}
+              </div>
+            )}
             <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:block" />
           </button>
 

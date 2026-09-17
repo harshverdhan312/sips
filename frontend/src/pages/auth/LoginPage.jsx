@@ -147,22 +147,20 @@ export function LoginPage() {
             <button
               type="button"
               onClick={() => setIsRegisterMode(false)}
-              className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                !isRegisterMode
+              className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${!isRegisterMode
                   ? "bg-white text-indigo-600 shadow-2xs"
                   : "text-slate-600 hover:text-slate-900"
-              }`}
+                }`}
             >
               Sign In
             </button>
             <button
               type="button"
               onClick={() => setIsRegisterMode(true)}
-              className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1 ${
-                isRegisterMode
+              className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1 ${isRegisterMode
                   ? "bg-white text-indigo-600 shadow-2xs"
                   : "text-slate-600 hover:text-slate-900"
-              }`}
+                }`}
             >
               <UserPlus className="w-3.5 h-3.5" />
               Register College

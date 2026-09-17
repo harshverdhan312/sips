@@ -29,7 +29,34 @@ class _OpportunitiesScreenState extends ConsumerState<OpportunitiesScreen> {
       backgroundColor: AppColors.background,
       body: jobsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
-        error: (err, _) => Center(child: Text('Error loading jobs: $err')),
+        error: (err, _) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.cloud_off_rounded, size: 48, color: AppColors.outline),
+                const SizedBox(height: 12),
+                Text(
+                  'Unable to load campus opportunities',
+                  style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 16),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  err.toString(),
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AppColors.onSurfaceVariant),
+                ),
+                const SizedBox(height: 16),
+                SipsButton(
+                  label: 'Retry',
+                  size: SipsButtonSize.small,
+                  onPressed: () => ref.read(opportunitiesProvider.notifier).loadJobs(),
+                ),
+              ],
+            ),
+          ),
+        ),
         data: (jobs) {
           final filteredJobs = jobs.where((job) {
             if (_selectedFilter == 1 && job.matchScore < 85) return false;
@@ -44,11 +71,14 @@ class _OpportunitiesScreenState extends ConsumerState<OpportunitiesScreen> {
             return true;
           }).toList();
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+          return RefreshIndicator(
+            onRefresh: () => ref.read(opportunitiesProvider.notifier).loadJobs(),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                 // Top Affinity Banner
                 SipsCard(
                   padding: const EdgeInsets.all(18),
@@ -139,8 +169,9 @@ class _OpportunitiesScreenState extends ConsumerState<OpportunitiesScreen> {
                 ...filteredJobs.map((job) => _buildJobCard(job)),
               ],
             ),
-          );
-        },
+          ),
+        );
+      },
       ),
     );
   }

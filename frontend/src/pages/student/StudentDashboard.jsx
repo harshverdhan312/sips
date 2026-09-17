@@ -11,17 +11,16 @@ import {
   CheckCircle2,
   AlertTriangle,
   Clock,
-  Play,
-  Flame
+  Building2,
+  Briefcase,
+  UploadCloud,
+  Layers
 } from "lucide-react";
 import { studentService } from "../../services/studentService";
-import { taskService } from "../../services/taskService";
-import { placementService } from "../../services/placementService";
 import { StatCard } from "../../components/common/StatCard";
 import { Card, CardHeader } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
-import { ProgressBar } from "../../components/common/ProgressBar";
 import { ProbabilityGauge } from "../../components/charts/ProbabilityGauge";
 import { RadarSkillChart } from "../../components/charts/RadarSkillChart";
 import { DashboardSkeleton } from "../../components/common/LoadingSkeleton";
@@ -30,23 +29,20 @@ export function StudentDashboard() {
   const navigate = useNavigate();
   const [student, setStudent] = useState(null);
   const [radarData, setRadarData] = useState([]);
-  const [tasksData, setTasksData] = useState(null);
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
       try {
-        const [studentData, radar, tasks, jobList] = await Promise.all([
+        const [studentData, radar, jobList] = await Promise.all([
           studentService.getCurrentStudent(),
           studentService.getRadarData(),
-          taskService.getTasksData(),
-          placementService.getJobs()
+          studentService.getStudentJobs()
         ]);
         setStudent(studentData);
         setRadarData(radar);
-        setTasksData(tasks);
-        setJobs(jobList.slice(0, 3));
+        setJobs(jobList.slice(0, 4));
       } catch (err) {
         console.error(err);
       } finally {
@@ -70,13 +66,13 @@ export function StudentDashboard() {
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-indigo-200 border border-white/10">
               <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              AI Placement Intelligence Active
+              Campus Placement Portal Active
             </div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight">
-              Good morning, {student.name.split(" ")[0]} 👋
+              Welcome back, {student.name ? student.name.split(" ")[0] : "Student"} 👋
             </h1>
             <p className="text-sm sm:text-base text-indigo-200 max-w-xl">
-              Here is your holistic placement readiness overview. Your profile is in the top 12% of the 2025 engineering batch.
+              {student.branch ? `${student.branch} • ${student.semester}` : "Live student placement dashboard"}
             </p>
           </div>
 
@@ -86,18 +82,18 @@ export function StudentDashboard() {
               size="md"
               icon={FileText}
               className="bg-white/10 text-white border-white/20 hover:bg-white/20 shadow-none"
-              onClick={() => navigate("/student/resume")}
+              onClick={() => navigate("/student/profile")}
             >
-              Analyze Resume
+              {student.resumeUrl ? "View Resume" : "Upload Resume"}
             </Button>
             <Button
               variant="primary"
               size="md"
-              icon={Play}
+              icon={Briefcase}
               className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-900/40"
-              onClick={() => navigate("/student/interview")}
+              onClick={() => navigate("/student/jobs")}
             >
-              Start AI Mock Drill
+              Explore Placement Drives
             </Button>
           </div>
         </div>
@@ -106,47 +102,41 @@ export function StudentDashboard() {
         <div className="absolute right-0 top-0 -bottom-10 w-96 bg-gradient-to-l from-indigo-500/20 to-transparent pointer-events-none" />
       </div>
 
-      {/* Main 6 Metric Cards */}
+      {/* Main Metric Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
         <StatCard
-          title="Employability Index"
-          value={`${metrics.employabilityIndex}/100`}
-          trend={{ value: "+3 pts", direction: "up", label: "this mo" }}
+          title="Readiness Score"
+          value={`${student.readinessScore}/100`}
           icon={TrendingUp}
           iconBg="bg-indigo-50 text-indigo-600"
         />
         <StatCard
-          title="Placement Prob."
+          title="Placement Probability"
           value={`${metrics.placementProbability}%`}
-          trend={{ value: "+4%", direction: "up", label: "vs batch" }}
           icon={Target}
           iconBg="bg-emerald-50 text-emerald-600"
         />
         <StatCard
           title="Technical Score"
-          value={metrics.technicalScore}
-          subtitle="Top 15% in CSE"
+          value={metrics.technicalScore > 0 ? `${metrics.technicalScore}/100` : "Not evaluated"}
           icon={Sparkles}
           iconBg="bg-blue-50 text-blue-600"
         />
         <StatCard
-          title="Soft Skill Index"
-          value={metrics.softSkillScore}
-          subtitle="Speech pace: 136 WPM"
+          title="Soft Skills Score"
+          value={metrics.softSkillScore > 0 ? `${metrics.softSkillScore}/100` : "Not evaluated"}
           icon={Mic}
           iconBg="bg-purple-50 text-purple-600"
         />
         <StatCard
           title="Resume Score"
-          value={`${metrics.resumeScore}/100`}
-          subtitle="ATS Verified"
+          value={metrics.resumeScore > 0 ? `${metrics.resumeScore}/100` : (student.resumeUrl ? "Uploaded" : "Pending")}
           icon={FileText}
           iconBg="bg-sky-50 text-sky-600"
         />
         <StatCard
-          title="Interview Ready"
-          value={`${metrics.interviewReadiness}%`}
-          trend={{ value: "+5%", direction: "up" }}
+          title="Academic CGPA"
+          value={student.cgpa > 0 ? student.cgpa.toFixed(2) : "N/A"}
           icon={Award}
           iconBg="bg-amber-50 text-amber-600"
         />
@@ -157,11 +147,11 @@ export function StudentDashboard() {
         {/* Placement Probability Breakdown Card */}
         <Card className="flex flex-col justify-between">
           <CardHeader
-            title="Placement Probability"
-            subtitle="Calculated across 40+ industry recruitment criteria"
+            title="Placement Readiness Index"
+            subtitle="Computed from your verified profile metrics"
             action={
-              <Badge variant="success" size="sm">
-                High Target Fit
+              <Badge variant={student.readinessScore >= 80 ? "success" : (student.readinessScore >= 60 ? "primary" : "neutral")} size="sm">
+                {student.status}
               </Badge>
             }
           />
@@ -169,18 +159,18 @@ export function StudentDashboard() {
             <ProbabilityGauge probability={metrics.placementProbability} />
           </div>
 
-          <div className="mt-4 pt-4 border-t border-slate-100 space-y-2">
-            <div className="flex justify-between text-xs font-medium">
-              <span className="text-slate-500">Tier-1 SDE Drives (Google / Microsoft):</span>
-              <span className="font-semibold text-slate-800">86% Fit</span>
+          <div className="mt-4 pt-4 border-t border-slate-100 space-y-2 text-xs">
+            <div className="flex justify-between font-medium">
+              <span className="text-slate-500">Placement Status:</span>
+              <span className="font-semibold text-slate-800">{student.placementStatus}</span>
             </div>
-            <div className="flex justify-between text-xs font-medium">
-              <span className="text-slate-500">FinTech & Quantitative Roles:</span>
-              <span className="font-semibold text-slate-800">82% Fit</span>
+            <div className="flex justify-between font-medium">
+              <span className="text-slate-500">Resume Synchronization:</span>
+              <span className="font-semibold text-slate-800">{student.resumeUrl ? "Synced" : "Upload required"}</span>
             </div>
-            <div className="flex justify-between text-xs font-medium">
-              <span className="text-slate-500">Mass / IT Services:</span>
-              <span className="font-semibold text-slate-800">98% Fit</span>
+            <div className="flex justify-between font-medium">
+              <span className="text-slate-500">Verified Technical Skills:</span>
+              <span className="font-semibold text-slate-800">{student.skills.length} skills</span>
             </div>
           </div>
         </Card>
@@ -188,8 +178,8 @@ export function StudentDashboard() {
         {/* Radar Skill Intelligence */}
         <Card className="lg:col-span-2">
           <CardHeader
-            title="Skill Intelligence Benchmark"
-            subtitle="Your current proficiency evaluated against Tier-1 campus benchmarks"
+            title="Readiness Dimension Telemetry"
+            subtitle="Holistic performance metrics synced with backend profile"
             action={
               <Button
                 variant="ghost"
@@ -198,7 +188,7 @@ export function StudentDashboard() {
                 iconPosition="right"
                 onClick={() => navigate("/student/skills")}
               >
-                Detailed Gap Analysis
+                View Skills
               </Button>
             }
           />
@@ -206,9 +196,58 @@ export function StudentDashboard() {
         </Card>
       </div>
 
-      {/* Skill Strengths vs Gaps Row */}
+      {/* Verified Skills & Profile Checklist */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Strong Skills */}
+        {/* Verified Technical Skills */}
+        <Card>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-xl bg-indigo-50 text-indigo-600">
+                <Layers className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-slate-900 text-base">
+                  Verified Technical Skills
+                </h3>
+                <p className="text-xs text-slate-500">Source: GET /api/student/profile</p>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              size="xs"
+              onClick={() => navigate("/student/profile")}
+            >
+              Edit Skills
+            </Button>
+          </div>
+
+          {student.skills && student.skills.length > 0 ? (
+            <div className="flex flex-wrap gap-2 pt-1">
+              {student.skills.map((skill, i) => (
+                <span
+                  key={i}
+                  className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200/80 flex items-center gap-1.5"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  {skill}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <div className="p-6 text-center rounded-2xl bg-slate-50 border border-dashed border-slate-200">
+              <p className="text-xs text-slate-500 mb-3">No verified technical skills added yet.</p>
+              <Button
+                variant="primary"
+                size="xs"
+                onClick={() => navigate("/student/profile")}
+              >
+                Add Skills in Profile
+              </Button>
+            </div>
+          )}
+        </Card>
+
+        {/* Profile Completion Checklist */}
         <Card>
           <div className="flex items-center gap-2 mb-4">
             <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600">
@@ -216,247 +255,88 @@ export function StudentDashboard() {
             </div>
             <div>
               <h3 className="font-semibold text-slate-900 text-base">
-                Your Strongest Proficiencies
+                Placement Cell Profile Checklist
               </h3>
-              <p className="text-xs text-slate-500">Exceeds campus hiring standards</p>
+              <p className="text-xs text-slate-500">Required credentials for campus placement drives</p>
             </div>
           </div>
 
-          <div className="space-y-3.5">
-            <div>
-              <div className="flex justify-between text-xs font-semibold mb-1">
-                <span className="text-slate-800">Python & Problem Solving</span>
-                <span className="text-emerald-600 font-bold">88% (Benchmark 85%)</span>
+          <div className="space-y-3">
+            <div className="p-3 rounded-xl bg-slate-50 flex items-center justify-between border border-slate-100 text-xs">
+              <div className="flex items-center gap-2.5">
+                <div className={`w-2 h-2 rounded-full ${student.cgpa > 0 ? "bg-emerald-500" : "bg-amber-500"}`} />
+                <span className="font-medium text-slate-700">Academic CGPA Verification</span>
               </div>
-              <ProgressBar value={88} variant="emerald" size="sm" showPercentage={false} />
+              <span className="font-semibold text-slate-900">{student.cgpa > 0 ? `${student.cgpa.toFixed(2)} CGPA` : "Pending"}</span>
             </div>
 
-            <div>
-              <div className="flex justify-between text-xs font-semibold mb-1">
-                <span className="text-slate-800">React.js & Web Architecture</span>
-                <span className="text-emerald-600 font-bold">85% (Benchmark 80%)</span>
+            <div className="p-3 rounded-xl bg-slate-50 flex items-center justify-between border border-slate-100 text-xs">
+              <div className="flex items-center gap-2.5">
+                <div className={`w-2 h-2 rounded-full ${student.resumeUrl ? "bg-emerald-500" : "bg-rose-500"}`} />
+                <span className="font-medium text-slate-700">Placement PDF Resume</span>
               </div>
-              <ProgressBar value={85} variant="emerald" size="sm" showPercentage={false} />
+              <span className="font-semibold text-slate-900">{student.resumeUrl ? "Uploaded & Synced" : "Not uploaded"}</span>
             </div>
 
-            <div>
-              <div className="flex justify-between text-xs font-semibold mb-1">
-                <span className="text-slate-800">JavaScript ES6+ & Async Concurrency</span>
-                <span className="text-emerald-600 font-bold">82% (Benchmark 85%)</span>
+            <div className="p-3 rounded-xl bg-slate-50 flex items-center justify-between border border-slate-100 text-xs">
+              <div className="flex items-center gap-2.5">
+                <div className={`w-2 h-2 rounded-full ${student.github ? "bg-emerald-500" : "bg-slate-400"}`} />
+                <span className="font-medium text-slate-700">GitHub Profile Handle</span>
               </div>
-              <ProgressBar value={82} variant="emerald" size="sm" showPercentage={false} />
+              <span className="font-semibold text-slate-900">{student.github || "Unlinked"}</span>
             </div>
 
-            <div>
-              <div className="flex justify-between text-xs font-semibold mb-1">
-                <span className="text-slate-800">Git Collaboration & Rebase Workflows</span>
-                <span className="text-emerald-600 font-bold">90% (Benchmark 80%)</span>
+            <div className="p-3 rounded-xl bg-slate-50 flex items-center justify-between border border-slate-100 text-xs">
+              <div className="flex items-center gap-2.5">
+                <div className={`w-2 h-2 rounded-full ${student.skills.length > 0 ? "bg-emerald-500" : "bg-amber-500"}`} />
+                <span className="font-medium text-slate-700">Technical Skills Mapping</span>
               </div>
-              <ProgressBar value={90} variant="emerald" size="sm" showPercentage={false} />
-            </div>
-          </div>
-        </Card>
-
-        {/* Needs Improvement */}
-        <Card>
-          <div className="flex items-center gap-2 mb-4">
-            <div className="p-2 rounded-xl bg-amber-50 text-amber-600">
-              <AlertTriangle className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-slate-900 text-base">
-                Skills Requiring Immediate Focus
-              </h3>
-              <p className="text-xs text-slate-500">Identified in 70%+ of target JDs</p>
-            </div>
-          </div>
-
-          <div className="space-y-3.5">
-            <div>
-              <div className="flex justify-between text-xs font-semibold mb-1">
-                <span className="text-slate-800">Docker & Containerization</span>
-                <span className="text-rose-600 font-bold">55% (Gap: 20%)</span>
-              </div>
-              <ProgressBar value={55} variant="rose" size="sm" showPercentage={false} />
-            </div>
-
-            <div>
-              <div className="flex justify-between text-xs font-semibold mb-1">
-                <span className="text-slate-800">AWS Cloud Services (S3, Lambda)</span>
-                <span className="text-rose-600 font-bold">50% (Gap: 20%)</span>
-              </div>
-              <ProgressBar value={50} variant="rose" size="sm" showPercentage={false} />
-            </div>
-
-            <div>
-              <div className="flex justify-between text-xs font-semibold mb-1">
-                <span className="text-slate-800">System Design & Sharding Patterns</span>
-                <span className="text-amber-600 font-bold">58% (Gap: 22%)</span>
-              </div>
-              <ProgressBar value={58} variant="amber" size="sm" showPercentage={false} />
-            </div>
-
-            <div>
-              <div className="flex justify-between text-xs font-semibold mb-1">
-                <span className="text-slate-800">SQL Window Functions & Indexing</span>
-                <span className="text-amber-600 font-bold">72% (Gap: 13%)</span>
-              </div>
-              <ProgressBar value={72} variant="amber" size="sm" showPercentage={false} />
+              <span className="font-semibold text-slate-900">{student.skills.length > 0 ? `${student.skills.length} skills verified` : "0 skills added"}</span>
             </div>
           </div>
         </Card>
       </div>
 
-      {/* Gamified Daily Task & Recommended Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Daily Behavioral Task */}
-        {tasksData && (
-          <Card className="bg-gradient-to-br from-indigo-50/70 to-white border-indigo-200/80">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">
-                <Flame className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-                {tasksData.state.streakDays}-Day Streak!
-              </div>
-              <Badge variant="purple" size="sm">
-                +{tasksData.tasks[0]?.xpReward || 150} XP
-              </Badge>
-            </div>
-
-            <h3 className="font-bold text-slate-900 text-base leading-snug">
-              Today's Challenge: {tasksData.tasks[0]?.title}
-            </h3>
-            <p className="text-xs text-slate-600 mt-1.5 line-clamp-3">
-              {tasksData.tasks[0]?.description}
-            </p>
-
-            <div className="mt-5 pt-4 border-t border-indigo-100 flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-500">
-                Difficulty: {tasksData.tasks[0]?.difficulty}
-              </span>
-              <Button
-                variant="primary"
-                size="sm"
-                icon={Play}
-                onClick={() => navigate("/student/tasks")}
-              >
-                Complete Task
-              </Button>
-            </div>
-          </Card>
-        )}
-
-        {/* Recommended Actions */}
-        <Card className="lg:col-span-2">
-          <CardHeader
-            title="AI Recommended Placement Actions"
-            subtitle="Prioritized steps to boost your Employability Index from 78 to 85+"
-            action={
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/student/recommendations")}
-              >
-                View All
-              </Button>
-            }
-          />
-
-          <div className="space-y-3">
-            <div className="p-3 rounded-xl bg-slate-50 hover:bg-slate-100/80 transition-colors flex items-center justify-between gap-4 border border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xs shrink-0">
-                  01
-                </div>
-                <div>
-                  <h4 className="text-xs sm:text-sm font-semibold text-slate-900">
-                    Complete Docker Containerization Lab
-                  </h4>
-                  <p className="text-[11px] text-slate-500">
-                    Directly addresses 20% gap in Microsoft SDE requirements
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                size="xs"
-                onClick={() => navigate("/student/skills")}
-              >
-                Start Lab
-              </Button>
-            </div>
-
-            <div className="p-3 rounded-xl bg-slate-50 hover:bg-slate-100/80 transition-colors flex items-center justify-between gap-4 border border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs shrink-0">
-                  02
-                </div>
-                <div>
-                  <h4 className="text-xs sm:text-sm font-semibold text-slate-900">
-                    Practice STAR Behavioral Story: Tight Deadlines
-                  </h4>
-                  <p className="text-[11px] text-slate-500">
-                    Boost behavioral score by adding quantifiable result metrics
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                size="xs"
-                onClick={() => navigate("/student/star")}
-              >
-                Open STAR
-              </Button>
-            </div>
-
-            <div className="p-3 rounded-xl bg-slate-50 hover:bg-slate-100/80 transition-colors flex items-center justify-between gap-4 border border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-xs shrink-0">
-                  03
-                </div>
-                <div>
-                  <h4 className="text-xs sm:text-sm font-semibold text-slate-900">
-                    Schedule Peer Mock Drill with Rohan Deshmukh
-                  </h4>
-                  <p className="text-[11px] text-slate-500">
-                    94% match for Go & backend system design mock practice
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                size="xs"
-                onClick={() => navigate("/student/peers")}
-              >
-                Connect
-              </Button>
-            </div>
+      {/* Upcoming Placement Drives */}
+      <Card>
+        <div className="flex items-center justify-between px-6 pt-5 pb-2">
+          <div>
+            <h3 className="text-base font-bold text-slate-900">Active Placement Opportunities</h3>
+            <p className="text-xs text-slate-500">Live recruitment drives from GET /api/student/jobs</p>
           </div>
-        </Card>
-      </div>
-
-      {/* Upcoming Placement Drives & Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Active Campus Drives */}
-        <Card className="lg:col-span-2">
-          <CardHeader
-            title="Upcoming Placement Opportunities"
-            subtitle="Campus recruitment drives matching your academic and skill criteria"
-          />
-          <div className="space-y-3">
-            {jobs.map((job) => (
+          <Button
+            variant="outline"
+            size="xs"
+            onClick={() => navigate("/student/jobs")}
+          >
+            View All Drives
+          </Button>
+        </div>
+        <div className="p-6 pt-2 space-y-3">
+          {jobs.length > 0 ? (
+            jobs.map((job) => (
               <div
                 key={job.id}
                 className="p-4 rounded-xl border border-slate-200/80 hover:border-slate-300 hover:shadow-xs transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
               >
                 <div className="flex items-start gap-3.5">
-                  <div className="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-700 text-base shrink-0">
+                  <div className="w-11 h-11 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center font-bold text-indigo-700 text-base shrink-0">
                     {job.company.charAt(0)}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
                       <h4 className="font-bold text-slate-900 text-sm">{job.company}</h4>
-                      <Badge variant="primary" size="sm">
-                        {job.studentMatch}% Match
+                      <Badge
+                        variant={
+                          job.matchScore >= 80
+                            ? "success"
+                            : job.matchScore >= 60
+                            ? "primary"
+                            : "neutral"
+                        }
+                        size="sm"
+                      >
+                        {job.matchScore}% Match
                       </Badge>
                     </div>
                     <p className="text-xs text-slate-600 mt-0.5">{job.role}</p>
@@ -475,57 +355,19 @@ export function StudentDashboard() {
                 <Button
                   variant="primary"
                   size="sm"
-                  onClick={() => navigate("/student/recommendations")}
+                  onClick={() => navigate("/student/jobs")}
                 >
-                  Apply Now
+                  Explore Drive
                 </Button>
               </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* Recent Activity */}
-        <Card>
-          <CardHeader title="Recent Activity" subtitle="Your latest platform interactions" />
-          <div className="space-y-4">
-            <div className="flex items-start gap-3 text-xs">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
-              <div>
-                <p className="font-semibold text-slate-800">Resume Parsed via ATS</p>
-                <p className="text-slate-500">Score increased from 82 to 88</p>
-                <span className="text-[10px] text-slate-400">Today, 10:15 AM</span>
-              </div>
+            ))
+          ) : (
+            <div className="py-8 text-center text-xs text-slate-400">
+              No placement drives available right now.
             </div>
-
-            <div className="flex items-start gap-3 text-xs">
-              <div className="w-2 h-2 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
-              <div>
-                <p className="font-semibold text-slate-800">Full-Stack AI Mock Drill Completed</p>
-                <p className="text-slate-500">Scored 82/100, Speech pace 136 WPM</p>
-                <span className="text-[10px] text-slate-400">Yesterday, 3:45 PM</span>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 text-xs">
-              <div className="w-2 h-2 rounded-full bg-purple-500 mt-1.5 shrink-0" />
-              <div>
-                <p className="font-semibold text-slate-800">STAR Story Drafted & Evaluated</p>
-                <p className="text-slate-500">Rated 88/100 for Quantifiable Impact</p>
-                <span className="text-[10px] text-slate-400">2 days ago</span>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 text-xs">
-              <div className="w-2 h-2 rounded-full bg-amber-500 mt-1.5 shrink-0" />
-              <div>
-                <p className="font-semibold text-slate-800">Completed 7-Day Behavioral Streak</p>
-                <p className="text-slate-500">Earned '7-Day Streak' badge & 150 XP</p>
-                <span className="text-[10px] text-slate-400">3 days ago</span>
-              </div>
-            </div>
-          </div>
-        </Card>
-      </div>
+          )}
+        </div>
+      </Card>
     </div>
   );
 }

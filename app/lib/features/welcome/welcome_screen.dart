@@ -107,7 +107,7 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    // Visual Readiness Preview Pill
+                    // Visual Feature Highlights Pill
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
@@ -118,11 +118,11 @@ class WelcomeScreen extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          _buildStatItem('78/100', 'Readiness Score', AppColors.primary),
+                          _buildStatItem('Real-Time', 'Readiness Index', AppColors.primary),
                           Container(width: 1, height: 28, color: AppColors.outlineVariant),
-                          _buildStatItem('Top 12%', 'Batch Standing', AppColors.secondary),
+                          _buildStatItem('Verified', 'Drive Alerts', AppColors.secondary),
                           Container(width: 1, height: 28, color: AppColors.outlineVariant),
-                          _buildStatItem('91% Match', 'Target Roles', AppColors.emerald),
+                          _buildStatItem('Live', 'Skill Benchmarking', AppColors.emerald),
                         ],
                       ),
                     ),

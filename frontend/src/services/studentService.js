@@ -1,5 +1,4 @@
 import { api } from "./api";
-import { mockSkillsData, radarSkillCategoryData } from "../data/mockSkills";
 
 export const studentService = {
   /**
@@ -9,48 +8,45 @@ export const studentService = {
     try {
       const student = await api.get('/api/student/profile');
       if (student) {
+        const readiness = student.readinessScore || 0;
+        const status = readiness >= 80 ? "Tier-1 Contender • Placement Ready" : (readiness >= 60 ? "Tier-2 Candidate • Developing" : "Tier-3 • Needs Preparation");
+        const skillsList = Array.isArray(student.skills) ? student.skills : [];
         return {
           id: student._id,
           _id: student._id,
-          name: student.name,
-          usn: student.usn || student.rollNo,
-          rollNo: student.rollNo,
-          email: student.email,
-          branch: student.branch,
-          batch: student.batch,
-          semester: "8th Semester",
-          cgpa: student.cgpa || 7.5,
-          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(student.name)}`,
-          phone: "+91 98765 43210",
-          location: "Campus Resident",
-          headline: `Candidate | ${student.branch}`,
-          bio: "Student pursuing engineering degree with focus on software development and data structures.",
-          status: (student.readinessScore || 65) >= 75 ? "Placement Ready" : "Needs Improvement",
-          skills: student.skills || [],
+          name: student.name || "",
+          usn: student.usn || student.rollNo || "Not assigned",
+          rollNo: student.rollNo || "",
+          email: student.email || "",
+          branch: student.branch || "",
+          batch: student.batch || "",
+          semester: student.batch ? `${student.batch} Batch` : "Campus Student",
+          cgpa: typeof student.cgpa === 'number' ? student.cgpa : 0.0,
+          placementStatus: student.placementStatus || "Not Placed",
+          avatar: student.avatarUrl || null,
+          phone: "Not available",
+          location: "Not available",
+          headline: student.branch ? `Candidate | ${student.branch}` : "Engineering Student",
+          bio: "Student profile synchronized with university campus placement portal.",
+          status,
+          readinessScore: readiness,
+          github: student.github || "",
+          resumeUrl: student.resumeUrl || "",
+          skills: skillsList,
           metrics: {
-            employabilityIndex: student.readinessScore || 70,
-            placementProbability: student.placementStatus === 'PLACED' ? 100 : Math.min(95, Math.round((student.readinessScore || 70) * 1.1)),
-            technicalScore: student.technicalScore || 70,
-            softSkillScore: student.softSkillScore || 65,
-            resumeScore: student.resumeScore || 75,
-            interviewReadiness: 70,
-            codingScore: 75,
-            academicScore: Math.round((student.cgpa || 7.5) * 10)
+            employabilityIndex: readiness,
+            placementProbability: student.placementStatus === 'PLACED' ? 100 : readiness,
+            technicalScore: student.technicalScore || 0,
+            softSkillScore: student.softSkillScore || 0,
+            resumeScore: student.resumeScore || 0,
+            interviewReadiness: readiness,
+            codingScore: student.technicalScore || 0,
+            academicScore: Math.round((student.cgpa || 0) * 10)
           },
           codingProfiles: {
-            leetcode: { handle: "candidate_dev", solved: 180, easy: 90, medium: 80, hard: 10, contestRating: 1540, badge: "Knight" },
-            github: { handle: "candidate-gh", repos: 12, stars: 18, contributions: 240 },
-            hackerrank: { handle: "candidate_hr", badges: ["5 Star Problem Solving"] }
+            github: { handle: student.github || "Not linked", verified: Boolean(student.github) }
           },
-          projects: [
-            {
-              id: "p1",
-              title: "Engineering Domain Capstone Project",
-              tech: ["React", "Node.js", "MongoDB"],
-              description: "Designed and implemented end-to-end fullstack platform with real-time state sync and REST APIs.",
-              link: "https://github.com"
-            }
-          ]
+          projects: []
         };
       }
     } catch (e) {
@@ -77,45 +73,103 @@ export const studentService = {
     }
   },
 
-  async getSkillsData(category = "All") {
-    if (!category || category === "All") {
-      return mockSkillsData;
+  /**
+   * Upload PDF resume to backend
+   */
+  async uploadResume(file) {
+    const formData = new FormData();
+    formData.append('resume', file);
+    return await api.postMultipart('/api/student/resume', formData);
+  },
+
+  /**
+   * Fetch active recruitment drives with student-specific match scores from backend
+   */
+  async getStudentJobs() {
+    try {
+      const res = await api.get('/api/student/jobs');
+      if (Array.isArray(res)) {
+        return res.map((j) => ({
+          id: j._id || j.id,
+          _id: j._id,
+          company: j.company,
+          role: j.role || j.title || "Software Engineer",
+          department: j.department || "Engineering",
+          location: j.location || "Bengaluru, India",
+          ctc: j.ctc || "Competitive",
+          type: j.type || "Full-time",
+          deadline: j.deadline ? new Date(j.deadline).toISOString().split('T')[0] : "Active Drive",
+          minCgpa: j.minCgpa ?? 0,
+          allowedBranches: Array.isArray(j.allowedBranches) ? j.allowedBranches : [],
+          requiredSkills: Array.isArray(j.requiredSkills) ? j.requiredSkills : [],
+          description: j.description || "",
+          matchScore: typeof j.matchScore === 'number' ? j.matchScore : 0,
+          matchedSkills: Array.isArray(j.matchedSkills) ? j.matchedSkills : [],
+          missingSkills: Array.isArray(j.missingSkills) ? j.missingSkills : [],
+          status: j.status || 'ACTIVE'
+        }));
+      }
+    } catch (e) {
+      console.warn("Could not fetch student jobs:", e.message);
     }
-    return mockSkillsData.filter((s) => s.category === category);
+    return [];
+  },
+
+  async getSkillsData(category = "All") {
+    const student = await this.getCurrentStudent();
+    if (!student || !Array.isArray(student.skills) || student.skills.length === 0) {
+      return [];
+    }
+    return student.skills.map((name, idx) => ({
+      id: `skill_${idx}`,
+      name,
+      category: "Technical Skills",
+      level: "Verified",
+      score: student.metrics?.technicalScore || 80,
+      verified: true
+    }));
   },
 
   async getRadarData() {
-    return radarSkillCategoryData;
+    const student = await this.getCurrentStudent();
+    if (!student) return [];
+    return [
+      { subject: "Technical Depth", score: student.metrics?.technicalScore || 0, fullMark: 100 },
+      { subject: "Soft Skills", score: student.metrics?.softSkillScore || 0, fullMark: 100 },
+      { subject: "Resume / ATS", score: student.metrics?.resumeScore || 0, fullMark: 100 },
+      { subject: "Academic Standing", score: student.metrics?.academicScore || 0, fullMark: 100 },
+      { subject: "Overall Readiness", score: student.readinessScore || 0, fullMark: 100 }
+    ];
   },
 
   async getReadinessBreakdown() {
     const student = await this.getCurrentStudent();
-    const metrics = student?.metrics || {
-      technicalScore: 70,
-      softSkillScore: 65,
-      resumeScore: 75,
-      codingScore: 70,
-      academicScore: 75
+    if (!student) return null;
+    const metrics = student.metrics || {
+      technicalScore: 0,
+      softSkillScore: 0,
+      resumeScore: 0,
+      codingScore: 0,
+      academicScore: 0
     };
 
     return {
       metrics,
       weights: [
-        { factor: "Technical Proficiency", weight: "30%", score: metrics.technicalScore, status: "Good" },
-        { factor: "Soft Skills & Communication", weight: "20%", score: metrics.softSkillScore, status: "Moderate" },
-        { factor: "Resume & ATS Optimization", weight: "20%", score: metrics.resumeScore, status: "Strong" },
-        { factor: "Coding Profile", weight: "15%", score: metrics.codingScore, status: "Good" },
-        { factor: "Academic CGPA", weight: "15%", score: metrics.academicScore, status: "Strong" }
+        { factor: "Technical Depth", weight: "30%", score: metrics.technicalScore, status: metrics.technicalScore >= 75 ? "Good" : "Needs Review" },
+        { factor: "Soft Skills & Communication", weight: "20%", score: metrics.softSkillScore, status: metrics.softSkillScore >= 70 ? "Good" : "Moderate" },
+        { factor: "Resume & ATS Optimization", weight: "20%", score: metrics.resumeScore, status: metrics.resumeScore >= 75 ? "Strong" : "Upload Pending" },
+        { factor: "Academic CGPA", weight: "30%", score: metrics.academicScore, status: metrics.academicScore >= 70 ? "Strong" : "Moderate" }
       ],
       positiveFactors: [
-        "Consistent academic performance across degree semesters",
-        "Clean ATS resume format scoring high compatibility",
-        "Verified competencies in core branch technologies"
+        student.cgpa > 0 ? `Verified academic CGPA of ${student.cgpa.toFixed(2)}` : "Enrolled candidate in degree program",
+        student.resumeUrl ? "Verified PDF resume synced to recruitment server" : "Profile created in placement cell database",
+        student.skills.length > 0 ? `${student.skills.length} verified technical skills mapped to matching engine` : "Profile registered for campus placement drives"
       ],
       negativeFactors: [
-        "Practice mock interview speech pacing (130-140 WPM)",
-        "Deepen practical hands-on experience in cloud architectures",
-        "Structure STAR responses with specific action impact statements"
+        student.skills.length === 0 ? "Add verified technical skills from your Profile to compute drive eligibility" : "Keep verified skills up to date",
+        !student.resumeUrl ? "Upload your PDF resume from your Profile to enable placement applications" : "Ensure resume reflects recent project experiences",
+        !student.github ? "Connect your GitHub profile handle to verify project contributions" : "Maintain active repository commits"
       ]
     };
   }

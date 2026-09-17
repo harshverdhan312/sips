@@ -30,8 +30,70 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
       backgroundColor: AppColors.background,
       body: skillsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
-        error: (err, _) => Center(child: Text('Error loading skills: $err')),
+        error: (err, _) => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline_rounded, color: AppColors.error, size: 40),
+              const SizedBox(height: 12),
+              Text('Unable to load skills: $err', style: GoogleFonts.plusJakartaSans(color: AppColors.onSurfaceVariant)),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => ref.refresh(skillsProvider),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
         data: (skills) {
+          if (skills.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryFixed,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.radar_rounded, size: 32, color: AppColors.primary),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No verified technical skills yet.',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.onSurface,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Add verified technical skills from your Profile to calibrate job matching and calculate readiness scores.',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 13,
+                        color: AppColors.onSurfaceVariant,
+                        height: 1.4,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    SipsButton(
+                      label: 'Add Skills in Profile',
+                      trailingIcon: Icons.arrow_forward_rounded,
+                      onPressed: () => context.go('/profile'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
           final strongCount = skills.where((s) => s.status == SkillStatus.strong).length;
           final devCount = skills.where((s) => s.status == SkillStatus.developing).length;
           final gapCount = skills.where((s) => s.status == SkillStatus.gap).length;
@@ -51,7 +113,7 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header & Target Benchmark Banner
+                // Header Banner
                 SipsCard(
                   padding: const EdgeInsets.all(18),
                   child: Column(
@@ -61,7 +123,7 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const SipsBadge(
-                            label: 'SKILL INTELLIGENCE MATRIX',
+                            label: 'VERIFIED SKILLS MATRIX',
                             variant: SipsBadgeVariant.primary,
                             isSmall: true,
                           ),
@@ -71,26 +133,20 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
                               color: AppColors.surfaceContainerLow,
                               borderRadius: AppRadius.fullRadius,
                             ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.tune_rounded, size: 12, color: AppColors.outline),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'SDE-1 Benchmark',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.onSurface,
-                                  ),
-                                ),
-                              ],
+                            child: Text(
+                              '${skills.length} Verified',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.onSurface,
+                              ),
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Target Role Alignment',
+                        'Verified Technical Competencies',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
@@ -100,44 +156,12 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Skills are dynamically audited against placement shortlist standards of Tier-1 product organizations.',
+                        'Skills listed in your student profile are matched dynamically against recruiter job requirements.',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 12,
                           color: AppColors.onSurfaceVariant,
                           height: 1.35,
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      // Summary Chips
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildSummaryBadge(
-                              '$strongCount',
-                              'Strong',
-                              const Color(0xFF047857),
-                              const Color(0xFFE6F8F0),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: _buildSummaryBadge(
-                              '$devCount',
-                              'Developing',
-                              const Color(0xFF4338CA),
-                              const Color(0xFFEEF2FF),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: _buildSummaryBadge(
-                              '$gapCount',
-                              'Critical Gaps',
-                              const Color(0xFFB45309),
-                              const Color(0xFFFFFBEB),
-                            ),
-                          ),
-                        ],
                       ),
                     ],
                   ),
@@ -150,7 +174,7 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
                   onChanged: (val) => setState(() => _searchQuery = val),
                   style: GoogleFonts.plusJakartaSans(fontSize: 13),
                   decoration: InputDecoration(
-                    hintText: 'Search skills, frameworks, topics...',
+                    hintText: 'Search skills...',
                     prefixIcon: const Icon(Icons.search_rounded, size: 20, color: AppColors.outline),
                     filled: true,
                     fillColor: AppColors.surfaceContainerLowest,
@@ -176,10 +200,14 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
                       _buildFilterChip(0, 'All (${skills.length})'),
                       const SizedBox(width: 8),
                       _buildFilterChip(1, 'Strong ($strongCount)'),
-                      const SizedBox(width: 8),
-                      _buildFilterChip(2, 'Developing ($devCount)'),
-                      const SizedBox(width: 8),
-                      _buildFilterChip(3, 'Identified Gaps ($gapCount)'),
+                      if (devCount > 0) ...[
+                        const SizedBox(width: 8),
+                        _buildFilterChip(2, 'Developing ($devCount)'),
+                      ],
+                      if (gapCount > 0) ...[
+                        const SizedBox(width: 8),
+                        _buildFilterChip(3, 'Gaps ($gapCount)'),
+                      ],
                     ],
                   ),
                 ),
@@ -191,63 +219,12 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
 
                 const SizedBox(height: 12),
 
-                // Action Callout Hero
-                Container(
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    gradient: AppColors.cobaltGradient,
-                    borderRadius: AppRadius.xlRadius,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.25),
-                        blurRadius: 16,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 18),
-                          const SizedBox(width: 8),
-                          Text(
-                            '+12.2% TOTAL READINESS POTENTIAL',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.primaryFixed,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Bridge Docker & Distributed Caching Gaps',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Completing the recommended 2 growth sprints triggers Tier-1 auto-verification.',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 12,
-                          color: Colors.white.withValues(alpha: 0.9),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      SipsButton(
-                        label: 'Launch Sprint Roadmap',
-                        variant: SipsButtonVariant.secondary,
-                        trailingIcon: Icons.arrow_forward_rounded,
-                        onPressed: () => context.go('/growth'),
-                      ),
-                    ],
+                // CTA to manage in profile
+                Center(
+                  child: TextButton.icon(
+                    onPressed: () => context.go('/profile'),
+                    icon: const Icon(Icons.edit_note_rounded, size: 18),
+                    label: const Text('Edit or Add More Skills in Profile'),
                   ),
                 ),
               ],
@@ -258,37 +235,7 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
     );
   }
 
-  Widget _buildSummaryBadge(String count, String label, Color fg, Color bg) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: AppRadius.mdRadius,
-        border: Border.all(color: fg.withValues(alpha: 0.2), width: 0.8),
-      ),
-      child: Column(
-        children: [
-          Text(
-            count,
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
-              color: fg,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-              color: fg,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildFilterChip(int index, String label) {
     final isSelected = _selectedFilter == index;

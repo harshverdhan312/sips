@@ -111,7 +111,102 @@ class _MockInterviewScreenState extends ConsumerState<MockInterviewScreen> {
         ],
       ),
       body: currentQ == null
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: const BoxDecoration(
+                        color: AppColors.primaryFixed,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.psychology_outlined, size: 32, color: AppColors.primary),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'AI Mock Interviews',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'AI mock interviews are not available yet.\n\nThis feature will appear here once the interview intelligence service is connected.',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 13,
+                        color: AppColors.onSurfaceVariant,
+                        height: 1.45,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    SipsCard(
+                      padding: const EdgeInsets.all(18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SipsBadge(
+                            label: 'INTELLIGENCE SUITE',
+                            variant: SipsBadgeVariant.neutral,
+                            isSmall: true,
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Planned Interview Simulator Capabilities:',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(Icons.check_circle_outline, size: 16, color: AppColors.primary),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Real-time voice and audio transcription analysis',
+                                  style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AppColors.onSurfaceVariant),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(Icons.check_circle_outline, size: 16, color: AppColors.primary),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Automated STAR framework response evaluation and scoring',
+                                  style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AppColors.onSurfaceVariant),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    SipsButton(
+                      label: 'Back to Dashboard',
+                      isFullWidth: true,
+                      onPressed: () => context.go('/home'),
+                    ),
+                  ],
+                ),
+              ),
+            )
           : Column(
               children: [
                 Expanded(

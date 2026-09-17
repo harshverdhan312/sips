@@ -7,7 +7,6 @@ import '../../app/theme/app_radius.dart';
 import '../../core/widgets/readiness_gauge.dart';
 import '../../core/widgets/section_header.dart';
 import '../../core/widgets/sips_badge.dart';
-import '../../core/widgets/sips_button.dart';
 import '../../core/widgets/sips_card.dart';
 import '../../providers/sips_providers.dart';
 
@@ -26,6 +25,10 @@ class HomeScreen extends ConsumerWidget {
         error: (err, _) => Center(child: Text('Error loading readiness: $err')),
         data: (readiness) {
           final profile = profileAsync.value;
+          final alertsAsync = ref.watch(alertsProvider);
+          final oppsAsync = ref.watch(opportunitiesProvider);
+          final latestAlert = alertsAsync.value?.isNotEmpty == true ? alertsAsync.value!.first : null;
+          final topJobs = oppsAsync.value?.take(2).toList() ?? [];
 
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -43,14 +46,14 @@ class HomeScreen extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SipsBadge(
-                            label: profile?.tier ?? 'Tier-1 Contender',
+                            label: profile?.tier ?? 'Tier-3 • Needs Preparation',
                             icon: Icons.verified_user_rounded,
                             variant: SipsBadgeVariant.neutral,
                           ),
                           SipsBadge(
                             label: readiness.scoreGainText,
                             icon: Icons.trending_up_rounded,
-                            variant: SipsBadgeVariant.emerald,
+                            variant: readiness.overallScore >= 80 ? SipsBadgeVariant.emerald : SipsBadgeVariant.neutral,
                           ),
                         ],
                       ),
@@ -122,7 +125,7 @@ class HomeScreen extends ConsumerWidget {
 
                 const SizedBox(height: 16),
 
-                // Placement Cell Urgent Announcement Banner
+                // Placement Cell Announcement Banner (LIVE from notifications)
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -160,7 +163,7 @@ class HomeScreen extends ConsumerWidget {
                                   ),
                                 ),
                                 Text(
-                                  'Just now',
+                                  latestAlert?.timestamp ?? 'Live',
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 10,
                                     color: AppColors.outline,
@@ -170,7 +173,7 @@ class HomeScreen extends ConsumerWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Google Autumn Drive Finalized',
+                              latestAlert?.title ?? 'No Active Announcements',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
@@ -178,28 +181,12 @@ class HomeScreen extends ConsumerWidget {
                               ),
                             ),
                             const SizedBox(height: 3),
-                            RichText(
-                              text: TextSpan(
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 12,
-                                  color: AppColors.onSurfaceVariant,
-                                  height: 1.35,
-                                ),
-                                children: const [
-                                  TextSpan(
-                                    text: 'Eligibility benchmark locked at ',
-                                  ),
-                                  TextSpan(
-                                    text: '80+ Readiness Score',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.primary,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: '. You are currently 2 points away from direct shortlist privilege.',
-                                  ),
-                                ],
+                            Text(
+                              latestAlert?.description ?? 'New campus placement alerts and recruitment schedules will appear here in real time.',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 12,
+                                color: AppColors.onSurfaceVariant,
+                                height: 1.35,
                               ),
                             ),
                           ],
@@ -211,7 +198,7 @@ class HomeScreen extends ConsumerWidget {
 
                 const SizedBox(height: 20),
 
-                // Candidate Telemetry Row
+                // Candidate Telemetry Row (LIVE Backend Fields)
                 SectionHeader(
                   title: 'Candidate Telemetry',
                   badge: const SipsBadge(label: 'SYNC: LIVE', variant: SipsBadgeVariant.neutral, isSmall: true),
@@ -219,38 +206,39 @@ class HomeScreen extends ConsumerWidget {
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    // LeetCode Card
+                    // GitHub Card
                     Expanded(
                       child: SipsCard(
                         padding: const EdgeInsets.all(12),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Row(
+                            Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Icon(Icons.terminal_rounded, size: 18, color: AppColors.secondary),
+                                const Icon(Icons.terminal_rounded, size: 18, color: AppColors.secondary),
                                 Text(
-                                  '3 Synced',
+                                  profile?.githubHandle.isNotEmpty == true ? 'Synced' : 'Not Linked',
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w700,
-                                    color: Color(0xFF006E4C),
+                                    color: profile?.githubHandle.isNotEmpty == true ? const Color(0xFF006E4C) : AppColors.outline,
                                   ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              '${profile?.leetcodeRating ?? 1842}',
+                              profile?.githubHandle.isNotEmpty == true ? profile!.githubHandle : '—',
                               style: GoogleFonts.plusJakartaSans(
-                                fontSize: 17,
+                                fontSize: 13,
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.onSurface,
                               ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              'LeetCode Rating',
+                              'GitHub Handle',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 10,
                                 color: AppColors.outline,
@@ -262,15 +250,18 @@ class HomeScreen extends ConsumerWidget {
                                 Container(
                                   width: 4,
                                   height: 4,
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.emerald,
+                                  decoration: BoxDecoration(
+                                    color: profile?.githubHandle.isNotEmpty == true ? AppColors.emerald : AppColors.outline,
                                     shape: BoxShape.circle,
                                   ),
                                 ),
                                 const SizedBox(width: 4),
-                                Text(
-                                  '${profile?.githubCommits ?? 320} commits',
-                                  style: const TextStyle(fontSize: 10, color: AppColors.onSurfaceVariant),
+                                Expanded(
+                                  child: Text(
+                                    profile?.githubHandle.isNotEmpty == true ? 'Connected' : 'Add in Profile',
+                                    style: const TextStyle(fontSize: 10, color: AppColors.onSurfaceVariant),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               ],
                             ),
@@ -286,16 +277,16 @@ class HomeScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Row(
+                            Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Icon(Icons.description_outlined, size: 18, color: AppColors.primary),
+                                const Icon(Icons.description_outlined, size: 18, color: AppColors.primary),
                                 Text(
-                                  'v3.4',
+                                  profile?.resumeUrl.isNotEmpty == true ? 'Uploaded' : 'Pending',
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w700,
-                                    color: AppColors.primary,
+                                    color: profile?.resumeUrl.isNotEmpty == true ? AppColors.primary : AppColors.outline,
                                   ),
                                 ),
                               ],
@@ -308,9 +299,9 @@ class HomeScreen extends ConsumerWidget {
                                   fontWeight: FontWeight.w800,
                                   color: AppColors.onSurface,
                                 ),
-                                children: const [
-                                  TextSpan(text: '92'),
-                                  TextSpan(
+                                children: [
+                                  TextSpan(text: '${profile?.atsScore ?? 0}'),
+                                  const TextSpan(
                                     text: '/100',
                                     style: TextStyle(fontSize: 11, color: AppColors.outline),
                                   ),
@@ -325,13 +316,17 @@ class HomeScreen extends ConsumerWidget {
                               ),
                             ),
                             const SizedBox(height: 6),
-                            const Row(
+                            Row(
                               children: [
-                                Icon(Icons.check_circle_rounded, size: 12, color: AppColors.emerald),
-                                SizedBox(width: 4),
+                                Icon(
+                                  profile?.resumeUrl.isNotEmpty == true ? Icons.check_circle_rounded : Icons.radio_button_unchecked,
+                                  size: 12,
+                                  color: profile?.resumeUrl.isNotEmpty == true ? AppColors.emerald : AppColors.outline,
+                                ),
+                                const SizedBox(width: 4),
                                 Text(
-                                  'Parse Ready',
-                                  style: TextStyle(fontSize: 10, color: AppColors.onSurfaceVariant),
+                                  profile?.resumeUrl.isNotEmpty == true ? 'Verified' : 'Not Uploaded',
+                                  style: const TextStyle(fontSize: 10, color: AppColors.onSurfaceVariant),
                                 ),
                               ],
                             ),
@@ -352,7 +347,7 @@ class HomeScreen extends ConsumerWidget {
                               children: [
                                 Icon(Icons.school_outlined, size: 18, color: Color(0xFF006E4C)),
                                 Text(
-                                  'Clear',
+                                  'Academic',
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w700,
@@ -363,7 +358,7 @@ class HomeScreen extends ConsumerWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              '${profile?.backlogs ?? 0}',
+                              (profile?.cgpa ?? 0.0) > 0 ? (profile!.cgpa).toStringAsFixed(2) : '—',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w800,
@@ -371,7 +366,7 @@ class HomeScreen extends ConsumerWidget {
                               ),
                             ),
                             Text(
-                              'Backlogs',
+                              'CGPA',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 10,
                                 color: AppColors.outline,
@@ -380,11 +375,14 @@ class HomeScreen extends ConsumerWidget {
                             const SizedBox(height: 6),
                             Row(
                               children: [
-                                const Icon(Icons.thumb_up_rounded, size: 11, color: Color(0xFF006E4C)),
+                                const Icon(Icons.batch_prediction_rounded, size: 11, color: Color(0xFF006E4C)),
                                 const SizedBox(width: 4),
-                                Text(
-                                  '${profile?.cgpa ?? 8.82} CGPA',
-                                  style: const TextStyle(fontSize: 10, color: AppColors.onSurfaceVariant),
+                                Expanded(
+                                  child: Text(
+                                    profile?.graduationYear.isNotEmpty == true ? '${profile!.graduationYear} Batch' : 'Batch',
+                                    style: const TextStyle(fontSize: 10, color: AppColors.onSurfaceVariant),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               ],
                             ),
@@ -397,9 +395,9 @@ class HomeScreen extends ConsumerWidget {
 
                 const SizedBox(height: 24),
 
-                // Today's Focus (Action Priority Queue)
+                // Top Opportunities / Active Drives (LIVE Backend Jobs)
                 SectionHeader(
-                  title: "Today's Focus",
+                  title: 'Active Recruitment Drives',
                   badge: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
@@ -407,7 +405,7 @@ class HomeScreen extends ConsumerWidget {
                       borderRadius: AppRadius.fullRadius,
                     ),
                     child: Text(
-                      '3',
+                      '${oppsAsync.value?.length ?? 0}',
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
@@ -415,32 +413,35 @@ class HomeScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  actionLabel: 'View All Tasks',
-                  onActionTap: () => context.go('/growth'),
+                  actionLabel: 'View All Drives',
+                  onActionTap: () => context.go('/opportunities'),
                 ),
                 const SizedBox(height: 10),
 
-                // Focus Card 1: System Design Mock
-                SipsCard(
-                  padding: const EdgeInsets.all(16),
-                  onTap: () => context.push('/mock-interview'),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                if (topJobs.isNotEmpty)
+                  ...topJobs.map((job) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: SipsCard(
+                      padding: const EdgeInsets.all(16),
+                      onTap: () => context.push('/opportunities/${job.id}'),
+                      child: Row(
                         children: [
                           Container(
-                            width: 38,
-                            height: 38,
+                            width: 40,
+                            height: 40,
                             decoration: BoxDecoration(
                               color: AppColors.primaryFixed,
                               borderRadius: AppRadius.mdRadius,
                             ),
-                            child: const Icon(
-                              Icons.video_camera_front_rounded,
-                              color: AppColors.primary,
-                              size: 20,
+                            child: Center(
+                              child: Text(
+                                job.company.isNotEmpty ? job.company[0].toUpperCase() : 'J',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.onPrimaryFixed,
+                                ),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -450,119 +451,35 @@ class HomeScreen extends ConsumerWidget {
                               children: [
                                 Row(
                                   children: [
-                                    Container(
-                                      width: 5,
-                                      height: 5,
-                                      decoration: const BoxDecoration(
-                                        color: AppColors.primary,
-                                        shape: BoxShape.circle,
+                                    Expanded(
+                                      child: Text(
+                                        job.company,
+                                        style: GoogleFonts.plusJakartaSans(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.onSurface,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      '6:30 PM • Peer Mock Session',
-                                      style: GoogleFonts.plusJakartaSans(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColors.primary,
-                                      ),
+                                    SipsBadge(
+                                      label: '${job.matchScore}% Match',
+                                      variant: job.matchScore >= 80 ? SipsBadgeVariant.emerald : SipsBadgeVariant.primary,
+                                      isSmall: true,
                                     ),
                                   ],
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'Distributed Caching System',
+                                  job.role,
                                   style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.onSurface,
+                                    fontSize: 12,
+                                    color: AppColors.onSurfaceVariant,
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                          const SipsBadge(
-                            label: '45m',
-                            variant: SipsBadgeVariant.neutral,
-                            isSmall: true,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 24,
-                                height: 24,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFFCBD5E1),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Center(
-                                  child: Text('RV', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800)),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'With Rohan V. (SDE-1 @ Stripe)',
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 12,
-                                  color: AppColors.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SipsButton(
-                            label: 'Join Room',
-                            size: SipsButtonSize.small,
-                            trailingIcon: Icons.arrow_forward_rounded,
-                            onPressed: () => context.push('/mock-interview'),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                // Focus Card 2: Tree Problem Task
-                SipsCard(
-                  padding: const EdgeInsets.all(16),
-                  onTap: () => context.go('/growth'),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          color: AppColors.secondaryFixed,
-                          borderRadius: AppRadius.mdRadius,
-                        ),
-                        child: const Icon(
-                          Icons.account_tree_rounded,
-                          color: AppColors.secondary,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                const SipsBadge(
-                                  label: 'Uber Tagged',
-                                  variant: SipsBadgeVariant.neutral,
-                                  isSmall: true,
-                                ),
-                                const SizedBox(width: 6),
+                                const SizedBox(height: 4),
                                 Text(
-                                  '• 25 mins',
+                                  '${job.ctc} • ${job.deadlineText}',
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 11,
                                     color: AppColors.outline,
@@ -570,32 +487,39 @@ class HomeScreen extends ConsumerWidget {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              '2 High-Frequency Tree Inversions',
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.onSurface,
-                              ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.outline),
+                        ],
+                      ),
+                    ),
+                  ))
+                else
+                  SipsCard(
+                    padding: const EdgeInsets.all(20),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          const Icon(Icons.work_outline_rounded, size: 32, color: AppColors.outline),
+                          const SizedBox(height: 8),
+                          Text(
+                            'No placement drives available right now.',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 13,
+                              color: AppColors.onSurfaceVariant,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.play_circle_fill_rounded, color: AppColors.primary, size: 28),
-                        onPressed: () => context.go('/growth'),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
 
                 const SizedBox(height: 24),
 
-                // Domain Competency Radar
+                // Domain Competency Radar (LIVE Scores)
                 SectionHeader(
-                  title: 'Domain Competency Radar',
-                  actionLabel: 'Deep Audit',
+                  title: 'Domain Competency Assessment',
+                  actionLabel: 'View Skills',
                   onActionTap: () => context.go('/skills'),
                 ),
                 const SizedBox(height: 10),
@@ -637,9 +561,9 @@ class HomeScreen extends ConsumerWidget {
                                 minHeight: 6,
                                 backgroundColor: AppColors.surfaceContainerLow,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  domain.score >= 90
+                                  domain.score >= 80
                                       ? AppColors.emerald
-                                      : (domain.score >= 80 ? AppColors.primary : AppColors.secondary),
+                                      : (domain.score >= 50 ? AppColors.primary : AppColors.secondary),
                                 ),
                               ),
                             ),
@@ -652,7 +576,7 @@ class HomeScreen extends ConsumerWidget {
 
                 const SizedBox(height: 20),
 
-                // Placement Cell Advisor Note Card
+                // Placement Cell Advisor Note Card (Dynamic guidance)
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -678,7 +602,7 @@ class HomeScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Placement Cell Advisor Note',
+                              'Placement Guidance Note',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
@@ -687,7 +611,11 @@ class HomeScreen extends ConsumerWidget {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              'Complete your mock interview today to trigger automatic tier-1 verification for tomorrow\'s campus shortlist batch.',
+                              profile?.skills.isEmpty == true
+                                  ? 'Add your verified technical skills in your Profile to calculate company drive match scores.'
+                                  : (profile?.resumeUrl.isEmpty == true
+                                      ? 'Upload your PDF resume in your Profile to unlock one-click campus drive applications.'
+                                      : 'Your student profile is synchronized with the placement server for live recruitment drives.'),
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 11,
                                 color: AppColors.onSurfaceVariant,

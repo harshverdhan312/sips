@@ -18,6 +18,7 @@ import { StarTrackerPage } from "../pages/student/StarTrackerPage";
 import { BehavioralTasksPage } from "../pages/student/BehavioralTasksPage";
 import { PeerMatchingPage } from "../pages/student/PeerMatchingPage";
 import { RecommendationsPage } from "../pages/student/RecommendationsPage";
+import { StudentJobsPage } from "../pages/student/StudentJobsPage";
 import { StudentProfilePage } from "../pages/student/StudentProfilePage";
 
 // Placement Cell Pages
@@ -71,6 +72,7 @@ export function AppRoutes() {
           <Route path="/student/behavioral-tasks" element={<BehavioralTasksPage />} />
           <Route path="/student/peers" element={<PeerMatchingPage />} />
           <Route path="/student/peer-matching" element={<PeerMatchingPage />} />
+          <Route path="/student/jobs" element={<StudentJobsPage />} />
           <Route path="/student/recommendations" element={<RecommendationsPage />} />
           <Route path="/student/profile" element={<StudentProfilePage />} />
         </Route>

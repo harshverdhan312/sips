@@ -21,12 +21,12 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   int _currentStep = 0;
 
-  final _nameController = TextEditingController(text: 'Aarav Sharma');
-  final _collegeController = TextEditingController(text: 'National Institute of Technology');
-  final _branchController = TextEditingController(text: 'Computer Science & Engineering');
-  final _cgpaController = TextEditingController(text: '8.82');
-  final _leetcodeController = TextEditingController(text: 'aarav_nit');
-  final _githubController = TextEditingController(text: 'aarav-sharma-dev');
+  final _nameController = TextEditingController();
+  final _collegeController = TextEditingController();
+  final _branchController = TextEditingController();
+  final _cgpaController = TextEditingController();
+  final _leetcodeController = TextEditingController();
+  final _githubController = TextEditingController();
 
   final List<String> _availableRoles = [
     'Software Development Engineer (SDE-1)',
@@ -37,10 +37,28 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     'Mobile Application Engineer',
   ];
 
-  final Set<String> _selectedRoles = {
-    'Software Development Engineer (SDE-1)',
-    'Distributed Systems Engineer',
-  };
+  final Set<String> _selectedRoles = {};
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final profile = ref.read(studentProfileProvider).value;
+      if (profile != null) {
+        if (profile.name.isNotEmpty) _nameController.text = profile.name;
+        if (profile.college.isNotEmpty) _collegeController.text = profile.college;
+        if (profile.branch.isNotEmpty) _branchController.text = profile.branch;
+        if (profile.cgpa > 0) _cgpaController.text = profile.cgpa.toString();
+        if (profile.githubHandle.isNotEmpty) _githubController.text = profile.githubHandle;
+        if (profile.leetcodeHandle.isNotEmpty) _leetcodeController.text = profile.leetcodeHandle;
+        if (profile.targetRoles.isNotEmpty) {
+          setState(() {
+            _selectedRoles.addAll(profile.targetRoles);
+          });
+        }
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -54,17 +72,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   void _handleComplete() {
-    final updatedProfile = StudentProfile(
-      id: 'std_001',
-      name: _nameController.text,
-      email: 'aarav.sharma@nit.ac.in',
-      college: _collegeController.text,
-      branch: _branchController.text,
-      graduationYear: '2026 Batch',
-      cgpa: double.tryParse(_cgpaController.text) ?? 8.82,
+    final authState = ref.read(authProvider);
+    final existingProfile = ref.read(studentProfileProvider).value;
+    final baseProfile = existingProfile ?? const StudentProfile();
+    final updatedProfile = baseProfile.copyWith(
+      name: _nameController.text.trim().isNotEmpty ? _nameController.text.trim() : baseProfile.name,
+      email: authState.userEmail.isNotEmpty ? authState.userEmail : baseProfile.email,
+      college: _collegeController.text.trim(),
+      branch: _branchController.text.trim(),
+      cgpa: double.tryParse(_cgpaController.text.trim()) ?? baseProfile.cgpa,
       targetRoles: _selectedRoles.toList(),
-      leetcodeHandle: _leetcodeController.text,
-      githubHandle: _githubController.text,
+      leetcodeHandle: _leetcodeController.text.trim(),
+      githubHandle: _githubController.text.trim(),
     );
 
     ref.read(studentProfileProvider.notifier).updateProfile(updatedProfile);
@@ -356,56 +375,70 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 prefixIcon: Icons.terminal_rounded,
               ),
               const SizedBox(height: 20),
-              // Resume Upload Mock Container
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceContainerLow,
-                  borderRadius: AppRadius.lgRadius,
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.3),
-                    width: 1,
-                    style: BorderStyle.solid,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryFixed,
-                        borderRadius: AppRadius.mdRadius,
-                      ),
-                      child: const Icon(Icons.description_rounded, color: AppColors.primary, size: 22),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Aarav_Sharma_Resume_2026.pdf',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.onSurface,
-                            ),
-                          ),
-                          Text(
-                            'ATS Score: 92/100 • Parse Ready',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 11,
-                              color: const Color(0xFF059669),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
+              Builder(
+                builder: (context) {
+                  final profile = ref.watch(studentProfileProvider).value;
+                  final hasResume = profile != null && profile.resumeUrl.isNotEmpty;
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceContainerLow,
+                      borderRadius: AppRadius.lgRadius,
+                      border: Border.all(
+                        color: hasResume ? AppColors.emerald.withValues(alpha: 0.3) : AppColors.outlineVariant,
+                        width: 1,
                       ),
                     ),
-                    const Icon(Icons.check_circle_rounded, color: Color(0xFF10B981), size: 20),
-                  ],
-                ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: hasResume ? const Color(0xFFD1FAE5) : AppColors.surfaceContainerHigh,
+                            borderRadius: AppRadius.mdRadius,
+                          ),
+                          child: Icon(
+                            Icons.description_rounded,
+                            color: hasResume ? AppColors.emerald : AppColors.onSurfaceVariant,
+                            size: 22,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                hasResume ? (profile.resumeVersion.isNotEmpty ? profile.resumeVersion : 'Resume Attached') : 'No Resume Uploaded',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.onSurface,
+                                ),
+                              ),
+                              Text(
+                                hasResume
+                                    ? (profile.resumeScore > 0 ? 'Resume Score: ${profile.resumeScore.round()}/100' : 'Uploaded to student profile')
+                                    : 'Upload your PDF resume anytime from Profile',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 11,
+                                  color: hasResume ? const Color(0xFF059669) : AppColors.onSurfaceVariant,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          hasResume ? Icons.check_circle_rounded : Icons.info_outline_rounded,
+                          color: hasResume ? const Color(0xFF10B981) : AppColors.outline,
+                          size: 20,
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ],
           ),

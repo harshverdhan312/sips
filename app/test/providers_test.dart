@@ -1,34 +1,83 @@
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sips_app/core/network/api_client.dart';
 import 'package:sips_app/providers/sips_providers.dart';
+import 'package:sips_app/repositories/mock_sips_repository.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('Riverpod Providers Tests', () {
     late ProviderContainer container;
+    late MockClient mockHttpClient;
 
     setUp(() {
-      container = ProviderContainer();
+      SharedPreferences.setMockInitialValues({});
+      mockHttpClient = MockClient((request) async {
+        if (request.url.path.contains('/api/auth/login')) {
+          final body = jsonDecode(request.body);
+          if (body['password'] == 'password123') {
+            return http.Response(
+              jsonEncode({
+                'token': 'mock-jwt-token-xyz',
+                'role': 'STUDENT',
+                'studentName': 'Aarav Sharma',
+                'collegeName': 'RVCE',
+                'userId': 'std_101',
+              }),
+              200,
+              headers: {'content-type': 'application/json'},
+            );
+          }
+          return http.Response(
+            jsonEncode({'message': 'Invalid credentials'}),
+            401,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        return http.Response(jsonEncode({}), 200, headers: {'content-type': 'application/json'});
+      });
+
+      container = ProviderContainer(
+        overrides: [
+          apiClientProvider.overrideWithValue(ApiClient(client: mockHttpClient, baseUrl: 'http://localhost:5000')),
+          sipsRepositoryProvider.overrideWithValue(MockSipsRepository()),
+        ],
+      );
     });
 
     tearDown(() {
       container.dispose();
     });
 
-    test('authProvider initially is authenticated for demo exploration', () {
+    test('authProvider initially is unauthenticated until login or token restore', () {
       final auth = container.read(authProvider);
-      expect(auth.isAuthenticated, true);
-      expect(auth.userEmail, 'aarav.sharma@nit.ac.in');
+      expect(auth.isAuthenticated, false);
     });
 
-    test('authProvider signOut and signIn transition works', () async {
+    test('authProvider signIn success transitions state and saves token', () async {
       final authNotifier = container.read(authProvider.notifier);
-      authNotifier.signOut();
 
-      expect(container.read(authProvider).isAuthenticated, false);
-
-      await authNotifier.signIn('newstudent@nit.ac.in', 'password');
+      final success = await authNotifier.signIn('aarav@rvce.edu', 'password123');
+      expect(success, true);
       expect(container.read(authProvider).isAuthenticated, true);
-      expect(container.read(authProvider).userEmail, 'newstudent@nit.ac.in');
+      expect(container.read(authProvider).userName, 'Aarav Sharma');
+
+      await authNotifier.signOut();
+      expect(container.read(authProvider).isAuthenticated, false);
+    });
+
+    test('authProvider signIn failure sets error message', () async {
+      final authNotifier = container.read(authProvider.notifier);
+
+      final success = await authNotifier.signIn('aarav@rvce.edu', 'wrongpassword');
+      expect(success, false);
+      expect(container.read(authProvider).isAuthenticated, false);
+      expect(container.read(authProvider).errorMessage, isNotNull);
     });
 
     test('growthTasksProvider loads tasks and allows completion toggling', () async {
