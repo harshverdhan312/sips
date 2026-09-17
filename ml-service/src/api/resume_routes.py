@@ -5,8 +5,13 @@ from pydantic import BaseModel, ConfigDict
 from pypdf.errors import PdfReadError
 
 from src.resume.parser import extract_pdf_text
+from src.resume.semantic_matcher import (
+    DEFAULT_MODEL_NAME,
+    calculate_semantic_similarity,
+)
 from src.resume.skill_extractor import extract_skills
 from src.resume.skill_gap import compare_skill_sets
+from src.resume.skill_normalizer import normalize_skills
 
 
 MAX_PDF_SIZE_BYTES = 5 * 1024 * 1024
@@ -33,6 +38,18 @@ class ResumeMatchResponse(BaseModel):
     matched_skills: list[str]
     missing_skills: list[str]
     coverage_score: float
+
+
+class SemanticMatchRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    student_skills: list[str]
+    job_text: str
+
+
+class SemanticMatchResponse(BaseModel):
+    semantic_similarity: float
+    model_name: str
 
 
 @router.post(
@@ -90,3 +107,40 @@ def match_resume_skills(
         request.student_skills,
         request.required_skills,
     )
+
+
+@router.post(
+    "/semantic-match",
+    response_model=SemanticMatchResponse,
+)
+def semantic_match_resume(
+    request: SemanticMatchRequest,
+):
+    normalized_skills = normalize_skills(
+        request.student_skills
+    )
+
+    if not normalized_skills:
+        raise HTTPException(
+            status_code=422,
+            detail="Student skills must not be empty.",
+        )
+
+    try:
+        similarity = calculate_semantic_similarity(
+            " ".join(normalized_skills),
+            request.job_text,
+        )
+    except (TypeError, ValueError) as error:
+        raise HTTPException(
+            status_code=422,
+            detail=str(error),
+        ) from error
+
+    return {
+        "semantic_similarity": round(
+            similarity,
+            4,
+        ),
+        "model_name": DEFAULT_MODEL_NAME,
+    }
