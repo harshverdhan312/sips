@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { TopNavbar } from "./TopNavbar";
-import { ToastContainer } from "../common/ToastContainer";
 import { cn } from "../../utils/cn";
 
 export function DashboardLayout() {
@@ -32,9 +31,6 @@ export function DashboardLayout() {
           <Outlet />
         </main>
       </div>
-
-      {/* Global Toast Notifications */}
-      <ToastContainer />
     </div>
   );
 }

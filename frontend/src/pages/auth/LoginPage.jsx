@@ -9,7 +9,8 @@ import {
   CheckCircle2,
   UserPlus,
   Globe,
-  Info
+  Info,
+  AlertCircle
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/NotificationContext";
@@ -18,13 +19,13 @@ import { Modal } from "../../components/common/Modal";
 
 export function LoginPage() {
   const { login, registerCollege } = useAuth();
-  const { addToast } = useNotifications();
+  const { showSuccess, showError, showWarning, showInfo } = useNotifications();
   const navigate = useNavigate();
 
   // Mode: Sign In vs Register
   const [isRegisterMode, setIsRegisterMode] = useState(false);
 
-  // Sign In states (blank by default - no demo credentials)
+  // Sign In states
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
@@ -32,6 +33,7 @@ export function LoginPage() {
   const [forgotEmail, setForgotEmail] = useState("");
   const [resetSent, setResetSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
 
   // College Register states
   const [regCollegeName, setRegCollegeName] = useState("");
@@ -40,21 +42,47 @@ export function LoginPage() {
   const [regMasterPassword, setRegMasterPassword] = useState("");
   const [regConfirmMasterPassword, setRegConfirmMasterPassword] = useState("");
   const [regAcceptedDomains, setRegAcceptedDomains] = useState("");
+  const [regErrors, setRegErrors] = useState({});
 
   const handleSignInSubmit = async (e) => {
     e.preventDefault();
-    if (!identifier.trim() || !password) {
-      addToast("Please enter your ID/Email and password", "warning");
+    const newErrors = {};
+    const trimmedId = identifier.trim();
+
+    if (!trimmedId) {
+      newErrors.identifier = "Please enter your email or ID.";
+    } else if (trimmedId.includes("@")) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(trimmedId)) {
+        newErrors.identifier = "Please enter a valid email address.";
+      }
+    }
+
+    if (!password) {
+      newErrors.password = "Please enter your password.";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      if (newErrors.identifier === "Please enter a valid email address.") {
+        showError("Invalid email format. Please check and try again.");
+      } else {
+        showWarning("Email/ID and password are required.");
+      }
       return;
     }
 
+    setErrors({});
     setLoading(true);
     try {
-      const result = await login(identifier.trim(), password);
-      addToast(`Welcome back, ${result.user.name}!`, "success");
+      const result = await login(trimmedId, password);
+      showSuccess(`Login successful. Welcome back, ${result.user?.name || "User"}!`);
       navigate(`/${result.role}/dashboard`);
     } catch (err) {
-      addToast(err.message || "Invalid credentials. Please verify your ID/Email and password.", "error");
+      const msg = err.message || "Invalid credentials. Please verify your ID/Email and password.";
+      setErrors({ general: msg });
+      setPassword(""); // Clear password field for security and easy re-entry
+      showError(msg);
     } finally {
       setLoading(false);
     }
@@ -62,9 +90,19 @@ export function LoginPage() {
 
   const handleForgotSubmit = (e) => {
     e.preventDefault();
+    if (!forgotEmail.trim()) {
+      showWarning("Please enter your email address.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(forgotEmail.trim())) {
+      showError("Please enter a valid email address.");
+      return;
+    }
+
     setResetSent(true);
     setTimeout(() => {
-      addToast("Password reset instructions sent to " + forgotEmail, "info");
+      showInfo("Password reset instructions sent to " + forgotEmail.trim());
       setForgotModalOpen(false);
       setResetSent(false);
       setForgotEmail("");
@@ -73,18 +111,41 @@ export function LoginPage() {
 
   const handleCollegeRegister = async (e) => {
     e.preventDefault();
-    if (regMasterPassword !== regConfirmMasterPassword) {
-      addToast("Master passwords do not match. Please re-enter.", "error");
-      return;
+    const newErrors = {};
+
+    if (!regCollegeName.trim()) {
+      newErrors.name = "Institution name is required.";
+    }
+    if (!regCollegeSlug.trim()) {
+      newErrors.slug = "Institution slug is required.";
+    }
+    if (!regAdminEmail.trim()) {
+      newErrors.adminEmail = "Admin email is required.";
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(regAdminEmail.trim())) {
+        newErrors.adminEmail = "Please enter a valid email address.";
+      }
+    }
+
+    if (!regMasterPassword) {
+      newErrors.masterPassword = "Master password is required.";
+    } else if (regMasterPassword.length < 6) {
+      newErrors.masterPassword = "Password must be at least 6 characters long.";
+    }
+
+    if (!regConfirmMasterPassword) {
+      newErrors.confirmPassword = "Please confirm your password.";
+    } else if (regMasterPassword !== regConfirmMasterPassword) {
+      newErrors.confirmPassword = "Passwords do not match.";
     }
 
     const domains = regAcceptedDomains
       .split(",")
-      .map((d) => d.trim().toLowerCase().replace(/^@/, ''))
+      .map((d) => d.trim().toLowerCase().replace(/^@/, ""))
       .filter(Boolean);
 
-    // Auto-include admin email domain so admin can always access their institution
-    const emailParts = regAdminEmail.trim().split('@');
+    const emailParts = regAdminEmail.trim().split("@");
     if (emailParts.length === 2) {
       const adminDomain = emailParts[1].toLowerCase().trim();
       if (adminDomain && !domains.includes(adminDomain)) {
@@ -93,24 +154,36 @@ export function LoginPage() {
     }
 
     if (domains.length === 0) {
-      addToast("Please provide at least one accepted email domain for students.", "warning");
+      newErrors.domains = "Please provide at least one accepted email domain.";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setRegErrors(newErrors);
+      if (newErrors.confirmPassword === "Passwords do not match.") {
+        showError("Passwords do not match. Please re-enter.");
+      } else {
+        showWarning("Please fill in all required fields correctly.");
+      }
       return;
     }
 
+    setRegErrors({});
     setLoading(true);
     try {
       await registerCollege({
-        name: regCollegeName,
+        name: regCollegeName.trim(),
         slug: regCollegeSlug.toLowerCase().trim(),
         adminEmail: regAdminEmail.toLowerCase().trim(),
         masterPassword: regMasterPassword,
         acceptedDomains: domains
       });
 
-      addToast(`Institution ${regCollegeName} onboarded successfully! Welcome!`, "success");
+      showSuccess(`Account created successfully. Welcome to SIPS, ${regCollegeName.trim()}!`);
       navigate("/placement/dashboard");
     } catch (err) {
-      addToast(err.message || "Institution registration failed.", "error");
+      const msg = err.message || "Institution registration failed.";
+      setRegErrors({ general: msg });
+      showError(msg);
     } finally {
       setLoading(false);
     }
@@ -171,7 +244,15 @@ export function LoginPage() {
           {/* SIGN IN FORM                                     */}
           {/* ================================================= */}
           {!isRegisterMode && (
-            <form onSubmit={handleSignInSubmit} className="space-y-4">
+            <form onSubmit={handleSignInSubmit} className="space-y-4" noValidate>
+              {/* General Error Banner */}
+              {errors.general && (
+                <div className="flex items-start gap-2.5 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 animate-in fade-in duration-200">
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                  <span className="leading-snug">{errors.general}</span>
+                </div>
+              )}
+
               {/* Student Notice Pill */}
               <div className="flex items-start gap-2 p-2.5 bg-indigo-50/70 rounded-xl border border-indigo-100/80 text-xs text-indigo-900 leading-snug">
                 <Info className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
@@ -189,12 +270,28 @@ export function LoginPage() {
                   <input
                     type="text"
                     required
+                    disabled={loading}
                     value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
+                    onChange={(e) => {
+                      setIdentifier(e.target.value);
+                      if (errors.identifier || errors.general) {
+                        setErrors((prev) => ({ ...prev, identifier: "", general: "" }));
+                      }
+                    }}
                     placeholder="e.g. 1RV21CS001 or student@rvce.edu"
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+                    className={`w-full pl-9 pr-3.5 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 ${
+                      errors.identifier
+                        ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                        : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                    } ${loading ? "opacity-60 bg-slate-50 cursor-not-allowed" : ""}`}
                   />
                 </div>
+                {errors.identifier && (
+                  <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    {errors.identifier}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -206,12 +303,28 @@ export function LoginPage() {
                   <input
                     type="password"
                     required
+                    disabled={loading}
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (errors.password || errors.general) {
+                        setErrors((prev) => ({ ...prev, password: "", general: "" }));
+                      }
+                    }}
                     placeholder="••••••••"
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+                    className={`w-full pl-9 pr-3.5 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 ${
+                      errors.password
+                        ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                        : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                    } ${loading ? "opacity-60 bg-slate-50 cursor-not-allowed" : ""}`}
                   />
                 </div>
+                {errors.password && (
+                  <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    {errors.password}
+                  </p>
+                )}
               </div>
 
               <div className="flex items-center justify-between text-xs pt-0.5">
@@ -219,6 +332,7 @@ export function LoginPage() {
                   <input
                     type="checkbox"
                     checked={rememberMe}
+                    disabled={loading}
                     onChange={(e) => setRememberMe(e.target.checked)}
                     className="rounded text-indigo-600 focus:ring-indigo-500 border-slate-300"
                   />
@@ -226,6 +340,7 @@ export function LoginPage() {
                 </label>
                 <button
                   type="button"
+                  disabled={loading}
                   onClick={() => setForgotModalOpen(true)}
                   className="font-semibold text-indigo-600 hover:text-indigo-800 cursor-pointer"
                 >
@@ -236,11 +351,12 @@ export function LoginPage() {
               <Button
                 type="submit"
                 loading={loading}
+                disabled={loading}
                 className="w-full py-2.5 mt-1"
                 icon={ArrowRight}
                 iconPosition="right"
               >
-                Sign In to SIPS
+                {loading ? "Logging in..." : "Sign In to SIPS"}
               </Button>
 
               <div className="pt-2 text-center text-xs text-slate-500">
@@ -271,7 +387,15 @@ export function LoginPage() {
                 </p>
               </div>
 
-              <form onSubmit={handleCollegeRegister} className="space-y-3">
+              {/* General Error Banner */}
+              {regErrors.general && (
+                <div className="flex items-start gap-2.5 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 animate-in fade-in duration-200 mb-3">
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                  <span className="leading-snug">{regErrors.general}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleCollegeRegister} className="space-y-3" noValidate>
                 <div>
                   <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Institution Name *
@@ -279,11 +403,27 @@ export function LoginPage() {
                   <input
                     type="text"
                     required
+                    disabled={loading}
                     value={regCollegeName}
-                    onChange={(e) => setRegCollegeName(e.target.value)}
+                    onChange={(e) => {
+                      setRegCollegeName(e.target.value);
+                      if (regErrors.name || regErrors.general) {
+                        setRegErrors((prev) => ({ ...prev, name: "", general: "" }));
+                      }
+                    }}
                     placeholder="e.g. RV College of Engineering"
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+                    className={`w-full px-3.5 py-2 rounded-xl border text-xs focus:outline-none focus:ring-2 ${
+                      regErrors.name
+                        ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                        : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                    } ${loading ? "opacity-60 bg-slate-50 cursor-not-allowed" : ""}`}
                   />
+                  {regErrors.name && (
+                    <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3 shrink-0" />
+                      {regErrors.name}
+                    </p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
@@ -296,12 +436,28 @@ export function LoginPage() {
                       <input
                         type="text"
                         required
+                        disabled={loading}
                         value={regCollegeSlug}
-                        onChange={(e) => setRegCollegeSlug(e.target.value)}
+                        onChange={(e) => {
+                          setRegCollegeSlug(e.target.value);
+                          if (regErrors.slug || regErrors.general) {
+                            setRegErrors((prev) => ({ ...prev, slug: "", general: "" }));
+                          }
+                        }}
                         placeholder="rvce"
-                        className="w-full pl-8 pr-2 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+                        className={`w-full pl-8 pr-2 py-2 rounded-xl border text-xs focus:outline-none focus:ring-2 ${
+                          regErrors.slug
+                            ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                            : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                        } ${loading ? "opacity-60 bg-slate-50 cursor-not-allowed" : ""}`}
                       />
                     </div>
+                    {regErrors.slug && (
+                      <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3 shrink-0" />
+                        {regErrors.slug}
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -311,11 +467,27 @@ export function LoginPage() {
                     <input
                       type="email"
                       required
+                      disabled={loading}
                       value={regAdminEmail}
-                      onChange={(e) => setRegAdminEmail(e.target.value)}
+                      onChange={(e) => {
+                        setRegAdminEmail(e.target.value);
+                        if (regErrors.adminEmail || regErrors.general) {
+                          setRegErrors((prev) => ({ ...prev, adminEmail: "", general: "" }));
+                        }
+                      }}
                       placeholder="placement@rvce.edu"
-                      className="w-full px-2.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+                      className={`w-full px-2.5 py-2 rounded-xl border text-xs focus:outline-none focus:ring-2 ${
+                        regErrors.adminEmail
+                          ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                          : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                      } ${loading ? "opacity-60 bg-slate-50 cursor-not-allowed" : ""}`}
                     />
+                    {regErrors.adminEmail && (
+                      <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3 shrink-0" />
+                        {regErrors.adminEmail}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -326,11 +498,27 @@ export function LoginPage() {
                   <input
                     type="text"
                     required
+                    disabled={loading}
                     value={regAcceptedDomains}
-                    onChange={(e) => setRegAcceptedDomains(e.target.value)}
+                    onChange={(e) => {
+                      setRegAcceptedDomains(e.target.value);
+                      if (regErrors.domains || regErrors.general) {
+                        setRegErrors((prev) => ({ ...prev, domains: "", general: "" }));
+                      }
+                    }}
                     placeholder="e.g. rvce.edu, student.rvce.edu"
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+                    className={`w-full px-3.5 py-2 rounded-xl border text-xs focus:outline-none focus:ring-2 ${
+                      regErrors.domains
+                        ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                        : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                    } ${loading ? "opacity-60 bg-slate-50 cursor-not-allowed" : ""}`}
                   />
+                  {regErrors.domains && (
+                    <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3 shrink-0" />
+                      {regErrors.domains}
+                    </p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
@@ -342,11 +530,27 @@ export function LoginPage() {
                       type="password"
                       required
                       minLength={6}
+                      disabled={loading}
                       value={regMasterPassword}
-                      onChange={(e) => setRegMasterPassword(e.target.value)}
+                      onChange={(e) => {
+                        setRegMasterPassword(e.target.value);
+                        if (regErrors.masterPassword || regErrors.general) {
+                          setRegErrors((prev) => ({ ...prev, masterPassword: "", general: "" }));
+                        }
+                      }}
                       placeholder="••••••••"
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+                      className={`w-full px-3 py-2 rounded-xl border text-xs focus:outline-none focus:ring-2 ${
+                        regErrors.masterPassword
+                          ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                          : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                      } ${loading ? "opacity-60 bg-slate-50 cursor-not-allowed" : ""}`}
                     />
+                    {regErrors.masterPassword && (
+                      <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3 shrink-0" />
+                        {regErrors.masterPassword}
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -357,22 +561,39 @@ export function LoginPage() {
                       type="password"
                       required
                       minLength={6}
+                      disabled={loading}
                       value={regConfirmMasterPassword}
-                      onChange={(e) => setRegConfirmMasterPassword(e.target.value)}
+                      onChange={(e) => {
+                        setRegConfirmMasterPassword(e.target.value);
+                        if (regErrors.confirmPassword || regErrors.general) {
+                          setRegErrors((prev) => ({ ...prev, confirmPassword: "", general: "" }));
+                        }
+                      }}
                       placeholder="••••••••"
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+                      className={`w-full px-3 py-2 rounded-xl border text-xs focus:outline-none focus:ring-2 ${
+                        regErrors.confirmPassword
+                          ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                          : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                      } ${loading ? "opacity-60 bg-slate-50 cursor-not-allowed" : ""}`}
                     />
+                    {regErrors.confirmPassword && (
+                      <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3 shrink-0" />
+                        {regErrors.confirmPassword}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <Button
                   type="submit"
                   loading={loading}
+                  disabled={loading}
                   className="w-full py-2.5 mt-2"
                   icon={Building2}
                   iconPosition="left"
                 >
-                  Register & Onboard Institution
+                  {loading ? "Creating account..." : "Register & Onboard Institution"}
                 </Button>
               </form>
 

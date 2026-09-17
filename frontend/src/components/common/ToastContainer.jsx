@@ -1,5 +1,5 @@
 import React from "react";
-import { CheckCircle2, AlertCircle, Info, X } from "lucide-react";
+import { CheckCircle2, AlertCircle, AlertTriangle, Info, X } from "lucide-react";
 import { useNotifications } from "../../context/NotificationContext";
 import { cn } from "../../utils/cn";
 
@@ -19,6 +19,11 @@ export function ToastContainer() {
       border: "border-rose-200 bg-rose-50 text-rose-900",
       iconColor: "text-rose-600"
     },
+    warning: {
+      icon: AlertTriangle,
+      border: "border-amber-200 bg-amber-50 text-amber-900",
+      iconColor: "text-amber-600"
+    },
     info: {
       icon: Info,
       border: "border-indigo-200 bg-indigo-50 text-indigo-900",
@@ -27,7 +32,7 @@ export function ToastContainer() {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none">
+    <div className="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0">
       {toasts.map((toast) => {
         const config = typeConfig[toast.type] || typeConfig.success;
         const Icon = config.icon;

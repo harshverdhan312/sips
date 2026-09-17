@@ -17,7 +17,7 @@ import { Badge } from "../../components/common/Badge";
 import { useNotifications } from "../../context/NotificationContext";
 
 export function ResumeAnalysisPage() {
-  const { addToast } = useNotifications();
+  const { showSuccess, showError, showWarning } = useNotifications();
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadedResume, setUploadedResume] = useState(null);
@@ -31,13 +31,17 @@ export function ResumeAnalysisPage() {
       selectedFile.type !== "application/pdf" &&
       !selectedFile.name.toLowerCase().endsWith(".pdf")
     ) {
-      setError("Only PDF files are allowed (.pdf).");
+      const msg = "Please upload a valid PDF resume.";
+      setError(msg);
+      showError(msg);
       setFile(null);
       return;
     }
 
     if (selectedFile.size > 5 * 1024 * 1024) {
-      setError("File size exceeds 5MB limit. Please upload a smaller PDF.");
+      const msg = "File size exceeds the allowed limit.";
+      setError(msg);
+      showError(msg);
       setFile(null);
       return;
     }
@@ -60,7 +64,9 @@ export function ResumeAnalysisPage() {
 
   const handleUpload = async () => {
     if (!file) {
-      setError("Please select a PDF resume to upload.");
+      const msg = "Please select a PDF resume to upload.";
+      setError(msg);
+      showWarning(msg);
       return;
     }
 
@@ -76,12 +82,12 @@ export function ResumeAnalysisPage() {
         uploadDate: new Date().toLocaleDateString(),
         resumeUrl
       });
-      addToast("Resume uploaded successfully and linked to your profile!", "success");
+      showSuccess("Resume uploaded successfully.");
     } catch (err) {
       console.error("Resume upload error:", err);
-      const msg = err.message || "Failed to upload resume. Please try again.";
+      const msg = err.message || "Failed to process the uploaded file.";
       setError(msg);
-      addToast(msg, "error");
+      showError(msg);
     } finally {
       setUploading(false);
     }
@@ -185,7 +191,7 @@ export function ResumeAnalysisPage() {
                 onClick={handleUpload}
                 icon={UploadCloud}
               >
-                {uploading ? "Uploading to Server..." : "Upload & Link to Profile"}
+                {uploading ? "Uploading resume..." : "Upload & Link to Profile"}
               </Button>
             </div>
           </div>

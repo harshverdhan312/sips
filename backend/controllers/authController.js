@@ -18,19 +18,27 @@ exports.login = async (req, res) => {
     const { email, identifier, password, collegeSlug } = req.body;
     const loginId = (email || identifier || '').toLowerCase().trim();
 
-    if (!loginId || !password) {
+    if (!loginId && !password) {
       return res.status(400).json({ message: 'Email/ID and password are required' });
     }
+    if (!loginId) {
+      return res.status(400).json({ message: 'Please enter your email or ID.' });
+    }
+    if (!password) {
+      return res.status(400).json({ message: 'Please enter your password.' });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     // ----------------------------------------------------
     // Resilient In-Memory Mode (when MongoDB is offline)
     // ----------------------------------------------------
     if (!memoryDb.isMongoConnected()) {
       if (loginId.includes('@')) {
-        const parts = loginId.split('@');
-        if (parts.length !== 2) {
+        if (!emailRegex.test(loginId)) {
           return res.status(400).json({ message: 'Invalid email format' });
         }
+        const parts = loginId.split('@');
         const domain = parts[1];
         let college = memoryDb.findCollegeByDomain(domain) || (collegeSlug ? memoryDb.findCollegeBySlug(collegeSlug) : null);
         if (!college) {
@@ -131,10 +139,10 @@ exports.login = async (req, res) => {
 
     // 1. Check if loginId is an email address
     if (loginId.includes('@')) {
-      const parts = loginId.split('@');
-      if (parts.length !== 2) {
+      if (!emailRegex.test(loginId)) {
         return res.status(400).json({ message: 'Invalid email format' });
       }
+      const parts = loginId.split('@');
       const domain = parts[1];
 
       // Find college by accepted domain, or fallback to adminEmail
@@ -252,7 +260,7 @@ exports.login = async (req, res) => {
 
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: 'Server error during login' });
+    res.status(500).json({ message: 'Something went wrong on the server. Please try again later.' });
   }
 };
 

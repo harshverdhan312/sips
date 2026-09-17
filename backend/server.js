@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 require('dotenv').config();
 
 const app = express();
@@ -59,6 +60,37 @@ app.use('/jd', jdRoutes);
 app.use('/api/notification', notificationRoutes);
 app.use('/notification', notificationRoutes);
 
+const frontendDistPath = path.join(__dirname, '../frontend/dist');
+
+// Root route - Points to landing page of website
+app.get('/', (req, res) => {
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+  const indexPath = path.join(__dirname, '../frontend/dist/index.html');
+
+  // If client explicitly requests JSON without HTML, return API metadata pointing to landing page
+  if (!req.accepts('html') && req.accepts('json')) {
+    return res.json({
+      name: 'SIPS - Skill Intelligence Placement System API',
+      status: 'online',
+      website: frontendUrl,
+      landingPage: frontendUrl,
+      health: '/health'
+    });
+  }
+
+  // Otherwise, serve landing page directly or redirect to it
+  if (fs.existsSync(indexPath)) {
+    return res.sendFile(indexPath);
+  }
+
+  return res.redirect(frontendUrl);
+});
+
+// Serve static frontend assets if built (excluding automatic index.html takeover on /)
+if (fs.existsSync(frontendDistPath)) {
+  app.use(express.static(frontendDistPath, { index: false }));
+}
+
 // Health check
 app.get(['/health', '/api/health'], (req, res) => {
   const isMongo = mongoose.connection.readyState === 1;
@@ -69,6 +101,35 @@ app.get(['/health', '/api/health'], (req, res) => {
     mongoDbName: isMongo ? mongoose.connection.name : null,
     timestamp: new Date().toISOString()
   });
+});
+
+// Fallback for non-API client routes to serve landing page / SPA or redirect to frontend
+app.get('*', (req, res, next) => {
+  if (
+    req.path.startsWith('/api') ||
+    req.path.startsWith('/auth') ||
+    req.path.startsWith('/admin') ||
+    req.path.startsWith('/college') ||
+    req.path.startsWith('/student') ||
+    req.path.startsWith('/jd') ||
+    req.path.startsWith('/notification') ||
+    req.path.startsWith('/uploads') ||
+    req.path.startsWith('/health')
+  ) {
+    return next();
+  }
+
+  const indexPath = path.join(__dirname, '../frontend/dist/index.html');
+  if (fs.existsSync(indexPath) && req.accepts('html')) {
+    return res.sendFile(indexPath);
+  }
+
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+  if (req.accepts('html')) {
+    return res.redirect(`${frontendUrl}${req.path}`);
+  }
+
+  next();
 });
 
 // 404 handler
