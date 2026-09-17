@@ -25,7 +25,7 @@ import { ProgressBar } from "../../components/common/ProgressBar";
 import { useNotifications } from "../../context/NotificationContext";
 
 export function JobDescriptionsPage() {
-  const { addToast } = useNotifications();
+  const { showSuccess, showError, showWarning, showInfo } = useNotifications();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedJob, setSelectedJob] = useState(null);
@@ -42,6 +42,7 @@ export function JobDescriptionsPage() {
   // New JD Modal State
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [jobErrors, setJobErrors] = useState({});
   const [newJob, setNewJob] = useState({
     company: "",
     role: "",
@@ -65,7 +66,7 @@ export function JobDescriptionsPage() {
         }
       } catch (e) {
         console.error("Failed to load recruitment drives:", e);
-        addToast("Failed to load recruitment drives.", "error");
+        showError("Failed to load recruitment drives.");
       } finally {
         setLoading(false);
       }
@@ -137,9 +138,39 @@ export function JobDescriptionsPage() {
 
   const handleCreateJob = async (e) => {
     e.preventDefault();
+    const newErrors = {};
+
+    if (!newJob.company.trim()) {
+      newErrors.company = "Company name is required.";
+    }
+
+    if (!newJob.role.trim()) {
+      newErrors.role = "Job title / role is required.";
+    }
+
+    if (!newJob.description.trim()) {
+      newErrors.description = "Job description is required.";
+    }
+
+    if (!newJob.requiredSkills.trim()) {
+      newErrors.requiredSkills = "Required skills are required.";
+    }
+
+    const minCgpaVal = parseFloat(newJob.minCgpa);
+    if (newJob.minCgpa !== "" && (isNaN(minCgpaVal) || minCgpaVal < 0 || minCgpaVal > 10)) {
+      newErrors.minCgpa = "Minimum CGPA must be between 0 and 10.";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setJobErrors(newErrors);
+      showWarning("Please fill in all required fields.");
+      return;
+    }
+
+    setJobErrors({});
     setSubmitting(true);
     try {
-      const skillsArray = newJob.requiredSkills.split(",").map((s) => s.trim());
+      const skillsArray = newJob.requiredSkills.split(",").map((s) => s.trim()).filter(Boolean);
       const created = await placementService.createJob({
         ...newJob,
         requiredSkills: skillsArray
@@ -147,10 +178,12 @@ export function JobDescriptionsPage() {
       setJobs((prev) => [created, ...prev]);
       setSelectedJob(created);
       setCreateModalOpen(false);
-      addToast(`Recruitment drive created for ${created.company}! SIPS Match Engine computed candidate compatibility.`, "success");
+      showSuccess("Job description uploaded successfully.");
     } catch (e) {
       console.error(e);
-      addToast("Failed to create recruitment drive.", "error");
+      const msg = e.message || "Failed to create recruitment drive.";
+      setJobErrors({ general: msg });
+      showError(msg);
     } finally {
       setSubmitting(false);
     }
@@ -559,34 +592,73 @@ export function JobDescriptionsPage() {
         title="Upload / Create Campus Recruitment Drive"
         subtitle="SIPS AI will automatically extract skills and calculate candidate compatibility"
       >
-        <form onSubmit={handleCreateJob} className="space-y-4">
+        <form onSubmit={handleCreateJob} className="space-y-4" noValidate>
+          {jobErrors.general && (
+            <div className="flex items-start gap-2.5 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 animate-in fade-in duration-200">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <span className="leading-snug">{jobErrors.general}</span>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                Company Name
+                Company Name *
               </label>
               <input
                 type="text"
                 required
+                disabled={submitting}
                 value={newJob.company}
-                onChange={(e) => setNewJob({ ...newJob, company: e.target.value })}
+                onChange={(e) => {
+                  setNewJob({ ...newJob, company: e.target.value });
+                  if (jobErrors.company || jobErrors.general) {
+                    setJobErrors((prev) => ({ ...prev, company: "", general: "" }));
+                  }
+                }}
                 placeholder="e.g. Cisco Systems"
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+                className={`w-full px-3.5 py-2 rounded-xl border text-sm font-medium focus:ring-2 ${
+                  jobErrors.company
+                    ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                    : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                }`}
               />
+              {jobErrors.company && (
+                <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  {jobErrors.company}
+                </p>
+              )}
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                Job Title / Role
+                Job Title / Role *
               </label>
               <input
                 type="text"
                 required
+                disabled={submitting}
                 value={newJob.role}
-                onChange={(e) => setNewJob({ ...newJob, role: e.target.value })}
+                onChange={(e) => {
+                  setNewJob({ ...newJob, role: e.target.value });
+                  if (jobErrors.role || jobErrors.general) {
+                    setJobErrors((prev) => ({ ...prev, role: "", general: "" }));
+                  }
+                }}
                 placeholder="e.g. Associate Software Engineer"
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+                className={`w-full px-3.5 py-2 rounded-xl border text-sm font-medium focus:ring-2 ${
+                  jobErrors.role
+                    ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                    : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                }`}
               />
+              {jobErrors.role && (
+                <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  {jobErrors.role}
+                </p>
+              )}
             </div>
           </div>
 
@@ -597,6 +669,7 @@ export function JobDescriptionsPage() {
               </label>
               <input
                 type="text"
+                disabled={submitting}
                 value={newJob.ctc}
                 onChange={(e) => setNewJob({ ...newJob, ctc: e.target.value })}
                 placeholder="e.g. 16 LPA - 20 LPA"
@@ -611,11 +684,29 @@ export function JobDescriptionsPage() {
               <input
                 type="number"
                 step="0.1"
+                min="0"
+                max="10"
+                disabled={submitting}
                 value={newJob.minCgpa}
-                onChange={(e) => setNewJob({ ...newJob, minCgpa: e.target.value })}
+                onChange={(e) => {
+                  setNewJob({ ...newJob, minCgpa: e.target.value });
+                  if (jobErrors.minCgpa || jobErrors.general) {
+                    setJobErrors((prev) => ({ ...prev, minCgpa: "", general: "" }));
+                  }
+                }}
                 placeholder="7.5"
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm font-medium"
+                className={`w-full px-3.5 py-2 rounded-xl border text-sm font-medium ${
+                  jobErrors.minCgpa
+                    ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                    : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                }`}
               />
+              {jobErrors.minCgpa && (
+                <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  {jobErrors.minCgpa}
+                </p>
+              )}
             </div>
 
             <div>
@@ -624,6 +715,7 @@ export function JobDescriptionsPage() {
               </label>
               <input
                 type="date"
+                disabled={submitting}
                 value={newJob.deadline}
                 onChange={(e) => setNewJob({ ...newJob, deadline: e.target.value })}
                 className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm font-medium"
@@ -633,40 +725,74 @@ export function JobDescriptionsPage() {
 
           <div>
             <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-              Required Skills (Comma separated)
+              Required Skills (Comma separated) *
             </label>
             <input
               type="text"
               required
+              disabled={submitting}
               value={newJob.requiredSkills}
-              onChange={(e) => setNewJob({ ...newJob, requiredSkills: e.target.value })}
+              onChange={(e) => {
+                setNewJob({ ...newJob, requiredSkills: e.target.value });
+                if (jobErrors.requiredSkills || jobErrors.general) {
+                  setJobErrors((prev) => ({ ...prev, requiredSkills: "", general: "" }));
+                }
+              }}
               placeholder="Python, React, SQL, Algorithms, Docker"
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm font-medium"
+              className={`w-full px-3.5 py-2 rounded-xl border text-sm font-medium ${
+                jobErrors.requiredSkills
+                  ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                  : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+              }`}
             />
+            {jobErrors.requiredSkills && (
+              <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                <AlertCircle className="w-3 h-3 shrink-0" />
+                {jobErrors.requiredSkills}
+              </p>
+            )}
           </div>
 
           <div>
             <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-              Job Description / Notes
+              Job Description / Notes *
             </label>
             <textarea
               rows={3}
+              required
+              disabled={submitting}
               value={newJob.description}
-              onChange={(e) => setNewJob({ ...newJob, description: e.target.value })}
-              className="w-full p-3 rounded-xl border border-slate-200 text-sm"
+              onChange={(e) => {
+                setNewJob({ ...newJob, description: e.target.value });
+                if (jobErrors.description || jobErrors.general) {
+                  setJobErrors((prev) => ({ ...prev, description: "", general: "" }));
+                }
+              }}
+              className={`w-full p-3 rounded-xl border text-sm ${
+                jobErrors.description
+                  ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                  : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+              }`}
             />
+            {jobErrors.description && (
+              <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                <AlertCircle className="w-3 h-3 shrink-0" />
+                {jobErrors.description}
+              </p>
+            )}
           </div>
 
           <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
             <Button
               type="button"
               variant="outline"
+              disabled={submitting}
               onClick={() => setCreateModalOpen(false)}
             >
               Cancel
             </Button>
-            <Button type="submit" variant="primary" loading={submitting}>
-              Publish Drive & Run Match
+            <Button type="submit" variant="primary" loading={submitting} disabled={submitting}>
+              {submitting ? "Posting Drive..." : "Publish Drive & Run Match"}
             </Button>
           </div>
         </form>

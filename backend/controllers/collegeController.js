@@ -152,9 +152,9 @@ exports.registerCollege = async (req, res) => {
   } catch (error) {
     console.error('Registration error:', error);
     if (error.code === 11000) {
-      return res.status(400).json({ message: 'College name, slug, or domain already exists. Please choose another.' });
+      return res.status(409).json({ message: 'College name, slug, or domain already exists. Please choose another.' });
     }
-    res.status(500).json({ message: 'Server error during registration: ' + (error.message || error) });
+    res.status(500).json({ message: 'Something went wrong on the server. Please try again later.' });
   }
 };
 
@@ -294,7 +294,7 @@ exports.uploadStudents = async (req, res) => {
     res.json(results);
   } catch (error) {
     console.error('Upload students error:', error);
-    res.status(500).json({ message: 'Server error during student upload' });
+    res.status(500).json({ message: 'Something went wrong on the server. Please try again later.' });
   }
 };
 
@@ -315,7 +315,7 @@ exports.getStudents = async (req, res) => {
     res.json(students);
   } catch (error) {
     console.error('Get students error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong on the server. Please try again later.' });
   }
 };
 
@@ -344,6 +344,6 @@ exports.getCollegeBySlug = async (req, res) => {
     }
     res.json(college);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong on the server. Please try again later.' });
   }
 };

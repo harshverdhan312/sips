@@ -13,6 +13,33 @@ const getAuthToken = () => {
   }
 };
 
+const sanitizeErrorMessage = (msg, status) => {
+  if (!msg || typeof msg !== 'string') {
+    return null;
+  }
+  const lower = msg.toLowerCase();
+  const sensitivePatterns = [
+    'mongo',
+    'cast to',
+    'syntaxerror',
+    'referenceerror',
+    'typeerror',
+    'econnrefused',
+    'enotfound',
+    'stack',
+    'node_modules',
+    'at async',
+    'server error during'
+  ];
+  if (sensitivePatterns.some(pattern => lower.includes(pattern))) {
+    if (status >= 500) {
+      return 'Something went wrong on the server. Please try again later.';
+    }
+    return 'Invalid request. Please check your information.';
+  }
+  return msg;
+};
+
 async function request(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
   const token = getAuthToken();
@@ -33,17 +60,38 @@ async function request(endpoint, options = {}) {
     options.body = JSON.stringify(options.body);
   }
 
-  const response = await fetch(url, {
-    ...options,
-    headers
-  });
+  let response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      headers
+    });
+  } catch (networkError) {
+    const err = new Error('Unable to connect to the server. Please check your connection and try again.');
+    err.status = 0;
+    err.isNetworkError = true;
+    err.originalError = networkError;
+    throw err;
+  }
 
   // Handle 401 Unauthorized
   if (response.status === 401 && !endpoint.includes('/auth/login')) {
-    localStorage.removeItem('sips_token');
-    localStorage.removeItem('sips_auth_user');
-    if (window.location.pathname !== '/login') {
-      window.location.href = '/login';
+    try {
+      localStorage.removeItem('sips_token');
+      localStorage.removeItem('sips_auth_user');
+    } catch (e) {
+      // ignore
+    }
+
+    if (typeof window !== 'undefined') {
+      const currentPath = window.location.pathname;
+      const isPublicRoute = currentPath === '/' || currentPath === '' || currentPath === '/login';
+
+      // Only redirect if accessing a protected route with an expired/invalid session
+      // Never redirect from the public Landing Page or Login page
+      if (!isPublicRoute && token) {
+        window.location.href = '/login';
+      }
     }
   }
 
@@ -51,14 +99,48 @@ async function request(endpoint, options = {}) {
   let data;
   const contentType = response.headers.get('content-type');
   if (contentType && contentType.includes('application/json')) {
-    data = await response.json();
+    try {
+      data = await response.json();
+    } catch (e) {
+      data = null;
+    }
   } else {
-    data = await response.text();
+    try {
+      data = await response.text();
+    } catch (e) {
+      data = null;
+    }
   }
 
   if (!response.ok) {
-    const errorMsg = (typeof data === 'object' && data?.message) || response.statusText || 'Request failed';
-    const err = new Error(errorMsg);
+    let rawMsg = (typeof data === 'object' && data !== null && (data.message || data.error)) || response.statusText;
+    let safeMsg = sanitizeErrorMessage(rawMsg, response.status);
+
+    if (response.status === 401) {
+      if (endpoint.includes('/auth/login')) {
+        safeMsg = safeMsg || 'Invalid credentials. Please check your login details.';
+      } else {
+        safeMsg = 'Your session has expired. Please log in again.';
+      }
+    } else if (response.status === 403) {
+      safeMsg = safeMsg || 'You do not have permission to perform this action.';
+    } else if (response.status === 404) {
+      safeMsg = safeMsg || 'The requested resource could not be found.';
+    } else if (response.status === 409) {
+      safeMsg = safeMsg || 'This information already exists.';
+    } else if (response.status === 422) {
+      safeMsg = safeMsg || 'Please check the entered information.';
+    } else if (response.status === 429) {
+      safeMsg = 'Too many requests. Please try again later.';
+    } else if (response.status >= 502 && response.status <= 504) {
+      safeMsg = 'Server is currently unavailable. Please try again later.';
+    } else if (response.status >= 500) {
+      safeMsg = 'Something went wrong on the server. Please try again later.';
+    } else if (!safeMsg) {
+      safeMsg = 'Request failed. Please try again.';
+    }
+
+    const err = new Error(safeMsg);
     err.status = response.status;
     err.data = data;
     throw err;

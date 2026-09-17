@@ -24,7 +24,7 @@ import { DashboardSkeleton } from "../../components/common/LoadingSkeleton";
 import { useNotifications } from "../../context/NotificationContext";
 
 export function StudentProfilePage() {
-  const { addToast } = useNotifications();
+  const { showSuccess, showError, showWarning } = useNotifications();
   const [student, setStudent] = useState(null);
   const [isEditingSkills, setIsEditingSkills] = useState(false);
   const [isEditingGithub, setIsEditingGithub] = useState(false);
@@ -55,10 +55,10 @@ export function StudentProfilePage() {
       const updated = await studentService.getCurrentStudent();
       setStudent(updated);
       setIsEditingSkills(false);
-      addToast("Verified skills updated successfully!", "success");
+      showSuccess("Profile updated successfully.");
     } catch (e) {
       console.error(e);
-      addToast("Failed to save skills: " + e.message, "error");
+      showError(e.message || "Failed to save skills. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -71,10 +71,10 @@ export function StudentProfilePage() {
       const updated = await studentService.getCurrentStudent();
       setStudent(updated);
       setIsEditingGithub(false);
-      addToast("GitHub handle updated successfully!", "success");
+      showSuccess("Profile updated successfully.");
     } catch (e) {
       console.error(e);
-      addToast("Failed to save GitHub handle: " + e.message, "error");
+      showError(e.message || "Failed to save GitHub handle. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -84,13 +84,13 @@ export function StudentProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.name.toLowerCase().endsWith(".pdf")) {
-      addToast("Only PDF resume files are supported.", "error");
+    if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+      showError("Please upload a valid PDF resume.");
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      addToast("Resume file size exceeds 5MB limit.", "error");
+      showError("File size exceeds the allowed limit.");
       return;
     }
 
@@ -99,10 +99,10 @@ export function StudentProfilePage() {
       await studentService.uploadResume(file);
       const updated = await studentService.getCurrentStudent();
       setStudent(updated);
-      addToast("Resume uploaded successfully!", "success");
+      showSuccess("Resume uploaded successfully.");
     } catch (err) {
       console.error(err);
-      addToast("Resume upload failed: " + err.message, "error");
+      showError(err.message || "Failed to process the uploaded file.");
     } finally {
       setUploadingResume(false);
     }
