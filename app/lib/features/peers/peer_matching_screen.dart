@@ -124,6 +124,105 @@ class PeerMatchingScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (err, _) => Center(child: Text('Error loading peers: $err')),
         data: (peers) {
+          if (peers.isEmpty) {
+            return Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: const BoxDecoration(
+                        color: AppColors.primaryFixed,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.people_alt_outlined, size: 32, color: AppColors.primary),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Peer Matching',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Peer matching is not available yet.\n\nMatching will appear here once the intelligence service is connected.',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 13,
+                        color: AppColors.onSurfaceVariant,
+                        height: 1.45,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    SipsCard(
+                      padding: const EdgeInsets.all(18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SipsBadge(
+                            label: 'PEER INTELLIGENCE',
+                            variant: SipsBadgeVariant.neutral,
+                            isSmall: true,
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Planned Collaboration Features:',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(Icons.check_circle_outline, size: 16, color: AppColors.primary),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Automated peer pairing based on complementary skill gaps',
+                                  style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AppColors.onSurfaceVariant),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(Icons.check_circle_outline, size: 16, color: AppColors.primary),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Synchronized mock interview rooms and mutual peer scoring',
+                                  style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AppColors.onSurfaceVariant),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    SipsButton(
+                      label: 'Back to Home',
+                      isFullWidth: true,
+                      onPressed: () => context.go('/home'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             child: Column(

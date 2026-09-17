@@ -30,6 +30,105 @@ class RoadmapScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (err, _) => Center(child: Text('Error loading roadmap: $err')),
         data: (milestones) {
+          if (milestones.isEmpty) {
+            return Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: const BoxDecoration(
+                        color: AppColors.primaryFixed,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.route_rounded, size: 32, color: AppColors.primary),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Personalized Roadmap',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Personalized roadmap not available yet.\n\nYour roadmap will appear here once backend intelligence is connected.',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 13,
+                        color: AppColors.onSurfaceVariant,
+                        height: 1.45,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    SipsCard(
+                      padding: const EdgeInsets.all(18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SipsBadge(
+                            label: 'INTELLIGENCE ROADMAP',
+                            variant: SipsBadgeVariant.neutral,
+                            isSmall: true,
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Upcoming capabilities:',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(Icons.check_circle_outline, size: 16, color: AppColors.primary),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Curated milestone timelines tailored to your branch and skill gaps',
+                                  style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AppColors.onSurfaceVariant),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(Icons.check_circle_outline, size: 16, color: AppColors.primary),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Company-specific target criteria matching',
+                                  style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AppColors.onSurfaceVariant),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    SipsButton(
+                      label: 'Explore Opportunities',
+                      isFullWidth: true,
+                      onPressed: () => context.go('/opportunities'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             child: Column(

@@ -166,7 +166,7 @@ void main() {
       expect(alert.description, 'Online Assessment scheduled for Friday.');
     });
 
-    test('ApiSipsRepository delegates unsupported features to mock store', () async {
+    test('ApiSipsRepository returns empty/honest states for unsupported features without mock fabrication', () async {
       final mockClient = MockClient((request) async {
         return http.Response(jsonEncode({}), 200);
       });
@@ -175,16 +175,16 @@ void main() {
       final repo = ApiSipsRepository(apiClient);
 
       final tasks = await repo.getGrowthTasks();
-      expect(tasks.isNotEmpty, true);
+      expect(tasks.isEmpty, true);
 
       final milestones = await repo.getRoadmapMilestones();
-      expect(milestones.isNotEmpty, true);
+      expect(milestones.isEmpty, true);
 
       final interviewQuestions = await repo.getMockInterviewQuestions();
-      expect(interviewQuestions.isNotEmpty, true);
+      expect(interviewQuestions.isEmpty, true);
 
       final peers = await repo.getPeerMatches();
-      expect(peers.isNotEmpty, true);
+      expect(peers.isEmpty, true);
     });
   });
 }

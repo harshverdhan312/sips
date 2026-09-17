@@ -49,10 +49,10 @@ export function PlacementReadinessPage() {
       <div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
           <GraduationCap className="w-8 h-8 text-indigo-600" />
-          Placement Readiness & Employability Index
+          Placement Readiness & Scoring Diagnostics
         </h1>
         <p className="text-sm text-slate-500 mt-1">
-          A multi-dimensional scoring model assessing technical, behavioral, and academic placement fit.
+          A multi-dimensional scoring model assessing technical depth, soft skills, resume optimization, and academic performance.
         </p>
       </div>
 
@@ -64,15 +64,15 @@ export function PlacementReadinessPage() {
           </h3>
           <ProbabilityGauge probability={metrics.placementProbability} size={200} />
           <p className="text-xs text-slate-500 max-w-xs mt-3">
-            Simulated over 48 Tier-1 and Tier-2 campus recruiters based on the 2025 hiring criteria.
+            Computed from your verified backend profile metrics (GET /api/student/profile).
           </p>
         </Card>
 
         {/* Weighted Score Breakdown Table */}
         <Card className="lg:col-span-2">
           <CardHeader
-            title="Weighted Employability Index (78/100)"
-            subtitle="Algorithm composite weighting across 5 distinct assessment pillars"
+            title={`Weighted Readiness Index (${metrics.employabilityIndex}/100)`}
+            subtitle="Algorithm composite weighting across key assessment dimensions"
           />
           <div className="space-y-4">
             {weights.map((w, idx) => (
@@ -128,10 +128,10 @@ export function PlacementReadinessPage() {
             </div>
             <div>
               <h3 className="font-bold text-slate-900 text-base">
-                Positive Contributors (+ Boosters)
+                Positive Profile Indicators
               </h3>
               <p className="text-xs text-emerald-700 font-medium">
-                Factors giving you an edge in campus shortlists
+                Verified attributes strengthening your candidacy
               </p>
             </div>
           </div>
@@ -156,10 +156,10 @@ export function PlacementReadinessPage() {
             </div>
             <div>
               <h3 className="font-bold text-slate-900 text-base">
-                Critical Focus Areas (- Gaps)
+                Actionable Focus Areas
               </h3>
               <p className="text-xs text-amber-700 font-medium">
-                Targeted actions needed to hit 90%+ placement probability
+                Steps to optimize your placement readiness
               </p>
             </div>
           </div>
@@ -176,76 +176,6 @@ export function PlacementReadinessPage() {
           </ul>
         </Card>
       </div>
-
-      {/* Campus Placement Season Timeline & Checklist */}
-      <Card>
-        <CardHeader
-          title="Placement Season Preparation Roadmap"
-          subtitle="Milestones to track prior to Day-1 on-campus recruitment drives"
-        />
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/30 flex flex-col justify-between">
-            <div>
-              <Badge variant="success" size="sm" className="mb-2">
-                Completed
-              </Badge>
-              <h4 className="font-bold text-slate-900 text-sm">Phase 1: Resume Verification</h4>
-              <p className="text-xs text-slate-500 mt-1">
-                ATS score above 85, GitHub portfolio linked, projects verified.
-              </p>
-            </div>
-            <div className="mt-4 pt-3 border-t border-emerald-100 text-xs font-semibold text-emerald-700">
-              100% Done
-            </div>
-          </div>
-
-          <div className="p-4 rounded-xl border border-indigo-200 bg-indigo-50/30 flex flex-col justify-between">
-            <div>
-              <Badge variant="primary" size="sm" className="mb-2">
-                In Progress
-              </Badge>
-              <h4 className="font-bold text-slate-900 text-sm">Phase 2: DSA & Tech Drills</h4>
-              <p className="text-xs text-slate-500 mt-1">
-                LeetCode medium threshold reached. Complete 15 SQL query drills.
-              </p>
-            </div>
-            <div className="mt-4 pt-3 border-t border-indigo-100 text-xs font-semibold text-indigo-700">
-              80% Done
-            </div>
-          </div>
-
-          <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex flex-col justify-between">
-            <div>
-              <Badge variant="neutral" size="sm" className="mb-2">
-                Up Next
-              </Badge>
-              <h4 className="font-bold text-slate-900 text-sm">Phase 3: Behavioral STAR Drills</h4>
-              <p className="text-xs text-slate-500 mt-1">
-                Record 5 STAR scenarios with speech cadence at 130-140 WPM.
-              </p>
-            </div>
-            <div className="mt-4 pt-3 border-t border-slate-200 text-xs font-semibold text-slate-600">
-              40% Done
-            </div>
-          </div>
-
-          <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex flex-col justify-between">
-            <div>
-              <Badge variant="neutral" size="sm" className="mb-2">
-                Scheduled
-              </Badge>
-              <h4 className="font-bold text-slate-900 text-sm">Phase 4: Day-1 Company Drives</h4>
-              <p className="text-xs text-slate-500 mt-1">
-                Attend pre-placement talks and appear for Day-1 online assessments.
-              </p>
-            </div>
-            <div className="mt-4 pt-3 border-t border-slate-200 text-xs font-semibold text-slate-400">
-              Starts Apr 20
-            </div>
-          </div>
-        </div>
-      </Card>
     </div>
   );
 }

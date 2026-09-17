@@ -201,14 +201,31 @@ class MainShellScreen extends ConsumerWidget {
                           width: 1.5,
                         ),
                       ),
-                      child: const Center(
-                        child: Text(
-                          'AS',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.onPrimaryFixed,
-                          ),
+                      child: Center(
+                        child: Consumer(
+                          builder: (context, ref, _) {
+                            final profileAsync = ref.watch(studentProfileProvider);
+                            final initials = profileAsync.maybeWhen(
+                              data: (profile) {
+                                final name = profile.name.trim();
+                                if (name.isEmpty) return 'ST';
+                                final parts = name.split(RegExp(r'\s+'));
+                                if (parts.length == 1) {
+                                  return parts[0].substring(0, parts[0].length >= 2 ? 2 : 1).toUpperCase();
+                                }
+                                return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+                              },
+                              orElse: () => 'ST',
+                            );
+                            return Text(
+                              initials,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.onPrimaryFixed,
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ),

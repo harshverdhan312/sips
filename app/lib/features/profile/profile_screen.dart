@@ -560,11 +560,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            _buildAcademicPill('CGPA', '${profile.cgpa}', const Color(0xFF047857)),
+                            _buildAcademicPill('CGPA', profile.cgpa > 0 ? profile.cgpa.toStringAsFixed(2) : 'N/A', const Color(0xFF047857)),
                             Container(width: 1, height: 26, color: AppColors.outlineVariant),
-                            _buildAcademicPill('Backlogs', '${profile.backlogs}', AppColors.onSurface),
+                            _buildAcademicPill('Status', profile.placementStatus.isNotEmpty ? profile.placementStatus : 'Active', AppColors.onSurface),
                             Container(width: 1, height: 26, color: AppColors.outlineVariant),
-                            _buildAcademicPill('Graduation', '${profile.graduationYear} Batch', AppColors.primary),
+                            _buildAcademicPill('Batch', profile.graduationYear.isNotEmpty ? profile.graduationYear : 'N/A', AppColors.primary),
                           ],
                         ),
                       ),
@@ -581,9 +581,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
-                      _buildInfoRow(Icons.school_outlined, 'College', profile.college),
+                      _buildInfoRow(Icons.school_outlined, 'College / Institute', profile.college.isNotEmpty ? profile.college : 'Not specified'),
                       const Divider(height: 16),
-                      _buildInfoRow(Icons.account_tree_outlined, 'Branch', profile.branch),
+                      _buildInfoRow(Icons.account_tree_outlined, 'Department / Branch', profile.branch.isNotEmpty ? profile.branch : 'Not specified'),
                     ],
                   ),
                 ),
@@ -592,28 +592,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
                 // Connected Telemetry Accounts
                 SectionHeader(
-                  title: 'Connected Telemetry Handles',
-                  badge: const SipsBadge(label: 'SYNCED', variant: SipsBadgeVariant.emerald, isSmall: true),
+                  title: 'Connected Accounts',
+                  badge: SipsBadge(
+                    label: profile.githubHandle.isNotEmpty ? 'SYNCED' : 'UNLINKED',
+                    variant: profile.githubHandle.isNotEmpty ? SipsBadgeVariant.emerald : SipsBadgeVariant.neutral,
+                    isSmall: true,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 SipsCard(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
-                      _buildInfoRow(
-                        Icons.code_rounded,
-                        'LeetCode Handle',
-                        '${profile.leetcodeHandle} (${profile.leetcodeRating} Rating)',
-                      ),
-                      const Divider(height: 16),
                       Row(
                         children: [
                           Expanded(
                             child: _buildInfoRow(
                               Icons.terminal_rounded,
-                              'GitHub Account',
+                              'GitHub Profile',
                               profile.githubHandle.isNotEmpty
-                                  ? '${profile.githubHandle} (${profile.githubCommits} Commits)'
+                                  ? profile.githubHandle
                                   : 'No handle linked',
                             ),
                           ),

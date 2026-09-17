@@ -1,42 +1,47 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Target,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  CheckCircle2,
+  Layers,
+  FileCode
 } from "lucide-react";
 import { studentService } from "../../services/studentService";
-import { skillCategories } from "../../data/mockSkills";
 import { Card, CardHeader } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
-import { Tabs } from "../../components/common/Tabs";
-import { ProgressBar } from "../../components/common/ProgressBar";
 import { RadarSkillChart } from "../../components/charts/RadarSkillChart";
-import { useNotifications } from "../../context/NotificationContext";
+import { DashboardSkeleton } from "../../components/common/LoadingSkeleton";
 
 export function SkillGapPage() {
-  const { addToast } = useNotifications();
-  const [activeCategory, setActiveCategory] = useState("All");
+  const navigate = useNavigate();
+  const [student, setStudent] = useState(null);
   const [skills, setSkills] = useState([]);
   const [radarData, setRadarData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       try {
-        const [data, radar] = await Promise.all([
-          studentService.getSkillsData(activeCategory),
+        const [studentData, radar] = await Promise.all([
+          studentService.getCurrentStudent(),
           studentService.getRadarData()
         ]);
-        setSkills(data);
+        setStudent(studentData);
+        setSkills(studentData?.skills || []);
         setRadarData(radar);
       } catch (e) {
         console.error(e);
+      } finally {
+        setLoading(false);
       }
     }
     load();
-  }, [activeCategory]);
-  const strongCount = skills.filter((s) => s.gap === 0).length;
-  const gapCount = skills.filter((s) => s.gap > 0).length;
+  }, []);
+
+  if (loading || !student) return <DashboardSkeleton />;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -45,171 +50,110 @@ export function SkillGapPage() {
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
             <Target className="w-8 h-8 text-indigo-600" />
-            Skill Gap Intelligence & Learning Roadmap
+            Verified Technical Skills & Alignment
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            Compare your verified competencies against current industry campus recruitment standards.
+            Skills synchronized with your student profile (GET /api/student/profile) used for campus recruitment matching.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <Badge variant="success" size="lg">
-            {strongCount} Mastered Skills
+            {skills.length} Verified Skills
           </Badge>
-          <Badge variant="warning" size="lg">
-            {gapCount} Identified Gaps
-          </Badge>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate("/student/profile")}
+          >
+            Manage in Profile
+          </Button>
         </div>
       </div>
 
-      {/* Overview Card: Radar + Metric Summary */}
+      {/* Overview Card: Metric Summary + Radar */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="flex flex-col justify-between">
           <CardHeader
-            title="Skill Health Index"
-            subtitle="Weighted benchmark alignment score"
+            title="Readiness Index"
+            subtitle="Calculated technical and profile readiness"
           />
           <div className="py-4 text-center">
             <div className="inline-flex items-baseline gap-1 text-5xl font-extrabold text-indigo-600">
-              76<span className="text-xl text-slate-400 font-medium">/100</span>
+              {student.readinessScore}<span className="text-xl text-slate-400 font-medium">/100</span>
             </div>
             <p className="text-xs font-semibold text-slate-700 mt-2">
-              Overall Technical & Domain Competency
+              {student.status}
             </p>
             <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
-              You are 8 points above the university average for the 2025 cohort.
+              Live placement status: {student.placementStatus}
             </p>
           </div>
 
           <div className="pt-4 border-t border-slate-100 space-y-2 text-xs">
             <div className="flex justify-between">
-              <span className="text-slate-500">Fastest growing domain:</span>
-              <span className="font-semibold text-emerald-600">Frontend & React (85%)</span>
+              <span className="text-slate-500">Technical Score:</span>
+              <span className="font-semibold text-slate-800">{student.metrics?.technicalScore || 0}/100</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500">Largest hiring bottleneck:</span>
-              <span className="font-semibold text-rose-600">Cloud & Docker (20% gap)</span>
+              <span className="text-slate-500">Resume Status:</span>
+              <span className="font-semibold text-slate-800">{student.resumeUrl ? "Synced" : "Upload Pending"}</span>
             </div>
           </div>
         </Card>
 
         <Card className="lg:col-span-2">
           <CardHeader
-            title="Domain Proficiency Radar"
-            subtitle="Comparing your skill footprint with target software engineer profiles"
+            title="Readiness Dimension Telemetry"
+            subtitle="Verified student attributes across placement readiness pillars"
           />
           <RadarSkillChart data={radarData} height={280} />
         </Card>
       </div>
 
-      {/* Category Tabs Filter */}
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <Tabs
-          tabs={skillCategories}
-          activeTab={activeCategory}
-          onChange={(cat) => setActiveCategory(cat)}
-        />
-        <span className="text-xs text-slate-400 font-medium">
-          Showing {skills.length} skills in {activeCategory}
-        </span>
-      </div>
+      {/* Verified Skills Grid or Clean Empty State */}
+      <div>
+        <h3 className="font-bold text-slate-900 text-lg mb-3">
+          Verified Competencies
+        </h3>
 
-      {/* Detailed Skill Gap Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {skills.map((skill) => {
-          const isStrong = skill.gap === 0;
-          return (
-            <Card
-              key={skill.id}
-              className="flex flex-col justify-between hover:border-slate-300 transition-all"
+        {skills.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {skills.map((skill, index) => (
+              <Card key={index} className="p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs shrink-0">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 text-sm">{skill}</h4>
+                    <span className="text-[11px] text-slate-400">Verified Technical Skill</span>
+                  </div>
+                </div>
+                <Badge variant="success" size="sm">
+                  Verified
+                </Badge>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card className="p-8 text-center max-w-md mx-auto">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-3">
+              <Layers className="w-6 h-6" />
+            </div>
+            <h4 className="font-bold text-slate-900 text-base mb-1">No verified technical skills yet</h4>
+            <p className="text-xs text-slate-500 mb-4">
+              Add your programming languages and technical competencies in your Profile to calculate company drive match scores.
+            </p>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => navigate("/student/profile")}
             >
-              <div>
-                <div className="flex items-start justify-between gap-2 mb-3">
-                  <div>
-                    <h4 className="font-bold text-slate-900 text-base">{skill.name}</h4>
-                    <span className="text-xs text-slate-400">{skill.category}</span>
-                  </div>
-                  <Badge
-                    variant={isStrong ? "success" : skill.priority === "High" ? "danger" : "warning"}
-                    size="sm"
-                  >
-                    {isStrong ? "Benchmark Met" : `${skill.priority} Priority`}
-                  </Badge>
-                </div>
-
-                <div className="space-y-3 mt-4">
-                  {/* Current vs Benchmark Bars */}
-                  <div>
-                    <div className="flex justify-between text-xs font-semibold mb-1">
-                      <span className="text-slate-600">Your Current Level</span>
-                      <span className="text-indigo-600">{skill.currentLevel}%</span>
-                    </div>
-                    <ProgressBar
-                      value={skill.currentLevel}
-                      variant={isStrong ? "emerald" : "primary"}
-                      size="sm"
-                      showPercentage={false}
-                    />
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between text-xs font-semibold mb-1">
-                      <span className="text-slate-600">Industry Required Level</span>
-                      <span className="text-slate-700">{skill.requiredLevel}%</span>
-                    </div>
-                    <ProgressBar
-                      value={skill.requiredLevel}
-                      variant="purple"
-                      size="sm"
-                      showPercentage={false}
-                    />
-                  </div>
-                </div>
-
-                {/* Gap & Roadmap info */}
-                <div className="mt-4 pt-3 border-t border-slate-100 text-xs">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-slate-500 font-medium">Skill Gap:</span>
-                    <span
-                      className={
-                        isStrong
-                          ? "font-bold text-emerald-600"
-                          : "font-bold text-rose-600"
-                      }
-                    >
-                      {isStrong ? "No Gap (+3% Surplus)" : `-${skill.gap}% Deficit`}
-                    </span>
-                  </div>
-
-                  <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-100 mt-2">
-                    <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-                      <Sparkles className="w-3 h-3 text-indigo-600" />
-                      Recommended Action:
-                    </p>
-                    <p className="text-xs text-slate-700 font-medium">
-                      {skill.roadmap}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-[11px] text-slate-400">
-                  {skill.endorsements} endorsements
-                </span>
-                <Button
-                  variant="outline"
-                  size="xs"
-                  icon={ArrowRight}
-                  iconPosition="right"
-                  onClick={() => addToast(`Learning path for ${skill.name} added to your plan!`, "info")}
-                >
-                  Bridge Gap
-                </Button>
-              </div>
-            </Card>
-          );
-        })}
+              Add Skills from Profile
+            </Button>
+          </Card>
+        )}
       </div>
     </div>
   );

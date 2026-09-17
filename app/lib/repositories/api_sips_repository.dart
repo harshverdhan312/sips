@@ -1,6 +1,5 @@
 import '../core/network/api_client.dart';
 import '../core/widgets/skill_chip.dart';
-import '../mock/mock_data.dart';
 import '../models/growth_task.dart';
 import '../models/job_opportunity.dart';
 import '../models/mock_interview.dart';
@@ -24,13 +23,6 @@ class ApiSipsRepository implements SipsRepository {
   final Set<String> _readAlertIds = {};
   final Set<String> _appliedJobIds = {};
   final Set<String> _bookmarkedJobIds = {};
-
-  // Local state for unsupported features (Backend Gaps)
-  List<GrowthTask> _localTasks = List.from(MockData.tasks);
-  final List<RoadmapMilestone> _localMilestones = List.from(MockData.roadmapMilestones);
-  final List<InterviewQuestion> _localInterviewQuestions = List.from(MockData.mockInterviewQuestions);
-  final InterviewDiagnosticReport _localDiagnostic = MockData.diagnosticReport;
-  final List<PeerMatch> _localPeers = List.from(MockData.peers);
 
   ApiSipsRepository(this._apiClient);
 
@@ -70,22 +62,24 @@ class ApiSipsRepository implements SipsRepository {
   @override
   Future<ReadinessMetric> getReadinessMetric() async {
     final profile = _cachedProfile ?? await getStudentProfile();
-    final overall = profile.readinessScore > 0 ? profile.readinessScore : 78;
+    final overall = profile.readinessScore;
 
     return ReadinessMetric(
       overallScore: overall,
       maxScore: 100,
-      percentileText: 'Top ${overall >= 80 ? '12%' : '25%'} in CSE Batch',
-      profileSummary: 'Calibrated readiness profile for core engineering drives.',
-      scoreGainText: '+14 pts • Active',
-      techDepthScore: (overall * 0.95).round().clamp(50, 98),
-      starBehaviorScore: 82,
-      systemArchScore: (overall * 0.9).round().clamp(50, 95),
+      percentileText: overall > 0 ? 'Tier Benchmark: $overall/100' : 'Score Pending Assessment',
+      profileSummary: overall > 0
+          ? 'Calibrated readiness profile based on verified backend credentials.'
+          : 'Complete your profile and add technical skills to compute your readiness score.',
+      scoreGainText: overall > 0 ? 'Active Assessment' : 'Pending',
+      techDepthScore: overall > 0 ? (overall * 0.95).round().clamp(0, 100) : 0,
+      starBehaviorScore: overall > 0 ? 80 : 0,
+      systemArchScore: overall > 0 ? (overall * 0.9).round().clamp(0, 100) : 0,
       domainScores: [
-        DomainScore(title: 'Core Technical Skills', score: (overall * 0.95).round().clamp(50, 98), category: 'technical'),
-        DomainScore(title: 'System Architecture', score: (overall * 0.9).round().clamp(50, 95), category: 'arch'),
-        DomainScore(title: 'Soft Skills & Communication', score: 82, category: 'soft_skills'),
-        DomainScore(title: 'Resume & Portfolio Impact', score: profile.atsScore > 0 ? profile.atsScore : 80, category: 'resume'),
+        DomainScore(title: 'Core Technical Skills', score: overall > 0 ? (overall * 0.95).round().clamp(0, 100) : 0, category: 'technical'),
+        DomainScore(title: 'System Architecture', score: overall > 0 ? (overall * 0.9).round().clamp(0, 100) : 0, category: 'arch'),
+        DomainScore(title: 'Soft Skills & Communication', score: overall > 0 ? 80 : 0, category: 'soft_skills'),
+        DomainScore(title: 'Resume & Portfolio Impact', score: profile.atsScore, category: 'resume'),
       ],
     );
   }
@@ -103,13 +97,15 @@ class ApiSipsRepository implements SipsRepository {
         return SkillItem(
           id: 'sk_$index',
           name: skillName,
-          category: 'Core Skills',
+          category: 'Verified Skill',
           status: SkillStatus.strong,
           proficiency: 85,
+          readinessImpact: 5,
+          recommendation: 'Verified in student profile for campus drive matching.',
         );
       }).toList();
     }
-    return MockData.skills;
+    return [];
   }
 
   // ==========================================
@@ -230,44 +226,49 @@ class ApiSipsRepository implements SipsRepository {
   }
 
   // ==========================================
-  // 7. Unsupported Features (Preserved Mocks)
+  // 7. Unsupported Features (No backend capability)
   // ==========================================
   @override
   Future<List<GrowthTask>> getGrowthTasks() async {
-    return _localTasks;
+    return const [];
   }
 
   @override
   Future<GrowthTask> toggleTaskCompletion(String taskId) async {
-    GrowthTask? updated;
-    _localTasks = _localTasks.map((t) {
-      if (t.id == taskId) {
-        final nextState = !t.isCompleted;
-        updated = t.copyWith(isCompleted: nextState);
-        return updated!;
-      }
-      return t;
-    }).toList();
-    return updated ?? _localTasks.first;
+    throw UnsupportedError('Task tracking is not supported by the backend');
   }
 
   @override
   Future<List<RoadmapMilestone>> getRoadmapMilestones() async {
-    return _localMilestones;
+    return const [];
   }
 
   @override
   Future<List<InterviewQuestion>> getMockInterviewQuestions() async {
-    return _localInterviewQuestions;
+    return const [];
   }
 
   @override
   Future<InterviewDiagnosticReport> getDiagnosticReport() async {
-    return _localDiagnostic;
+    return const InterviewDiagnosticReport(
+      id: 'diagnostic_unavailable',
+      interviewTitle: 'No Diagnostic Report',
+      date: 'N/A',
+      overallScore: 0,
+      technicalScore: 0,
+      starMethodScore: 0,
+      communicationScore: 0,
+      structureScore: 0,
+      confidenceScore: 0,
+      summaryVerdict: 'Interview diagnostics are not available yet.',
+      topStrengths: [],
+      highPriorityGaps: [],
+      actionableNextSteps: [],
+    );
   }
 
   @override
   Future<List<PeerMatch>> getPeerMatches() async {
-    return _localPeers;
+    return const [];
   }
 }

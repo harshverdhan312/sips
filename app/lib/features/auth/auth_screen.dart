@@ -191,56 +191,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
               const SizedBox(height: 16),
 
-              // Demo Fast-Track Card
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF0FDF4),
-                  borderRadius: AppRadius.lgRadius,
-                  border: Border.all(color: const Color(0xFF86EFAC), width: 1),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.flash_on_rounded, color: Color(0xFF16A34A), size: 22),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Demo Candidate Quick Access',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF15803D),
-                            ),
-                          ),
-                          Text(
-                            'Aarav Sharma • NIT CSE Final Year',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 11,
-                              color: const Color(0xFF166534),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SipsButton(
-                      label: 'Auto Fill',
-                      variant: SipsButtonVariant.emerald,
-                      size: SipsButtonSize.small,
-                      onPressed: () {
-                        _emailController.text = 'aarav.sharma@nit.ac.in';
-                        _passwordController.text = 'password123';
-                        _handleLogin();
-                      },
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
               Center(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
