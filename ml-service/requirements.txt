@@ -10,3 +10,6 @@ xgboost==3.2.0
 
 pytest
 httpx
+pypdf
+sentence-transformers
+python-multipart

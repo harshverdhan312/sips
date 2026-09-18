@@ -5,6 +5,11 @@ export const notificationService = {
    * Fetch live college notifications from backend
    */
   async getNotifications() {
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('sips_token') : null;
+    if (!token) {
+      return [];
+    }
+
     try {
       const data = await api.get('/api/notification');
       if (Array.isArray(data)) {

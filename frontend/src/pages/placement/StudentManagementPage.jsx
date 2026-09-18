@@ -21,7 +21,7 @@ import { Modal } from "../../components/common/Modal";
 import { useNotifications } from "../../context/NotificationContext";
 
 export function StudentManagementPage() {
-  const { addToast } = useNotifications();
+  const { showSuccess, showError, showWarning, showInfo } = useNotifications();
   const [students, setStudents] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState("All");
@@ -33,6 +33,7 @@ export function StudentManagementPage() {
   // Add Student modal
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [savingStudent, setSavingStudent] = useState(false);
+  const [addStudentErrors, setAddStudentErrors] = useState({});
   const [newStudent, setNewStudent] = useState({
     name: "",
     email: "",
@@ -70,20 +71,50 @@ export function StudentManagementPage() {
   }, [selectedBranch, selectedStatus]);
 
   const handleExportCsv = () => {
-    addToast("Exporting Student Placement Readiness records to CSV...", "info");
+    showInfo("Exporting Student Placement Readiness records to CSV...");
   };
 
   const handleCreateStudent = async (e) => {
     e.preventDefault();
-    if (!newStudent.name || !newStudent.email || !newStudent.rollNo) {
-      addToast("Please fill in Name, Email, and Roll No / USN", "warning");
+    const newErrors = {};
+
+    if (!newStudent.name.trim()) {
+      newErrors.name = "Full name is required.";
+    }
+
+    if (!newStudent.email.trim()) {
+      newErrors.email = "Institutional email is required.";
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(newStudent.email.trim())) {
+        newErrors.email = "Please enter a valid email address.";
+      }
+    }
+
+    if (!newStudent.rollNo.trim()) {
+      newErrors.rollNo = "Roll No / USN is required.";
+    }
+
+    const cgpaVal = parseFloat(newStudent.cgpa);
+    if (newStudent.cgpa !== "" && (isNaN(cgpaVal) || cgpaVal < 0 || cgpaVal > 10)) {
+      newErrors.cgpa = "CGPA must be between 0 and 10.";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setAddStudentErrors(newErrors);
+      if (newErrors.email === "Please enter a valid email address.") {
+        showError("Please enter a valid email address.");
+      } else {
+        showWarning("Please fill in all required fields.");
+      }
       return;
     }
 
+    setAddStudentErrors({});
     setSavingStudent(true);
     try {
       const res = await adminService.createStudent(newStudent);
-      addToast(`Student ${res.student.name} created! Password: ${res.student.initialPassword}`, "success");
+      showSuccess(`Student created successfully. Initial password: ${res.student.initialPassword}`);
       setAddModalOpen(false);
       setNewStudent({
         name: "",
@@ -97,7 +128,9 @@ export function StudentManagementPage() {
 
       await loadStudents();
     } catch (err) {
-      addToast(err.message || "Failed to create student account", "error");
+      const msg = err.message || "Failed to create student account.";
+      setAddStudentErrors({ general: msg });
+      showError(msg);
     } finally {
       setSavingStudent(false);
     }
@@ -108,7 +141,17 @@ export function StudentManagementPage() {
     if (!file) return;
 
     if (!file.name.toLowerCase().endsWith(".csv") && file.type !== "text/csv") {
-      setImportError("Please select a valid .csv file.");
+      const msg = "Please select a valid CSV file.";
+      setImportError(msg);
+      showError(msg);
+      setCsvFile(null);
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      const msg = "File size exceeds the allowed limit.";
+      setImportError(msg);
+      showError(msg);
       setCsvFile(null);
       return;
     }
@@ -128,7 +171,23 @@ export function StudentManagementPage() {
     e.preventDefault();
     const payload = csvText.trim();
     if (!payload) {
-      setImportError("Please select a CSV file or paste CSV content.");
+      const msg = "Please select a CSV file or paste CSV content.";
+      setImportError(msg);
+      showWarning(msg);
+      return;
+    }
+
+    // Verify headers
+    const firstLine = payload.split(/\r?\n/)[0] || "";
+    const lowerFirst = firstLine.toLowerCase();
+    const hasName = lowerFirst.includes("name");
+    const hasRoll = lowerFirst.includes("roll") || lowerFirst.includes("usn");
+    const hasEmail = lowerFirst.includes("email");
+
+    if (!hasName || !hasRoll || !hasEmail) {
+      const msg = "CSV file must contain Name, Roll No (or USN), and Email columns.";
+      setImportError(msg);
+      showError(msg);
       return;
     }
 
@@ -142,14 +201,17 @@ export function StudentManagementPage() {
       setImportResult(outcome);
 
       if (outcome.success > 0) {
-        addToast(`Successfully imported ${outcome.success} student records!`, "success");
+        showSuccess(`Imported ${outcome.success} of ${outcome.total || outcome.success} students successfully.`);
         await loadStudents();
-      } else if (outcome.failed > 0) {
-        addToast(`Import failed for ${outcome.failed} rows. Review errors below.`, "warning");
+      }
+      if (outcome.failed > 0) {
+        showWarning(`Import encountered issues for ${outcome.failed} rows. Please review below.`);
       }
     } catch (err) {
       console.error("Bulk CSV import error:", err);
-      setImportError(err.message || "Server error during CSV student import.");
+      const msg = err.message || "Failed to process the uploaded file.";
+      setImportError(msg);
+      showError(msg);
     } finally {
       setImporting(false);
     }
@@ -502,7 +564,14 @@ export function StudentManagementPage() {
         title="Provision New Student Account"
         subtitle="Create an individual student account with institutional login credentials"
       >
-        <form onSubmit={handleCreateStudent} className="space-y-4">
+        <form onSubmit={handleCreateStudent} className="space-y-4" noValidate>
+          {addStudentErrors.general && (
+            <div className="flex items-start gap-2.5 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 animate-in fade-in duration-200">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <span className="leading-snug">{addStudentErrors.general}</span>
+            </div>
+          )}
+
           <div>
             <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
               Full Name *
@@ -510,11 +579,27 @@ export function StudentManagementPage() {
             <input
               type="text"
               required
+              disabled={savingStudent}
               value={newStudent.name}
-              onChange={(e) => setNewStudent({ ...newStudent, name: e.target.value })}
+              onChange={(e) => {
+                setNewStudent({ ...newStudent, name: e.target.value });
+                if (addStudentErrors.name || addStudentErrors.general) {
+                  setAddStudentErrors((prev) => ({ ...prev, name: "", general: "" }));
+                }
+              }}
               placeholder="e.g. Aarav Sharma"
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+              className={`w-full px-3.5 py-2 rounded-xl border text-sm focus:outline-none focus:ring-2 ${
+                addStudentErrors.name
+                  ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                  : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+              }`}
             />
+            {addStudentErrors.name && (
+              <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                <AlertCircle className="w-3 h-3 shrink-0" />
+                {addStudentErrors.name}
+              </p>
+            )}
           </div>
 
           <div>
@@ -524,11 +609,27 @@ export function StudentManagementPage() {
             <input
               type="email"
               required
+              disabled={savingStudent}
               value={newStudent.email}
-              onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
+              onChange={(e) => {
+                setNewStudent({ ...newStudent, email: e.target.value });
+                if (addStudentErrors.email || addStudentErrors.general) {
+                  setAddStudentErrors((prev) => ({ ...prev, email: "", general: "" }));
+                }
+              }}
               placeholder="aarav.sharma@college.edu"
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+              className={`w-full px-3.5 py-2 rounded-xl border text-sm focus:outline-none focus:ring-2 ${
+                addStudentErrors.email
+                  ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                  : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+              }`}
             />
+            {addStudentErrors.email && (
+              <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                <AlertCircle className="w-3 h-3 shrink-0" />
+                {addStudentErrors.email}
+              </p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -539,11 +640,27 @@ export function StudentManagementPage() {
               <input
                 type="text"
                 required
+                disabled={savingStudent}
                 value={newStudent.rollNo}
-                onChange={(e) => setNewStudent({ ...newStudent, rollNo: e.target.value })}
+                onChange={(e) => {
+                  setNewStudent({ ...newStudent, rollNo: e.target.value });
+                  if (addStudentErrors.rollNo || addStudentErrors.general) {
+                    setAddStudentErrors((prev) => ({ ...prev, rollNo: "", general: "" }));
+                  }
+                }}
                 placeholder="1RV21CS001"
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className={`w-full px-3.5 py-2 rounded-xl border text-sm focus:outline-none focus:ring-2 ${
+                  addStudentErrors.rollNo
+                    ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                    : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                }`}
               />
+              {addStudentErrors.rollNo && (
+                <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  {addStudentErrors.rollNo}
+                </p>
+              )}
             </div>
             <div>
               <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
@@ -554,10 +671,26 @@ export function StudentManagementPage() {
                 step="0.01"
                 min="0"
                 max="10"
+                disabled={savingStudent}
                 value={newStudent.cgpa}
-                onChange={(e) => setNewStudent({ ...newStudent, cgpa: e.target.value })}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                onChange={(e) => {
+                  setNewStudent({ ...newStudent, cgpa: e.target.value });
+                  if (addStudentErrors.cgpa || addStudentErrors.general) {
+                    setAddStudentErrors((prev) => ({ ...prev, cgpa: "", general: "" }));
+                  }
+                }}
+                className={`w-full px-3.5 py-2 rounded-xl border text-sm focus:outline-none focus:ring-2 ${
+                  addStudentErrors.cgpa
+                    ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                    : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                }`}
               />
+              {addStudentErrors.cgpa && (
+                <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  {addStudentErrors.cgpa}
+                </p>
+              )}
             </div>
           </div>
 
@@ -567,6 +700,7 @@ export function StudentManagementPage() {
                 Department / Branch
               </label>
               <select
+                disabled={savingStudent}
                 value={newStudent.branch}
                 onChange={(e) => setNewStudent({ ...newStudent, branch: e.target.value })}
                 className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
@@ -583,6 +717,7 @@ export function StudentManagementPage() {
               </label>
               <input
                 type="text"
+                disabled={savingStudent}
                 value={newStudent.batch}
                 onChange={(e) => setNewStudent({ ...newStudent, batch: e.target.value })}
                 className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
@@ -596,6 +731,7 @@ export function StudentManagementPage() {
             </label>
             <input
               type="password"
+              disabled={savingStudent}
               value={newStudent.password}
               onChange={(e) => setNewStudent({ ...newStudent, password: e.target.value })}
               placeholder="Leave blank to use Roll No as password"
@@ -607,12 +743,13 @@ export function StudentManagementPage() {
             <Button
               type="button"
               variant="outline"
+              disabled={savingStudent}
               onClick={() => setAddModalOpen(false)}
             >
               Cancel
             </Button>
-            <Button type="submit" variant="primary" loading={savingStudent}>
-              Provision Student
+            <Button type="submit" variant="primary" loading={savingStudent} disabled={savingStudent}>
+              {savingStudent ? "Creating student..." : "Provision Student"}
             </Button>
           </div>
         </form>
@@ -749,9 +886,9 @@ export function StudentManagementPage() {
               type="submit"
               variant="primary"
               loading={importing}
-              disabled={!csvText.trim()}
+              disabled={importing || !csvText.trim()}
             >
-              Upload & Provision Students
+              {importing ? "Importing students..." : "Upload & Provision Students"}
             </Button>
           </div>
         </form>

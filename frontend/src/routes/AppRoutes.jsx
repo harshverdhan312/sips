@@ -6,6 +6,7 @@ import { DashboardLayout } from "../components/layout/DashboardLayout";
 
 // Auth
 import { LoginPage } from "../pages/auth/LoginPage";
+import { LandingPage } from "../pages/LandingPage";
 import { NotFoundPage } from "../pages/NotFoundPage";
 
 // Student Pages
@@ -40,17 +41,8 @@ export function AppRoutes() {
 
   return (
     <Routes>
-      {/* Root redirect */}
-      <Route
-        path="/"
-        element={
-          isAuthenticated && role ? (
-            <Navigate to={`/${role}/dashboard`} replace />
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        }
-      />
+      {/* Public Marketing & Gateway Layer */}
+      <Route path="/" element={<LandingPage />} />
 
       {/* Public Login */}
       <Route path="/login" element={<LoginPage />} />

@@ -1,11 +1,20 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { notificationService } from "../services/notificationService";
+import { useAuth } from "./AuthContext";
 
 const NotificationContext = createContext(null);
 
 export function NotificationProvider({ children }) {
+  let authContext = null;
+  try {
+    authContext = useAuth();
+  } catch (e) {
+    // Graceful fallback if used outside AuthProvider in isolated tests
+  }
+  const isAuthenticated = authContext?.isAuthenticated ?? false;
+
   const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [toasts, setToasts] = useState([]);
 
   // Load read notification IDs from localStorage
@@ -27,6 +36,11 @@ export function NotificationProvider({ children }) {
   }, []);
 
   const loadNotifications = useCallback(async () => {
+    if (!isAuthenticated) {
+      setNotifications([]);
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       const notifs = await notificationService.getNotifications();
@@ -41,11 +55,16 @@ export function NotificationProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  }, [getReadIds]);
+  }, [isAuthenticated, getReadIds]);
 
   useEffect(() => {
-    loadNotifications();
-  }, [loadNotifications]);
+    if (isAuthenticated) {
+      loadNotifications();
+    } else {
+      setNotifications([]);
+      setLoading(false);
+    }
+  }, [isAuthenticated, loadNotifications]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -67,15 +86,29 @@ export function NotificationProvider({ children }) {
   };
 
   const addToast = (message, type = "success", duration = 4000) => {
-    const id = "toast_" + Date.now();
+    const id = "toast_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7);
     setToasts((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, duration);
+    if (duration > 0) {
+      setTimeout(() => {
+        setToasts((prev) => prev.filter((t) => t.id !== id));
+      }, duration);
+    }
+    return id;
   };
 
   const removeToast = (id) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const showSuccess = (message, duration = 4000) => addToast(message, "success", duration);
+  const showError = (message, duration = 5000) => addToast(message, "error", duration);
+  const showWarning = (message, duration = 4500) => addToast(message, "warning", duration);
+  const showInfo = (message, duration = 4000) => addToast(message, "info", duration);
+  const showNotification = (msgOrObj, type = "info", duration = 4000) => {
+    if (typeof msgOrObj === "object" && msgOrObj !== null) {
+      return addToast(msgOrObj.message || String(msgOrObj), msgOrObj.type || type, msgOrObj.duration || duration);
+    }
+    return addToast(String(msgOrObj), type, duration);
   };
 
   return (
@@ -89,7 +122,12 @@ export function NotificationProvider({ children }) {
         markAllAsRead,
         toasts,
         addToast,
-        removeToast
+        removeToast,
+        showSuccess,
+        showError,
+        showWarning,
+        showInfo,
+        showNotification
       }}
     >
       {children}
