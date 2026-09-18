@@ -32,3 +32,72 @@ From the repository root, regenerate it with:
 This creates: ml-service/models/placement_model.joblib
 
 The placement API loads this artifact for inference.
+
+## Resume Intelligence API
+
+The resume intelligence endpoints are registered under `/resume`.
+
+### Extract Skills from a PDF
+
+`POST /resume/extract`
+
+- Content type: `multipart/form-data`
+- File field: `file`
+- Accepted type: PDF
+- Maximum size: 5 MB
+- Supports text-based PDFs; scanned image PDFs require OCR, which is not yet implemented.
+
+Example response:
+
+```json
+{
+  "extracted_skills": ["python", "sql", "machine learning"]
+}
+```
+
+### Deterministic Job Skill Match
+
+`POST /resume/match`
+
+Example request:
+
+```json
+{
+  "student_skills": ["Python", "ML", "SQL"],
+  "required_skills": ["Python", "SQL", "Docker"]
+}
+```
+
+Example response:
+
+```json
+{
+  "matched_skills": ["python", "sql"],
+  "missing_skills": ["docker"],
+  "coverage_score": 66.67
+}
+```
+
+### Semantic Job Match
+
+`POST /resume/semantic-match`
+
+This endpoint uses pretrained `all-MiniLM-L6-v2` Sentence-BERT embeddings with cosine similarity. It does not use a fine-tuned model.
+
+Example request:
+
+```json
+{
+  "student_skills": ["Python", "ML", "SQL"],
+  "job_text": "Seeking a machine learning engineer with Python experience."
+}
+```
+
+Example response:
+
+```json
+{
+  "semantic_similarity": 0.8123,
+  "model_name": "all-MiniLM-L6-v2"
+}
+```
