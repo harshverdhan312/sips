@@ -2,15 +2,12 @@ import io
 import wave
 
 import numpy as np
-from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 import src.api.interview_routes as interview_routes
-from src.api.interview_routes import router
+from src.api.main import app
 
 
-app = FastAPI()
-app.include_router(router)
 client = TestClient(app)
 
 

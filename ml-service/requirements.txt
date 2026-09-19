@@ -12,4 +12,3 @@ pytest
 httpx
 pypdf
 sentence-transformers
-python-multipart
