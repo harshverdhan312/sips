@@ -5,10 +5,10 @@ PyYAML
 python-dotenv
 fastapi
 uvicorn
-python-multipart
 xgboost==3.2.0
 
 pytest
 httpx
 pypdf
 sentence-transformers
+python-multipart
