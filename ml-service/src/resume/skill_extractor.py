@@ -1,23 +1,6 @@
 import re
 
-from src.resume.skill_normalizer import DEFAULT_SKILL_ALIASES
-
-
-DEFAULT_SKILLS = [
-    "python",
-    "java",
-    "javascript",
-    "sql",
-    "machine learning",
-    "deep learning",
-    "data science",
-    "data analysis",
-    "html",
-    "css",
-    "react",
-    "node.js",
-    "git",
-]
+from src.resume.skill_catalog import DEFAULT_SKILLS, SKILL_ALIASES
 
 
 def extract_skills(text: str, skills=None) -> list[str]:
@@ -34,7 +17,7 @@ def extract_skills(text: str, skills=None) -> list[str]:
         if skills is None:
             variants.extend(
                 alias
-                for alias, canonical in DEFAULT_SKILL_ALIASES.items()
+                for alias, canonical in SKILL_ALIASES.items()
                 if canonical == skill and alias != skill
             )
 
