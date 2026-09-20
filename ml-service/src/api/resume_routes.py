@@ -23,6 +23,35 @@ router = APIRouter(
 )
 
 
+def _validate_pdf_upload(
+    file: UploadFile,
+    pdf_bytes: bytes,
+) -> None:
+    if file.content_type != "application/pdf":
+        raise HTTPException(
+            status_code=415,
+            detail="Only PDF files are supported.",
+        )
+
+    if not pdf_bytes:
+        raise HTTPException(
+            status_code=400,
+            detail="Uploaded PDF must not be empty.",
+        )
+
+    if len(pdf_bytes) > MAX_PDF_SIZE_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail="PDF file must not exceed 5 MB.",
+        )
+
+    if b"%PDF-" not in pdf_bytes[:1024]:
+        raise HTTPException(
+            status_code=422,
+            detail="Uploaded file is not a valid PDF.",
+        )
+
+
 class ResumeExtractionResponse(BaseModel):
     extracted_skills: list[str]
 
@@ -59,25 +88,8 @@ class SemanticMatchResponse(BaseModel):
 async def extract_resume_skills(
     file: UploadFile = File(...),
 ):
-    if file.content_type != "application/pdf":
-        raise HTTPException(
-            status_code=415,
-            detail="Only PDF files are supported.",
-        )
-
     pdf_bytes = await file.read()
-
-    if not pdf_bytes:
-        raise HTTPException(
-            status_code=400,
-            detail="Uploaded PDF must not be empty.",
-        )
-
-    if len(pdf_bytes) > MAX_PDF_SIZE_BYTES:
-        raise HTTPException(
-            status_code=413,
-            detail="PDF file must not exceed 5 MB.",
-        )
+    _validate_pdf_upload(file, pdf_bytes)
 
     try:
         resume_text = extract_pdf_text(
@@ -161,25 +173,8 @@ async def analyze_resume(
     file: UploadFile = File(...),
     required_skills: list[str] = Form(...),
 ):
-    if file.content_type != "application/pdf":
-        raise HTTPException(
-            status_code=415,
-            detail="Only PDF files are supported.",
-        )
-
     pdf_bytes = await file.read()
-
-    if not pdf_bytes:
-        raise HTTPException(
-            status_code=400,
-            detail="Uploaded PDF must not be empty.",
-        )
-
-    if len(pdf_bytes) > MAX_PDF_SIZE_BYTES:
-        raise HTTPException(
-            status_code=413,
-            detail="PDF file must not exceed 5 MB.",
-        )
+    _validate_pdf_upload(file, pdf_bytes)
 
     try:
         resume_text = extract_pdf_text(
