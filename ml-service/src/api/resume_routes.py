@@ -4,6 +4,11 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel, ConfigDict
 from pypdf.errors import PdfReadError
 
+from src.resume.hybrid_matcher import (
+    DEFAULT_SEMANTIC_WEIGHT,
+    DEFAULT_SKILL_WEIGHT,
+    calculate_hybrid_match,
+)
 from src.resume.parser import extract_pdf_text
 from src.resume.semantic_matcher import (
     DEFAULT_MODEL_NAME,
@@ -197,3 +202,48 @@ async def analyze_resume(
         "extracted_skills": extracted_skills,
         **gap_analysis,
     }
+
+
+class HybridMatchRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    student_skills: list[str]
+    required_skills: list[str]
+    resume_text: str
+    job_text: str
+    skill_weight: float = DEFAULT_SKILL_WEIGHT
+    semantic_weight: float = DEFAULT_SEMANTIC_WEIGHT
+
+
+class HybridMatchResponse(BaseModel):
+    matched_skills: list[str]
+    missing_skills: list[str]
+    skill_coverage_score: float
+    semantic_similarity: float
+    semantic_score: float
+    hybrid_match_score: float
+    skill_weight: float
+    semantic_weight: float
+
+
+@router.post(
+    "/hybrid-match",
+    response_model=HybridMatchResponse,
+)
+def hybrid_match_resume(
+    request: HybridMatchRequest,
+):
+    try:
+        return calculate_hybrid_match(
+            student_skills=request.student_skills,
+            required_skills=request.required_skills,
+            resume_text=request.resume_text,
+            job_text=request.job_text,
+            skill_weight=request.skill_weight,
+            semantic_weight=request.semantic_weight,
+        )
+    except (TypeError, ValueError) as error:
+        raise HTTPException(
+            status_code=422,
+            detail=str(error),
+        ) from error

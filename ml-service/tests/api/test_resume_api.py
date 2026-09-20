@@ -261,3 +261,65 @@ def test_analyze_resume_rejects_oversized_pdf(monkeypatch):
     assert response.json()["detail"] == (
         "PDF file must not exceed 5 MB."
     )
+
+
+def test_hybrid_match_returns_explainable_scores(monkeypatch):
+    monkeypatch.setattr(
+        resume_routes,
+        "calculate_hybrid_match",
+        lambda **kwargs: {
+            "matched_skills": ["python", "machine learning"],
+            "missing_skills": ["sql"],
+            "skill_coverage_score": 66.67,
+            "semantic_similarity": 0.8,
+            "semantic_score": 80.0,
+            "hybrid_match_score": 72.0,
+            "skill_weight": 0.6,
+            "semantic_weight": 0.4,
+        },
+    )
+
+    response = client.post(
+        "/resume/hybrid-match",
+        json={
+            "student_skills": ["Python", "ML"],
+            "required_skills": [
+                "Python",
+                "Machine Learning",
+                "SQL",
+            ],
+            "resume_text": "Python machine learning experience.",
+            "job_text": "Python ML engineer with SQL.",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "matched_skills": ["python", "machine learning"],
+        "missing_skills": ["sql"],
+        "skill_coverage_score": 66.67,
+        "semantic_similarity": 0.8,
+        "semantic_score": 80.0,
+        "hybrid_match_score": 72.0,
+        "skill_weight": 0.6,
+        "semantic_weight": 0.4,
+    }
+
+
+def test_hybrid_match_rejects_invalid_weights():
+    response = client.post(
+        "/resume/hybrid-match",
+        json={
+            "student_skills": ["Python"],
+            "required_skills": ["Python"],
+            "resume_text": "Python",
+            "job_text": "Python developer",
+            "skill_weight": 0.8,
+            "semantic_weight": 0.8,
+        },
+    )
+
+    assert response.status_code == 422
+    assert response.json()["detail"] == (
+        "Match weights must be between 0 and 1 and sum to 1."
+    )
