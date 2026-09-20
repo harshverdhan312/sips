@@ -1,15 +1,7 @@
-DEFAULT_SKILL_ALIASES = {
-    "js": "javascript",
-    "javascript": "javascript",
-    "nodejs": "node.js",
-    "node.js": "node.js",
-    "ml": "machine learning",
-    "machine learning": "machine learning",
-    "dl": "deep learning",
-    "deep learning": "deep learning",
-    "ai": "artificial intelligence",
-    "artificial intelligence": "artificial intelligence",
-}
+from src.resume.skill_catalog import SKILL_ALIASES
+
+
+DEFAULT_SKILL_ALIASES = SKILL_ALIASES
 
 
 def normalize_skill(skill: str, aliases=None) -> str:

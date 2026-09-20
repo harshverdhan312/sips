@@ -55,3 +55,19 @@ def test_custom_skill_list_does_not_expand_default_aliases():
     )
 
     assert result == ["docker"]
+
+
+def test_default_catalog_extracts_expanded_skills_and_aliases():
+    result = extract_skills(
+        "Built AI services with PostgreSQL, Postgres, "
+        "PowerBI, Docker, K8s, Kubernetes and AWS."
+    )
+
+    assert result == [
+        "postgresql",
+        "artificial intelligence",
+        "power bi",
+        "docker",
+        "kubernetes",
+        "aws",
+    ]
