@@ -132,3 +132,44 @@ Example response:
   "coverage_score": 75.0
 }
 ```
+
+### Hybrid Job Match
+
+`POST /resume/hybrid-match`
+
+This endpoint combines deterministic skill coverage with pretrained Sentence-BERT semantic similarity.
+
+Default weights:
+
+- Skill coverage: `0.6`
+- Semantic similarity: `0.4`
+
+The weights can be customized, but each must be between `0` and `1`, and together they must sum to `1`.
+
+Example request:
+
+```json
+{
+  "student_skills": ["Python", "ML"],
+  "required_skills": ["Python", "Machine Learning", "SQL"],
+  "resume_text": "Python and machine learning experience.",
+  "job_text": "Python ML engineer with SQL.",
+  "skill_weight": 0.6,
+  "semantic_weight": 0.4
+}
+```
+
+Example response:
+
+```json
+{
+  "matched_skills": ["python", "machine learning"],
+  "missing_skills": ["sql"],
+  "skill_coverage_score": 66.67,
+  "semantic_similarity": 0.8,
+  "semantic_score": 80.0,
+  "hybrid_match_score": 72.0,
+  "skill_weight": 0.6,
+  "semantic_weight": 0.4
+}
+```
