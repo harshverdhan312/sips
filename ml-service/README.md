@@ -101,3 +101,34 @@ Example response:
   "model_name": "all-MiniLM-L6-v2"
 }
 ```
+
+### Analyze a PDF Against Job Requirements
+
+`POST /resume/analyze`
+
+- Content type: `multipart/form-data`
+- PDF field: `file`
+- Repeat the `required_skills` form field once for each required skill
+- Accepted file type: PDF
+- Maximum file size: 5 MB
+
+Example form fields:
+
+```text
+file: resume.pdf
+required_skills: Python
+required_skills: Machine Learning
+required_skills: Kubernetes
+required_skills: SQL
+```
+
+Example response:
+
+```json
+{
+  "extracted_skills": ["python", "sql", "machine learning", "docker"],
+  "matched_skills": ["python", "machine learning", "sql"],
+  "missing_skills": ["kubernetes"],
+  "coverage_score": 75.0
+}
+```

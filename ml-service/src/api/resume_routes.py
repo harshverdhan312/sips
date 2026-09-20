@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel, ConfigDict
 from pypdf.errors import PdfReadError
 
@@ -143,4 +143,62 @@ def semantic_match_resume(
             4,
         ),
         "model_name": DEFAULT_MODEL_NAME,
+    }
+
+
+class ResumeAnalysisResponse(BaseModel):
+    extracted_skills: list[str]
+    matched_skills: list[str]
+    missing_skills: list[str]
+    coverage_score: float
+
+
+@router.post(
+    "/analyze",
+    response_model=ResumeAnalysisResponse,
+)
+async def analyze_resume(
+    file: UploadFile = File(...),
+    required_skills: list[str] = Form(...),
+):
+    if file.content_type != "application/pdf":
+        raise HTTPException(
+            status_code=415,
+            detail="Only PDF files are supported.",
+        )
+
+    pdf_bytes = await file.read()
+
+    if not pdf_bytes:
+        raise HTTPException(
+            status_code=400,
+            detail="Uploaded PDF must not be empty.",
+        )
+
+    if len(pdf_bytes) > MAX_PDF_SIZE_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail="PDF file must not exceed 5 MB.",
+        )
+
+    try:
+        resume_text = extract_pdf_text(
+            BytesIO(pdf_bytes)
+        )
+        extracted_skills = extract_skills(
+            resume_text
+        )
+        gap_analysis = compare_skill_sets(
+            extracted_skills,
+            required_skills,
+        )
+    except (PdfReadError, TypeError, ValueError) as error:
+        raise HTTPException(
+            status_code=422,
+            detail=str(error),
+        ) from error
+
+    return {
+        "extracted_skills": extracted_skills,
+        **gap_analysis,
     }

@@ -151,3 +151,67 @@ def test_semantic_match_rejects_empty_student_skills():
     assert response.json()["detail"] == (
         "Student skills must not be empty."
     )
+
+
+def test_analyze_resume_pdf_against_job_requirements(monkeypatch):
+    monkeypatch.setattr(
+        resume_routes,
+        "extract_pdf_text",
+        lambda source: "Python ML SQL Docker",
+    )
+
+    response = client.post(
+        "/resume/analyze",
+        files=[
+            (
+                "file",
+                (
+                    "resume.pdf",
+                    b"%PDF-fake",
+                    "application/pdf",
+                ),
+            ),
+            ("required_skills", (None, "Python")),
+            ("required_skills", (None, "Machine Learning")),
+            ("required_skills", (None, "Kubernetes")),
+            ("required_skills", (None, "SQL")),
+        ],
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "extracted_skills": [
+            "python",
+            "sql",
+            "machine learning",
+            "docker",
+        ],
+        "matched_skills": [
+            "python",
+            "machine learning",
+            "sql",
+        ],
+        "missing_skills": ["kubernetes"],
+        "coverage_score": 75.0,
+    }
+
+
+def test_analyze_resume_rejects_empty_requirements(monkeypatch):
+    monkeypatch.setattr(
+        resume_routes,
+        "extract_pdf_text",
+        lambda source: "Python SQL",
+    )
+
+    response = client.post(
+        "/resume/analyze",
+        files={
+            "file": (
+                "resume.pdf",
+                b"%PDF-fake",
+                "application/pdf",
+            )
+        },
+    )
+
+    assert response.status_code == 422
