@@ -215,3 +215,49 @@ def test_analyze_resume_rejects_empty_requirements(monkeypatch):
     )
 
     assert response.status_code == 422
+
+
+def test_extract_resume_rejects_invalid_pdf_signature():
+    response = client.post(
+        "/resume/extract",
+        files={
+            "file": (
+                "resume.pdf",
+                b"not-a-real-pdf",
+                "application/pdf",
+            )
+        },
+    )
+
+    assert response.status_code == 422
+    assert response.json()["detail"] == (
+        "Uploaded file is not a valid PDF."
+    )
+
+
+def test_analyze_resume_rejects_oversized_pdf(monkeypatch):
+    monkeypatch.setattr(
+        resume_routes,
+        "MAX_PDF_SIZE_BYTES",
+        8,
+    )
+
+    response = client.post(
+        "/resume/analyze",
+        files=[
+            (
+                "file",
+                (
+                    "resume.pdf",
+                    b"%PDF-too-large",
+                    "application/pdf",
+                ),
+            ),
+            ("required_skills", (None, "Python")),
+        ],
+    )
+
+    assert response.status_code == 413
+    assert response.json()["detail"] == (
+        "PDF file must not exceed 5 MB."
+    )
