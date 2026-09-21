@@ -13,6 +13,7 @@ class MemoryDatabase {
     this.alerts = [];
     this.auditLogs = [];
     this.matches = [];
+    this.applications = [];
     this._idCounter = 1000;
   }
 
@@ -261,6 +262,60 @@ class MemoryDatabase {
     };
     this.alerts.unshift(newAlert);
     return newAlert;
+  }
+
+  // ==========================================
+  // Application Operations
+  // ==========================================
+  findApplicationById(id) {
+    return this.applications.find(a => String(a._id) === String(id));
+  }
+
+  findApplication(collegeId, studentId, jobId) {
+    return this.applications.find(a => 
+      String(a.collegeId) === String(collegeId) &&
+      String(a.studentId) === String(studentId) &&
+      String(a.jobId) === String(jobId)
+    );
+  }
+
+  getStudentApplications(collegeId, studentId) {
+    return this.applications
+      .filter(a => 
+        String(a.collegeId) === String(collegeId) && 
+        String(a.studentId) === String(studentId)
+      )
+      .sort((a, b) => new Date(b.appliedAt) - new Date(a.appliedAt));
+  }
+
+  getJobApplications(collegeId, jobId) {
+    return this.applications
+      .filter(a => 
+        String(a.collegeId) === String(collegeId) && 
+        String(a.jobId) === String(jobId)
+      )
+      .sort((a, b) => new Date(b.appliedAt) - new Date(a.appliedAt));
+  }
+
+  saveApplication(appData) {
+    const newApp = {
+      _id: appData._id || this.nextId('app_'),
+      collegeId: appData.collegeId,
+      studentId: appData.studentId,
+      jobId: appData.jobId,
+      status: appData.status || 'APPLIED',
+      appliedAt: appData.appliedAt || new Date(),
+      updatedAt: new Date()
+    };
+    this.applications.unshift(newApp);
+    return newApp;
+  }
+
+  updateApplication(id, updates) {
+    const app = this.findApplicationById(id);
+    if (!app) return null;
+    Object.assign(app, updates, { updatedAt: new Date() });
+    return app;
   }
 
   // ==========================================

@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs');
 const Student = require('../models/Student');
 const Match = require('../models/Match');
 const JobDescription = require('../models/JobDescription');
+const Application = require('../models/Application');
+const Notification = require('../models/Notification');
 const { calculateMatch } = require('../utils/matchingEngine');
 const memoryDb = require('../utils/memoryDb');
 const config = require('../config');
@@ -342,20 +344,27 @@ exports.uploadResume = async (req, res) => {
 
 /**
  * GET /api/student/jobs
- * Student-only — list all JDs with match scores for this student
+ * Student-only — list all JDs with match scores and authoritative application state
  */
 exports.getJobs = async (req, res) => {
   try {
     if (!memoryDb.isMongoConnected()) {
       const jds = memoryDb.getJobs(req.collegeId);
       const student = memoryDb.findStudentById(req.user.id);
+      const studentApps = memoryDb.getStudentApplications(req.collegeId, req.user.id);
+      const appMap = {};
+      studentApps.forEach(a => { appMap[String(a.jobId)] = a; });
+
       const jobsWithScores = jds.map(jd => {
         const match = student ? calculateMatch(student.skills || [], jd.requiredSkills || []) : { score: 0, matchedSkills: [], missingSkills: [] };
+        const app = appMap[String(jd._id)];
         return {
           ...jd,
           matchScore: match.score,
           matchedSkills: match.matchedSkills,
-          missingSkills: match.missingSkills
+          missingSkills: match.missingSkills,
+          hasApplied: !!app,
+          applicationStatus: app ? app.status : null
         };
       });
       return res.json(jobsWithScores);
@@ -370,20 +379,31 @@ exports.getJobs = async (req, res) => {
     });
 
     // Get matches for this student
-    const matches = await Match.find({ 
+    const matches = student ? await Match.find({ 
       studentId: student._id, 
       collegeId: req.collegeId 
-    });
+    }) : [];
     const matchMap = {};
     matches.forEach(m => { matchMap[m.jdId.toString()] = m; });
 
+    // Get applications for this student
+    const applications = await Application.find({
+      studentId: req.user.id,
+      collegeId: req.collegeId
+    });
+    const appMap = {};
+    applications.forEach(a => { appMap[a.jobId.toString()] = a; });
+
     const jobsWithScores = jds.map(jd => {
       const match = matchMap[jd._id.toString()];
+      const app = appMap[jd._id.toString()];
       return {
         ...jd.toObject(),
         matchScore: match ? match.score : 0,
         matchedSkills: match ? match.matchedSkills : [],
-        missingSkills: match ? match.missingSkills : []
+        missingSkills: match ? match.missingSkills : [],
+        hasApplied: !!app,
+        applicationStatus: app ? app.status : null
       };
     });
 
@@ -396,20 +416,27 @@ exports.getJobs = async (req, res) => {
 
 /**
  * GET /api/student/preferred-jobs
- * Student-only — top matching JDs sorted by score descending
+ * Student-only — top matching JDs sorted by score descending with application state
  */
 exports.getPreferredJobs = async (req, res) => {
   try {
     if (!memoryDb.isMongoConnected()) {
       const jds = memoryDb.getJobs(req.collegeId);
       const student = memoryDb.findStudentById(req.user.id);
+      const studentApps = memoryDb.getStudentApplications(req.collegeId, req.user.id);
+      const appMap = {};
+      studentApps.forEach(a => { appMap[String(a.jobId)] = a; });
+
       const preferred = jds.map(jd => {
         const match = student ? calculateMatch(student.skills || [], jd.requiredSkills || []) : { score: 0, matchedSkills: [], missingSkills: [] };
+        const app = appMap[String(jd._id)];
         return {
           ...jd,
           matchScore: match.score,
           matchedSkills: match.matchedSkills,
-          missingSkills: match.missingSkills
+          missingSkills: match.missingSkills,
+          hasApplied: !!app,
+          applicationStatus: app ? app.status : null
         };
       }).filter(j => j.matchScore > 0).sort((a, b) => b.matchScore - a.matchScore);
       return res.json(preferred);
@@ -420,6 +447,10 @@ exports.getPreferredJobs = async (req, res) => {
       collegeId: req.collegeId 
     });
 
+    if (!student) {
+      return res.json([]);
+    }
+
     const matches = await Match.find({ 
       studentId: student._id, 
       collegeId: req.collegeId,
@@ -428,16 +459,277 @@ exports.getPreferredJobs = async (req, res) => {
       .sort({ score: -1 })
       .populate('jdId');
 
-    const preferredJobs = matches.map(m => ({
-      ...m.jdId.toObject(),
-      matchScore: m.score,
-      matchedSkills: m.matchedSkills,
-      missingSkills: m.missingSkills
-    }));
+    const applications = await Application.find({
+      studentId: req.user.id,
+      collegeId: req.collegeId
+    });
+    const appMap = {};
+    applications.forEach(a => { appMap[a.jobId.toString()] = a; });
+
+    const preferredJobs = matches
+      .filter(m => m.jdId)
+      .map(m => {
+        const jdObj = m.jdId.toObject ? m.jdId.toObject() : m.jdId;
+        const app = appMap[jdObj._id.toString()];
+        return {
+          ...jdObj,
+          matchScore: m.score,
+          matchedSkills: m.matchedSkills,
+          missingSkills: m.missingSkills,
+          hasApplied: !!app,
+          applicationStatus: app ? app.status : null
+        };
+      });
 
     res.json(preferredJobs);
   } catch (error) {
     logger.error('Get preferred jobs error:', error);
     res.status(500).json({ message: 'Server error retrieving preferred jobs' });
+  }
+};
+
+/**
+ * POST /api/student/jobs/:id/apply
+ * Student-only — submit persistent application for a job
+ */
+exports.applyToJob = async (req, res) => {
+  try {
+    const jobId = req.params.id;
+
+    // ----------------------------------------------------
+    // Resilient In-Memory Mode
+    // ----------------------------------------------------
+    if (!memoryDb.isMongoConnected()) {
+      const job = memoryDb.findJobById(jobId);
+      if (!job || String(job.collegeId) !== String(req.collegeId)) {
+        return res.status(404).json({ success: false, message: 'Job not found' });
+      }
+
+      if (job.status && job.status === 'CLOSED') {
+        return res.status(400).json({ success: false, message: 'This job posting is closed' });
+      }
+
+      if (job.deadline && new Date(job.deadline) < new Date()) {
+        return res.status(400).json({ success: false, message: 'The application deadline for this job has passed' });
+      }
+
+      const existing = memoryDb.findApplication(req.collegeId, req.user.id, jobId);
+      if (existing) {
+        return res.status(409).json({ success: false, message: 'You have already applied for this job' });
+      }
+
+      const application = memoryDb.saveApplication({
+        collegeId: req.collegeId,
+        studentId: req.user.id,
+        jobId: job._id,
+        status: 'APPLIED',
+        appliedAt: new Date()
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: 'Application submitted successfully',
+        application
+      });
+    }
+
+    // ----------------------------------------------------
+    // MongoDB Mode
+    // ----------------------------------------------------
+    const job = await JobDescription.findOne({
+      _id: jobId,
+      collegeId: req.collegeId
+    });
+
+    if (!job) {
+      return res.status(404).json({ success: false, message: 'Job not found' });
+    }
+
+    if (job.status && job.status === 'CLOSED') {
+      return res.status(400).json({ success: false, message: 'This job posting is closed' });
+    }
+
+    if (job.deadline && new Date(job.deadline) < new Date()) {
+      return res.status(400).json({ success: false, message: 'The application deadline for this job has passed' });
+    }
+
+    // Check duplicate application
+    const existing = await Application.findOne({
+      collegeId: req.collegeId,
+      studentId: req.user.id,
+      jobId: job._id
+    });
+
+    if (existing) {
+      return res.status(409).json({ success: false, message: 'You have already applied for this job' });
+    }
+
+    const application = new Application({
+      collegeId: req.collegeId,
+      studentId: req.user.id,
+      jobId: job._id,
+      status: 'APPLIED',
+      appliedAt: new Date()
+    });
+
+    await application.save();
+
+    // Best-effort notification
+    Notification.create({
+      collegeId: req.collegeId,
+      message: `New application submitted for ${job.title} at ${job.company}`,
+      target: 'ALL'
+    }).catch(err => logger.warn('Application notification error:', err.message));
+
+    res.status(201).json({
+      success: true,
+      message: 'Application submitted successfully',
+      application
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({ success: false, message: 'You have already applied for this job' });
+    }
+    logger.error('Apply to job error:', error);
+    res.status(500).json({ success: false, message: 'Server error submitting application' });
+  }
+};
+
+/**
+ * GET /api/student/applications
+ * Student-only — list all applications submitted by the student
+ */
+exports.getApplications = async (req, res) => {
+  try {
+    if (!memoryDb.isMongoConnected()) {
+      const apps = memoryDb.getStudentApplications(req.collegeId, req.user.id);
+      const populated = apps.map(app => {
+        const job = memoryDb.findJobById(app.jobId);
+        return {
+          ...app,
+          jobId: job || null
+        };
+      });
+
+      return res.json({
+        success: true,
+        count: populated.length,
+        applications: populated
+      });
+    }
+
+    const applications = await Application.find({
+      collegeId: req.collegeId,
+      studentId: req.user.id
+    })
+      .sort({ appliedAt: -1 })
+      .populate('jobId', 'title company role department location ctc ctcValue type deadline status');
+
+    res.json({
+      success: true,
+      count: applications.length,
+      applications
+    });
+  } catch (error) {
+    logger.error('Get student applications error:', error);
+    res.status(500).json({ success: false, message: 'Server error retrieving applications' });
+  }
+};
+
+/**
+ * GET /api/student/applications/:id
+ * Student-only — get single application details
+ */
+exports.getApplicationById = async (req, res) => {
+  try {
+    if (!memoryDb.isMongoConnected()) {
+      const app = memoryDb.findApplicationById(req.params.id);
+      if (!app || String(app.collegeId) !== String(req.collegeId) || String(app.studentId) !== String(req.user.id)) {
+        return res.status(404).json({ success: false, message: 'Application not found' });
+      }
+      const job = memoryDb.findJobById(app.jobId);
+      return res.json({
+        success: true,
+        application: { ...app, jobId: job || null }
+      });
+    }
+
+    const application = await Application.findOne({
+      _id: req.params.id,
+      collegeId: req.collegeId,
+      studentId: req.user.id
+    }).populate('jobId', 'title company role department location ctc ctcValue type deadline status');
+
+    if (!application) {
+      return res.status(404).json({ success: false, message: 'Application not found' });
+    }
+
+    res.json({
+      success: true,
+      application
+    });
+  } catch (error) {
+    logger.error('Get application by ID error:', error);
+    res.status(500).json({ success: false, message: 'Server error retrieving application' });
+  }
+};
+
+/**
+ * PATCH /api/student/applications/:id/withdraw
+ * Student-only — withdraw active application
+ */
+exports.withdrawApplication = async (req, res) => {
+  try {
+    if (!memoryDb.isMongoConnected()) {
+      const app = memoryDb.findApplicationById(req.params.id);
+      if (!app || String(app.collegeId) !== String(req.collegeId) || String(app.studentId) !== String(req.user.id)) {
+        return res.status(404).json({ success: false, message: 'Application not found' });
+      }
+
+      if (app.status === 'WITHDRAWN') {
+        return res.status(400).json({ success: false, message: 'Application is already withdrawn' });
+      }
+
+      if (app.status === 'REJECTED' || app.status === 'SELECTED') {
+        return res.status(400).json({ success: false, message: `Cannot withdraw a finalized application (${app.status})` });
+      }
+
+      const updated = memoryDb.updateApplication(app._id, { status: 'WITHDRAWN' });
+      return res.json({
+        success: true,
+        message: 'Application withdrawn successfully',
+        application: updated
+      });
+    }
+
+    const application = await Application.findOne({
+      _id: req.params.id,
+      collegeId: req.collegeId,
+      studentId: req.user.id
+    });
+
+    if (!application) {
+      return res.status(404).json({ success: false, message: 'Application not found' });
+    }
+
+    if (application.status === 'WITHDRAWN') {
+      return res.status(400).json({ success: false, message: 'Application is already withdrawn' });
+    }
+
+    if (application.status === 'REJECTED' || application.status === 'SELECTED') {
+      return res.status(400).json({ success: false, message: `Cannot withdraw a finalized application (${application.status})` });
+    }
+
+    application.status = 'WITHDRAWN';
+    await application.save();
+
+    res.json({
+      success: true,
+      message: 'Application withdrawn successfully',
+      application
+    });
+  } catch (error) {
+    logger.error('Withdraw application error:', error);
+    res.status(500).json({ success: false, message: 'Server error withdrawing application' });
   }
 };

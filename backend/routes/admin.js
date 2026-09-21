@@ -46,7 +46,9 @@ router.get('/jobs/:id', validateObjectId('id'), adminJobController.getJobById);
 router.put('/jobs/:id', validateObjectId('id'), adminJobController.updateJob);
 router.delete('/jobs/:id', validateObjectId('id'), adminJobController.deleteJob);
 router.get('/jobs/:id/matches', validateObjectId('id'), adminJobController.getJobMatches);
+router.get('/jobs/:id/applicants', validateObjectId('id'), adminJobController.getJobApplicants);
 router.post('/jobs/:id/recompute', validateObjectId('id'), adminJobController.recomputeJobMatches);
+router.patch('/applications/:id/status', validateObjectId('id'), adminJobController.updateApplicationStatus);
 
 // ==========================================
 // 5. Skill Intelligence

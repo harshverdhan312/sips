@@ -1,9 +1,12 @@
 const JobDescription = require('../models/JobDescription');
 const Student = require('../models/Student');
 const Match = require('../models/Match');
+const Application = require('../models/Application');
+const Notification = require('../models/Notification');
 const AuditLog = require('../models/AuditLog');
 const { calculateMatch, extractSkillsFromText } = require('../utils/matchingEngine');
 const memoryDb = require('../utils/memoryDb');
+const logger = require('../utils/logger');
 
 /**
  * Helper to compute eligible and matched count for a JD
@@ -549,7 +552,183 @@ exports.recomputeJobMatches = async (req, res) => {
       matchedCount: stats.matchedCount
     });
   } catch (error) {
-    console.error('Admin recomputeJobMatches error:', error);
+    logger.error('Admin recomputeJobMatches error:', error);
     res.status(500).json({ message: 'Server error recomputing matches' });
+  }
+};
+
+/**
+ * GET /api/admin/jobs/:id/applicants
+ * List all applicants for a specific campus job
+ */
+exports.getJobApplicants = async (req, res) => {
+  try {
+    const jobId = req.params.id;
+
+    if (!memoryDb.isMongoConnected()) {
+      const job = memoryDb.findJobById(jobId);
+      if (!job || String(job.collegeId) !== String(req.collegeId)) {
+        return res.status(404).json({ success: false, message: 'Job not found' });
+      }
+
+      const apps = memoryDb.getJobApplications(req.collegeId, jobId);
+      const applicants = apps.map(app => {
+        const student = memoryDb.findStudentById(app.studentId);
+        const { passwordHash, ...cleanStudent } = student || {};
+        return {
+          applicationId: app._id,
+          student: cleanStudent,
+          status: app.status,
+          appliedAt: app.appliedAt,
+          updatedAt: app.updatedAt
+        };
+      });
+
+      return res.json({
+        success: true,
+        count: applicants.length,
+        job: { _id: job._id, title: job.title, company: job.company },
+        applicants
+      });
+    }
+
+    const jd = await JobDescription.findOne({
+      _id: jobId,
+      collegeId: req.collegeId
+    });
+
+    if (!jd) {
+      return res.status(404).json({ success: false, message: 'Job not found' });
+    }
+
+    const applications = await Application.find({
+      jobId: jd._id,
+      collegeId: req.collegeId
+    })
+      .sort({ appliedAt: -1 })
+      .populate('studentId', 'name rollNo usn email branch batch cgpa placementStatus readinessScore skills resumeUrl');
+
+    const applicants = applications
+      .filter(app => app.studentId)
+      .map(app => ({
+        applicationId: app._id,
+        student: app.studentId,
+        status: app.status,
+        appliedAt: app.appliedAt,
+        updatedAt: app.updatedAt
+      }));
+
+    res.json({
+      success: true,
+      count: applicants.length,
+      job: {
+        _id: jd._id,
+        title: jd.title,
+        company: jd.company
+      },
+      applicants
+    });
+  } catch (error) {
+    logger.error('Admin getJobApplicants error:', error);
+    res.status(500).json({ success: false, message: 'Server error retrieving applicants' });
+  }
+};
+
+/**
+ * PATCH /api/admin/applications/:id/status
+ * Update student job application status (SHORTLISTED, REJECTED, SELECTED, WITHDRAWN)
+ */
+exports.updateApplicationStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const applicationId = req.params.id;
+
+    if (!status || typeof status !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'Status string is required'
+      });
+    }
+
+    const newStatus = status.trim().toUpperCase();
+    if (!Application.VALID_STATUSES.includes(newStatus)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid status. Must be one of: ${Application.VALID_STATUSES.join(', ')}`
+      });
+    }
+
+    // ----------------------------------------------------
+    // Resilient In-Memory Mode
+    // ----------------------------------------------------
+    if (!memoryDb.isMongoConnected()) {
+      const app = memoryDb.findApplicationById(applicationId);
+      if (!app || String(app.collegeId) !== String(req.collegeId)) {
+        return res.status(404).json({ success: false, message: 'Application not found' });
+      }
+
+      if (!Application.isValidTransition(app.status, newStatus)) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid status transition from ${app.status} to ${newStatus}`
+        });
+      }
+
+      const updated = memoryDb.updateApplication(app._id, { status: newStatus });
+      return res.json({
+        success: true,
+        message: 'Application status updated',
+        application: updated
+      });
+    }
+
+    // ----------------------------------------------------
+    // MongoDB Mode
+    // ----------------------------------------------------
+    const application = await Application.findOne({
+      _id: applicationId,
+      collegeId: req.collegeId
+    });
+
+    if (!application) {
+      return res.status(404).json({ success: false, message: 'Application not found' });
+    }
+
+    if (!Application.isValidTransition(application.status, newStatus)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid status transition from ${application.status} to ${newStatus}`
+      });
+    }
+
+    application.status = newStatus;
+    await application.save();
+
+    // Audit log
+    await AuditLog.create({
+      collegeId: req.collegeId,
+      action: 'UPDATE_APPLICATION_STATUS',
+      actor: req.user.email || 'Admin',
+      target: `Application ${application._id}`,
+      details: { applicationId: application._id, newStatus }
+    }).catch(err => logger.warn('AuditLog error:', err.message));
+
+    // Optional notification on major status milestones
+    if (newStatus === 'SHORTLISTED' || newStatus === 'SELECTED') {
+      Notification.create({
+        collegeId: req.collegeId,
+        message: `Application update: Candidate status changed to ${newStatus}`,
+        target: 'STUDENTS'
+      }).catch(err => logger.warn('Notification error:', err.message));
+    }
+
+    res.json({
+      success: true,
+      message: 'Application status updated',
+      application
+    });
+  } catch (error) {
+    logger.error('Admin updateApplicationStatus error:', error);
+    res.status(500).json({ success: false, message: 'Server error updating application status' });
   }
 };

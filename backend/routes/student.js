@@ -7,6 +7,7 @@ const config = require('../config');
 const studentController = require('../controllers/studentController');
 const auth = require('../middleware/auth');
 const tenant = require('../middleware/tenant');
+const { validateObjectId } = require('../middleware/validate');
 
 // Ensure upload directory exists
 if (!fs.existsSync(config.uploadDir)) {
@@ -53,7 +54,19 @@ router.post('/resume', auth, tenant, upload.single('resume'), studentController.
 // GET /api/student/jobs
 router.get('/jobs', auth, tenant, studentController.getJobs);
 
+// POST /api/student/jobs/:id/apply
+router.post('/jobs/:id/apply', auth, tenant, validateObjectId('id'), studentController.applyToJob);
+
 // GET /api/student/preferred-jobs
 router.get('/preferred-jobs', auth, tenant, studentController.getPreferredJobs);
+
+// GET /api/student/applications
+router.get('/applications', auth, tenant, studentController.getApplications);
+
+// GET /api/student/applications/:id
+router.get('/applications/:id', auth, tenant, validateObjectId('id'), studentController.getApplicationById);
+
+// PATCH /api/student/applications/:id/withdraw
+router.patch('/applications/:id/withdraw', auth, tenant, validateObjectId('id'), studentController.withdrawApplication);
 
 module.exports = router;

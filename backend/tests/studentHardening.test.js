@@ -5,11 +5,13 @@ const studentController = require('../controllers/studentController');
 const Student = require('../models/Student');
 const Match = require('../models/Match');
 const JobDescription = require('../models/JobDescription');
+const Application = require('../models/Application');
 const config = require('../config');
 
 jest.mock('../models/Student');
 jest.mock('../models/Match');
 jest.mock('../models/JobDescription');
+jest.mock('../models/Application');
 
 describe('Phase 2: Student / Profile / Resume Hardening', () => {
   const mockCollegeId = '507f1f77bcf86cd799439011';
@@ -452,6 +454,7 @@ describe('Phase 2: Student / Profile / Resume Hardening', () => {
       });
       Student.findOne.mockResolvedValue(mockStudent);
       Match.find.mockResolvedValue(mockMatches);
+      Application.find.mockResolvedValue([]);
 
       const req = createMockReq();
       const res = createMockRes();
