@@ -4,9 +4,10 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const memoryDb = require('../utils/memoryDb');
 
+const config = require('../config');
+
 const generateToken = (payload) => {
-  const secret = process.env.JWT_SECRET || 'sips-dev-secret-key-2025';
-  return jwt.sign(payload, secret, { expiresIn: '7d' });
+  return jwt.sign(payload, config.jwtSecret, { expiresIn: config.jwtExpiresIn });
 };
 
 /**

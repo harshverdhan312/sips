@@ -4,6 +4,7 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 const tenant = require('../middleware/tenant');
 const adminOnly = require('../middleware/adminOnly');
+const { validateObjectId, validatePagination } = require('../middleware/validate');
 
 const adminAnalyticsController = require('../controllers/adminAnalyticsController');
 const adminStudentController = require('../controllers/adminStudentController');
@@ -22,13 +23,13 @@ router.get('/overview', adminAnalyticsController.getOverview);
 // ==========================================
 // 2. Student Management & Bulk Operations
 // ==========================================
-router.get('/students', adminStudentController.getStudents);
+router.get('/students', validatePagination, adminStudentController.getStudents);
 router.post('/students', adminStudentController.createStudent);
 router.post('/students/upload', adminStudentController.uploadStudentsCSV);
 router.get('/students/export', adminStudentController.exportStudentsCSV);
-router.get('/students/:id', adminStudentController.getStudentById);
-router.put('/students/:id', adminStudentController.updateStudent);
-router.delete('/students/:id', adminStudentController.deleteStudent);
+router.get('/students/:id', validateObjectId('id'), adminStudentController.getStudentById);
+router.put('/students/:id', validateObjectId('id'), adminStudentController.updateStudent);
+router.delete('/students/:id', validateObjectId('id'), adminStudentController.deleteStudent);
 
 // ==========================================
 // 3. Analytics
@@ -41,11 +42,11 @@ router.get('/analytics/placement', adminAnalyticsController.getPlacementAnalytic
 // ==========================================
 router.get('/jobs', adminJobController.getJobs);
 router.post('/jobs', adminJobController.createJob);
-router.get('/jobs/:id', adminJobController.getJobById);
-router.put('/jobs/:id', adminJobController.updateJob);
-router.delete('/jobs/:id', adminJobController.deleteJob);
-router.get('/jobs/:id/matches', adminJobController.getJobMatches);
-router.post('/jobs/:id/recompute', adminJobController.recomputeJobMatches);
+router.get('/jobs/:id', validateObjectId('id'), adminJobController.getJobById);
+router.put('/jobs/:id', validateObjectId('id'), adminJobController.updateJob);
+router.delete('/jobs/:id', validateObjectId('id'), adminJobController.deleteJob);
+router.get('/jobs/:id/matches', validateObjectId('id'), adminJobController.getJobMatches);
+router.post('/jobs/:id/recompute', validateObjectId('id'), adminJobController.recomputeJobMatches);
 
 // ==========================================
 // 5. Skill Intelligence
@@ -57,7 +58,7 @@ router.get('/skills/intelligence', adminSkillController.getSkillIntelligence);
 // ==========================================
 router.get('/alerts', alertController.getAlerts);
 router.post('/alerts', alertController.createAlert);
-router.put('/alerts/:id', alertController.updateAlert);
-router.delete('/alerts/:id', alertController.deleteAlert);
+router.put('/alerts/:id', validateObjectId('id'), alertController.updateAlert);
+router.delete('/alerts/:id', validateObjectId('id'), alertController.deleteAlert);
 
 module.exports = router;
