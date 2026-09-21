@@ -25,6 +25,10 @@ class StudentProfile {
   final int resumeScore;
   final String placementStatus;
   final bool isVerified;
+  final int? age;
+  final int? internships;
+  final bool? hostel;
+  final int? historyOfBacklogs;
 
   const StudentProfile({
     this.id = '',
@@ -53,6 +57,10 @@ class StudentProfile {
     this.resumeScore = 0,
     this.placementStatus = 'Not Placed',
     this.isVerified = true,
+    this.age,
+    this.internships,
+    this.hostel,
+    this.historyOfBacklogs,
   });
 
   factory StudentProfile.fromBackendJson(Map<String, dynamic> json, {String collegeName = ''}) {
@@ -95,6 +103,10 @@ class StudentProfile {
       resumeUrl: resumeUrl,
       readinessScore: readiness,
       isVerified: true,
+      age: (json['age'] as num?)?.toInt(),
+      internships: (json['internships'] as num?)?.toInt(),
+      hostel: json['hostel'] as bool?,
+      historyOfBacklogs: (json['historyOfBacklogs'] as num?)?.toInt(),
     );
   }
 
@@ -125,6 +137,10 @@ class StudentProfile {
     int? resumeScore,
     String? placementStatus,
     bool? isVerified,
+    int? age,
+    int? internships,
+    bool? hostel,
+    int? historyOfBacklogs,
   }) {
     return StudentProfile(
       id: id ?? this.id,
@@ -153,6 +169,10 @@ class StudentProfile {
       resumeScore: resumeScore ?? this.resumeScore,
       placementStatus: placementStatus ?? this.placementStatus,
       isVerified: isVerified ?? this.isVerified,
+      age: age ?? this.age,
+      internships: internships ?? this.internships,
+      hostel: hostel ?? this.hostel,
+      historyOfBacklogs: historyOfBacklogs ?? this.historyOfBacklogs,
     );
   }
 }

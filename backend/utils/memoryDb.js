@@ -149,6 +149,10 @@ class MemoryDatabase {
       notes: studentData.notes || '',
       github: studentData.github || '',
       resumeUrl: studentData.resumeUrl || '',
+      age: studentData.age !== undefined ? studentData.age : null,
+      internships: studentData.internships !== undefined ? studentData.internships : null,
+      hostel: studentData.hostel !== undefined ? studentData.hostel : null,
+      historyOfBacklogs: studentData.historyOfBacklogs !== undefined ? studentData.historyOfBacklogs : null,
       createdAt: new Date(),
       updatedAt: new Date()
     };

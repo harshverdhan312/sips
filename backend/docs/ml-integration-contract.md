@@ -224,33 +224,53 @@ The Node.js backend manages ML service configuration via environment variables i
 
 ---
 
-## 6. Critical Contract Gaps & Blockers
+## 6. Student Placement Data Model & Mapping Contract (Phase 6A)
 
-### 6.1 Student Domain Model Field Mismatch
-The prototype ML placement model (`ml-service/src/schemas/placement.py`) was trained on a Kaggle-style placement dataset and strictly expects:
-* `Age` (Integer)
-* `Internships` (Integer count)
-* `Hostel` (Binary 0 or 1)
-* `HistoryOfBacklogs` (Binary 0 or 1)
-* `CGPA` (Float)
-* `Stream` (String)
+### 6.1 Placement Model Input Schema
+FastAPI placement prediction (`POST /placement/predict`) expects:
+* `Age` (Integer, 19–30)
+* `Internships` (Integer, 0–3)
+* `CGPA` (Float, 5.0–9.0)
+* `Hostel` (Integer binary, 0 or 1)
+* `HistoryOfBacklogs` (Integer binary, 0 or 1)
+* `Stream` (String enum)
 
-**Node.js Database State (`Student` Model):**
-* `cgpa`: Present (Number)
-* `branch`: Present (String, maps to Stream)
-* `Age`: **Missing**
-* `Internships`: **Missing**
-* `Hostel`: **Missing**
-* `HistoryOfBacklogs`: **Missing**
+### 6.2 Node.js Student Field Source Mapping
 
-**Resolution Policy for Phase 5:**
-* The Node `Student` schema **MUST NOT** be polluted with dummy or fabricated defaults.
-* The `MLService.predictPlacement()` client method validates and enforces field presence, throwing a controlled `422 Unprocessable Entity` if invoked without these attributes.
-* Live integration of `/placement/predict` is classified as **BLOCKED / CONTRACT-PENDING** until the ML model is retrained on the real SIPS platform student features or the schema evolves under stakeholder consensus.
+In Phase 6A, the Node `Student` model (`backend/models/Student.js`) is extended to legitimately provide these profile attributes:
 
-### 6.2 Service-to-Service Authentication
+| ML Feature | Type Expected by ML | Node Student Field | Node Schema Type | Transformation / Mapping Rule |
+| :--- | :--- | :--- | :--- | :--- |
+| `Age` | `int` (19..30) | `student.age` | `Number` (integer) | Direct integer value. Must be present. |
+| `Internships` | `int` (0..3) | `student.internships` | `Number` (integer) | Direct integer value >= 0. Must be present. |
+| `CGPA` | `float` (5..9) | `student.cgpa` | `Number` (float) | Float rounded to 2 decimals. Must be present. |
+| `Hostel` | `int` (0 or 1) | `student.hostel` | `Boolean` | `true` -> `1`, `false` -> `0`. Must not be null. |
+| `HistoryOfBacklogs` | `int` (0 or 1) | `student.historyOfBacklogs` | `Number` (integer) | `> 0` -> `1`, `0` -> `0`. Must not be null. |
+| `Stream` | `str` | `student.branch` | `String` | Deterministic normalization via `placementDataMapper.js`. |
+
+### 6.3 Deterministic Branch-to-Stream Mapping Matrix
+
+The mapping layer (`backend/utils/placementDataMapper.js`) normalizes institutional branch names into canonical ML streams:
+
+| SIPS Institutional Branch (`student.branch`) | Canonical ML Stream (`Stream`) |
+| :--- | :--- |
+| `Computer Science & Engineering` | `Computer Science` |
+| `Computer Science and Engineering` | `Computer Science` |
+| `Computer Science` / `CSE` | `Computer Science` |
+| `Information Technology` / `IT` | `Information Technology` |
+| `Electronics And Communication` | `Electronics And Communication` |
+| `Electronics & Communication Engineering` | `Electronics And Communication` |
+| `Mechanical` / `Mechanical Engineering` | `Mechanical` |
+| `Civil` / `Civil Engineering` | `Civil` |
+| `Electrical` / `Electrical Engineering` | `Electrical` |
+| `Electrical & Electronics Engineering` | `Electrical` |
+
+> [!IMPORTANT]
+> **No Synthetic Defaults Rule:** If any required placement input field is missing (`null` or `undefined`) or if an institutional branch cannot be safely mapped to a valid stream, the mapping layer marks the request as incomplete (`isComplete: false`). SIPS NEVER fabricates dummy or synthetic values.
+
+### 6.4 Service-to-Service Authentication
 * FastAPI currently does not validate API tokens or client origins.
-* Node is configured to transmit `X-API-Key` if configured, maintaining zero code changes when authentication is introduced to `ml-service` in future phases.
+* Node is configured to transmit `X-API-Key` and `Authorization: Bearer <key>` if configured, maintaining zero code changes when authentication is introduced to `ml-service` in future phases.
 
 ---
 

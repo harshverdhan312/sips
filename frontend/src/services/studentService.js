@@ -33,6 +33,10 @@ export const studentService = {
           github: student.github || "",
           resumeUrl: student.resumeUrl || "",
           skills: skillsList,
+          age: typeof student.age === 'number' ? student.age : null,
+          internships: typeof student.internships === 'number' ? student.internships : null,
+          hostel: typeof student.hostel === 'boolean' ? student.hostel : null,
+          historyOfBacklogs: typeof student.historyOfBacklogs === 'number' ? student.historyOfBacklogs : null,
           metrics: {
             employabilityIndex: readiness,
             placementProbability: student.placementStatus === 'PLACED' ? 100 : readiness,
@@ -61,11 +65,7 @@ export const studentService = {
    */
   async updateCurrentStudent(updatedFields) {
     try {
-      const res = await api.put('/api/student/profile', {
-        skills: updatedFields.skills,
-        github: updatedFields.github,
-        newPassword: updatedFields.newPassword
-      });
+      const res = await api.put('/api/student/profile', updatedFields);
       return res.student || res;
     } catch (e) {
       console.error("Failed to update student profile:", e);

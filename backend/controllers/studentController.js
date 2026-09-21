@@ -82,7 +82,7 @@ exports.getProfile = async (req, res) => {
  */
 exports.updateProfile = async (req, res) => {
   try {
-    const { skills, github, newPassword, password, name, tags, notes } = req.body;
+    const { skills, github, newPassword, password, name, tags, notes, age, internships, hostel, historyOfBacklogs } = req.body;
     const pwd = newPassword || password;
 
     // Validate password if supplied
@@ -92,6 +92,66 @@ exports.updateProfile = async (req, res) => {
           success: false,
           message: 'Password must be a string with at least 4 characters.'
         });
+      }
+    }
+
+    // Validate age if supplied
+    let sanitizedAge = undefined;
+    if (age !== undefined) {
+      if (age === null) {
+        sanitizedAge = null;
+      } else if (typeof age !== 'number' || !Number.isInteger(age) || age < 16 || age > 100) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid age: Age must be an integer between 16 and 100.'
+        });
+      } else {
+        sanitizedAge = age;
+      }
+    }
+
+    // Validate internships if supplied
+    let sanitizedInternships = undefined;
+    if (internships !== undefined) {
+      if (internships === null) {
+        sanitizedInternships = null;
+      } else if (typeof internships !== 'number' || !Number.isInteger(internships) || internships < 0 || internships > 20) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid internships: Internships must be a non-negative integer.'
+        });
+      } else {
+        sanitizedInternships = internships;
+      }
+    }
+
+    // Validate hostel if supplied
+    let sanitizedHostel = undefined;
+    if (hostel !== undefined) {
+      if (hostel === null) {
+        sanitizedHostel = null;
+      } else if (typeof hostel !== 'boolean') {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid hostel value: Hostel must be a boolean (true or false).'
+        });
+      } else {
+        sanitizedHostel = hostel;
+      }
+    }
+
+    // Validate historyOfBacklogs if supplied
+    let sanitizedHistoryOfBacklogs = undefined;
+    if (historyOfBacklogs !== undefined) {
+      if (historyOfBacklogs === null) {
+        sanitizedHistoryOfBacklogs = null;
+      } else if (typeof historyOfBacklogs !== 'number' || !Number.isInteger(historyOfBacklogs) || historyOfBacklogs < 0 || historyOfBacklogs > 50) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid historyOfBacklogs: History of backlogs must be a non-negative integer.'
+        });
+      } else {
+        sanitizedHistoryOfBacklogs = historyOfBacklogs;
       }
     }
 
@@ -188,6 +248,10 @@ exports.updateProfile = async (req, res) => {
       if (sanitizedName !== undefined) updates.name = sanitizedName;
       if (sanitizedTags !== undefined) updates.tags = sanitizedTags;
       if (sanitizedNotes !== undefined) updates.notes = sanitizedNotes;
+      if (sanitizedAge !== undefined) updates.age = sanitizedAge;
+      if (sanitizedInternships !== undefined) updates.internships = sanitizedInternships;
+      if (sanitizedHostel !== undefined) updates.hostel = sanitizedHostel;
+      if (sanitizedHistoryOfBacklogs !== undefined) updates.historyOfBacklogs = sanitizedHistoryOfBacklogs;
       if (pwd) {
         const salt = await bcrypt.genSalt(10);
         updates.passwordHash = await bcrypt.hash(pwd.trim(), salt);
@@ -224,6 +288,18 @@ exports.updateProfile = async (req, res) => {
     }
     if (sanitizedNotes !== undefined) {
       student.notes = sanitizedNotes;
+    }
+    if (sanitizedAge !== undefined) {
+      student.age = sanitizedAge;
+    }
+    if (sanitizedInternships !== undefined) {
+      student.internships = sanitizedInternships;
+    }
+    if (sanitizedHostel !== undefined) {
+      student.hostel = sanitizedHostel;
+    }
+    if (sanitizedHistoryOfBacklogs !== undefined) {
+      student.historyOfBacklogs = sanitizedHistoryOfBacklogs;
     }
     if (pwd) {
       const salt = await bcrypt.genSalt(10);

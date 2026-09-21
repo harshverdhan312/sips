@@ -434,6 +434,253 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  Future<void> _showEditPlacementDialog(BuildContext context, StudentProfile profile) async {
+    final ageCtrl = TextEditingController(text: profile.age?.toString() ?? '');
+    final internshipsCtrl = TextEditingController(text: profile.internships?.toString() ?? '');
+    final backlogsCtrl = TextEditingController(text: profile.historyOfBacklogs?.toString() ?? '');
+    String hostelSelection = profile.hostel == true ? 'true' : (profile.hostel == false ? 'false' : 'unset');
+    final messenger = ScaffoldMessenger.of(context);
+    bool isSaving = false;
+
+    await showDialog(
+      context: context,
+      builder: (dialogCtx) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: AppColors.surface,
+              shape: RoundedRectangleBorder(borderRadius: AppRadius.xlRadius),
+              title: Row(
+                children: [
+                  const Icon(Icons.badge_outlined, color: AppColors.primary, size: 22),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Placement Information',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                      color: AppColors.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Attributes used for calibrated readiness scoring and institutional drives.',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12,
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Age
+                      Text('Age (Years)', style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.onSurface)),
+                      const SizedBox(height: 4),
+                      TextField(
+                        controller: ageCtrl,
+                        keyboardType: TextInputType.number,
+                        enabled: !isSaving,
+                        decoration: InputDecoration(
+                          hintText: 'e.g. 21',
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          filled: true,
+                          fillColor: AppColors.surfaceContainerLow,
+                          border: OutlineInputBorder(
+                            borderRadius: AppRadius.mdRadius,
+                            borderSide: const BorderSide(color: AppColors.outlineVariant),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      // Internships
+                      Text('Internships Completed', style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.onSurface)),
+                      const SizedBox(height: 4),
+                      TextField(
+                        controller: internshipsCtrl,
+                        keyboardType: TextInputType.number,
+                        enabled: !isSaving,
+                        decoration: InputDecoration(
+                          hintText: 'e.g. 1',
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          filled: true,
+                          fillColor: AppColors.surfaceContainerLow,
+                          border: OutlineInputBorder(
+                            borderRadius: AppRadius.mdRadius,
+                            borderSide: const BorderSide(color: AppColors.outlineVariant),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      // Hostel Status
+                      Text('Accommodation Status', style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.onSurface)),
+                      const SizedBox(height: 4),
+                      DropdownButtonFormField<String>(
+                        initialValue: hostelSelection,
+                        onChanged: isSaving ? null : (val) => setDialogState(() => hostelSelection = val ?? 'unset'),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          filled: true,
+                          fillColor: AppColors.surfaceContainerLow,
+                          border: OutlineInputBorder(
+                            borderRadius: AppRadius.mdRadius,
+                            borderSide: const BorderSide(color: AppColors.outlineVariant),
+                          ),
+                        ),
+                        items: const [
+                          DropdownMenuItem(value: 'unset', child: Text('Unset / Not Specified')),
+                          DropdownMenuItem(value: 'true', child: Text('Hostel Resident')),
+                          DropdownMenuItem(value: 'false', child: Text('Day Scholar')),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      // History of Backlogs
+                      Text('History of Backlogs', style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.onSurface)),
+                      const SizedBox(height: 4),
+                      TextField(
+                        controller: backlogsCtrl,
+                        keyboardType: TextInputType.number,
+                        enabled: !isSaving,
+                        decoration: InputDecoration(
+                          hintText: 'e.g. 0',
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          filled: true,
+                          fillColor: AppColors.surfaceContainerLow,
+                          border: OutlineInputBorder(
+                            borderRadius: AppRadius.mdRadius,
+                            borderSide: const BorderSide(color: AppColors.outlineVariant),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isSaving ? null : () => Navigator.of(dialogCtx).pop(),
+                  child: Text('Cancel', style: GoogleFonts.plusJakartaSans(color: AppColors.outline)),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(borderRadius: AppRadius.mdRadius),
+                  ),
+                  onPressed: isSaving
+                      ? null
+                      : () async {
+                          final ageText = ageCtrl.text.trim();
+                          int? parsedAge;
+                          if (ageText.isNotEmpty) {
+                            parsedAge = int.tryParse(ageText);
+                            if (parsedAge == null || parsedAge < 16 || parsedAge > 100) {
+                              messenger.showSnackBar(
+                                const SnackBar(
+                                  content: Text('Invalid age: Must be an integer between 16 and 100.'),
+                                  backgroundColor: AppColors.error,
+                                ),
+                              );
+                              return;
+                            }
+                          }
+
+                          final internText = internshipsCtrl.text.trim();
+                          int? parsedInternships;
+                          if (internText.isNotEmpty) {
+                            parsedInternships = int.tryParse(internText);
+                            if (parsedInternships == null || parsedInternships < 0 || parsedInternships > 20) {
+                              messenger.showSnackBar(
+                                const SnackBar(
+                                  content: Text('Invalid internships: Must be an integer between 0 and 20.'),
+                                  backgroundColor: AppColors.error,
+                                ),
+                              );
+                              return;
+                            }
+                          }
+
+                          bool? parsedHostel;
+                          if (hostelSelection == 'true') parsedHostel = true;
+                          if (hostelSelection == 'false') parsedHostel = false;
+
+                          final backlogsText = backlogsCtrl.text.trim();
+                          int? parsedBacklogs;
+                          if (backlogsText.isNotEmpty) {
+                            parsedBacklogs = int.tryParse(backlogsText);
+                            if (parsedBacklogs == null || parsedBacklogs < 0 || parsedBacklogs > 50) {
+                              messenger.showSnackBar(
+                                const SnackBar(
+                                  content: Text('Invalid backlogs: Must be an integer between 0 and 50.'),
+                                  backgroundColor: AppColors.error,
+                                ),
+                              );
+                              return;
+                            }
+                          }
+
+                          setDialogState(() => isSaving = true);
+                          try {
+                            final updated = profile.copyWith(
+                              age: parsedAge,
+                              internships: parsedInternships,
+                              hostel: parsedHostel,
+                              historyOfBacklogs: parsedBacklogs,
+                            );
+                            await ref.read(studentProfileProvider.notifier).updateProfile(updated);
+                            if (dialogCtx.mounted) {
+                              Navigator.of(dialogCtx).pop();
+                            }
+                            if (mounted) {
+                              messenger.showSnackBar(
+                                const SnackBar(
+                                  content: Text('Placement profile updated successfully!'),
+                                  backgroundColor: Color(0xFF047857),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            setDialogState(() => isSaving = false);
+                            if (mounted) {
+                              messenger.showSnackBar(
+                                SnackBar(
+                                  content: Text('Update failed: ${e.toString()}'),
+                                  backgroundColor: AppColors.error,
+                                ),
+                              );
+                            }
+                          }
+                        },
+                  child: isSaving
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : Text(
+                          'Save',
+                          style: GoogleFonts.plusJakartaSans(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(studentProfileProvider);
@@ -584,6 +831,74 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       _buildInfoRow(Icons.school_outlined, 'College / Institute', profile.college.isNotEmpty ? profile.college : 'Not specified'),
                       const Divider(height: 16),
                       _buildInfoRow(Icons.account_tree_outlined, 'Department / Branch', profile.branch.isNotEmpty ? profile.branch : 'Not specified'),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Placement Profile Information
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: SectionHeader(
+                        title: 'Placement Information',
+                        badge: SipsBadge(
+                          label: profile.age != null ? 'CONFIGURED' : 'UNSET',
+                          variant: profile.age != null ? SipsBadgeVariant.emerald : SipsBadgeVariant.neutral,
+                          isSmall: true,
+                        ),
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: () => _showEditPlacementDialog(context, profile),
+                      icon: const Icon(Icons.edit_note_rounded, size: 18, color: AppColors.primary),
+                      label: Text(
+                        'Edit Placement Info',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                SipsCard(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      _buildInfoRow(
+                        Icons.calendar_today_outlined,
+                        'Age',
+                        profile.age != null ? '${profile.age} years' : 'Not set',
+                      ),
+                      const Divider(height: 16),
+                      _buildInfoRow(
+                        Icons.work_outline_rounded,
+                        'Internships Completed',
+                        profile.internships != null ? '${profile.internships} completed' : 'Not set',
+                      ),
+                      const Divider(height: 16),
+                      _buildInfoRow(
+                        Icons.home_work_outlined,
+                        'Accommodation Status',
+                        profile.hostel == true
+                            ? 'Hostel Resident'
+                            : (profile.hostel == false ? 'Day Scholar' : 'Not set'),
+                      ),
+                      const Divider(height: 16),
+                      _buildInfoRow(
+                        Icons.history_edu_rounded,
+                        'History of Backlogs',
+                        profile.historyOfBacklogs != null
+                            ? (profile.historyOfBacklogs == 0
+                                ? '0 (Clean Record)'
+                                : '${profile.historyOfBacklogs} backlog(s)')
+                            : 'Not set',
+                      ),
                     ],
                   ),
                 ),

@@ -44,6 +44,10 @@ class ApiSipsRepository implements SipsRepository {
     final body = <String, dynamic>{
       'skills': profile.skills,
       'github': profile.githubHandle,
+      'age': profile.age,
+      'internships': profile.internships,
+      'hostel': profile.hostel,
+      'historyOfBacklogs': profile.historyOfBacklogs,
     };
 
     final response = await _apiClient.put('/api/student/profile', body: body);
