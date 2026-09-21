@@ -4,6 +4,7 @@ import '../models/job_opportunity.dart';
 import '../models/mock_interview.dart';
 import '../models/peer_match.dart';
 import '../models/placement_alert.dart';
+import '../models/placement_prediction.dart';
 import '../models/readiness_metric.dart';
 import '../models/roadmap_milestone.dart';
 import '../models/skill_intelligence.dart';
@@ -12,6 +13,7 @@ import 'sips_repository.dart';
 
 class MockSipsRepository implements SipsRepository {
   StudentProfile _profile = MockData.studentProfile;
+  PlacementPrediction? _prediction;
   ReadinessMetric _readiness = MockData.readinessMetric;
   final List<SkillItem> _skills = List.from(MockData.skills);
   List<JobOpportunity> _jobs = List.from(MockData.jobs);
@@ -31,6 +33,16 @@ class MockSipsRepository implements SipsRepository {
   Future<StudentProfile> updateStudentProfile(StudentProfile profile) async {
     _profile = profile;
     return _profile;
+  }
+
+  @override
+  Future<PlacementPrediction?> getLatestPlacementPrediction() async {
+    return _prediction;
+  }
+
+  @override
+  Future<PlacementPrediction> requestPlacementPrediction() async {
+    throw UnsupportedError('ML Prediction is only supported in live backend mode');
   }
 
   @override

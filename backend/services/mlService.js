@@ -265,8 +265,7 @@ class MLService {
 
     if (missing.length > 0) {
       throw new AppError(
-        `Placement prediction payload is missing required fields: ${missing.join(', ')}. ` +
-        'Note: Node Student model currently does not store these fields without contract evolution.',
+        `Placement prediction payload is missing required fields: ${missing.join(', ')}.`,
         422
       );
     }
@@ -277,11 +276,39 @@ class MLService {
       body: JSON.stringify(payload)
     });
 
-    if (!data || typeof data !== 'object' || typeof data.prediction !== 'number') {
+    if (!data || typeof data !== 'object') {
       throw new AppError('ML Service returned invalid placement prediction schema.', 502);
     }
 
-    return data;
+    // Support FastAPI response format (placement_probability, predicted_class, predicted_label)
+    const hasProbability = typeof data.placement_probability === 'number' || typeof data.probability === 'number';
+    const hasClass = typeof data.predicted_class === 'number' || typeof data.prediction === 'number';
+
+    if (!hasProbability && !hasClass) {
+      throw new AppError('ML Service returned invalid placement prediction schema.', 502);
+    }
+
+    const placementProbability = typeof data.placement_probability === 'number'
+      ? data.placement_probability
+      : (typeof data.probability === 'number' ? data.probability : (data.prediction === 1 ? 1.0 : 0.0));
+
+    const predictedClass = typeof data.predicted_class === 'number'
+      ? data.predicted_class
+      : (typeof data.prediction === 'number' ? data.prediction : (placementProbability >= (data.decision_threshold || 0.5) ? 1 : 0));
+
+    const decisionThreshold = typeof data.decision_threshold === 'number' ? data.decision_threshold : 0.5;
+    const predictedLabel = data.predicted_label || (predictedClass === 1 ? 'Placed' : 'Not Placed');
+    const modelVersion = data.model_version || '1.0.0';
+
+    return {
+      placement_probability: placementProbability,
+      decision_threshold: decisionThreshold,
+      predicted_class: predictedClass,
+      predicted_label: predictedLabel,
+      model_version: modelVersion,
+      prediction: predictedClass,
+      probability: placementProbability
+    };
   }
 }
 

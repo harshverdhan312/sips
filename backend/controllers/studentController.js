@@ -6,8 +6,11 @@ const Match = require('../models/Match');
 const JobDescription = require('../models/JobDescription');
 const Application = require('../models/Application');
 const Notification = require('../models/Notification');
+const PlacementPrediction = require('../models/PlacementPrediction');
 const { calculateMatch } = require('../utils/matchingEngine');
 const { sendNotification } = require('../utils/notificationService');
+const { mapStudentToPlacementInput } = require('../utils/placementDataMapper');
+const mlService = require('../services/mlService');
 const memoryDb = require('../utils/memoryDb');
 const config = require('../config');
 const logger = require('../utils/logger');
@@ -901,5 +904,112 @@ exports.getPlacementTelemetry = async (req, res) => {
   } catch (error) {
     logger.error('Get student telemetry error:', error);
     res.status(500).json({ success: false, message: 'Server error retrieving placement telemetry' });
+  }
+};
+
+/**
+ * POST /api/student/analytics/placement/predict
+ * Authenticated student — calculate and persist ML placement prediction
+ */
+exports.predictPlacement = async (req, res, next) => {
+  try {
+    let student = null;
+
+    if (memoryDb.isMongoConnected() || Student.findOne.mock) {
+      student = await Student.findOne({
+        _id: req.user.id,
+        collegeId: req.collegeId
+      });
+    } else {
+      student = memoryDb.findStudentById(req.user.id);
+      if (student && student.collegeId && String(student.collegeId) !== String(req.collegeId)) {
+        student = null;
+      }
+    }
+
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student profile not found' });
+    }
+
+    // Map student profile data to strict ML schema
+    const { isComplete, missingFields, payload } = mapStudentToPlacementInput(student);
+
+    if (!isComplete) {
+      return res.status(422).json({
+        success: false,
+        message: `Placement prediction requires complete profile information. Missing fields: ${missingFields.join(', ')}.`,
+        missingFields
+      });
+    }
+
+    // Call FastAPI ML microservice via resilient client
+    const mlResponse = await mlService.predictPlacement(payload);
+
+    const predictionData = {
+      collegeId: req.collegeId,
+      studentId: req.user.id,
+      placementProbability: mlResponse.placement_probability,
+      decisionThreshold: mlResponse.decision_threshold,
+      predictedClass: mlResponse.predicted_class,
+      predictedLabel: mlResponse.predicted_label,
+      modelVersion: mlResponse.model_version,
+      inputSnapshot: {
+        age: payload.Age,
+        internships: payload.Internships,
+        cgpa: payload.CGPA,
+        hostel: payload.Hostel,
+        historyOfBacklogs: payload.HistoryOfBacklogs,
+        stream: payload.Stream
+      }
+    };
+
+    let savedRecord = null;
+    if (memoryDb.isMongoConnected() || PlacementPrediction.create.mock) {
+      savedRecord = await PlacementPrediction.create(predictionData);
+    } else {
+      savedRecord = memoryDb.savePlacementPrediction(predictionData);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Placement prediction calculated successfully',
+      prediction: savedRecord
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * GET /api/student/analytics/placement/prediction
+ * Authenticated student — get latest persisted placement prediction
+ */
+exports.getLatestPlacementPrediction = async (req, res, next) => {
+  try {
+    let prediction = null;
+
+    if (memoryDb.isMongoConnected() || PlacementPrediction.findOne.mock) {
+      prediction = await PlacementPrediction.findOne({
+        studentId: req.user.id,
+        collegeId: req.collegeId
+      }).sort({ createdAt: -1 });
+    } else {
+      prediction = memoryDb.getLatestPlacementPrediction(req.collegeId, req.user.id);
+    }
+
+    if (!prediction) {
+      return res.status(200).json({
+        success: true,
+        prediction: null,
+        message: 'No placement prediction available yet. Please complete your placement profile and request a prediction.'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      prediction
+    });
+  } catch (error) {
+    next(error);
   }
 };

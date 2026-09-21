@@ -5,6 +5,7 @@ import '../models/job_opportunity.dart';
 import '../models/mock_interview.dart';
 import '../models/peer_match.dart';
 import '../models/placement_alert.dart';
+import '../models/placement_prediction.dart';
 import '../models/readiness_metric.dart';
 import '../models/roadmap_milestone.dart';
 import '../models/skill_intelligence.dart';
@@ -16,6 +17,7 @@ class ApiSipsRepository implements SipsRepository {
 
   // In-memory caches for live data
   StudentProfile? _cachedProfile;
+  PlacementPrediction? _cachedPrediction;
   List<JobOpportunity> _cachedJobs = [];
   List<PlacementAlert> _cachedAlerts = [];
 
@@ -58,6 +60,34 @@ class ApiSipsRepository implements SipsRepository {
     }
     _cachedProfile = profile;
     return profile;
+  }
+
+  // ==========================================
+  // 1b. Placement ML Prediction (LIVE)
+  // ==========================================
+  @override
+  Future<PlacementPrediction?> getLatestPlacementPrediction() async {
+    final response = await _apiClient.get('/api/student/analytics/placement/prediction');
+    if (response is Map<String, dynamic>) {
+      final predJson = response['prediction'];
+      if (predJson is Map<String, dynamic>) {
+        _cachedPrediction = PlacementPrediction.fromBackendJson(predJson);
+        return _cachedPrediction;
+      }
+      _cachedPrediction = null;
+      return null;
+    }
+    return null;
+  }
+
+  @override
+  Future<PlacementPrediction> requestPlacementPrediction() async {
+    final response = await _apiClient.post('/api/student/analytics/placement/predict');
+    if (response is Map<String, dynamic> && response['prediction'] is Map<String, dynamic>) {
+      _cachedPrediction = PlacementPrediction.fromBackendJson(response['prediction'] as Map<String, dynamic>);
+      return _cachedPrediction!;
+    }
+    throw Exception('Prediction calculation did not return a valid result');
   }
 
   // ==========================================

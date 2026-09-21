@@ -24,6 +24,34 @@ class ProfileScreen extends ConsumerStatefulWidget {
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   bool _isUploadingResume = false;
+  bool _isPredicting = false;
+
+  Future<void> _handlePredictPlacement() async {
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _isPredicting = true);
+    try {
+      final pred = await ref.read(placementPredictionProvider.notifier).requestPrediction();
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('Placement prediction computed: ${pred.predictedLabel} (${(pred.placementProbability * 100).toStringAsFixed(1)}%)'),
+          backgroundColor: const Color(0xFF047857),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('Prediction failed: ${e.toString()}'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isPredicting = false);
+      }
+    }
+  }
 
   Future<void> _handleResumeUpload(StudentProfile profile) async {
     final messenger = ScaffoldMessenger.of(context);
@@ -684,6 +712,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(studentProfileProvider);
+    final predictionAsync = ref.watch(placementPredictionProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -901,6 +930,213 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ),
                     ],
                   ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // ML Placement Likelihood Prediction
+                SectionHeader(
+                  title: 'Placement ML Prediction',
+                  badge: SipsBadge(
+                    label: 'FASTAPI ML',
+                    variant: SipsBadgeVariant.primary,
+                    isSmall: true,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                predictionAsync.when(
+                  loading: () => const SipsCard(
+                    padding: EdgeInsets.all(20),
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(12),
+                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                      ),
+                    ),
+                  ),
+                  error: (err, _) => SipsCard(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.warning_amber_rounded, color: AppColors.error, size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Prediction Unavailable',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 13,
+                                color: AppColors.error,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          '$err',
+                          style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AppColors.onSurfaceVariant),
+                        ),
+                        const SizedBox(height: 12),
+                        OutlinedButton.icon(
+                          onPressed: _isPredicting ? null : _handlePredictPlacement,
+                          icon: const Icon(Icons.refresh, size: 16),
+                          label: const Text('Try Again'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  data: (prediction) {
+                    if (prediction == null) {
+                      return SipsCard(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          children: [
+                            const Icon(Icons.analytics_outlined, size: 36, color: AppColors.outline),
+                            const SizedBox(height: 8),
+                            Text(
+                              'No Prediction Calculated Yet',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                                color: AppColors.onSurface,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Ensure your profile attributes above are complete, then run the ML placement prediction model.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AppColors.onSurfaceVariant),
+                            ),
+                            const SizedBox(height: 14),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  shape: RoundedRectangleBorder(borderRadius: AppRadius.mdRadius),
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                ),
+                                onPressed: _isPredicting ? null : _handlePredictPlacement,
+                                icon: _isPredicting
+                                    ? const SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                      )
+                                    : const Icon(Icons.auto_awesome_rounded, size: 18, color: Colors.white),
+                                label: Text(
+                                  _isPredicting ? 'Computing Prediction...' : 'Run ML Prediction',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 13,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    final pct = (prediction.placementProbability * 100).toStringAsFixed(1);
+                    final isPlaced = prediction.predictedClass == 1;
+
+                    return SipsCard(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Placement Likelihood',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.outline,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '$pct%',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w800,
+                                      color: isPlaced ? const Color(0xFF047857) : AppColors.primary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SipsBadge(
+                                label: prediction.predictedLabel.toUpperCase(),
+                                variant: isPlaced ? SipsBadgeVariant.emerald : SipsBadgeVariant.neutral,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          ClipRRect(
+                            borderRadius: AppRadius.fullRadius,
+                            child: LinearProgressIndicator(
+                              value: prediction.placementProbability.clamp(0.0, 1.0),
+                              minHeight: 8,
+                              backgroundColor: AppColors.surfaceContainerHigh,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                isPlaced ? const Color(0xFF047857) : AppColors.primary,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Decision Threshold: ${(prediction.decisionThreshold * 100).toStringAsFixed(0)}%',
+                                style: GoogleFonts.plusJakartaSans(fontSize: 11, color: AppColors.outline),
+                              ),
+                              Text(
+                                'Model: ${prediction.modelVersion.isNotEmpty ? prediction.modelVersion : "Standard"}',
+                                style: GoogleFonts.plusJakartaSans(fontSize: 11, color: AppColors.outline),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: AppColors.primary),
+                                shape: RoundedRectangleBorder(borderRadius: AppRadius.mdRadius),
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                              ),
+                              onPressed: _isPredicting ? null : _handlePredictPlacement,
+                              icon: _isPredicting
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                                    )
+                                  : const Icon(Icons.refresh_rounded, size: 18, color: AppColors.primary),
+                              label: Text(
+                                _isPredicting ? 'Recalculating...' : 'Recalculate Prediction',
+                                style: GoogleFonts.plusJakartaSans(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
 
                 const SizedBox(height: 20),

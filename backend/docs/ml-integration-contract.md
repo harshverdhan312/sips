@@ -61,7 +61,7 @@ The Node.js backend manages ML service configuration via environment variables i
 | `/resume/semantic-match` | `POST` | `SemanticMatchRequest` -> `SemanticMatchResponse` | `semanticMatchResume(skills, text)` | **READY** |
 | `/resume/hybrid-match` | `POST` | `HybridMatchRequest` -> `HybridMatchResponse` | `hybridMatchResume(options)` | **READY** |
 | `/interview/analyze` | `POST` | Multipart `transcript: str`, `audio: UploadFile` | `analyzeInterview(options)` | **READY** |
-| `/placement/predict` | `POST` | `PlacementRequest` (`extra='forbid'`) | `predictPlacement(payload)` | **BLOCKED / CONTRACT-PENDING** |
+| `/placement/predict` | `POST` | `PlacementRequest` (`extra='forbid'`) | `predictPlacement(payload)` | **READY** |
 
 ---
 
@@ -201,7 +201,7 @@ The Node.js backend manages ML service configuration via environment variables i
 
 ### 5.7 Placement Prediction
 * **Endpoint:** `POST /placement/predict`
-* **Status:** **BLOCKED / CONTRACT-PENDING**
+* **Status:** **READY & INTEGRATED**
 * **Request Content-Type:** `application/json`
 * **FastAPI Required Schema (`PlacementRequest` with `extra="forbid"`):**
   ```json
@@ -214,13 +214,29 @@ The Node.js backend manages ML service configuration via environment variables i
     "Stream": "Computer Science"
   }
   ```
-* **FastAPI Response:**
+* **FastAPI Response (`PlacementResponse`):**
   ```json
   {
-    "prediction": 1,
-    "probability": 0.88
+    "placement_probability": 0.88,
+    "decision_threshold": 0.5,
+    "predicted_class": 1,
+    "predicted_label": "Placed",
+    "model_version": "1.0.0"
   }
   ```
+* **Node API Endpoints:**
+  * `POST /api/student/analytics/placement/predict`: Calculates, normalizes, and persists prediction for authenticated student.
+  * `GET /api/student/analytics/placement/prediction`: Retrieves latest persisted prediction for authenticated student.
+* **Node Persistence Schema (`PlacementPrediction`):**
+  * `collegeId` (ObjectId, indexed)
+  * `studentId` (ObjectId, indexed)
+  * `placementProbability` (Number)
+  * `decisionThreshold` (Number, default 0.5)
+  * `predictedClass` (Number, 0 or 1)
+  * `predictedLabel` (String, "Placed" or "Not Placed")
+  * `modelVersion` (String)
+  * `inputSnapshot` ({ age, internships, cgpa, hostel, historyOfBacklogs, stream })
+  * `createdAt` (Date, indexed)
 
 ---
 

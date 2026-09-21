@@ -74,6 +74,32 @@ export const studentService = {
   },
 
   /**
+   * Fetch current/latest placement prediction from backend
+   */
+  async getPlacementPrediction() {
+    try {
+      const res = await api.get('/api/student/analytics/placement/prediction');
+      return res?.prediction || null;
+    } catch (e) {
+      console.warn("Could not fetch placement prediction:", e.message);
+      return null;
+    }
+  },
+
+  /**
+   * Request/calculate placement prediction via ML pipeline
+   */
+  async requestPlacementPrediction() {
+    try {
+      const res = await api.post('/api/student/analytics/placement/predict');
+      return res?.prediction || res;
+    } catch (e) {
+      console.error("Failed to calculate placement prediction:", e);
+      throw e;
+    }
+  },
+
+  /**
    * Upload PDF resume to backend
    */
   async uploadResume(file) {

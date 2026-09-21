@@ -19,6 +19,10 @@ const BRANCH_TO_STREAM_MAP = {
   'cse': 'Computer Science',
   'information technology': 'Information Technology',
   'it': 'Information Technology',
+  'information science and engineering': 'Information Technology',
+  'information science & engineering': 'Information Technology',
+  'information science': 'Information Technology',
+  'ise': 'Information Technology',
   'electronics and communication': 'Electronics And Communication',
   'electronics & communication': 'Electronics And Communication',
   'electronics and communication engineering': 'Electronics And Communication',
@@ -118,6 +122,7 @@ function mapStudentToPlacementInput(student) {
 
   return {
     isComplete,
+    isValid: isComplete,
     missingFields,
     payload: isComplete
       ? {

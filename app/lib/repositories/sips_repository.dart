@@ -3,6 +3,7 @@ import '../models/job_opportunity.dart';
 import '../models/mock_interview.dart';
 import '../models/peer_match.dart';
 import '../models/placement_alert.dart';
+import '../models/placement_prediction.dart';
 import '../models/readiness_metric.dart';
 import '../models/roadmap_milestone.dart';
 import '../models/skill_intelligence.dart';
@@ -11,6 +12,9 @@ import '../models/student_profile.dart';
 abstract class SipsRepository {
   Future<StudentProfile> getStudentProfile();
   Future<StudentProfile> updateStudentProfile(StudentProfile profile);
+
+  Future<PlacementPrediction?> getLatestPlacementPrediction();
+  Future<PlacementPrediction> requestPlacementPrediction();
 
   Future<ReadinessMetric> getReadinessMetric();
 
@@ -34,3 +38,4 @@ abstract class SipsRepository {
   Future<void> markAlertAsRead(String alertId);
   Future<String> uploadResume(List<int> bytes, String filename);
 }
+

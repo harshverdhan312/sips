@@ -18,7 +18,11 @@ import {
   Building2,
   Calendar,
   History,
-  Home
+  Home,
+  Sparkles,
+  Cpu,
+  TrendingUp,
+  RefreshCw
 } from "lucide-react";
 import { studentService } from "../../services/studentService";
 import { Card, CardHeader } from "../../components/common/Card";
@@ -30,6 +34,7 @@ import { useNotifications } from "../../context/NotificationContext";
 export function StudentProfilePage() {
   const { showSuccess, showError, showWarning } = useNotifications();
   const [student, setStudent] = useState(null);
+  const [prediction, setPrediction] = useState(null);
   const [isEditingSkills, setIsEditingSkills] = useState(false);
   const [isEditingGithub, setIsEditingGithub] = useState(false);
   const [isEditingPlacement, setIsEditingPlacement] = useState(false);
@@ -41,6 +46,7 @@ export function StudentProfilePage() {
   const [hostelInput, setHostelInput] = useState("");
   const [backlogsInput, setBacklogsInput] = useState("");
   const [saving, setSaving] = useState(false);
+  const [calculatingPrediction, setCalculatingPrediction] = useState(false);
   const [uploadingResume, setUploadingResume] = useState(false);
 
   useEffect(() => {
@@ -54,6 +60,10 @@ export function StudentProfilePage() {
         setInternshipsInput(data.internships !== null && data.internships !== undefined ? String(data.internships) : "");
         setHostelInput(data.hostel === true ? "true" : (data.hostel === false ? "false" : ""));
         setBacklogsInput(data.historyOfBacklogs !== null && data.historyOfBacklogs !== undefined ? String(data.historyOfBacklogs) : "");
+      }
+      const pred = await studentService.getPlacementPrediction();
+      if (pred) {
+        setPrediction(pred);
       }
     }
     load();
@@ -146,6 +156,24 @@ export function StudentProfilePage() {
       showError(e.message || "Failed to save placement information.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleCalculatePrediction = async () => {
+    setCalculatingPrediction(true);
+    try {
+      const res = await studentService.requestPlacementPrediction();
+      if (res && res.prediction) {
+        setPrediction(res.prediction);
+        showSuccess("Placement likelihood prediction computed successfully!");
+      } else {
+        showError("Could not retrieve prediction result.");
+      }
+    } catch (err) {
+      console.error(err);
+      showError(err.message || "Failed to calculate placement prediction.");
+    } finally {
+      setCalculatingPrediction(false);
     }
   };
 
@@ -553,6 +581,98 @@ export function StudentProfilePage() {
                 </p>
               </div>
             </div>
+          </div>
+        )}
+      </Card>
+
+      {/* ML Placement Likelihood Prediction Hub */}
+      <Card>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-indigo-600" />
+              <h3 className="font-bold text-slate-900 text-base">ML Placement Likelihood Prediction</h3>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Trained institutional machine learning model prediction based on academic & demographic profile inputs
+            </p>
+          </div>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handleCalculatePrediction}
+            disabled={calculatingPrediction}
+            className="shrink-0"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${calculatingPrediction ? "animate-spin" : ""}`} />
+            {calculatingPrediction ? "Predicting..." : (prediction ? "Recalculate Prediction" : "Run ML Prediction")}
+          </Button>
+        </div>
+
+        {prediction ? (
+          <div className="space-y-4">
+            <div className="p-4 rounded-xl border border-indigo-100 bg-indigo-50/40">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Classification Outcome</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Badge variant={prediction.predictedClass === 1 ? "success" : "neutral"} size="md">
+                      {prediction.predictedLabel}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Placement Likelihood</p>
+                  <p className="text-xl font-black text-indigo-700 mt-0.5">
+                    {(prediction.placementProbability * 100).toFixed(1)}%
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Decision Threshold</p>
+                  <p className="text-sm font-bold text-slate-700 mt-1">
+                    {(prediction.decisionThreshold * 100).toFixed(0)}% ({prediction.decisionThreshold})
+                  </p>
+                </div>
+              </div>
+
+              {/* Likelihood Progress Bar */}
+              <div className="mt-4 pt-3 border-t border-indigo-100/80">
+                <div className="flex justify-between items-center text-xs font-semibold text-slate-600 mb-1.5">
+                  <span>Confidence Gauge</span>
+                  <span>{(prediction.placementProbability * 100).toFixed(1)}%</span>
+                </div>
+                <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      prediction.placementProbability >= prediction.decisionThreshold
+                        ? "bg-emerald-500"
+                        : "bg-indigo-500"
+                    }`}
+                    style={{ width: `${Math.min(Math.max(prediction.placementProbability * 100, 0), 100)}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 px-1">
+              <span>
+                <strong>Model Version:</strong> {prediction.modelVersion || "Standard"}
+              </span>
+              <span>
+                <strong>Calculated:</strong>{" "}
+                {prediction.createdAt ? new Date(prediction.createdAt).toLocaleString() : "Recently"}
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="p-6 rounded-xl border border-dashed border-slate-300 bg-slate-50/50 text-center">
+            <Cpu className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+            <p className="text-sm font-bold text-slate-700">No ML Placement Prediction Generated</p>
+            <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
+              Ensure your Age, Internships, Accommodation status, and Backlog history above are configured, then click &quot;Run ML Prediction&quot; to compute placement likelihood.
+            </p>
           </div>
         )}
       </Card>

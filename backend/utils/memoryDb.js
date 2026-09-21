@@ -15,6 +15,7 @@ class MemoryDatabase {
     this.matches = [];
     this.applications = [];
     this.notifications = [];
+    this.placementPredictions = [];
     this._idCounter = 1000;
   }
 
@@ -497,6 +498,46 @@ class MemoryDatabase {
       ],
       recentLogs: this.auditLogs.slice(0, 5)
     };
+  }
+
+  // ==========================================
+  // Placement Prediction Operations
+  // ==========================================
+  savePlacementPrediction(data) {
+    const newPrediction = {
+      _id: data._id || this.nextId('pred_'),
+      collegeId: data.collegeId,
+      studentId: data.studentId,
+      placementProbability: data.placementProbability,
+      decisionThreshold: data.decisionThreshold !== undefined ? data.decisionThreshold : 0.5,
+      predictedClass: data.predictedClass,
+      predictedLabel: data.predictedLabel,
+      modelVersion: data.modelVersion || '1.0.0',
+      inputSnapshot: data.inputSnapshot || {},
+      createdAt: data.createdAt || new Date(),
+      updatedAt: data.updatedAt || new Date()
+    };
+    this.placementPredictions.push(newPrediction);
+    return newPrediction;
+  }
+
+  getLatestPlacementPrediction(collegeId, studentId) {
+    const matches = this.placementPredictions.filter(p =>
+      String(p.studentId) === String(studentId) &&
+      (!collegeId || String(p.collegeId) === String(collegeId))
+    );
+    if (matches.length === 0) return null;
+    matches.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    return matches[0];
+  }
+
+  getPlacementPredictions(collegeId, studentId) {
+    return this.placementPredictions
+      .filter(p =>
+        String(p.studentId) === String(studentId) &&
+        (!collegeId || String(p.collegeId) === String(collegeId))
+      )
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }
 }
 

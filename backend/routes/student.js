@@ -72,4 +72,10 @@ router.patch('/applications/:id/withdraw', auth, tenant, validateObjectId('id'),
 // GET /api/student/analytics/placement
 router.get('/analytics/placement', auth, tenant, studentController.getPlacementTelemetry);
 
+// POST /api/student/analytics/placement/predict
+router.post('/analytics/placement/predict', auth, tenant, studentController.predictPlacement);
+
+// GET /api/student/analytics/placement/prediction
+router.get('/analytics/placement/prediction', auth, tenant, studentController.getLatestPlacementPrediction);
+
 module.exports = router;
