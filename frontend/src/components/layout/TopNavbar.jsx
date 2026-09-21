@@ -10,6 +10,7 @@ import {
   Shield,
   GraduationCap,
   Building2,
+  BarChart3,
   LogOut
 } from "lucide-react";
 import Avatar from "../common/Avatar";
@@ -192,28 +193,52 @@ export function TopNavbar({ onMenuClick }) {
                   </button>
                 )}
                 {role === "placement" && (
-                  <button
-                    onClick={() => {
-                      navigate("/placement/analytics");
-                      setProfileOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 cursor-pointer"
-                  >
-                    <Building2 className="w-4 h-4 text-slate-400" />
-                    Placement Analytics
-                  </button>
+                  <>
+                    <button
+                      onClick={() => {
+                        navigate("/placement/profile");
+                        setProfileOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 cursor-pointer font-semibold text-indigo-600"
+                    >
+                      <Building2 className="w-4 h-4 text-indigo-600" />
+                      College Profile
+                    </button>
+                    <button
+                      onClick={() => {
+                        navigate("/placement/analytics");
+                        setProfileOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 cursor-pointer"
+                    >
+                      <BarChart3 className="w-4 h-4 text-slate-400" />
+                      Placement Analytics
+                    </button>
+                  </>
                 )}
                 {role === "admin" && (
-                  <button
-                    onClick={() => {
-                      navigate("/admin/settings");
-                      setProfileOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 cursor-pointer"
-                  >
-                    <Shield className="w-4 h-4 text-slate-400" />
-                    Platform Settings
-                  </button>
+                  <>
+                    <button
+                      onClick={() => {
+                        navigate("/admin/profile");
+                        setProfileOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 cursor-pointer font-semibold text-indigo-600"
+                    >
+                      <Building2 className="w-4 h-4 text-indigo-600" />
+                      College Profile
+                    </button>
+                    <button
+                      onClick={() => {
+                        navigate("/admin/settings");
+                        setProfileOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 cursor-pointer"
+                    >
+                      <Shield className="w-4 h-4 text-slate-400" />
+                      Platform Settings
+                    </button>
+                  </>
                 )}
               </div>
 

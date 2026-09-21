@@ -158,6 +158,19 @@ export const adminService = {
   },
 
   /**
+   * Update current college profile fields
+   */
+  async updateCollegeProfile(profileData) {
+    try {
+      const res = await api.put('/api/admin/college/profile', profileData);
+      return res?.college || res;
+    } catch (e) {
+      console.error("Failed to update college profile:", e);
+      throw e;
+    }
+  },
+
+  /**
    * Upload college logo
    */
   async uploadCollegeLogo(file) {

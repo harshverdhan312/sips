@@ -35,6 +35,7 @@ import { AdminUserManagementPage } from "../pages/admin/AdminUserManagementPage"
 import { AdminStudentsPage } from "../pages/admin/AdminStudentsPage";
 import { AdminAnalyticsPage } from "../pages/admin/AdminAnalyticsPage";
 import { AdminSettingsPage } from "../pages/admin/AdminSettingsPage";
+import { CollegeProfilePage } from "../pages/admin/CollegeProfilePage";
 
 export function AppRoutes() {
   const { role, isAuthenticated } = useAuth();
@@ -79,6 +80,8 @@ export function AppRoutes() {
           <Route path="/placement/job-descriptions" element={<JobDescriptionsPage />} />
           <Route path="/placement/analytics" element={<PlacementAnalyticsPage />} />
           <Route path="/placement/reports" element={<PlacementReportsPage />} />
+          <Route path="/placement/profile" element={<CollegeProfilePage />} />
+          <Route path="/placement/college-profile" element={<CollegeProfilePage />} />
         </Route>
       </Route>
 
@@ -91,6 +94,8 @@ export function AppRoutes() {
           <Route path="/admin/placement-cell" element={<AdminUserManagementPage />} />
           <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
           <Route path="/admin/settings" element={<AdminSettingsPage />} />
+          <Route path="/admin/profile" element={<CollegeProfilePage />} />
+          <Route path="/admin/college-profile" element={<CollegeProfilePage />} />
         </Route>
       </Route>
 
