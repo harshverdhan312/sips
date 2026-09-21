@@ -8,7 +8,10 @@ const SENSITIVE_KEYS = new Set([
   'token',
   'authorization',
   'secret',
-  'jwtsecret'
+  'jwtsecret',
+  'apikey',
+  'mlserviceapikey',
+  'x-api-key'
 ]);
 
 function sanitize(data) {

@@ -11,7 +11,10 @@ const config = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
   uploadLimitBytes: 5 * 1024 * 1024, // 5MB
-  uploadDir: path.resolve(__dirname, '..', process.env.UPLOAD_DIR || 'uploads')
+  uploadDir: path.resolve(__dirname, '..', process.env.UPLOAD_DIR || 'uploads'),
+  mlServiceUrl: process.env.ML_SERVICE_URL || 'http://127.0.0.1:8000',
+  mlServiceTimeoutMs: parseInt(process.env.ML_SERVICE_TIMEOUT_MS, 10) || 5000,
+  mlServiceApiKey: process.env.ML_SERVICE_API_KEY || ''
 };
 
 module.exports = config;
