@@ -19,6 +19,14 @@ const collegeSchema = new mongoose.Schema({
     trim: true
   }],
   logoUrl: { type: String, default: null },
+  code: { type: String, trim: true, default: '' },
+  address: { type: String, trim: true, default: '' },
+  city: { type: String, trim: true, default: '' },
+  state: { type: String, trim: true, default: '' },
+  website: { type: String, trim: true, default: '' },
+  contactEmail: { type: String, trim: true, lowercase: true, default: '' },
+  contactPhone: { type: String, trim: true, default: '' },
+  establishedYear: { type: Number, default: null },
   createdAt: { type: Date, default: Date.now }
 });
 

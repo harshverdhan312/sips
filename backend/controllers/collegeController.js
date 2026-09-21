@@ -409,7 +409,7 @@ exports.getCollegeBySlug = async (req, res) => {
 
 /**
  * GET /api/admin/college/profile
- * Admin-only — get authenticated college details including logoUrl
+ * Admin-only — get authenticated college details including logoUrl and metadata
  */
 exports.getCollegeProfile = async (req, res) => {
   try {
@@ -427,6 +427,14 @@ exports.getCollegeProfile = async (req, res) => {
           adminEmail: college.adminEmail,
           acceptedDomains: college.acceptedDomains || [],
           logoUrl: college.logoUrl || null,
+          code: college.code || '',
+          address: college.address || '',
+          city: college.city || '',
+          state: college.state || '',
+          website: college.website || '',
+          contactEmail: college.contactEmail || '',
+          contactPhone: college.contactPhone || '',
+          establishedYear: typeof college.establishedYear === 'number' ? college.establishedYear : null,
           createdAt: college.createdAt
         }
       });
@@ -444,6 +452,157 @@ exports.getCollegeProfile = async (req, res) => {
   } catch (error) {
     logger.error('Get college profile error:', error);
     res.status(500).json({ success: false, message: 'Server error retrieving college profile' });
+  }
+};
+
+/**
+ * PUT /api/admin/college/profile
+ * Admin-only — update authenticated college profile metadata
+ */
+exports.updateCollegeProfile = async (req, res) => {
+  try {
+    const {
+      name,
+      code,
+      address,
+      city,
+      state,
+      website,
+      contactEmail,
+      contactPhone,
+      establishedYear,
+      acceptedDomains
+    } = req.body;
+
+    const updates = {};
+
+    // Validate name
+    if (name !== undefined) {
+      if (typeof name !== 'string' || name.trim() === '') {
+        return res.status(400).json({ success: false, message: 'College name cannot be empty' });
+      }
+      updates.name = name.trim();
+    }
+
+    // Optional string fields
+    if (code !== undefined) {
+      updates.code = typeof code === 'string' ? code.trim() : '';
+    }
+    if (address !== undefined) {
+      updates.address = typeof address === 'string' ? address.trim() : '';
+    }
+    if (city !== undefined) {
+      updates.city = typeof city === 'string' ? city.trim() : '';
+    }
+    if (state !== undefined) {
+      updates.state = typeof state === 'string' ? state.trim() : '';
+    }
+    if (website !== undefined) {
+      updates.website = typeof website === 'string' ? website.trim() : '';
+    }
+    if (contactPhone !== undefined) {
+      updates.contactPhone = typeof contactPhone === 'string' ? contactPhone.trim() : '';
+    }
+
+    // Validate contactEmail if provided
+    if (contactEmail !== undefined) {
+      const emailStr = String(contactEmail || '').trim().toLowerCase();
+      if (emailStr.length > 0) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(emailStr)) {
+          return res.status(400).json({ success: false, message: 'Invalid contact email address format' });
+        }
+      }
+      updates.contactEmail = emailStr;
+    }
+
+    // Validate establishedYear
+    if (establishedYear !== undefined) {
+      if (establishedYear === null || establishedYear === '') {
+        updates.establishedYear = null;
+      } else {
+        const yearNum = Number(establishedYear);
+        const currentYear = new Date().getFullYear();
+        if (!Number.isInteger(yearNum) || yearNum < 1800 || yearNum > currentYear + 1) {
+          return res.status(400).json({
+            success: false,
+            message: `Established year must be a valid 4-digit year between 1800 and ${currentYear + 1}`
+          });
+        }
+        updates.establishedYear = yearNum;
+      }
+    }
+
+    // Validate acceptedDomains if provided
+    if (acceptedDomains !== undefined) {
+      let domainList = Array.isArray(acceptedDomains) ? acceptedDomains : String(acceptedDomains || '').split(',');
+      const normalizedDomains = domainList
+        .map(d => String(d || '').toLowerCase().trim())
+        .filter(Boolean);
+
+      if (normalizedDomains.length === 0) {
+        return res.status(400).json({ success: false, message: 'At least one valid accepted domain is required' });
+      }
+
+      const domainRegex = /^[a-z0-9.-]+\.[a-z]{2,}$/;
+      for (const d of normalizedDomains) {
+        if (!domainRegex.test(d)) {
+          return res.status(400).json({ success: false, message: `Invalid domain format: ${d}` });
+        }
+      }
+      updates.acceptedDomains = normalizedDomains;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ success: false, message: 'No valid editable fields provided for update' });
+    }
+
+    if (!memoryDb.isMongoConnected() && !College.findByIdAndUpdate.mock) {
+      const college = memoryDb.updateCollege(req.collegeId, updates);
+      if (!college) {
+        return res.status(404).json({ success: false, message: 'College profile not found' });
+      }
+      return res.status(200).json({
+        success: true,
+        message: 'College profile updated successfully',
+        college: {
+          _id: college._id,
+          name: college.name,
+          slug: college.slug,
+          adminEmail: college.adminEmail,
+          acceptedDomains: college.acceptedDomains || [],
+          logoUrl: college.logoUrl || null,
+          code: college.code || '',
+          address: college.address || '',
+          city: college.city || '',
+          state: college.state || '',
+          website: college.website || '',
+          contactEmail: college.contactEmail || '',
+          contactPhone: college.contactPhone || '',
+          establishedYear: typeof college.establishedYear === 'number' ? college.establishedYear : null,
+          createdAt: college.createdAt
+        }
+      });
+    }
+
+    const updated = await College.findByIdAndUpdate(
+      req.collegeId,
+      { $set: updates },
+      { new: true, runValidators: true }
+    ).select('-masterPasswordHash');
+
+    if (!updated) {
+      return res.status(404).json({ success: false, message: 'College profile not found' });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'College profile updated successfully',
+      college: updated
+    });
+  } catch (error) {
+    logger.error('Update college profile error:', error);
+    res.status(500).json({ success: false, message: 'Server error updating college profile' });
   }
 };
 

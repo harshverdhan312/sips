@@ -50,7 +50,8 @@ export function Sidebar({ isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen
     { to: "/placement/students", label: "Student Directory", icon: Users },
     { to: "/placement/jobs", label: "Job Descriptions", icon: Briefcase, badge: "Match" },
     { to: "/placement/analytics", label: "Placement Analytics", icon: BarChart3 },
-    { to: "/placement/reports", label: "Institutional Reports", icon: FileSpreadsheet }
+    { to: "/placement/reports", label: "Institutional Reports", icon: FileSpreadsheet },
+    { to: "/placement/profile", label: "College Profile", icon: Building2 }
   ];
 
   const adminLinks = [
@@ -58,6 +59,7 @@ export function Sidebar({ isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen
     { to: "/admin/users", label: "User Management", icon: Users },
     { to: "/admin/students", label: "Student Records", icon: GraduationCap },
     { to: "/admin/analytics", label: "Platform Analytics", icon: BarChart3 },
+    { to: "/admin/profile", label: "College Profile", icon: Building2 },
     { to: "/admin/settings", label: "System Settings", icon: Settings }
   ];
 

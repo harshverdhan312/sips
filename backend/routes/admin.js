@@ -50,6 +50,7 @@ router.use(auth, tenant, adminOnly);
 // 0. College Profile & Logo Identity
 // ==========================================
 router.get('/college/profile', collegeController.getCollegeProfile);
+router.put('/college/profile', collegeController.updateCollegeProfile);
 router.post('/college/profile/image', logoUpload.single('image'), collegeController.uploadLogo);
 router.delete('/college/profile/image', collegeController.deleteLogo);
 

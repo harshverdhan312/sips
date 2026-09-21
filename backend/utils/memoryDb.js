@@ -59,6 +59,14 @@ class MemoryDatabase {
       masterPasswordHash: collegeData.masterPasswordHash,
       acceptedDomains: collegeData.acceptedDomains || [],
       logoUrl: collegeData.logoUrl || null,
+      code: collegeData.code || '',
+      address: collegeData.address || '',
+      city: collegeData.city || '',
+      state: collegeData.state || '',
+      website: collegeData.website || '',
+      contactEmail: collegeData.contactEmail || '',
+      contactPhone: collegeData.contactPhone || '',
+      establishedYear: typeof collegeData.establishedYear === 'number' ? collegeData.establishedYear : null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
