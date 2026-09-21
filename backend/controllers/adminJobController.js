@@ -5,6 +5,7 @@ const Application = require('../models/Application');
 const Notification = require('../models/Notification');
 const AuditLog = require('../models/AuditLog');
 const { calculateMatch, extractSkillsFromText } = require('../utils/matchingEngine');
+const { sendNotification } = require('../utils/notificationService');
 const memoryDb = require('../utils/memoryDb');
 const logger = require('../utils/logger');
 
@@ -674,7 +675,44 @@ exports.updateApplicationStatus = async (req, res) => {
         });
       }
 
+      const previousStatus = app.status;
       const updated = memoryDb.updateApplication(app._id, { status: newStatus });
+
+      // Audit log
+      AuditLog.create({
+        collegeId: req.collegeId,
+        action: 'UPDATE_APPLICATION_STATUS',
+        actor: req.user.email || 'Admin',
+        target: `Application ${app._id}`,
+        details: {
+          applicationId: app._id,
+          studentId: app.studentId,
+          jobId: app.jobId,
+          previousStatus,
+          newStatus
+        }
+      }).catch(err => logger.warn('AuditLog error:', err.message));
+
+      // Event notification to student
+      let msg = `Your application status has been updated to ${newStatus}.`;
+      if (newStatus === 'SHORTLISTED') {
+        msg = 'Congratulations! You have been shortlisted for the role.';
+      } else if (newStatus === 'SELECTED') {
+        msg = 'Congratulations! You have been selected for the position!';
+      } else if (newStatus === 'REJECTED') {
+        msg = 'Update on your application: Your application was not selected.';
+      }
+
+      sendNotification({
+        collegeId: req.collegeId,
+        studentId: app.studentId,
+        title: `Application ${newStatus}`,
+        message: msg,
+        type: `APPLICATION_${newStatus}`,
+        applicationId: app._id,
+        jobId: app.jobId
+      });
+
       return res.json({
         success: true,
         message: 'Application status updated',
@@ -701,26 +739,44 @@ exports.updateApplicationStatus = async (req, res) => {
       });
     }
 
+    const previousStatus = application.status;
     application.status = newStatus;
     await application.save();
 
     // Audit log
-    await AuditLog.create({
+    AuditLog.create({
       collegeId: req.collegeId,
       action: 'UPDATE_APPLICATION_STATUS',
       actor: req.user.email || 'Admin',
       target: `Application ${application._id}`,
-      details: { applicationId: application._id, newStatus }
+      details: {
+        applicationId: application._id,
+        studentId: application.studentId,
+        jobId: application.jobId,
+        previousStatus,
+        newStatus
+      }
     }).catch(err => logger.warn('AuditLog error:', err.message));
 
-    // Optional notification on major status milestones
-    if (newStatus === 'SHORTLISTED' || newStatus === 'SELECTED') {
-      Notification.create({
-        collegeId: req.collegeId,
-        message: `Application update: Candidate status changed to ${newStatus}`,
-        target: 'STUDENTS'
-      }).catch(err => logger.warn('Notification error:', err.message));
+    // Event notification to student
+    let msg = `Your application status has been updated to ${newStatus}.`;
+    if (newStatus === 'SHORTLISTED') {
+      msg = 'Congratulations! You have been shortlisted for the role.';
+    } else if (newStatus === 'SELECTED') {
+      msg = 'Congratulations! You have been selected for the position!';
+    } else if (newStatus === 'REJECTED') {
+      msg = 'Update on your application: Your application was not selected.';
     }
+
+    sendNotification({
+      collegeId: req.collegeId,
+      studentId: application.studentId,
+      title: `Application ${newStatus}`,
+      message: msg,
+      type: `APPLICATION_${newStatus}`,
+      applicationId: application._id,
+      jobId: application.jobId
+    });
 
     res.json({
       success: true,

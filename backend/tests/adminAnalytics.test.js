@@ -2,12 +2,14 @@ const adminAnalyticsController = require('../controllers/adminAnalyticsControlle
 const adminSkillController = require('../controllers/adminSkillController');
 const Student = require('../models/Student');
 const JobDescription = require('../models/JobDescription');
+const Application = require('../models/Application');
 const Alert = require('../models/Alert');
 const AuditLog = require('../models/AuditLog');
 const Match = require('../models/Match');
 
 jest.mock('../models/Student');
 jest.mock('../models/JobDescription');
+jest.mock('../models/Application');
 jest.mock('../models/Alert');
 jest.mock('../models/AuditLog');
 jest.mock('../models/Match');
@@ -37,6 +39,12 @@ describe('Admin Analytics & Skill Intelligence Controllers', () => {
     });
     return res;
   };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    Application.countDocuments.mockResolvedValue(0);
+    Application.aggregate.mockResolvedValue([]);
+  });
 
   afterEach(() => {
     jest.clearAllMocks();

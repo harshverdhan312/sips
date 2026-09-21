@@ -69,4 +69,7 @@ router.get('/applications/:id', auth, tenant, validateObjectId('id'), studentCon
 // PATCH /api/student/applications/:id/withdraw
 router.patch('/applications/:id/withdraw', auth, tenant, validateObjectId('id'), studentController.withdrawApplication);
 
+// GET /api/student/analytics/placement
+router.get('/analytics/placement', auth, tenant, studentController.getPlacementTelemetry);
+
 module.exports = router;

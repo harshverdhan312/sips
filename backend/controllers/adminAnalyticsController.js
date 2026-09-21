@@ -1,8 +1,10 @@
 const Student = require('../models/Student');
 const JobDescription = require('../models/JobDescription');
+const Application = require('../models/Application');
 const Alert = require('../models/Alert');
 const AuditLog = require('../models/AuditLog');
 const memoryDb = require('../utils/memoryDb');
+const logger = require('../utils/logger');
 
 /**
  * GET /api/admin/overview
@@ -46,6 +48,7 @@ exports.getOverview = async (req, res) => {
       optedOutStudents,
       activeJobsCount,
       activeAlertsCount,
+      totalApplications,
       recentLogs
     ] = await Promise.all([
       Student.countDocuments({ collegeId }),
@@ -54,6 +57,7 @@ exports.getOverview = async (req, res) => {
       Student.countDocuments({ collegeId, placementStatus: 'OPTED_OUT' }),
       JobDescription.countDocuments({ collegeId, status: 'ACTIVE' }),
       Alert.countDocuments({ collegeId, active: true }),
+      Application.countDocuments({ collegeId }),
       AuditLog.find({ collegeId }).sort({ timestamp: -1 }).limit(5).lean()
     ]);
 
@@ -131,6 +135,7 @@ exports.getOverview = async (req, res) => {
         needsImprovementCount: stats.needsImprovementCount || 0,
         activeJobsCount,
         activeAlertsCount,
+        totalApplications: totalApplications || 0,
         recentActivity: recentLogs.map(log => ({
           id: log._id,
           action: log.action,
@@ -409,6 +414,41 @@ exports.getPlacementAnalytics = async (req, res) => {
       }
     ]);
 
+    // 6. Application Telemetry
+    let applicationStats;
+    if (!memoryDb.isMongoConnected()) {
+      applicationStats = memoryDb.getCollegeApplicationStats(collegeId);
+    } else {
+      const appCounts = await Application.aggregate([
+        { $match: { collegeId } },
+        { $group: { _id: '$status', count: { $sum: 1 } } }
+      ]);
+      const appByStatus = {
+        APPLIED: 0,
+        SHORTLISTED: 0,
+        REJECTED: 0,
+        SELECTED: 0,
+        WITHDRAWN: 0
+      };
+      let totalApps = 0;
+      appCounts.forEach(a => {
+        if (a._id && appByStatus[a._id] !== undefined) {
+          appByStatus[a._id] = a.count;
+        }
+        totalApps += a.count;
+      });
+      applicationStats = {
+        total: totalApps,
+        active: appByStatus.APPLIED + appByStatus.SHORTLISTED,
+        selected: appByStatus.SELECTED,
+        shortlisted: appByStatus.SHORTLISTED,
+        rejected: appByStatus.REJECTED,
+        withdrawn: appByStatus.WITHDRAWN,
+        applied: appByStatus.APPLIED,
+        byStatus: appByStatus
+      };
+    }
+
     res.json({
       success: true,
       data: {
@@ -416,7 +456,8 @@ exports.getPlacementAnalytics = async (req, res) => {
         departments: departmentPlacement,
         ctcDistribution: formattedCtcTiers,
         topRecruiters,
-        batchTrends
+        batchTrends,
+        applications: applicationStats
       }
     });
   } catch (error) {

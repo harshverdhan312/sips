@@ -7,6 +7,7 @@ const JobDescription = require('../models/JobDescription');
 const Application = require('../models/Application');
 const Notification = require('../models/Notification');
 const { calculateMatch } = require('../utils/matchingEngine');
+const { sendNotification } = require('../utils/notificationService');
 const memoryDb = require('../utils/memoryDb');
 const config = require('../config');
 const logger = require('../utils/logger');
@@ -526,6 +527,16 @@ exports.applyToJob = async (req, res) => {
         appliedAt: new Date()
       });
 
+      sendNotification({
+        collegeId: req.collegeId,
+        studentId: req.user.id,
+        title: 'Application Submitted',
+        message: `Your application for ${job.title} at ${job.company} has been submitted.`,
+        type: 'APPLICATION_SUBMITTED',
+        applicationId: application._id,
+        jobId: job._id
+      });
+
       return res.status(201).json({
         success: true,
         message: 'Application submitted successfully',
@@ -574,12 +585,16 @@ exports.applyToJob = async (req, res) => {
 
     await application.save();
 
-    // Best-effort notification
-    Notification.create({
+    // Send persistent event notification (non-blocking)
+    sendNotification({
       collegeId: req.collegeId,
-      message: `New application submitted for ${job.title} at ${job.company}`,
-      target: 'ALL'
-    }).catch(err => logger.warn('Application notification error:', err.message));
+      studentId: req.user.id,
+      title: 'Application Submitted',
+      message: `Your application for ${job.title} at ${job.company} has been submitted.`,
+      type: 'APPLICATION_SUBMITTED',
+      applicationId: application._id,
+      jobId: job._id
+    });
 
     res.status(201).json({
       success: true,
@@ -695,6 +710,17 @@ exports.withdrawApplication = async (req, res) => {
       }
 
       const updated = memoryDb.updateApplication(app._id, { status: 'WITHDRAWN' });
+
+      sendNotification({
+        collegeId: req.collegeId,
+        studentId: req.user.id,
+        title: 'Application Withdrawn',
+        message: 'You have withdrawn your job application.',
+        type: 'APPLICATION_WITHDRAWN',
+        applicationId: app._id,
+        jobId: app.jobId
+      });
+
       return res.json({
         success: true,
         message: 'Application withdrawn successfully',
@@ -723,6 +749,16 @@ exports.withdrawApplication = async (req, res) => {
     application.status = 'WITHDRAWN';
     await application.save();
 
+    sendNotification({
+      collegeId: req.collegeId,
+      studentId: req.user.id,
+      title: 'Application Withdrawn',
+      message: 'You have withdrawn your job application.',
+      type: 'APPLICATION_WITHDRAWN',
+      applicationId: application._id,
+      jobId: application.jobId
+    });
+
     res.json({
       success: true,
       message: 'Application withdrawn successfully',
@@ -731,5 +767,63 @@ exports.withdrawApplication = async (req, res) => {
   } catch (error) {
     logger.error('Withdraw application error:', error);
     res.status(500).json({ success: false, message: 'Server error withdrawing application' });
+  }
+};
+
+/**
+ * GET /api/student/analytics/placement
+ * Student-only — get placement telemetry for authenticated student
+ */
+exports.getPlacementTelemetry = async (req, res) => {
+  try {
+    if (!memoryDb.isMongoConnected()) {
+      const stats = memoryDb.getStudentApplicationStats(req.collegeId, req.user.id);
+      return res.json({
+        success: true,
+        data: stats
+      });
+    }
+
+    const applications = await Application.find({
+      collegeId: req.collegeId,
+      studentId: req.user.id
+    });
+
+    const byStatus = {
+      APPLIED: 0,
+      SHORTLISTED: 0,
+      REJECTED: 0,
+      SELECTED: 0,
+      WITHDRAWN: 0
+    };
+
+    applications.forEach(app => {
+      if (byStatus[app.status] !== undefined) {
+        byStatus[app.status]++;
+      }
+    });
+
+    const totalApplications = applications.length;
+    const activeApplications = byStatus.APPLIED + byStatus.SHORTLISTED;
+    const selectedApplications = byStatus.SELECTED;
+    const shortlistedApplications = byStatus.SHORTLISTED;
+    const rejectedApplications = byStatus.REJECTED;
+    const withdrawnApplications = byStatus.WITHDRAWN;
+
+    res.json({
+      success: true,
+      data: {
+        totalApplications,
+        activeApplications,
+        selectedApplications,
+        shortlistedApplications,
+        rejectedApplications,
+        withdrawnApplications,
+        byStatus
+      }
+    });
+  } catch (error) {
+    logger.error('Get student telemetry error:', error);
+    res.status(500).json({ success: false, message: 'Server error retrieving placement telemetry' });
   }
 };

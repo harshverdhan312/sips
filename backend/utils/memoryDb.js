@@ -14,6 +14,7 @@ class MemoryDatabase {
     this.auditLogs = [];
     this.matches = [];
     this.applications = [];
+    this.notifications = [];
     this._idCounter = 1000;
   }
 
@@ -311,11 +312,133 @@ class MemoryDatabase {
     return newApp;
   }
 
-  updateApplication(id, updates) {
-    const app = this.findApplicationById(id);
-    if (!app) return null;
-    Object.assign(app, updates, { updatedAt: new Date() });
-    return app;
+  // ==========================================
+  // Notification Operations
+  // ==========================================
+  findNotificationById(id) {
+    return this.notifications.find(n => String(n._id) === String(id));
+  }
+
+  getNotifications(collegeId, filters = {}) {
+    let list = this.notifications.filter(n => String(n.collegeId) === String(collegeId));
+
+    if (filters.studentId) {
+      const sid = String(filters.studentId);
+      list = list.filter(n =>
+        (n.studentId && String(n.studentId) === sid) ||
+        n.target === 'ALL' ||
+        n.target === 'STUDENTS'
+      );
+    }
+
+    if (filters.read !== undefined) {
+      const isRead = filters.read === true || filters.read === 'true';
+      list = list.filter(n => n.read === isRead);
+    }
+
+    return list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }
+
+  saveNotification(data) {
+    const newNotif = {
+      _id: data._id || this.nextId('notif_'),
+      collegeId: data.collegeId,
+      studentId: data.studentId || null,
+      title: data.title || '',
+      message: data.message,
+      type: data.type || 'ANNOUNCEMENT',
+      target: data.target || (data.studentId ? 'INDIVIDUAL' : 'ALL'),
+      applicationId: data.applicationId || null,
+      jobId: data.jobId || null,
+      read: data.read || false,
+      readAt: data.readAt || null,
+      createdAt: data.createdAt || new Date(),
+      updatedAt: new Date()
+    };
+    this.notifications.unshift(newNotif);
+    return newNotif;
+  }
+
+  updateNotification(id, updates) {
+    const notif = this.findNotificationById(id);
+    if (!notif) return null;
+    Object.assign(notif, updates, { updatedAt: new Date() });
+    return notif;
+  }
+
+  markAllNotificationsAsRead(collegeId, studentId) {
+    let count = 0;
+    this.notifications.forEach(n => {
+      if (String(n.collegeId) === String(collegeId)) {
+        if (!studentId || (n.studentId && String(n.studentId) === String(studentId))) {
+          if (!n.read) {
+            n.read = true;
+            n.readAt = new Date();
+            n.updatedAt = new Date();
+            count++;
+          }
+        }
+      }
+    });
+    return count;
+  }
+
+  // ==========================================
+  // Telemetry Operations
+  // ==========================================
+  getStudentApplicationStats(collegeId, studentId) {
+    const apps = this.getStudentApplications(collegeId, studentId);
+    const byStatus = {
+      APPLIED: 0,
+      SHORTLISTED: 0,
+      REJECTED: 0,
+      SELECTED: 0,
+      WITHDRAWN: 0
+    };
+
+    apps.forEach(a => {
+      if (byStatus[a.status] !== undefined) {
+        byStatus[a.status]++;
+      }
+    });
+
+    return {
+      totalApplications: apps.length,
+      activeApplications: byStatus.APPLIED + byStatus.SHORTLISTED,
+      selectedApplications: byStatus.SELECTED,
+      shortlistedApplications: byStatus.SHORTLISTED,
+      rejectedApplications: byStatus.REJECTED,
+      withdrawnApplications: byStatus.WITHDRAWN,
+      byStatus
+    };
+  }
+
+  getCollegeApplicationStats(collegeId) {
+    const apps = this.applications.filter(a => String(a.collegeId) === String(collegeId));
+    const byStatus = {
+      APPLIED: 0,
+      SHORTLISTED: 0,
+      REJECTED: 0,
+      SELECTED: 0,
+      WITHDRAWN: 0
+    };
+
+    apps.forEach(a => {
+      if (byStatus[a.status] !== undefined) {
+        byStatus[a.status]++;
+      }
+    });
+
+    return {
+      total: apps.length,
+      active: byStatus.APPLIED + byStatus.SHORTLISTED,
+      selected: byStatus.SELECTED,
+      shortlisted: byStatus.SHORTLISTED,
+      rejected: byStatus.REJECTED,
+      withdrawn: byStatus.WITHDRAWN,
+      applied: byStatus.APPLIED,
+      byStatus
+    };
   }
 
   // ==========================================
