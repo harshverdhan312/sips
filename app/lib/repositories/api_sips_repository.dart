@@ -260,6 +260,36 @@ class ApiSipsRepository implements SipsRepository {
   }
 
   // ==========================================
+  // 6b. Profile Image Upload & Delete (LIVE)
+  // ==========================================
+  @override
+  Future<String> uploadProfileImage(List<int> bytes, String filename) async {
+    final response = await _apiClient.uploadMultipart(
+      '/api/student/profile/image',
+      fieldName: 'image',
+      fileBytes: bytes,
+      filename: filename,
+    );
+
+    if (response is Map<String, dynamic> && response['profileImageUrl'] != null) {
+      final imageUrl = response['profileImageUrl'] as String;
+      if (_cachedProfile != null) {
+        _cachedProfile = _cachedProfile!.copyWith(profileImageUrl: imageUrl);
+      }
+      return imageUrl;
+    }
+    throw Exception('Profile image upload did not return a valid URL');
+  }
+
+  @override
+  Future<void> deleteProfileImage() async {
+    await _apiClient.delete('/api/student/profile/image');
+    if (_cachedProfile != null) {
+      _cachedProfile = _cachedProfile!.copyWith(profileImageUrl: '');
+    }
+  }
+
+  // ==========================================
   // 7. Unsupported Features (No backend capability)
   // ==========================================
   @override

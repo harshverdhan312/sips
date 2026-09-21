@@ -37,5 +37,7 @@ abstract class SipsRepository {
   Future<List<PlacementAlert>> getPlacementAlerts();
   Future<void> markAlertAsRead(String alertId);
   Future<String> uploadResume(List<int> bytes, String filename);
+  Future<String> uploadProfileImage(List<int> bytes, String filename);
+  Future<void> deleteProfileImage();
 }
 

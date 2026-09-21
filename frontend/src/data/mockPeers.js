@@ -2,7 +2,7 @@ export const mockPeersList = [
   {
     id: "peer_01",
     name: "Rohan Deshmukh",
-    avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+    avatar: null,
     branch: "Computer Science & Engineering",
     batch: "2025",
     cgpa: 8.6,
@@ -19,7 +19,7 @@ export const mockPeersList = [
   {
     id: "peer_02",
     name: "Priya Sundaram",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
+    avatar: null,
     branch: "Information Technology",
     batch: "2025",
     cgpa: 8.9,
@@ -36,7 +36,7 @@ export const mockPeersList = [
   {
     id: "peer_03",
     name: "Karthik Nair",
-    avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=80",
+    avatar: null,
     branch: "Artificial Intelligence & ML",
     batch: "2025",
     cgpa: 8.4,
@@ -53,7 +53,7 @@ export const mockPeersList = [
   {
     id: "peer_04",
     name: "Divya Patel",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    avatar: null,
     branch: "Electronics & Communication",
     batch: "2025",
     cgpa: 8.1,

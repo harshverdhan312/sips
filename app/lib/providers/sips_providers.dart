@@ -207,6 +207,17 @@ class ProfileNotifier extends StateNotifier<AsyncValue<StudentProfile>> {
     await loadProfile();
     return url;
   }
+
+  Future<String> uploadProfileImage(List<int> bytes, String filename) async {
+    final url = await _repository.uploadProfileImage(bytes, filename);
+    await loadProfile();
+    return url;
+  }
+
+  Future<void> deleteProfileImage() async {
+    await _repository.deleteProfileImage();
+    await loadProfile();
+  }
 }
 
 final studentProfileProvider = StateNotifierProvider<ProfileNotifier, AsyncValue<StudentProfile>>((ref) {

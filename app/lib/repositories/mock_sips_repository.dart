@@ -162,4 +162,16 @@ class MockSipsRepository implements SipsRepository {
     );
     return _profile.resumeUrl;
   }
+
+  @override
+  Future<String> uploadProfileImage(List<int> bytes, String filename) async {
+    final imageUrl = '/uploads/$filename';
+    _profile = _profile.copyWith(profileImageUrl: imageUrl);
+    return imageUrl;
+  }
+
+  @override
+  Future<void> deleteProfileImage() async {
+    _profile = _profile.copyWith(profileImageUrl: '');
+  }
 }

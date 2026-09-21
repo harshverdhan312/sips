@@ -27,6 +27,7 @@ const studentSchema = new mongoose.Schema({
   notes: { type: String, default: '' },
   github: { type: String, trim: true, default: '' },
   resumeUrl: { type: String, default: '' },
+  profileImageUrl: { type: String, default: null },
   age: { type: Number, default: null },
   internships: { type: Number, default: null, min: 0 },
   hostel: { type: Boolean, default: null },

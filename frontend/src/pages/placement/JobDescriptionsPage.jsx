@@ -22,6 +22,7 @@ import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
 import { Modal } from "../../components/common/Modal";
 import { ProgressBar } from "../../components/common/ProgressBar";
+import Avatar from "../../components/common/Avatar";
 import { useNotifications } from "../../context/NotificationContext";
 
 export function JobDescriptionsPage() {
@@ -443,10 +444,11 @@ export function JobDescriptionsPage() {
                             <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-800 font-bold flex items-center justify-center text-xs shrink-0">
                               {m.rank || idx + 1}
                             </span>
-                            <img
-                              src={m.student?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(m.student?.name || "Student")}`}
-                              alt={m.student?.name || "Student"}
-                              className="w-7 h-7 rounded-full object-cover border border-slate-200 shrink-0"
+                            <Avatar
+                              src={m.student?.profileImageUrl || m.student?.avatar}
+                              name={m.student?.name || "Candidate"}
+                              size="xs"
+                              className="w-7 h-7 border border-slate-200 shrink-0"
                             />
                             <div>
                               <p className="font-bold text-slate-900">{m.student?.name || "Candidate"}</p>
@@ -513,10 +515,12 @@ export function JobDescriptionsPage() {
         {activeStudent && (
           <div className="space-y-4">
             <div className="flex items-center gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-100">
-              <img
-                src={activeStudent.avatar}
-                alt={activeStudent.name}
-                className="w-12 h-12 rounded-xl object-cover border border-slate-200"
+              <Avatar
+                src={activeStudent.profileImageUrl || activeStudent.avatar}
+                name={activeStudent.name}
+                size="lg"
+                variant="rounded"
+                className="w-12 h-12 rounded-xl border border-slate-200 shrink-0"
               />
               <div className="flex-1">
                 <h4 className="font-bold text-slate-900 text-sm">{activeStudent.name}</h4>

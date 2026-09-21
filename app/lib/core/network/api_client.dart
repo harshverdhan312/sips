@@ -119,6 +119,21 @@ class ApiClient {
     }
   }
 
+  Future<dynamic> delete(String path) async {
+    try {
+      final uri = _buildUri(path);
+      final headers = await _getHeaders();
+      final response = await _client.delete(
+        uri,
+        headers: headers,
+      );
+      return _handleResponse(response);
+    } catch (e) {
+      if (e is ApiException) rethrow;
+      throw ApiException(message: 'Network error: ${e.toString()}');
+    }
+  }
+
   Future<dynamic> uploadMultipart(
     String path, {
     required String fieldName,

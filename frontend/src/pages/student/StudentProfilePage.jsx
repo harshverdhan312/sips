@@ -22,19 +22,26 @@ import {
   Sparkles,
   Cpu,
   TrendingUp,
-  RefreshCw
+  RefreshCw,
+  Camera,
+  X,
+  ImageIcon
 } from "lucide-react";
+import Avatar from "../../components/common/Avatar";
 import { studentService } from "../../services/studentService";
 import { Card, CardHeader } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
 import { DashboardSkeleton } from "../../components/common/LoadingSkeleton";
 import { useNotifications } from "../../context/NotificationContext";
+import { useAuth } from "../../context/AuthContext";
 
 export function StudentProfilePage() {
   const { showSuccess, showError, showWarning } = useNotifications();
+  const { updateUser } = useAuth();
   const [student, setStudent] = useState(null);
   const [prediction, setPrediction] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [isEditingSkills, setIsEditingSkills] = useState(false);
   const [isEditingGithub, setIsEditingGithub] = useState(false);
   const [isEditingPlacement, setIsEditingPlacement] = useState(false);
@@ -205,13 +212,59 @@ export function StudentProfilePage() {
     }
   };
 
-  const initials = (student.name || "ST")
-    .trim()
-    .split(/\s+/)
-    .map((n) => n[0] || "")
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    if (!allowedTypes.includes(file.type)) {
+      showError("Please upload a valid image (JPEG, PNG, WebP, or GIF).");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      showError("Image size exceeds the 5MB limit.");
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      const res = await studentService.uploadProfileImage(file);
+      const updated = await studentService.getCurrentStudent();
+      setStudent(updated);
+      updateUser({
+        avatar: updated.avatar || res.profileImageUrl,
+        profileImageUrl: updated.profileImageUrl || res.profileImageUrl
+      });
+      showSuccess("Profile photo updated successfully.");
+    } catch (err) {
+      console.error(err);
+      showError(err.message || "Failed to upload profile photo.");
+    } finally {
+      setUploadingImage(false);
+      // Reset input value so same file can be re-selected if needed
+      e.target.value = "";
+    }
+  };
+
+  const handleImageDelete = async () => {
+    setUploadingImage(true);
+    try {
+      await studentService.deleteProfileImage();
+      const updated = await studentService.getCurrentStudent();
+      setStudent(updated);
+      updateUser({
+        avatar: null,
+        profileImageUrl: null
+      });
+      showSuccess("Profile photo removed.");
+    } catch (err) {
+      console.error(err);
+      showError(err.message || "Failed to remove profile photo.");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -221,9 +274,54 @@ export function StudentProfilePage() {
         <div className="px-6 pb-6 pt-0 relative">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div className="-mt-12 sm:-mt-14 w-20 h-20 sm:w-24 sm:h-24 rounded-2xl sm:rounded-3xl bg-indigo-600 text-white text-xl sm:text-2xl font-extrabold flex items-center justify-center border-4 border-white shadow-md shrink-0 relative z-10">
-                {initials}
+              {/* Interactive Avatar Container */}
+              <div className="-mt-12 sm:-mt-14 relative group shrink-0 z-10">
+                <Avatar
+                  src={student.profileImageUrl || student.avatar}
+                  name={student.name}
+                  size="2xl"
+                  variant="rounded"
+                  className="w-20 h-20 sm:w-24 sm:h-24 border-4 border-white shadow-md rounded-2xl sm:rounded-3xl"
+                />
+                
+                {/* Upload Overlay / Trigger */}
+                <label
+                  htmlFor="profile-image-input"
+                  className={`absolute inset-0 rounded-2xl sm:rounded-3xl bg-slate-900/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white cursor-pointer transition-opacity border-4 border-white ${
+                    uploadingImage ? "opacity-100" : ""
+                  }`}
+                  title="Upload profile photo"
+                >
+                  {uploadingImage ? (
+                    <RefreshCw className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <Camera className="w-5 h-5 mb-0.5" />
+                      <span className="text-[10px] font-bold">Change</span>
+                    </>
+                  )}
+                </label>
+                <input
+                  id="profile-image-input"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                  disabled={uploadingImage}
+                />
+
+                {/* Remove button badge if image is uploaded */}
+                {(student.profileImageUrl || student.avatar) && !uploadingImage && (
+                  <button
+                    onClick={handleImageDelete}
+                    className="absolute -top-1 -right-1 p-1 bg-rose-600 text-white rounded-full shadow-md hover:bg-rose-700 transition-colors cursor-pointer border-2 border-white z-20"
+                    title="Remove photo"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
               </div>
+
               <div className="pt-1 sm:pt-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <h1 className="text-2xl font-black text-slate-900">{student.name}</h1>
