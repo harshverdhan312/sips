@@ -58,7 +58,7 @@ exports.registerCollege = async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     const masterPasswordHash = await bcrypt.hash(masterPassword, salt);
-    const secret = process.env.JWT_SECRET || 'sips-dev-secret-key-2025';
+    const config = require('../config');
 
     // 1. Mongoose Connected Mode
     if (memoryDb.isMongoConnected()) {
@@ -96,8 +96,8 @@ exports.registerCollege = async (req, res) => {
           collegeSlug: college.slug,
           email: college.adminEmail
         },
-        secret,
-        { expiresIn: '7d' }
+        config.jwtSecret,
+        { expiresIn: config.jwtExpiresIn }
       );
 
       return res.status(201).json({ 
@@ -135,8 +135,8 @@ exports.registerCollege = async (req, res) => {
         collegeSlug: memoryCollege.slug,
         email: memoryCollege.adminEmail
       },
-      secret,
-      { expiresIn: '7d' }
+      config.jwtSecret,
+      { expiresIn: config.jwtExpiresIn }
     );
 
     return res.status(201).json({ 

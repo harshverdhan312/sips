@@ -33,6 +33,10 @@ export const studentService = {
           github: student.github || "",
           resumeUrl: student.resumeUrl || "",
           skills: skillsList,
+          age: typeof student.age === 'number' ? student.age : null,
+          internships: typeof student.internships === 'number' ? student.internships : null,
+          hostel: typeof student.hostel === 'boolean' ? student.hostel : null,
+          historyOfBacklogs: typeof student.historyOfBacklogs === 'number' ? student.historyOfBacklogs : null,
           metrics: {
             employabilityIndex: readiness,
             placementProbability: student.placementStatus === 'PLACED' ? 100 : readiness,
@@ -61,14 +65,36 @@ export const studentService = {
    */
   async updateCurrentStudent(updatedFields) {
     try {
-      const res = await api.put('/api/student/profile', {
-        skills: updatedFields.skills,
-        github: updatedFields.github,
-        newPassword: updatedFields.newPassword
-      });
+      const res = await api.put('/api/student/profile', updatedFields);
       return res.student || res;
     } catch (e) {
       console.error("Failed to update student profile:", e);
+      throw e;
+    }
+  },
+
+  /**
+   * Fetch current/latest placement prediction from backend
+   */
+  async getPlacementPrediction() {
+    try {
+      const res = await api.get('/api/student/analytics/placement/prediction');
+      return res?.prediction || null;
+    } catch (e) {
+      console.warn("Could not fetch placement prediction:", e.message);
+      return null;
+    }
+  },
+
+  /**
+   * Request/calculate placement prediction via ML pipeline
+   */
+  async requestPlacementPrediction() {
+    try {
+      const res = await api.post('/api/student/analytics/placement/predict');
+      return res?.prediction || res;
+    } catch (e) {
+      console.error("Failed to calculate placement prediction:", e);
       throw e;
     }
   },

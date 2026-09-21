@@ -62,6 +62,10 @@ void main() {
         initialProfile.copyWith(
           skills: ['Dart', 'Flutter', 'Go', 'Kubernetes'],
           githubHandle: 'aarav-new-dev',
+          age: 21,
+          internships: 2,
+          hostel: true,
+          historyOfBacklogs: 0,
         ),
       );
 
@@ -69,10 +73,77 @@ void main() {
       final sentBody = jsonDecode((capturedRequest as http.Request).body) as Map<String, dynamic>;
       expect(sentBody['skills'], ['Dart', 'Flutter', 'Go', 'Kubernetes']);
       expect(sentBody['github'], 'aarav-new-dev');
+      expect(sentBody['age'], 21);
+      expect(sentBody['internships'], 2);
+      expect(sentBody['hostel'], true);
+      expect(sentBody['historyOfBacklogs'], 0);
 
       expect(updated.skills, contains('Kubernetes'));
       expect(updated.githubHandle, 'aarav-new-dev');
       expect(updated.readinessScore, 85);
+    });
+
+    test('updateStudentProfile persists placement profile attributes accurately', () async {
+      late http.BaseRequest capturedRequest;
+      final mockClient = MockClient((request) async {
+        if (request.method == 'PUT' && request.url.path == '/api/student/profile') {
+          capturedRequest = request;
+          final parsed = jsonDecode(request.body) as Map<String, dynamic>;
+          return http.Response(
+            jsonEncode({
+              'message': 'Profile updated',
+              'student': {
+                '_id': 'st_202',
+                'name': 'Priya Nair',
+                'email': 'priya@eng.edu',
+                'branch': 'Information Technology',
+                'cgpa': 9.1,
+                'age': parsed['age'],
+                'internships': parsed['internships'],
+                'hostel': parsed['hostel'],
+                'historyOfBacklogs': parsed['historyOfBacklogs'],
+                'skills': ['Python', 'SQL'],
+              }
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        return http.Response('Not Found', 404);
+      });
+
+      final apiClient = ApiClient(client: mockClient, baseUrl: 'http://localhost:5000');
+      final repo = ApiSipsRepository(apiClient);
+
+      const profile = StudentProfile(
+        id: 'st_202',
+        name: 'Priya Nair',
+        email: 'priya@eng.edu',
+        branch: 'Information Technology',
+        cgpa: 9.1,
+        skills: ['Python', 'SQL'],
+      );
+
+      final updated = await repo.updateStudentProfile(
+        profile.copyWith(
+          age: 22,
+          internships: 1,
+          hostel: false,
+          historyOfBacklogs: 0,
+        ),
+      );
+
+      expect(capturedRequest.method, 'PUT');
+      final sentBody = jsonDecode((capturedRequest as http.Request).body) as Map<String, dynamic>;
+      expect(sentBody['age'], 22);
+      expect(sentBody['internships'], 1);
+      expect(sentBody['hostel'], false);
+      expect(sentBody['historyOfBacklogs'], 0);
+
+      expect(updated.age, 22);
+      expect(updated.internships, 1);
+      expect(updated.hostel, false);
+      expect(updated.historyOfBacklogs, 0);
     });
 
     test('uploadResume uploads PDF multipart and updates resumeUrl in repository', () async {

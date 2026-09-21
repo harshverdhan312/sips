@@ -105,7 +105,11 @@ void main() {
         'resumeScore': 84,
         'skills': ['React', 'Node.js', 'Python', 'SQL'],
         'github': 'https://github.com/aarav',
-        'resumeUrl': '/uploads/aarav_resume.pdf'
+        'resumeUrl': '/uploads/aarav_resume.pdf',
+        'age': 21,
+        'internships': 2,
+        'hostel': true,
+        'historyOfBacklogs': 0
       };
 
       final profile = StudentProfile.fromBackendJson(backendJson, collegeName: 'RV College of Engineering');
@@ -119,6 +123,10 @@ void main() {
       expect(profile.skills, contains('React'));
       expect(profile.resumeUrl, '/uploads/aarav_resume.pdf');
       expect(profile.resumeVersion, 'Uploaded Resume');
+      expect(profile.age, 21);
+      expect(profile.internships, 2);
+      expect(profile.hostel, true);
+      expect(profile.historyOfBacklogs, 0);
     });
 
     test('Backend Job JSON maps accurately to JobOpportunity with matches', () {

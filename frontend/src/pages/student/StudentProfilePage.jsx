@@ -14,7 +14,15 @@ import {
   FileText,
   Upload,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Building2,
+  Calendar,
+  History,
+  Home,
+  Sparkles,
+  Cpu,
+  TrendingUp,
+  RefreshCw
 } from "lucide-react";
 import { studentService } from "../../services/studentService";
 import { Card, CardHeader } from "../../components/common/Card";
@@ -26,12 +34,19 @@ import { useNotifications } from "../../context/NotificationContext";
 export function StudentProfilePage() {
   const { showSuccess, showError, showWarning } = useNotifications();
   const [student, setStudent] = useState(null);
+  const [prediction, setPrediction] = useState(null);
   const [isEditingSkills, setIsEditingSkills] = useState(false);
   const [isEditingGithub, setIsEditingGithub] = useState(false);
+  const [isEditingPlacement, setIsEditingPlacement] = useState(false);
   const [skillsList, setSkillsList] = useState([]);
   const [newSkill, setNewSkill] = useState("");
   const [githubHandle, setGithubHandle] = useState("");
+  const [ageInput, setAgeInput] = useState("");
+  const [internshipsInput, setInternshipsInput] = useState("");
+  const [hostelInput, setHostelInput] = useState("");
+  const [backlogsInput, setBacklogsInput] = useState("");
   const [saving, setSaving] = useState(false);
+  const [calculatingPrediction, setCalculatingPrediction] = useState(false);
   const [uploadingResume, setUploadingResume] = useState(false);
 
   useEffect(() => {
@@ -41,6 +56,14 @@ export function StudentProfilePage() {
         setStudent(data);
         setSkillsList(data.skills || []);
         setGithubHandle(data.github || "");
+        setAgeInput(data.age !== null && data.age !== undefined ? String(data.age) : "");
+        setInternshipsInput(data.internships !== null && data.internships !== undefined ? String(data.internships) : "");
+        setHostelInput(data.hostel === true ? "true" : (data.hostel === false ? "false" : ""));
+        setBacklogsInput(data.historyOfBacklogs !== null && data.historyOfBacklogs !== undefined ? String(data.historyOfBacklogs) : "");
+      }
+      const pred = await studentService.getPlacementPrediction();
+      if (pred) {
+        setPrediction(pred);
       }
     }
     load();
@@ -77,6 +100,80 @@ export function StudentProfilePage() {
       showError(e.message || "Failed to save GitHub handle. Please try again.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSavePlacement = async () => {
+    // Client-side validations
+    let parsedAge = null;
+    if (ageInput.trim() !== "") {
+      const a = parseInt(ageInput.trim(), 10);
+      if (isNaN(a) || a < 16 || a > 100) {
+        showError("Invalid age: Age must be an integer between 16 and 100.");
+        return;
+      }
+      parsedAge = a;
+    }
+
+    let parsedInternships = null;
+    if (internshipsInput.trim() !== "") {
+      const i = parseInt(internshipsInput.trim(), 10);
+      if (isNaN(i) || i < 0 || i > 20) {
+        showError("Invalid internships: Must be a non-negative integer between 0 and 20.");
+        return;
+      }
+      parsedInternships = i;
+    }
+
+    let parsedHostel = null;
+    if (hostelInput === "true") parsedHostel = true;
+    else if (hostelInput === "false") parsedHostel = false;
+
+    let parsedBacklogs = null;
+    if (backlogsInput.trim() !== "") {
+      const b = parseInt(backlogsInput.trim(), 10);
+      if (isNaN(b) || b < 0 || b > 50) {
+        showError("Invalid backlogs: Must be a non-negative integer between 0 and 50.");
+        return;
+      }
+      parsedBacklogs = b;
+    }
+
+    setSaving(true);
+    try {
+      await studentService.updateCurrentStudent({
+        age: parsedAge,
+        internships: parsedInternships,
+        hostel: parsedHostel,
+        historyOfBacklogs: parsedBacklogs
+      });
+      const updated = await studentService.getCurrentStudent();
+      setStudent(updated);
+      setIsEditingPlacement(false);
+      showSuccess("Placement information updated successfully.");
+    } catch (e) {
+      console.error(e);
+      showError(e.message || "Failed to save placement information.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCalculatePrediction = async () => {
+    setCalculatingPrediction(true);
+    try {
+      const res = await studentService.requestPlacementPrediction();
+      if (res && res.prediction) {
+        setPrediction(res.prediction);
+        showSuccess("Placement likelihood prediction computed successfully!");
+      } else {
+        showError("Could not retrieve prediction result.");
+      }
+    } catch (err) {
+      console.error(err);
+      showError(err.message || "Failed to calculate placement prediction.");
+    } finally {
+      setCalculatingPrediction(false);
     }
   };
 
@@ -333,6 +430,252 @@ export function StudentProfilePage() {
           </div>
         </Card>
       </div>
+
+      {/* Placement Profile Information */}
+      <Card>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="font-bold text-slate-900 text-base">Placement Profile Information</h3>
+            <p className="text-xs text-slate-500">Candidate placement attributes used for predictive analysis and institutional campus eligibility</p>
+          </div>
+          {!isEditingPlacement ? (
+            <Button
+              variant="outline"
+              size="xs"
+              icon={Edit2}
+              onClick={() => {
+                setAgeInput(student.age !== null && student.age !== undefined ? String(student.age) : "");
+                setInternshipsInput(student.internships !== null && student.internships !== undefined ? String(student.internships) : "");
+                setHostelInput(student.hostel === true ? "true" : (student.hostel === false ? "false" : ""));
+                setBacklogsInput(student.historyOfBacklogs !== null && student.historyOfBacklogs !== undefined ? String(student.historyOfBacklogs) : "");
+                setIsEditingPlacement(true);
+              }}
+            >
+              Edit Placement Info
+            </Button>
+          ) : (
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={() => {
+                  setAgeInput(student.age !== null && student.age !== undefined ? String(student.age) : "");
+                  setInternshipsInput(student.internships !== null && student.internships !== undefined ? String(student.internships) : "");
+                  setHostelInput(student.hostel === true ? "true" : (student.hostel === false ? "false" : ""));
+                  setBacklogsInput(student.historyOfBacklogs !== null && student.historyOfBacklogs !== undefined ? String(student.historyOfBacklogs) : "");
+                  setIsEditingPlacement(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                size="xs"
+                icon={Check}
+                loading={saving}
+                onClick={handleSavePlacement}
+              >
+                Save
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {isEditingPlacement ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Age (Years)</label>
+              <input
+                type="number"
+                min="16"
+                max="100"
+                placeholder="e.g. 21"
+                value={ageInput}
+                onChange={(e) => setAgeInput(e.target.value)}
+                className="w-full px-3 py-1.5 rounded-xl border border-slate-200 text-xs bg-white"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Internships Completed</label>
+              <input
+                type="number"
+                min="0"
+                max="20"
+                placeholder="e.g. 1"
+                value={internshipsInput}
+                onChange={(e) => setInternshipsInput(e.target.value)}
+                className="w-full px-3 py-1.5 rounded-xl border border-slate-200 text-xs bg-white"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Hostel Status</label>
+              <select
+                value={hostelInput}
+                onChange={(e) => setHostelInput(e.target.value)}
+                className="w-full px-3 py-1.5 rounded-xl border border-slate-200 text-xs bg-white"
+              >
+                <option value="">Unset / Not Specified</option>
+                <option value="true">Yes - Hostel Resident</option>
+                <option value="false">No - Day Scholar</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">History of Backlogs</label>
+              <input
+                type="number"
+                min="0"
+                max="50"
+                placeholder="e.g. 0"
+                value={backlogsInput}
+                onChange={(e) => setBacklogsInput(e.target.value)}
+                className="w-full px-3 py-1.5 rounded-xl border border-slate-200 text-xs bg-white"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center font-bold text-indigo-600 shrink-0">
+                <Calendar className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Age</p>
+                <p className="text-sm font-bold text-slate-900 mt-0.5">
+                  {student.age !== null && student.age !== undefined ? `${student.age} years` : <span className="text-slate-400 font-normal italic">Not set</span>}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center font-bold text-indigo-600 shrink-0">
+                <Briefcase className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Internships</p>
+                <p className="text-sm font-bold text-slate-900 mt-0.5">
+                  {student.internships !== null && student.internships !== undefined ? `${student.internships} completed` : <span className="text-slate-400 font-normal italic">Not set</span>}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center font-bold text-indigo-600 shrink-0">
+                <Home className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Accommodation</p>
+                <p className="text-sm font-bold text-slate-900 mt-0.5">
+                  {student.hostel === true ? "Hostel Resident" : (student.hostel === false ? "Day Scholar" : <span className="text-slate-400 font-normal italic">Not set</span>)}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center font-bold text-indigo-600 shrink-0">
+                <History className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Backlog History</p>
+                <p className="text-sm font-bold text-slate-900 mt-0.5">
+                  {student.historyOfBacklogs !== null && student.historyOfBacklogs !== undefined ? (student.historyOfBacklogs === 0 ? "0 (Clean Record)" : `${student.historyOfBacklogs} backlog(s)`) : <span className="text-slate-400 font-normal italic">Not set</span>}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </Card>
+
+      {/* ML Placement Likelihood Prediction Hub */}
+      <Card>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-indigo-600" />
+              <h3 className="font-bold text-slate-900 text-base">ML Placement Likelihood Prediction</h3>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Trained institutional machine learning model prediction based on academic & demographic profile inputs
+            </p>
+          </div>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handleCalculatePrediction}
+            disabled={calculatingPrediction}
+            className="shrink-0"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${calculatingPrediction ? "animate-spin" : ""}`} />
+            {calculatingPrediction ? "Predicting..." : (prediction ? "Recalculate Prediction" : "Run ML Prediction")}
+          </Button>
+        </div>
+
+        {prediction ? (
+          <div className="space-y-4">
+            <div className="p-4 rounded-xl border border-indigo-100 bg-indigo-50/40">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Classification Outcome</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Badge variant={prediction.predictedClass === 1 ? "success" : "neutral"} size="md">
+                      {prediction.predictedLabel}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Placement Likelihood</p>
+                  <p className="text-xl font-black text-indigo-700 mt-0.5">
+                    {(prediction.placementProbability * 100).toFixed(1)}%
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Decision Threshold</p>
+                  <p className="text-sm font-bold text-slate-700 mt-1">
+                    {(prediction.decisionThreshold * 100).toFixed(0)}% ({prediction.decisionThreshold})
+                  </p>
+                </div>
+              </div>
+
+              {/* Likelihood Progress Bar */}
+              <div className="mt-4 pt-3 border-t border-indigo-100/80">
+                <div className="flex justify-between items-center text-xs font-semibold text-slate-600 mb-1.5">
+                  <span>Confidence Gauge</span>
+                  <span>{(prediction.placementProbability * 100).toFixed(1)}%</span>
+                </div>
+                <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      prediction.placementProbability >= prediction.decisionThreshold
+                        ? "bg-emerald-500"
+                        : "bg-indigo-500"
+                    }`}
+                    style={{ width: `${Math.min(Math.max(prediction.placementProbability * 100, 0), 100)}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 px-1">
+              <span>
+                <strong>Model Version:</strong> {prediction.modelVersion || "Standard"}
+              </span>
+              <span>
+                <strong>Calculated:</strong>{" "}
+                {prediction.createdAt ? new Date(prediction.createdAt).toLocaleString() : "Recently"}
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="p-6 rounded-xl border border-dashed border-slate-300 bg-slate-50/50 text-center">
+            <Cpu className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+            <p className="text-sm font-bold text-slate-700">No ML Placement Prediction Generated</p>
+            <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
+              Ensure your Age, Internships, Accommodation status, and Backlog history above are configured, then click &quot;Run ML Prediction&quot; to compute placement likelihood.
+            </p>
+          </div>
+        )}
+      </Card>
 
       {/* Resume Hub */}
       <Card>

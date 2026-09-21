@@ -6,6 +6,7 @@ import '../models/job_opportunity.dart';
 import '../models/mock_interview.dart';
 import '../models/peer_match.dart';
 import '../models/placement_alert.dart';
+import '../models/placement_prediction.dart';
 import '../models/readiness_metric.dart';
 import '../models/roadmap_milestone.dart';
 import '../models/skill_intelligence.dart';
@@ -132,6 +133,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
         // Reload fresh live data
         _ref.read(studentProfileProvider.notifier).loadProfile();
+        _ref.read(placementPredictionProvider.notifier).loadPrediction();
         _ref.read(opportunitiesProvider.notifier).loadJobs();
         _ref.read(alertsProvider.notifier).loadAlerts();
         _ref.read(readinessProvider.notifier).loadReadiness();
@@ -210,6 +212,43 @@ class ProfileNotifier extends StateNotifier<AsyncValue<StudentProfile>> {
 final studentProfileProvider = StateNotifierProvider<ProfileNotifier, AsyncValue<StudentProfile>>((ref) {
   final repo = ref.watch(sipsRepositoryProvider);
   return ProfileNotifier(repo);
+});
+
+// --- Placement Prediction Provider ---
+class PlacementPredictionNotifier extends StateNotifier<AsyncValue<PlacementPrediction?>> {
+  final SipsRepository _repository;
+
+  PlacementPredictionNotifier(this._repository) : super(const AsyncValue.loading()) {
+    loadPrediction();
+  }
+
+  Future<void> loadPrediction() async {
+    state = const AsyncValue.loading();
+    try {
+      final pred = await _repository.getLatestPlacementPrediction();
+      state = AsyncValue.data(pred);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<PlacementPrediction> requestPrediction() async {
+    state = const AsyncValue.loading();
+    try {
+      final pred = await _repository.requestPlacementPrediction();
+      state = AsyncValue.data(pred);
+      return pred;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+}
+
+final placementPredictionProvider =
+    StateNotifierProvider<PlacementPredictionNotifier, AsyncValue<PlacementPrediction?>>((ref) {
+  final repo = ref.watch(sipsRepositoryProvider);
+  return PlacementPredictionNotifier(repo);
 });
 
 // --- Readiness Metric Provider ---

@@ -27,6 +27,10 @@ const studentSchema = new mongoose.Schema({
   notes: { type: String, default: '' },
   github: { type: String, trim: true, default: '' },
   resumeUrl: { type: String, default: '' },
+  age: { type: Number, default: null },
+  internships: { type: Number, default: null, min: 0 },
+  hostel: { type: Boolean, default: null },
+  historyOfBacklogs: { type: Number, default: null, min: 0 },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

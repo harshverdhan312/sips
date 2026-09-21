@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
-require('dotenv').config();
+const config = require('./config');
+const logger = require('./utils/logger');
 
 const app = express();
 
@@ -12,7 +13,7 @@ const allowedOrigins = [
   'http://localhost:5137',
   'http://localhost:5173',
   'https://sips-six.vercel.app',
-  process.env.FRONTEND_URL
+  config.frontendUrl
 ].filter(Boolean);
 
 app.use(cors({
@@ -141,21 +142,19 @@ app.use((req, res, next) => {
 app.use(require('./middleware/errorHandler'));
 
 // Database Connection & Server Startup
-if (process.env.NODE_ENV !== 'test') {
+if (!config.isTest) {
   mongoose.set('bufferCommands', false);
-  const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/sips';
 
-  mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 5000 })
+  mongoose.connect(config.mongoUri, { serverSelectionTimeoutMS: 5000 })
     .then((conn) => {
-      console.log(`✅ Connected to MongoDB: ${conn.connection.host}/${conn.connection.name}`);
+      logger.info(`✅ Connected to MongoDB: ${conn.connection.host}/${conn.connection.name}`);
     })
     .catch(err => {
-      console.warn(`⚠️  MongoDB connection failed (${err.message}). Running in resilient in-memory mode.`);
+      logger.warn(`⚠️  MongoDB connection failed (${err.message}). Running in resilient in-memory mode.`);
     });
 
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+  app.listen(config.port, () => {
+    logger.info(`🚀 Server running on port ${config.port}`);
   });
 }
 

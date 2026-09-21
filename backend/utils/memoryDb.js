@@ -13,6 +13,9 @@ class MemoryDatabase {
     this.alerts = [];
     this.auditLogs = [];
     this.matches = [];
+    this.applications = [];
+    this.notifications = [];
+    this.placementPredictions = [];
     this._idCounter = 1000;
   }
 
@@ -147,6 +150,10 @@ class MemoryDatabase {
       notes: studentData.notes || '',
       github: studentData.github || '',
       resumeUrl: studentData.resumeUrl || '',
+      age: studentData.age !== undefined ? studentData.age : null,
+      internships: studentData.internships !== undefined ? studentData.internships : null,
+      hostel: studentData.hostel !== undefined ? studentData.hostel : null,
+      historyOfBacklogs: studentData.historyOfBacklogs !== undefined ? studentData.historyOfBacklogs : null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -264,6 +271,182 @@ class MemoryDatabase {
   }
 
   // ==========================================
+  // Application Operations
+  // ==========================================
+  findApplicationById(id) {
+    return this.applications.find(a => String(a._id) === String(id));
+  }
+
+  findApplication(collegeId, studentId, jobId) {
+    return this.applications.find(a => 
+      String(a.collegeId) === String(collegeId) &&
+      String(a.studentId) === String(studentId) &&
+      String(a.jobId) === String(jobId)
+    );
+  }
+
+  getStudentApplications(collegeId, studentId) {
+    return this.applications
+      .filter(a => 
+        String(a.collegeId) === String(collegeId) && 
+        String(a.studentId) === String(studentId)
+      )
+      .sort((a, b) => new Date(b.appliedAt) - new Date(a.appliedAt));
+  }
+
+  getJobApplications(collegeId, jobId) {
+    return this.applications
+      .filter(a => 
+        String(a.collegeId) === String(collegeId) && 
+        String(a.jobId) === String(jobId)
+      )
+      .sort((a, b) => new Date(b.appliedAt) - new Date(a.appliedAt));
+  }
+
+  saveApplication(appData) {
+    const newApp = {
+      _id: appData._id || this.nextId('app_'),
+      collegeId: appData.collegeId,
+      studentId: appData.studentId,
+      jobId: appData.jobId,
+      status: appData.status || 'APPLIED',
+      appliedAt: appData.appliedAt || new Date(),
+      updatedAt: new Date()
+    };
+    this.applications.unshift(newApp);
+    return newApp;
+  }
+
+  // ==========================================
+  // Notification Operations
+  // ==========================================
+  findNotificationById(id) {
+    return this.notifications.find(n => String(n._id) === String(id));
+  }
+
+  getNotifications(collegeId, filters = {}) {
+    let list = this.notifications.filter(n => String(n.collegeId) === String(collegeId));
+
+    if (filters.studentId) {
+      const sid = String(filters.studentId);
+      list = list.filter(n =>
+        (n.studentId && String(n.studentId) === sid) ||
+        n.target === 'ALL' ||
+        n.target === 'STUDENTS'
+      );
+    }
+
+    if (filters.read !== undefined) {
+      const isRead = filters.read === true || filters.read === 'true';
+      list = list.filter(n => n.read === isRead);
+    }
+
+    return list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }
+
+  saveNotification(data) {
+    const newNotif = {
+      _id: data._id || this.nextId('notif_'),
+      collegeId: data.collegeId,
+      studentId: data.studentId || null,
+      title: data.title || '',
+      message: data.message,
+      type: data.type || 'ANNOUNCEMENT',
+      target: data.target || (data.studentId ? 'INDIVIDUAL' : 'ALL'),
+      applicationId: data.applicationId || null,
+      jobId: data.jobId || null,
+      read: data.read || false,
+      readAt: data.readAt || null,
+      createdAt: data.createdAt || new Date(),
+      updatedAt: new Date()
+    };
+    this.notifications.unshift(newNotif);
+    return newNotif;
+  }
+
+  updateNotification(id, updates) {
+    const notif = this.findNotificationById(id);
+    if (!notif) return null;
+    Object.assign(notif, updates, { updatedAt: new Date() });
+    return notif;
+  }
+
+  markAllNotificationsAsRead(collegeId, studentId) {
+    let count = 0;
+    this.notifications.forEach(n => {
+      if (String(n.collegeId) === String(collegeId)) {
+        if (!studentId || (n.studentId && String(n.studentId) === String(studentId))) {
+          if (!n.read) {
+            n.read = true;
+            n.readAt = new Date();
+            n.updatedAt = new Date();
+            count++;
+          }
+        }
+      }
+    });
+    return count;
+  }
+
+  // ==========================================
+  // Telemetry Operations
+  // ==========================================
+  getStudentApplicationStats(collegeId, studentId) {
+    const apps = this.getStudentApplications(collegeId, studentId);
+    const byStatus = {
+      APPLIED: 0,
+      SHORTLISTED: 0,
+      REJECTED: 0,
+      SELECTED: 0,
+      WITHDRAWN: 0
+    };
+
+    apps.forEach(a => {
+      if (byStatus[a.status] !== undefined) {
+        byStatus[a.status]++;
+      }
+    });
+
+    return {
+      totalApplications: apps.length,
+      activeApplications: byStatus.APPLIED + byStatus.SHORTLISTED,
+      selectedApplications: byStatus.SELECTED,
+      shortlistedApplications: byStatus.SHORTLISTED,
+      rejectedApplications: byStatus.REJECTED,
+      withdrawnApplications: byStatus.WITHDRAWN,
+      byStatus
+    };
+  }
+
+  getCollegeApplicationStats(collegeId) {
+    const apps = this.applications.filter(a => String(a.collegeId) === String(collegeId));
+    const byStatus = {
+      APPLIED: 0,
+      SHORTLISTED: 0,
+      REJECTED: 0,
+      SELECTED: 0,
+      WITHDRAWN: 0
+    };
+
+    apps.forEach(a => {
+      if (byStatus[a.status] !== undefined) {
+        byStatus[a.status]++;
+      }
+    });
+
+    return {
+      total: apps.length,
+      active: byStatus.APPLIED + byStatus.SHORTLISTED,
+      selected: byStatus.SELECTED,
+      shortlisted: byStatus.SHORTLISTED,
+      rejected: byStatus.REJECTED,
+      withdrawn: byStatus.WITHDRAWN,
+      applied: byStatus.APPLIED,
+      byStatus
+    };
+  }
+
+  // ==========================================
   // Overview / Analytics Computation
   // ==========================================
   getOverview(collegeId) {
@@ -315,6 +498,46 @@ class MemoryDatabase {
       ],
       recentLogs: this.auditLogs.slice(0, 5)
     };
+  }
+
+  // ==========================================
+  // Placement Prediction Operations
+  // ==========================================
+  savePlacementPrediction(data) {
+    const newPrediction = {
+      _id: data._id || this.nextId('pred_'),
+      collegeId: data.collegeId,
+      studentId: data.studentId,
+      placementProbability: data.placementProbability,
+      decisionThreshold: data.decisionThreshold !== undefined ? data.decisionThreshold : 0.5,
+      predictedClass: data.predictedClass,
+      predictedLabel: data.predictedLabel,
+      modelVersion: data.modelVersion || '1.0.0',
+      inputSnapshot: data.inputSnapshot || {},
+      createdAt: data.createdAt || new Date(),
+      updatedAt: data.updatedAt || new Date()
+    };
+    this.placementPredictions.push(newPrediction);
+    return newPrediction;
+  }
+
+  getLatestPlacementPrediction(collegeId, studentId) {
+    const matches = this.placementPredictions.filter(p =>
+      String(p.studentId) === String(studentId) &&
+      (!collegeId || String(p.collegeId) === String(collegeId))
+    );
+    if (matches.length === 0) return null;
+    matches.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    return matches[0];
+  }
+
+  getPlacementPredictions(collegeId, studentId) {
+    return this.placementPredictions
+      .filter(p =>
+        String(p.studentId) === String(studentId) &&
+        (!collegeId || String(p.collegeId) === String(collegeId))
+      )
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }
 }
 
