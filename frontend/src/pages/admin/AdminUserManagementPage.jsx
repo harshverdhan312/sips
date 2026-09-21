@@ -18,6 +18,7 @@ import { DataTable } from "../../components/common/DataTable";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
 import { Modal } from "../../components/common/Modal";
+import Avatar from "../../components/common/Avatar";
 import { useNotifications } from "../../context/NotificationContext";
 
 export function AdminUserManagementPage() {
@@ -90,10 +91,12 @@ export function AdminUserManagementPage() {
       sortable: true,
       render: (row) => (
         <div className="flex items-center gap-3">
-          <img
-            src={row.avatar}
-            alt={row.name}
-            className="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0"
+          <Avatar
+            src={row.profileImageUrl || row.avatar}
+            name={row.name}
+            isCollege={row.role === "admin" || row.role === "placement"}
+            size="sm"
+            className="border border-slate-200 shrink-0"
           />
           <div>
             <p className="font-bold text-slate-900">{row.name}</p>

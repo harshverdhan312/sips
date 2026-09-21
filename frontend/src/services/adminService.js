@@ -55,7 +55,8 @@ export const adminService = {
           department: s.branch,
           rollNo: s.rollNo,
           usn: s.usn,
-          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(s.name)}`,
+          avatar: s.profileImageUrl || null,
+          profileImageUrl: s.profileImageUrl || null,
           status: s.placementStatus || "Active",
           lastActive: "Recently active",
           title: "Student Candidate"
@@ -141,5 +142,34 @@ export const adminService = {
 
     const res = await api.post('/api/admin/students/upload', payload);
     return res;
+  },
+
+  /**
+   * Fetch current college profile
+   */
+  async getCollegeProfile() {
+    try {
+      const res = await api.get('/api/admin/college/profile');
+      return res?.college || res;
+    } catch (e) {
+      console.warn("Could not fetch college profile:", e.message);
+      return null;
+    }
+  },
+
+  /**
+   * Upload college logo
+   */
+  async uploadCollegeLogo(file) {
+    const formData = new FormData();
+    formData.append('image', file);
+    return await api.postMultipart('/api/admin/college/profile/image', formData);
+  },
+
+  /**
+   * Delete college logo
+   */
+  async deleteCollegeLogo() {
+    return await api.delete('/api/admin/college/profile/image');
   }
 };

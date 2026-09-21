@@ -1,9 +1,68 @@
+const path = require('path');
+const fs = require('fs');
 const College = require('../models/College');
 const Student = require('../models/Student');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { parseCSV } = require('../utils/csvParser');
 const memoryDb = require('../utils/memoryDb');
+const config = require('../config');
+const logger = require('../utils/logger');
+
+/**
+ * Helper to verify if a file has valid image magic bytes (JPEG, PNG, GIF, WEBP)
+ */
+function verifyImageMagicBytes(filePath) {
+  try {
+    const fd = fs.openSync(filePath, 'r');
+    const buffer = Buffer.alloc(12);
+    const bytesRead = fs.readSync(fd, buffer, 0, 12, 0);
+    fs.closeSync(fd);
+
+    if (bytesRead < 4) return false;
+
+    // JPEG: FF D8 FF
+    if (buffer[0] === 0xFF && buffer[1] === 0xD8 && buffer[2] === 0xFF) {
+      return true;
+    }
+    // PNG: 89 50 4E 47
+    if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47) {
+      return true;
+    }
+    // GIF: 47 49 46 38 (GIF8)
+    if (buffer[0] === 0x47 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x38) {
+      return true;
+    }
+    // WEBP: RIFF....WEBP
+    if (bytesRead >= 12 &&
+        buffer.toString('ascii', 0, 4) === 'RIFF' &&
+        buffer.toString('ascii', 8, 12) === 'WEBP') {
+      return true;
+    }
+
+    return false;
+  } catch (err) {
+    logger.error('Error verifying image magic bytes:', err.message);
+    return false;
+  }
+}
+
+/**
+ * Safely delete a file inside config.uploadDir
+ */
+function safeDeleteUploadFile(fileUrlOrName) {
+  if (!fileUrlOrName || typeof fileUrlOrName !== 'string') return;
+  try {
+    const filename = path.basename(fileUrlOrName);
+    const fullPath = path.join(config.uploadDir, filename);
+    if (fullPath.startsWith(config.uploadDir) && fs.existsSync(fullPath)) {
+      fs.unlinkSync(fullPath);
+      logger.info('Cleaned up previous file:', filename);
+    }
+  } catch (err) {
+    logger.warn('Failed to clean up file:', err.message);
+  }
+}
 
 /**
  * POST /api/auth/register-college
@@ -338,12 +397,188 @@ exports.getCollegeBySlug = async (req, res) => {
     }
 
     const college = await College.findOne({ slug: req.params.slug })
-      .select('name slug acceptedDomains');
+      .select('name slug acceptedDomains logoUrl');
     if (!college) {
       return res.status(404).json({ message: 'College not found' });
     }
     res.json(college);
   } catch (error) {
     res.status(500).json({ message: 'Something went wrong on the server. Please try again later.' });
+  }
+};
+
+/**
+ * GET /api/admin/college/profile
+ * Admin-only — get authenticated college details including logoUrl
+ */
+exports.getCollegeProfile = async (req, res) => {
+  try {
+    if (!memoryDb.isMongoConnected() && !College.findById.mock) {
+      const college = memoryDb.findCollegeById(req.collegeId);
+      if (!college) {
+        return res.status(404).json({ success: false, message: 'College profile not found' });
+      }
+      return res.status(200).json({
+        success: true,
+        college: {
+          _id: college._id,
+          name: college.name,
+          slug: college.slug,
+          adminEmail: college.adminEmail,
+          acceptedDomains: college.acceptedDomains || [],
+          logoUrl: college.logoUrl || null,
+          createdAt: college.createdAt
+        }
+      });
+    }
+
+    const college = await College.findById(req.collegeId).select('-masterPasswordHash');
+    if (!college) {
+      return res.status(404).json({ success: false, message: 'College profile not found' });
+    }
+
+    res.status(200).json({
+      success: true,
+      college
+    });
+  } catch (error) {
+    logger.error('Get college profile error:', error);
+    res.status(500).json({ success: false, message: 'Server error retrieving college profile' });
+  }
+};
+
+/**
+ * POST /api/admin/college/profile/image
+ * Admin-only — upload college logo (multipart form with 'image' or 'logo')
+ */
+exports.uploadLogo = async (req, res) => {
+  let uploadedFilePath = null;
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No image file uploaded' });
+    }
+
+    uploadedFilePath = req.file.path;
+
+    // Validate image magic bytes
+    if (!verifyImageMagicBytes(uploadedFilePath)) {
+      safeDeleteUploadFile(req.file.filename);
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid image file: Missing valid image signature (JPEG, PNG, GIF, WEBP).'
+      });
+    }
+
+    const newLogoUrl = `/uploads/${req.file.filename}`;
+
+    // ----------------------------------------------------
+    // Resilient In-Memory Mode
+    // ----------------------------------------------------
+    if (!memoryDb.isMongoConnected() && !College.findById.mock) {
+      const college = memoryDb.findCollegeById(req.collegeId);
+      if (!college) {
+        safeDeleteUploadFile(req.file.filename);
+        return res.status(404).json({ success: false, message: 'College not found' });
+      }
+
+      const oldLogo = college.logoUrl;
+      college.logoUrl = newLogoUrl;
+
+      // Clean up previous logo file if different
+      if (oldLogo && oldLogo !== newLogoUrl) {
+        safeDeleteUploadFile(oldLogo);
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: 'College logo updated successfully',
+        logoUrl: college.logoUrl
+      });
+    }
+
+    // ----------------------------------------------------
+    // MongoDB / Mongoose Mode
+    // ----------------------------------------------------
+    const college = await College.findById(req.collegeId);
+    if (!college) {
+      safeDeleteUploadFile(req.file.filename);
+      return res.status(404).json({ success: false, message: 'College not found' });
+    }
+
+    const oldLogo = college.logoUrl;
+    college.logoUrl = newLogoUrl;
+
+    try {
+      await college.save();
+    } catch (saveErr) {
+      safeDeleteUploadFile(req.file.filename);
+      throw saveErr;
+    }
+
+    // Clean up previous logo file if successfully replaced
+    if (oldLogo && oldLogo !== newLogoUrl) {
+      safeDeleteUploadFile(oldLogo);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'College logo updated successfully',
+      logoUrl: college.logoUrl
+    });
+  } catch (error) {
+    if (uploadedFilePath) {
+      safeDeleteUploadFile(path.basename(uploadedFilePath));
+    }
+    logger.error('Upload college logo error:', error);
+    res.status(500).json({ success: false, message: 'Server error uploading college logo' });
+  }
+};
+
+/**
+ * DELETE /api/admin/college/profile/image
+ * Admin-only — delete college logo
+ */
+exports.deleteLogo = async (req, res) => {
+  try {
+    if (!memoryDb.isMongoConnected() && !College.findById.mock) {
+      const college = memoryDb.findCollegeById(req.collegeId);
+      if (!college) {
+        return res.status(404).json({ success: false, message: 'College not found' });
+      }
+
+      const oldLogo = college.logoUrl;
+      college.logoUrl = null;
+      if (oldLogo) {
+        safeDeleteUploadFile(oldLogo);
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: 'College logo removed successfully',
+        logoUrl: null
+      });
+    }
+
+    const college = await College.findById(req.collegeId);
+    if (!college) {
+      return res.status(404).json({ success: false, message: 'College not found' });
+    }
+
+    const oldLogo = college.logoUrl;
+    college.logoUrl = null;
+    await college.save();
+
+    if (oldLogo) {
+      safeDeleteUploadFile(oldLogo);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'College logo removed successfully',
+      logoUrl: null
+    });
+  } catch (error) {
+    logger.error('Delete college logo error:', error);
+    res.status(500).json({ success: false, message: 'Server error deleting college logo' });
   }
 };

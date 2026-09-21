@@ -8,7 +8,7 @@ class StudentProfile {
   final double cgpa;
   final int backlogs;
   final String tier;
-  final String avatarUrl;
+  final String profileImageUrl;
   final String githubHandle;
   final String leetcodeHandle;
   final int leetcodeRating;
@@ -40,7 +40,7 @@ class StudentProfile {
     this.cgpa = 0.0,
     this.backlogs = 0,
     this.tier = 'Tier-3 • Needs Preparation',
-    this.avatarUrl = '',
+    this.profileImageUrl = '',
     this.githubHandle = '',
     this.leetcodeHandle = '',
     this.leetcodeRating = 0,
@@ -91,7 +91,7 @@ class StudentProfile {
       cgpa: cgpaVal,
       backlogs: 0,
       tier: tier,
-      avatarUrl: json['avatarUrl'] as String? ?? '',
+      profileImageUrl: json['profileImageUrl'] as String? ?? json['avatarUrl'] as String? ?? '',
       githubHandle: json['github'] as String? ?? '',
       atsScore: resumeScoreVal > 0 ? resumeScoreVal : (resumeUrl.isNotEmpty ? 80 : 0),
       resumeScore: resumeScoreVal,
@@ -120,7 +120,7 @@ class StudentProfile {
     double? cgpa,
     int? backlogs,
     String? tier,
-    String? avatarUrl,
+    String? profileImageUrl,
     String? githubHandle,
     String? leetcodeHandle,
     int? leetcodeRating,
@@ -152,7 +152,7 @@ class StudentProfile {
       cgpa: cgpa ?? this.cgpa,
       backlogs: backlogs ?? this.backlogs,
       tier: tier ?? this.tier,
-      avatarUrl: avatarUrl ?? this.avatarUrl,
+      profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       githubHandle: githubHandle ?? this.githubHandle,
       leetcodeHandle: leetcodeHandle ?? this.leetcodeHandle,
       leetcodeRating: leetcodeRating ?? this.leetcodeRating,

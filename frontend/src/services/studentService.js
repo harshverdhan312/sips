@@ -23,7 +23,8 @@ export const studentService = {
           semester: student.batch ? `${student.batch} Batch` : "Campus Student",
           cgpa: typeof student.cgpa === 'number' ? student.cgpa : 0.0,
           placementStatus: student.placementStatus || "Not Placed",
-          avatar: student.avatarUrl || null,
+          avatar: student.profileImageUrl || student.avatarUrl || null,
+          profileImageUrl: student.profileImageUrl || null,
           phone: "Not available",
           location: "Not available",
           headline: student.branch ? `Candidate | ${student.branch}` : "Engineering Student",
@@ -97,6 +98,22 @@ export const studentService = {
       console.error("Failed to calculate placement prediction:", e);
       throw e;
     }
+  },
+
+  /**
+   * Upload profile image to backend
+   */
+  async uploadProfileImage(file) {
+    const formData = new FormData();
+    formData.append('image', file);
+    return await api.postMultipart('/api/student/profile/image', formData);
+  },
+
+  /**
+   * Delete profile image from backend
+   */
+  async deleteProfileImage() {
+    return await api.delete('/api/student/profile/image');
   },
 
   /**

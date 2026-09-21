@@ -12,6 +12,7 @@ import '../../core/widgets/sips_badge.dart';
 import '../../core/widgets/sips_button.dart';
 import '../../core/widgets/sips_card.dart';
 import '../../core/widgets/skill_chip.dart';
+import '../../core/widgets/student_avatar.dart';
 import '../../models/student_profile.dart';
 import '../../providers/sips_providers.dart';
 
@@ -24,6 +25,7 @@ class ProfileScreen extends ConsumerStatefulWidget {
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   bool _isUploadingResume = false;
+  bool _isUploadingImage = false;
   bool _isPredicting = false;
 
   Future<void> _handlePredictPlacement() async {
@@ -130,6 +132,101 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     } finally {
       if (mounted) {
         setState(() => _isUploadingResume = false);
+      }
+    }
+  }
+
+  Future<void> _handleImageUpload(StudentProfile profile) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        withData: true,
+      );
+
+      if (result == null || result.files.isEmpty) {
+        return;
+      }
+
+      final file = result.files.first;
+
+      // Validate 5 MB limit (5 * 1024 * 1024 bytes)
+      const maxSizeBytes = 5 * 1024 * 1024;
+      if (file.size > maxSizeBytes) {
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('Image size exceeds 5MB limit. Please select a smaller photo.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
+
+      // Extract bytes
+      List<int>? bytes = file.bytes;
+      if (bytes == null && !kIsWeb && file.path != null) {
+        bytes = await io.File(file.path!).readAsBytes();
+      }
+
+      if (bytes == null || bytes.isEmpty) {
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('Could not read image content. Please try again.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
+
+      setState(() => _isUploadingImage = true);
+
+      await ref.read(studentProfileProvider.notifier).uploadProfileImage(bytes, file.name);
+
+      if (!mounted) return;
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Profile photo updated successfully!'),
+          backgroundColor: Color(0xFF047857),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('Photo upload failed: ${e.toString()}'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isUploadingImage = false);
+      }
+    }
+  }
+
+  Future<void> _handleImageDelete() async {
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _isUploadingImage = true);
+    try {
+      await ref.read(studentProfileProvider.notifier).deleteProfileImage();
+      if (!mounted) return;
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Profile photo removed.'),
+          backgroundColor: Color(0xFF047857),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('Failed to remove photo: ${e.toString()}'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isUploadingImage = false);
       }
     }
   }
@@ -761,26 +858,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     children: [
                       Row(
                         children: [
-                          Container(
-                            width: 60,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryFixed,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: AppColors.primary.withValues(alpha: 0.3), width: 2),
-                            ),
-                            child: Center(
-                              child: Text(
-                                profile.name.isNotEmpty
-                                    ? profile.name.trim().split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join().toUpperCase()
-                                    : 'ST',
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w800,
-                                  color: AppColors.onPrimaryFixed,
-                                ),
-                              ),
-                            ),
+                          StudentAvatar(
+                            profileImageUrl: profile.profileImageUrl,
+                            name: profile.name,
+                            size: 64,
+                            showUploadOverlay: true,
+                            isUploading: _isUploadingImage,
+                            onTap: () => _handleImageUpload(profile),
+                            onDelete: profile.profileImageUrl.isNotEmpty ? _handleImageDelete : null,
                           ),
                           const SizedBox(width: 16),
                           Expanded(

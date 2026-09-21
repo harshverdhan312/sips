@@ -42,11 +42,44 @@ const upload = multer({
   }
 });
 
+// Configure multer for image uploads (JPEG, PNG, WebP, GIF)
+const imageStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, config.uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
+    const uniqueName = `profile-${req.user ? req.user.id : 'user'}-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+    cb(null, uniqueName);
+  }
+});
+
+const imageUpload = multer({
+  storage: imageStorage,
+  limits: { fileSize: config.uploadLimitBytes }, // 5MB
+  fileFilter: (req, file, cb) => {
+    const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+    const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (allowedMimes.includes(file.mimetype) && allowedExts.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files (JPEG, PNG, WebP, GIF) are allowed'), false);
+    }
+  }
+});
+
 // GET /api/student/profile
 router.get('/profile', auth, tenant, studentController.getProfile);
 
 // PUT /api/student/profile
 router.put('/profile', auth, tenant, studentController.updateProfile);
+
+// POST /api/student/profile/image
+router.post('/profile/image', auth, tenant, imageUpload.single('image'), studentController.uploadProfileImage);
+
+// DELETE /api/student/profile/image
+router.delete('/profile/image', auth, tenant, studentController.deleteProfileImage);
 
 // POST /api/student/resume
 router.post('/resume', auth, tenant, upload.single('resume'), studentController.uploadResume);

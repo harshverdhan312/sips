@@ -12,6 +12,7 @@ import {
   Building2,
   LogOut
 } from "lucide-react";
+import Avatar from "../common/Avatar";
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/NotificationContext";
 import { cn } from "../../utils/cn";
@@ -157,23 +158,13 @@ export function TopNavbar({ onMenuClick }) {
             onClick={() => setProfileOpen(!profileOpen)}
             className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
           >
-            {user?.avatar ? (
-              <img
-                src={user.avatar}
-                alt={user?.name || "User"}
-                className="w-8 h-8 rounded-full object-cover border border-slate-200"
-              />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center border border-indigo-700/30">
-                {(user?.name || user?.studentName || "ST")
-                  .trim()
-                  .split(/\s+/)
-                  .map((n) => n[0] || "")
-                  .slice(0, 2)
-                  .join("")
-                  .toUpperCase()}
-              </div>
-            )}
+            <Avatar
+              src={user?.profileImageUrl || user?.logoUrl || user?.avatar}
+              name={user?.name || (user?.role === "placement" ? user?.collegeName : "User")}
+              isCollege={user?.role === "placement" || user?.role === "admin"}
+              size="sm"
+              className="border border-slate-200 shrink-0"
+            />
             <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:block" />
           </button>
 

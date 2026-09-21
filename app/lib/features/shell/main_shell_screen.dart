@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_radius.dart';
+import '../../core/widgets/student_avatar.dart';
 import '../../providers/sips_providers.dart';
 
 class MainShellScreen extends ConsumerWidget {
@@ -187,48 +188,19 @@ class MainShellScreen extends ConsumerWidget {
                   ),
                   const SizedBox(width: 2),
                   // User Avatar
-                  InkWell(
-                    onTap: () => context.go('/profile'),
-                    borderRadius: AppRadius.fullRadius,
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryFixed,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColors.primary.withValues(alpha: 0.25),
-                          width: 1.5,
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final profileAsync = ref.watch(studentProfileProvider);
+                      final profile = profileAsync.valueOrNull;
+                      return GestureDetector(
+                        onTap: () => context.go('/profile'),
+                        child: StudentAvatar(
+                          profileImageUrl: profile?.profileImageUrl ?? '',
+                          name: profile?.name ?? '',
+                          size: 32,
                         ),
-                      ),
-                      child: Center(
-                        child: Consumer(
-                          builder: (context, ref, _) {
-                            final profileAsync = ref.watch(studentProfileProvider);
-                            final initials = profileAsync.maybeWhen(
-                              data: (profile) {
-                                final name = profile.name.trim();
-                                if (name.isEmpty) return 'ST';
-                                final parts = name.split(RegExp(r'\s+'));
-                                if (parts.length == 1) {
-                                  return parts[0].substring(0, parts[0].length >= 2 ? 2 : 1).toUpperCase();
-                                }
-                                return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
-                              },
-                              orElse: () => 'ST',
-                            );
-                            return Text(
-                              initials,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.onPrimaryFixed,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 ],
               ),

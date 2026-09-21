@@ -152,6 +152,7 @@ async function request(endpoint, options = {}) {
 export const api = {
   get: (endpoint, options = {}) => request(endpoint, { ...options, method: 'GET' }),
   post: (endpoint, body, options = {}) => request(endpoint, { ...options, method: 'POST', body }),
+  postMultipart: (endpoint, formData, options = {}) => request(endpoint, { ...options, method: 'POST', body: formData }),
   put: (endpoint, body, options = {}) => request(endpoint, { ...options, method: 'PUT', body }),
   delete: (endpoint, options = {}) => request(endpoint, { ...options, method: 'DELETE' })
 };

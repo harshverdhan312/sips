@@ -54,7 +54,8 @@ export function AuthProvider({ children }) {
         backendRole: data.role,
         collegeSlug: data.collegeSlug,
         collegeName: data.collegeName,
-        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
+        avatar: data.logoUrl || null,
+        logoUrl: data.logoUrl || null,
         status: "Active"
       };
     } else {
@@ -68,7 +69,8 @@ export function AuthProvider({ children }) {
         backendRole: data.role,
         collegeSlug: data.collegeSlug,
         collegeName: data.collegeName,
-        avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+        avatar: data.profileImageUrl || null,
+        profileImageUrl: data.profileImageUrl || null,
         status: "Active"
       };
     }
@@ -101,7 +103,8 @@ export function AuthProvider({ children }) {
       collegeSlug: collegeData.slug,
       collegeName: collegeData.name,
       department: "Placement & Training Division",
-      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+      avatar: data.college?.logoUrl || null,
+      logoUrl: data.college?.logoUrl || null,
       status: "Active"
     };
 
@@ -110,6 +113,18 @@ export function AuthProvider({ children }) {
     setRole("placement");
 
     return newAdmin;
+  };
+
+  /**
+   * Update user details in memory and storage (e.g. after avatar upload/delete)
+   */
+  const updateUser = (fields) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+      const updated = { ...prev, ...fields };
+      localStorage.setItem("sips_auth_user", JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const logout = () => {
@@ -127,6 +142,7 @@ export function AuthProvider({ children }) {
         isAuthenticated: !!user && !!localStorage.getItem("sips_token"),
         login,
         registerCollege,
+        updateUser,
         logout
       }}
     >

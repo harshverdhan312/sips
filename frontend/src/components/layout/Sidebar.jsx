@@ -23,6 +23,7 @@ import {
   Zap,
   BookOpen
 } from "lucide-react";
+import Avatar from "../common/Avatar";
 import { useAuth } from "../../context/AuthContext";
 import { cn } from "../../utils/cn";
 
@@ -197,13 +198,12 @@ export function Sidebar({ isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen
               !isCollapsed && "hover:bg-white"
             )}
           >
-            <img
-              src={
-                user?.avatar ||
-                "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80"
-              }
-              alt={user?.name || "User"}
-              className="w-9 h-9 rounded-full object-cover border border-slate-200 shrink-0"
+            <Avatar
+              src={user?.profileImageUrl || user?.logoUrl || user?.avatar}
+              name={user?.name || (user?.role === "placement" ? user?.collegeName : "Student")}
+              isCollege={user?.role === "placement" || user?.role === "admin"}
+              size="sm"
+              className="border border-slate-200 shrink-0"
             />
             {!isCollapsed && (
               <div className="flex-1 min-w-0">

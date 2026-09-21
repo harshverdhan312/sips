@@ -32,6 +32,44 @@ function verifyPdfMagicBytes(filePath) {
 }
 
 /**
+ * Helper to verify if a file has valid image magic bytes (JPEG, PNG, GIF, WEBP)
+ */
+function verifyImageMagicBytes(filePath) {
+  try {
+    const fd = fs.openSync(filePath, 'r');
+    const buffer = Buffer.alloc(12);
+    const bytesRead = fs.readSync(fd, buffer, 0, 12, 0);
+    fs.closeSync(fd);
+
+    if (bytesRead < 4) return false;
+
+    // JPEG: FF D8 FF
+    if (buffer[0] === 0xFF && buffer[1] === 0xD8 && buffer[2] === 0xFF) {
+      return true;
+    }
+    // PNG: 89 50 4E 47
+    if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47) {
+      return true;
+    }
+    // GIF: 47 49 46 38 (GIF8)
+    if (buffer[0] === 0x47 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x38) {
+      return true;
+    }
+    // WEBP: RIFF....WEBP
+    if (bytesRead >= 12 &&
+        buffer.toString('ascii', 0, 4) === 'RIFF' &&
+        buffer.toString('ascii', 8, 12) === 'WEBP') {
+      return true;
+    }
+
+    return false;
+  } catch (err) {
+    logger.error('Error verifying image magic bytes:', err.message);
+    return false;
+  }
+}
+
+/**
  * Safely delete a file inside config.uploadDir
  */
 function safeDeleteUploadFile(fileUrlOrName) {
@@ -419,6 +457,150 @@ exports.uploadResume = async (req, res) => {
     }
     logger.error('Upload resume error:', error);
     res.status(500).json({ message: 'Server error uploading resume' });
+  }
+};
+
+/**
+ * POST /api/student/profile/image
+ * Student-only — upload profile image (multipart form with 'image' or 'profileImage')
+ */
+exports.uploadProfileImage = async (req, res) => {
+  let uploadedFilePath = null;
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No image file uploaded' });
+    }
+
+    uploadedFilePath = req.file.path;
+
+    // Validate image magic bytes
+    if (!verifyImageMagicBytes(uploadedFilePath)) {
+      safeDeleteUploadFile(req.file.filename);
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid image file: Missing valid image signature (JPEG, PNG, GIF, WEBP).'
+      });
+    }
+
+    const newImageUrl = `/uploads/${req.file.filename}`;
+
+    // ----------------------------------------------------
+    // Resilient In-Memory Mode
+    // ----------------------------------------------------
+    if (!memoryDb.isMongoConnected() && !Student.findOne.mock) {
+      const student = memoryDb.findStudentById(req.user.id);
+      if (!student || (student.collegeId && String(student.collegeId) !== String(req.collegeId))) {
+        safeDeleteUploadFile(req.file.filename);
+        return res.status(404).json({ success: false, message: 'Profile not found' });
+      }
+
+      const oldImage = student.profileImageUrl;
+      student.profileImageUrl = newImageUrl;
+
+      // Clean up previous image file if different
+      if (oldImage && oldImage !== newImageUrl) {
+        safeDeleteUploadFile(oldImage);
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: 'Profile image updated successfully',
+        profileImageUrl: student.profileImageUrl
+      });
+    }
+
+    // ----------------------------------------------------
+    // MongoDB / Mongoose Mode
+    // ----------------------------------------------------
+    const student = await Student.findOne({
+      _id: req.user.id,
+      collegeId: req.collegeId
+    });
+
+    if (!student) {
+      safeDeleteUploadFile(req.file.filename);
+      return res.status(404).json({ success: false, message: 'Profile not found' });
+    }
+
+    const oldImage = student.profileImageUrl;
+    student.profileImageUrl = newImageUrl;
+
+    try {
+      await student.save();
+    } catch (saveErr) {
+      safeDeleteUploadFile(req.file.filename);
+      throw saveErr;
+    }
+
+    // Clean up previous image file if successfully replaced
+    if (oldImage && oldImage !== newImageUrl) {
+      safeDeleteUploadFile(oldImage);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile image updated successfully',
+      profileImageUrl: student.profileImageUrl
+    });
+  } catch (error) {
+    if (uploadedFilePath) {
+      safeDeleteUploadFile(path.basename(uploadedFilePath));
+    }
+    logger.error('Upload profile image error:', error);
+    res.status(500).json({ success: false, message: 'Server error uploading profile image' });
+  }
+};
+
+/**
+ * DELETE /api/student/profile/image
+ * Student-only — delete own profile image
+ */
+exports.deleteProfileImage = async (req, res) => {
+  try {
+    if (!memoryDb.isMongoConnected() && !Student.findOne.mock) {
+      const student = memoryDb.findStudentById(req.user.id);
+      if (!student || (student.collegeId && String(student.collegeId) !== String(req.collegeId))) {
+        return res.status(404).json({ success: false, message: 'Profile not found' });
+      }
+
+      const oldImage = student.profileImageUrl;
+      student.profileImageUrl = null;
+      if (oldImage) {
+        safeDeleteUploadFile(oldImage);
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: 'Profile image removed successfully',
+        profileImageUrl: null
+      });
+    }
+
+    const student = await Student.findOne({
+      _id: req.user.id,
+      collegeId: req.collegeId
+    });
+
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Profile not found' });
+    }
+
+    const oldImage = student.profileImageUrl;
+    student.profileImageUrl = null;
+    await student.save();
+
+    if (oldImage) {
+      safeDeleteUploadFile(oldImage);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile image removed successfully',
+      profileImageUrl: null
+    });
+  } catch (error) {
+    logger.error('Delete profile image error:', error);
+    res.status(500).json({ success: false, message: 'Server error deleting profile image' });
   }
 };
 

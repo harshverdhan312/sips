@@ -20,6 +20,7 @@ import { Badge } from "../../components/common/Badge";
 import { BatchDonutChart } from "../../components/charts/BatchDonutChart";
 import { DepartmentBarChart } from "../../components/charts/DepartmentBarChart";
 import { DashboardSkeleton } from "../../components/common/LoadingSkeleton";
+import Avatar from "../../components/common/Avatar";
 import { useNotifications } from "../../context/NotificationContext";
 
 export function PlacementDashboard() {
@@ -206,10 +207,11 @@ export function PlacementDashboard() {
               {atRiskStudents.map((std) => (
                 <tr key={std.id} className="hover:bg-slate-50/80 transition-colors">
                   <td className="px-4 py-3 font-semibold text-slate-900 flex items-center gap-2.5">
-                    <img
-                      src={std.avatar}
-                      alt={std.name}
-                      className="w-7 h-7 rounded-full object-cover border border-slate-200"
+                    <Avatar
+                      src={std.profileImageUrl || std.avatar}
+                      name={std.name}
+                      size="xs"
+                      className="w-7 h-7 border border-slate-200 shrink-0"
                     />
                     <div>
                       <p className="font-bold">{std.name}</p>

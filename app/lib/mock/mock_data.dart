@@ -22,7 +22,7 @@ class MockData {
     cgpa: 8.82,
     backlogs: 0,
     tier: 'Tier-1 Contender',
-    avatarUrl: '',
+    profileImageUrl: '',
     githubHandle: 'aarav-sharma-dev',
     leetcodeHandle: 'aarav_nit',
     leetcodeRating: 1842,

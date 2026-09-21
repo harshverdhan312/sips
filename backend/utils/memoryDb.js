@@ -58,11 +58,23 @@ class MemoryDatabase {
       adminEmail: (collegeData.adminEmail || '').toLowerCase().trim(),
       masterPasswordHash: collegeData.masterPasswordHash,
       acceptedDomains: collegeData.acceptedDomains || [],
+      logoUrl: collegeData.logoUrl || null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
     this.colleges.push(newCollege);
     return newCollege;
+  }
+
+  updateCollege(id, updates) {
+    const college = this.findCollegeById(id);
+    if (!college) return null;
+    Object.assign(college, updates, { updatedAt: new Date() });
+    return college;
+  }
+
+  updateCollegeLogo(id, logoUrl) {
+    return this.updateCollege(id, { logoUrl });
   }
 
   // ==========================================
@@ -150,6 +162,7 @@ class MemoryDatabase {
       notes: studentData.notes || '',
       github: studentData.github || '',
       resumeUrl: studentData.resumeUrl || '',
+      profileImageUrl: studentData.profileImageUrl || null,
       age: studentData.age !== undefined ? studentData.age : null,
       internships: studentData.internships !== undefined ? studentData.internships : null,
       hostel: studentData.hostel !== undefined ? studentData.hostel : null,
@@ -166,6 +179,10 @@ class MemoryDatabase {
     if (!student) return null;
     Object.assign(student, updates, { updatedAt: new Date() });
     return student;
+  }
+
+  updateStudentProfileImage(id, profileImageUrl) {
+    return this.updateStudent(id, { profileImageUrl });
   }
 
   deleteStudent(id) {

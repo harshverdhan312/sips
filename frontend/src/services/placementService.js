@@ -62,7 +62,8 @@ export const placementService = {
           cgpa: s.cgpa || 7.5,
           status: s.readinessScore >= 75 ? "Placement Ready" : s.readinessScore >= 50 ? "Needs Improvement" : "At Risk",
           placementStatus: s.placementStatus || "UNPLACED",
-          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(s.name)}`,
+          avatar: s.profileImageUrl || null,
+          profileImageUrl: s.profileImageUrl || null,
           metrics: {
             technicalScore: s.technicalScore || 65,
             softSkillScore: s.softSkillScore || 65,
@@ -221,7 +222,8 @@ export const placementService = {
               placementStatus: m.student.placementStatus || "UNPLACED",
               readinessScore: m.student.readinessScore || 65,
               skills: m.student.skills || [],
-              avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(m.student.name)}`
+              avatar: m.student.profileImageUrl || null,
+              profileImageUrl: m.student.profileImageUrl || null
             } : null
           })).filter(m => m.student !== null)
         };

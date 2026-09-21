@@ -18,6 +18,7 @@ import { DataTable } from "../../components/common/DataTable";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
 import { Modal } from "../../components/common/Modal";
+import Avatar from "../../components/common/Avatar";
 import { useNotifications } from "../../context/NotificationContext";
 
 export function StudentManagementPage() {
@@ -229,10 +230,11 @@ export function StudentManagementPage() {
       sortable: true,
       render: (row) => (
         <div className="flex items-center gap-3">
-          <img
-            src={row.avatar}
-            alt={row.name}
-            className="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0"
+          <Avatar
+            src={row.profileImageUrl || row.avatar}
+            name={row.name}
+            size="sm"
+            className="border border-slate-200 shrink-0"
           />
           <div>
             <p className="font-bold text-slate-900">{row.name}</p>
@@ -427,10 +429,12 @@ export function StudentManagementPage() {
           <div className="space-y-6">
             {/* Header snippet */}
             <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-              <img
-                src={activeStudent.avatar}
-                alt={activeStudent.name}
-                className="w-16 h-16 rounded-2xl object-cover border-2 border-white shadow-xs"
+              <Avatar
+                src={activeStudent.profileImageUrl || activeStudent.avatar}
+                name={activeStudent.name}
+                size="xl"
+                variant="rounded"
+                className="w-16 h-16 rounded-2xl border-2 border-white shadow-xs shrink-0"
               />
               <div className="flex-1">
                 <div className="flex items-center gap-2">

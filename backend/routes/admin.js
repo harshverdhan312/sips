@@ -11,9 +11,47 @@ const adminStudentController = require('../controllers/adminStudentController');
 const adminJobController = require('../controllers/adminJobController');
 const adminSkillController = require('../controllers/adminSkillController');
 const alertController = require('../controllers/alertController');
+const collegeController = require('../controllers/collegeController');
+const multer = require('multer');
+const path = require('path');
+const config = require('../config');
+
+// Configure multer for college logo uploads (JPEG, PNG, WebP, GIF)
+const logoStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, config.uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
+    const uniqueName = `logo-${req.collegeId || 'college'}-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+    cb(null, uniqueName);
+  }
+});
+
+const logoUpload = multer({
+  storage: logoStorage,
+  limits: { fileSize: config.uploadLimitBytes }, // 5MB
+  fileFilter: (req, file, cb) => {
+    const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+    const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (allowedMimes.includes(file.mimetype) && allowedExts.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files (JPEG, PNG, WebP, GIF) are allowed'), false);
+    }
+  }
+});
 
 // Enforce authentication, tenant context, and admin role for all admin routes
 router.use(auth, tenant, adminOnly);
+
+// ==========================================
+// 0. College Profile & Logo Identity
+// ==========================================
+router.get('/college/profile', collegeController.getCollegeProfile);
+router.post('/college/profile/image', logoUpload.single('image'), collegeController.uploadLogo);
+router.delete('/college/profile/image', collegeController.deleteLogo);
 
 // ==========================================
 // 1. Overview & Institutional KPIs

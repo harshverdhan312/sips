@@ -14,6 +14,7 @@ import { DataTable } from "../../components/common/DataTable";
 import { Card, CardHeader } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
+import Avatar from "../../components/common/Avatar";
 import { useNotifications } from "../../context/NotificationContext";
 
 export function AdminStudentsPage() {
@@ -54,10 +55,11 @@ export function AdminStudentsPage() {
       sortable: true,
       render: (row) => (
         <div className="flex items-center gap-2.5">
-          <img
-            src={row.avatar}
-            alt={row.name}
-            className="w-7 h-7 rounded-full object-cover border border-slate-200"
+          <Avatar
+            src={row.profileImageUrl || row.avatar}
+            name={row.name}
+            size="xs"
+            className="w-7 h-7 border border-slate-200 shrink-0"
           />
           <span className="font-semibold text-slate-800">{row.name}</span>
         </div>

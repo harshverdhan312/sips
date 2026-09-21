@@ -18,6 +18,7 @@ const collegeSchema = new mongoose.Schema({
     lowercase: true,
     trim: true
   }],
+  logoUrl: { type: String, default: null },
   createdAt: { type: Date, default: Date.now }
 });
 
