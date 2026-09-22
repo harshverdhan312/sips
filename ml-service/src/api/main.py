@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from src.api.employability_routes import router as employability_router
 from src.api.interview_routes import router as interview_router
 from src.api.placement_routes import router as placement_router
 from src.api.resume_routes import router as resume_router
@@ -23,3 +24,4 @@ def health_check():
 app.include_router(placement_router)
 app.include_router(resume_router)
 app.include_router(interview_router)
+app.include_router(employability_router)
