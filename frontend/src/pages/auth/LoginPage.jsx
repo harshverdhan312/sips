@@ -198,15 +198,13 @@ export function LoginPage() {
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-200 mb-3">
-          <Zap className="w-8 h-8 fill-white" />
+        <div className="flex justify-center mb-3">
+          <img
+            src="/branding/sips-logo-full.png"
+            alt="SIPS - Skill Intelligence Placement System"
+            className="h-16 w-auto max-w-[280px] sm:max-w-[320px] object-contain"
+          />
         </div>
-        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-          SIPS
-        </h1>
-        <p className="text-xs uppercase tracking-widest font-bold text-indigo-600 mt-0.5">
-          Skill Intelligence Placement System
-        </p>
         <p className="mt-1.5 text-xs text-slate-600 max-w-sm mx-auto">
           AI-powered career intelligence platform reducing Data Blindness in campus placements.
         </p>

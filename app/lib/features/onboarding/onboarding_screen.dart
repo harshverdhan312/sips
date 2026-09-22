@@ -43,19 +43,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final profile = ref.read(studentProfileProvider).value;
-      if (profile != null) {
-        if (profile.name.isNotEmpty) _nameController.text = profile.name;
-        if (profile.college.isNotEmpty) _collegeController.text = profile.college;
-        if (profile.branch.isNotEmpty) _branchController.text = profile.branch;
-        if (profile.cgpa > 0) _cgpaController.text = profile.cgpa.toString();
-        if (profile.githubHandle.isNotEmpty) _githubController.text = profile.githubHandle;
-        if (profile.leetcodeHandle.isNotEmpty) _leetcodeController.text = profile.leetcodeHandle;
-        if (profile.targetRoles.isNotEmpty) {
-          setState(() {
-            _selectedRoles.addAll(profile.targetRoles);
-          });
-        }
+      if (!mounted) return;
+      final auth = ref.read(authProvider);
+      if (auth.isAuthenticated) {
+        context.go('/home');
+      } else {
+        context.go('/auth');
       }
     });
   }

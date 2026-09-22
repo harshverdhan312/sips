@@ -18,6 +18,7 @@ import { DataTable } from "../../components/common/DataTable";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
 import { Modal } from "../../components/common/Modal";
+import { ComingSoonModal } from "../../components/common/ComingSoonModal";
 import Avatar from "../../components/common/Avatar";
 import { useNotifications } from "../../context/NotificationContext";
 
@@ -30,6 +31,7 @@ export function StudentManagementPage() {
   // Selected student modal
   const [activeStudent, setActiveStudent] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [counselingComingSoon, setCounselingComingSoon] = useState(false);
 
   // Add Student modal
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -53,6 +55,7 @@ export function StudentManagementPage() {
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState(null);
   const [importError, setImportError] = useState(null);
+  const [exporting, setExporting] = useState(false);
 
   // Load students from backend
   const loadStudents = async () => {
@@ -71,8 +74,31 @@ export function StudentManagementPage() {
     loadStudents();
   }, [selectedBranch, selectedStatus]);
 
-  const handleExportCsv = () => {
+  const handleExportCsv = async () => {
+    if (exporting) return;
+    setExporting(true);
     showInfo("Exporting Student Placement Readiness records to CSV...");
+    try {
+      const { blob, filename } = await adminService.exportStudentsCSV({
+        branch: selectedBranch,
+        status: selectedStatus
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename || `sips_placement_roster_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      showSuccess("Placement roster CSV downloaded successfully.");
+    } catch (err) {
+      console.error("Failed to export students CSV:", err);
+      showError(err.message || "Failed to export roster CSV.");
+    } finally {
+      setExporting(false);
+    }
   };
 
   const handleCreateStudent = async (e) => {
@@ -371,8 +397,15 @@ export function StudentManagementPage() {
           >
             Add Student
           </Button>
-          <Button variant="secondary" size="sm" icon={Download} onClick={handleExportCsv}>
-            Export Roster
+          <Button
+            variant="secondary"
+            size="sm"
+            icon={Download}
+            onClick={handleExportCsv}
+            loading={exporting}
+            disabled={exporting}
+          >
+            {exporting ? "Exporting..." : "Export Roster"}
           </Button>
         </div>
       </div>
@@ -548,10 +581,7 @@ export function StudentManagementPage() {
               <Button
                 variant="primary"
                 size="sm"
-                onClick={() => {
-                  addToast(`Intervention notice issued to ${activeStudent.name}`, "info");
-                  setModalOpen(false);
-                }}
+                onClick={() => setCounselingComingSoon(true)}
               >
                 Schedule Career Counseling
               </Button>
@@ -559,6 +589,13 @@ export function StudentManagementPage() {
           </div>
         )}
       </Modal>
+
+      <ComingSoonModal
+        isOpen={counselingComingSoon}
+        onClose={() => setCounselingComingSoon(false)}
+        title="Career Counselling Coming Soon"
+        body="Career counselling features are currently under development and will be available in a future update."
+      />
 
       {/* Add Student Modal */}
       <Modal
@@ -835,7 +872,7 @@ export function StudentManagementPage() {
                 rows={6}
                 value={csvText}
                 onChange={(e) => setCsvText(e.target.value)}
-                placeholder="Name, Roll No, Email, Branch, Batch, CGPA, Skills&#10;Aarav Sharma, 1RV21CS001, aarav@college.edu, Computer Science, 2025, 8.8, Python, React"
+                placeholder={'Name, Roll No, Email, Branch, Batch, CGPA, Skills\nAarav Sharma, 1RV21CS001, aarav@college.edu, Computer Science, 2025, 8.8, "Python, React, SQL"'}
                 className="w-full p-3 rounded-xl border border-slate-200 font-mono text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 resize-none"
               />
             </div>

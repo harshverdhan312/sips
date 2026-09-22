@@ -73,16 +73,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
+              // Header Branding
               Center(
-                child: Container(
-                  width: 48,
+                child: Image.asset(
+                  'assets/branding/sips-logo-full.png',
                   height: 48,
-                  decoration: BoxDecoration(
-                    gradient: AppColors.cobaltGradient,
-                    borderRadius: AppRadius.lgRadius,
-                  ),
-                  child: const Icon(Icons.lock_outline_rounded, color: Colors.white, size: 26),
+                  fit: BoxFit.contain,
+                  semanticLabel: 'SIPS — Skill Intelligence Placement System',
                 ),
               ),
               const SizedBox(height: 16),

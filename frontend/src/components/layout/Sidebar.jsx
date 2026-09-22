@@ -90,26 +90,23 @@ export function Sidebar({ isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen
         )}
       >
         {/* Brand Header */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-slate-100">
+        <div className="h-16 flex items-center justify-between px-3.5 border-b border-slate-100">
           <div
             onClick={() => navigate(`/${role}/dashboard`)}
-            className="flex items-center gap-3 cursor-pointer overflow-hidden"
+            className="flex items-center gap-2.5 cursor-pointer overflow-hidden"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 flex items-center justify-center text-white shadow-sm shadow-indigo-300 shrink-0">
-              <Zap className="w-5 h-5 fill-white" />
-            </div>
-            {!isCollapsed && (
-              <div className="flex flex-col">
-                <span className="font-bold text-slate-900 tracking-tight text-lg leading-tight flex items-center gap-1.5">
-                  SIPS
-                  <span className="text-[10px] uppercase font-extrabold px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
-                    AI
-                  </span>
-                </span>
-                <span className="text-[11px] text-slate-400 font-medium truncate">
-                  Skill Intelligence
-                </span>
-              </div>
+            {isCollapsed ? (
+              <img
+                src="/branding/sips-mark.png"
+                alt="SIPS"
+                className="w-9 h-9 object-contain shrink-0 mx-auto"
+              />
+            ) : (
+              <img
+                src="/branding/sips-logo-compact.png"
+                alt="SIPS - Skill Intelligence"
+                className="h-8 w-auto max-w-[170px] object-contain shrink-0"
+              />
             )}
           </div>
 

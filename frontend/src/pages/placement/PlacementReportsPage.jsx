@@ -14,12 +14,14 @@ import {
 import { Card, CardHeader } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
-import { useNotifications } from "../../context/NotificationContext";
+import { ComingSoonModal } from "../../components/common/ComingSoonModal";
 
 export function PlacementReportsPage() {
-  const { addToast } = useNotifications();
+  const [comingSoonOpen, setComingSoonOpen] = useState(false);
 
-  const [department, setDepartment] = useState("All");
+  const triggerComingSoon = () => {
+    setComingSoonOpen(true);
+  };
 
   const reportsConfig = [
     {
@@ -55,10 +57,6 @@ export function PlacementReportsPage() {
       status: "Ready"
     }
   ];
-
-  const handleDownload = (title) => {
-    addToast(`Downloading official export: ${title}`, "success");
-  };
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -121,7 +119,7 @@ export function PlacementReportsPage() {
                 variant="outline"
                 size="sm"
                 icon={Share2}
-                onClick={() => addToast("Report share link copied to clipboard!", "info")}
+                onClick={triggerComingSoon}
               >
                 Share
               </Button>
@@ -129,7 +127,7 @@ export function PlacementReportsPage() {
                 variant="primary"
                 size="sm"
                 icon={Download}
-                onClick={() => handleDownload(rep.title)}
+                onClick={triggerComingSoon}
               >
                 Download Report
               </Button>
@@ -146,14 +144,18 @@ export function PlacementReportsPage() {
         />
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">
+          <div className="cursor-pointer" onClick={triggerComingSoon}>
+            <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5 cursor-pointer">
               Department Scope
             </label>
             <select
-              value={department}
-              onChange={(e) => setDepartment(e.target.value)}
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium"
+              value="All"
+              readOnly
+              onMouseDown={(e) => {
+                e.preventDefault();
+                triggerComingSoon();
+              }}
+              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium cursor-pointer"
             >
               <option value="All">All Departments (Institutional)</option>
               <option value="CSE">Computer Science & Engineering</option>
@@ -163,11 +165,18 @@ export function PlacementReportsPage() {
             </select>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">
+          <div className="cursor-pointer" onClick={triggerComingSoon}>
+            <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5 cursor-pointer">
               Minimum CGPA Filter
             </label>
-            <select className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium">
+            <select
+              readOnly
+              onMouseDown={(e) => {
+                e.preventDefault();
+                triggerComingSoon();
+              }}
+              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium cursor-pointer"
+            >
               <option>No CGPA Minimum (All 480 candidates)</option>
               <option>CGPA 7.0+ (Tier-2 Eligible)</option>
               <option>CGPA 8.0+ (Tier-1 Eligible)</option>
@@ -175,11 +184,18 @@ export function PlacementReportsPage() {
             </select>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">
+          <div className="cursor-pointer" onClick={triggerComingSoon}>
+            <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5 cursor-pointer">
               Output Format
             </label>
-            <select className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium">
+            <select
+              readOnly
+              onMouseDown={(e) => {
+                e.preventDefault();
+                triggerComingSoon();
+              }}
+              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium cursor-pointer"
+            >
               <option>PDF Document (.pdf)</option>
               <option>Microsoft Excel (.xlsx)</option>
               <option>CSV Dataset (.csv)</option>
@@ -192,12 +208,19 @@ export function PlacementReportsPage() {
             variant="primary"
             size="md"
             icon={Download}
-            onClick={() => addToast("Custom filtered placement report generated successfully!", "success")}
+            onClick={triggerComingSoon}
           >
             Generate & Download Custom Slice
           </Button>
         </div>
       </Card>
+
+      <ComingSoonModal
+        isOpen={comingSoonOpen}
+        onClose={() => setComingSoonOpen(false)}
+        title="Coming Soon"
+        body="This feature is currently under development and will be available in a future update."
+      />
     </div>
   );
 }

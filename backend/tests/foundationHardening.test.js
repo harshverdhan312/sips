@@ -160,6 +160,47 @@ describe('Phase 1: Backend Foundation Hardening', () => {
       expect(res.body.message).toMatch(/already exists/i);
     });
 
+    it('errorHandler should handle Multer PDF filter error with 400', () => {
+      const pdfErr = new Error('Only PDF files are allowed');
+
+      const req = { originalUrl: '/api/student/resume', method: 'POST' };
+      const res = createMockRes();
+      const next = jest.fn();
+
+      errorHandler(pdfErr, req, res, next);
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.message).toMatch(/Please upload a valid PDF resume/i);
+    });
+
+    it('errorHandler should handle Multer Image filter error with 400', () => {
+      const imgErr = new Error('Only image files (JPEG, PNG, WebP, GIF) are allowed');
+
+      const req = { originalUrl: '/api/student/profile/image', method: 'POST' };
+      const res = createMockRes();
+      const next = jest.fn();
+
+      errorHandler(imgErr, req, res, next);
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.message).toMatch(/Please upload a valid image file/i);
+    });
+
+    it('errorHandler should handle Multer LIMIT_FILE_SIZE error with 400', () => {
+      const limitErr = new Error('File too large');
+      limitErr.name = 'MulterError';
+      limitErr.code = 'LIMIT_FILE_SIZE';
+
+      const req = { originalUrl: '/api/student/resume', method: 'POST' };
+      const res = createMockRes();
+      const next = jest.fn();
+
+      errorHandler(limitErr, req, res, next);
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.message).toMatch(/File size exceeds/i);
+    });
+
     it('should return standardized 404 for unknown endpoints', async () => {
       const res = await request(app).get('/api/non-existent-route-xyz');
       expect(res.status).toBe(404);

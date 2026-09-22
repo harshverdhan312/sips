@@ -40,20 +40,14 @@ export function LandingPage() {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#2a14b4] to-[#4338ca] flex items-center justify-center text-white shadow-sm shadow-indigo-300">
-              <Zap className="w-5 h-5 fill-white" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-extrabold text-slate-900 tracking-tight text-lg leading-tight flex items-center gap-1.5">
-                SIPS
-                <span className="text-[10px] uppercase font-mono font-bold px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
-                  v4.8.2 Synced
-                </span>
-              </span>
-              <span className="text-[11px] text-slate-500 font-medium">
-                Skill Intelligence Placement System
-              </span>
-            </div>
+            <img
+              src="/branding/sips-logo-compact.png"
+              alt="SIPS - Skill Intelligence Placement System"
+              className="h-9 w-auto max-w-[170px] sm:max-w-[200px] object-contain"
+            />
+            <span className="hidden sm:inline-flex text-[10px] uppercase font-mono font-bold px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
+              v4.8.2 Synced
+            </span>
           </div>
 
           <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-slate-600">
@@ -452,7 +446,11 @@ export function LandingPage() {
                 
                 {/* Center Core */}
                 <div className="w-36 h-36 rounded-full bg-white border border-indigo-200 shadow-lg shadow-indigo-100 flex flex-col items-center justify-center text-center p-3">
-                  <Zap className="w-6 h-6 text-[#4338ca] fill-[#4338ca]" />
+                  <img
+                    src="/branding/sips-mark.png"
+                    alt="SIPS Mark"
+                    className="w-7 h-7 object-contain"
+                  />
                   <span className="font-extrabold text-slate-900 text-xs mt-1">SIPS Engine</span>
                   <span className="text-[10px] font-mono text-emerald-600 font-bold">68.2% Day-0 Yield</span>
                 </div>
@@ -580,7 +578,11 @@ export function LandingPage() {
       <footer className="bg-white border-t border-slate-200 py-10 text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 font-mono font-medium">
-            <Zap className="w-4 h-4 text-[#4338ca] fill-[#4338ca]" />
+            <img
+              src="/branding/sips-mark.png"
+              alt="SIPS Mark"
+              className="w-4 h-4 object-contain"
+            />
             <span>SIPS Platform // Approved Baseline v1.0.0</span>
           </div>
           <div>

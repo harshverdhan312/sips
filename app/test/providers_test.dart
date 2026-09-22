@@ -54,9 +54,34 @@ void main() {
       container.dispose();
     });
 
-    test('authProvider initially is unauthenticated until login or token restore', () {
+    test('authProvider initially is uninitialized and unauthenticated', () {
       final auth = container.read(authProvider);
+      expect(auth.isInitialized, false);
       expect(auth.isAuthenticated, false);
+    });
+
+    test('checkInitialAuth with no stored token marks initialized and unauthenticated', () async {
+      final authNotifier = container.read(authProvider.notifier);
+      final restored = await authNotifier.checkInitialAuth();
+
+      expect(restored, false);
+      final auth = container.read(authProvider);
+      expect(auth.isInitialized, true);
+      expect(auth.isAuthenticated, false);
+    });
+
+    test('checkInitialAuth with stored token restores session successfully', () async {
+      SharedPreferences.setMockInitialValues({
+        ApiConfig.tokenKey: 'persisted-jwt-token-123',
+      });
+
+      final authNotifier = container.read(authProvider.notifier);
+      final restored = await authNotifier.checkInitialAuth();
+
+      expect(restored, true);
+      final auth = container.read(authProvider);
+      expect(auth.isInitialized, true);
+      expect(auth.isAuthenticated, true);
     });
 
     test('authProvider signIn success transitions state and saves token', () async {
@@ -64,20 +89,40 @@ void main() {
 
       final success = await authNotifier.signIn('aarav@rvce.edu', 'password123');
       expect(success, true);
+      expect(container.read(authProvider).isInitialized, true);
       expect(container.read(authProvider).isAuthenticated, true);
       expect(container.read(authProvider).userName, 'Aarav Sharma');
 
       await authNotifier.signOut();
+      expect(container.read(authProvider).isInitialized, true);
       expect(container.read(authProvider).isAuthenticated, false);
     });
 
-    test('authProvider signIn failure sets error message', () async {
+    test('authProvider signIn failure sets error message and leaves unauthenticated', () async {
       final authNotifier = container.read(authProvider.notifier);
 
       final success = await authNotifier.signIn('aarav@rvce.edu', 'wrongpassword');
       expect(success, false);
       expect(container.read(authProvider).isAuthenticated, false);
       expect(container.read(authProvider).errorMessage, isNotNull);
+    });
+
+    test('authenticated providers stay idle when unauthenticated and populate when authenticated', () async {
+      // Initially unauthenticated -> profileProvider stays in loading/idle without throwing error
+      final initialProfile = container.read(studentProfileProvider);
+      expect(initialProfile.isLoading, true);
+
+      // Sign in -> authenticated
+      final authNotifier = container.read(authProvider.notifier);
+      await authNotifier.signIn('aarav@rvce.edu', 'password123');
+
+      // Await load completion
+      await container.read(studentProfileProvider.notifier).loadProfile();
+
+      // Now studentProfileProvider contains populated data
+      final profileAsync = container.read(studentProfileProvider);
+      expect(profileAsync.hasValue, true);
+      expect(profileAsync.value?.name, 'Aarav Sharma');
     });
 
     test('growthTasksProvider loads tasks and allows completion toggling', () async {

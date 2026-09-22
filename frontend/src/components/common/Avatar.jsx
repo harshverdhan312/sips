@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Building2 } from "lucide-react";
+import { resolveAssetUrl } from "../../services/api";
 
 /**
  * Deterministic initials generator from full name
@@ -76,8 +77,13 @@ export default function Avatar({
 }) {
   const [imageError, setImageError] = useState(false);
 
-  // Normalize image URL
-  const normalizedSrc = React.useMemo(() => {
+  // Reset image error state whenever src changes
+  useEffect(() => {
+    setImageError(false);
+  }, [src]);
+
+  // Normalize and resolve image URL
+  const normalizedSrc = useMemo(() => {
     if (!src || typeof src !== "string" || src.trim() === "") return null;
     const trimmed = src.trim();
     // Ignore any placeholder/unsplash/dicebear legacy urls if somehow passed
@@ -88,7 +94,7 @@ export default function Avatar({
     ) {
       return null;
     }
-    return trimmed;
+    return resolveAssetUrl(trimmed);
   }, [src]);
 
   const sizeClass = SIZE_CLASSES[size] || (typeof size === "string" ? size : "w-10 h-10 text-sm");

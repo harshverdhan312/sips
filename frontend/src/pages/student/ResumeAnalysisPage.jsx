@@ -11,6 +11,7 @@ import {
   Eye
 } from "lucide-react";
 import { resumeService } from "../../services/resumeService";
+import { resolveAssetUrl } from "../../services/api";
 import { Card, CardHeader } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
@@ -219,7 +220,7 @@ export function ResumeAnalysisPage() {
             <div className="flex items-center gap-2">
               {uploadedResume.resumeUrl && (
                 <a
-                  href={uploadedResume.resumeUrl}
+                  href={resolveAssetUrl(uploadedResume.resumeUrl)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50"

@@ -22,53 +22,11 @@ class WelcomeScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 12),
               // Top Brand Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      gradient: AppColors.cobaltGradient,
-                      borderRadius: AppRadius.mdRadius,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.insights_rounded,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'SIPS',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.onSurface,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                      Text(
-                        'Career Intelligence Platform',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+              Image.asset(
+                'assets/branding/sips-logo-full.png',
+                height: 52,
+                fit: BoxFit.contain,
+                semanticLabel: 'SIPS — Skill Intelligence Placement System',
               ),
 
               const SizedBox(height: 28),
@@ -158,29 +116,22 @@ class WelcomeScreen extends StatelessWidget {
 
               // Actions
               SipsButton(
-                label: 'Get Started — Setup Profile',
+                label: 'Sign In to Student Portal',
                 isFullWidth: true,
                 size: SipsButtonSize.large,
                 trailingIcon: Icons.arrow_forward_rounded,
-                onPressed: () => context.go('/onboarding'),
-              ),
-              const SizedBox(height: 14),
-              SipsButton(
-                label: 'Already Registered? Sign In',
-                variant: SipsButtonVariant.outline,
-                isFullWidth: true,
-                size: SipsButtonSize.large,
                 onPressed: () => context.go('/auth'),
               ),
 
               const SizedBox(height: 24),
               Text(
-                'Integrated with University Placement Cells & Top Engineering Batches',
+                'Student accounts are provisioned by your college placement cell.\nSign in with your institute email or roll number.',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.plusJakartaSans(
-                  fontSize: 11,
+                  fontSize: 12,
                   color: AppColors.outline,
                   fontWeight: FontWeight.w500,
+                  height: 1.4,
                 ),
               ),
             ],

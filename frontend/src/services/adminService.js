@@ -133,15 +133,30 @@ export const adminService = {
   async uploadStudentsCSV(csvData) {
     let payload;
     if (typeof csvData === 'string') {
-      payload = { csvText: csvData };
+      payload = { csvData, csvText: csvData };
     } else if (csvData instanceof FormData) {
       payload = csvData;
+    } else if (csvData && typeof csvData === 'object') {
+      const text = csvData.csvData || csvData.csvText || '';
+      payload = { csvData: text, csvText: text };
     } else {
-      payload = { csvText: String(csvData) };
+      payload = { csvData: String(csvData), csvText: String(csvData) };
     }
 
     const res = await api.post('/api/admin/students/upload', payload);
     return res;
+  },
+
+  /**
+   * Export students as CSV blob
+   */
+  async exportStudentsCSV(filters = {}) {
+    const params = new URLSearchParams();
+    if (filters.branch && filters.branch !== 'All') params.append('branch', filters.branch);
+    if (filters.batch && filters.batch !== 'All') params.append('batch', filters.batch);
+    if (filters.status && filters.status !== 'All') params.append('status', filters.status);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    return await api.getBlob(`/api/admin/students/export${queryString}`);
   },
 
   /**

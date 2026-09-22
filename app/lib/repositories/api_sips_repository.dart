@@ -1,3 +1,4 @@
+import 'package:http_parser/http_parser.dart';
 import '../core/network/api_client.dart';
 import '../core/widgets/skill_chip.dart';
 import '../models/growth_task.dart';
@@ -244,6 +245,7 @@ class ApiSipsRepository implements SipsRepository {
       fieldName: 'resume',
       fileBytes: bytes,
       filename: filename,
+      contentType: MediaType('application', 'pdf'),
     );
 
     if (response is Map<String, dynamic> && response['resumeUrl'] != null) {

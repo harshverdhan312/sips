@@ -340,24 +340,24 @@ exports.deleteStudent = async (req, res) => {
  */
 exports.uploadStudentsCSV = async (req, res) => {
   try {
-    const { csvData } = req.body;
+    const rawCsv = req.body.csvData || req.body.csvText;
 
-    if (!csvData) {
+    if (!rawCsv || typeof rawCsv !== 'string' || !rawCsv.trim()) {
       return res.status(400).json({ message: 'CSV data is required in the request body' });
     }
 
     let parsed;
     try {
-      parsed = parseCSV(csvData);
+      parsed = parseCSV(rawCsv);
     } catch (parseErr) {
       return res.status(400).json({ message: parseErr.message });
     }
 
     const { students: parsedStudents, errors: parseErrors } = parsed;
     const results = {
-      total: parsedStudents.length,
+      total: parsedStudents.length + parseErrors.length,
       success: 0,
-      failed: 0,
+      failed: parseErrors.length,
       errors: [...parseErrors]
     };
 
@@ -442,7 +442,7 @@ exports.uploadStudentsCSV = async (req, res) => {
     await AuditLog.create({
       collegeId: req.collegeId,
       action: 'BULK_STUDENT_IMPORT',
-      actor: req.user.email || 'Admin',
+      actor: req.user?.email || 'Admin',
       target: `${results.success} students imported`,
       details: results
     }).catch(err => console.error('AuditLog error:', err));
