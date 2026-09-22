@@ -31,6 +31,7 @@ final Provider<SipsRepository> sipsRepositoryProvider = Provider<SipsRepository>
 
 // --- Auth State & Provider ---
 class AuthState {
+  final bool isInitialized;
   final bool isAuthenticated;
   final bool isOnboardingCompleted;
   final String userEmail;
@@ -41,6 +42,7 @@ class AuthState {
   final String? errorMessage;
 
   const AuthState({
+    this.isInitialized = false,
     this.isAuthenticated = false,
     this.isOnboardingCompleted = true,
     this.userEmail = '',
@@ -52,6 +54,7 @@ class AuthState {
   });
 
   AuthState copyWith({
+    bool? isInitialized,
     bool? isAuthenticated,
     bool? isOnboardingCompleted,
     String? userEmail,
@@ -63,6 +66,7 @@ class AuthState {
     bool clearError = false,
   }) {
     return AuthState(
+      isInitialized: isInitialized ?? this.isInitialized,
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
       isOnboardingCompleted: isOnboardingCompleted ?? this.isOnboardingCompleted,
       userEmail: userEmail ?? this.userEmail,
@@ -77,16 +81,42 @@ class AuthState {
 
 class AuthNotifier extends StateNotifier<AuthState> {
   final ApiClient _apiClient;
-  final Ref _ref;
+  Future<bool>? _initialAuthFuture;
 
-  AuthNotifier(this._apiClient, this._ref) : super(const AuthState()) {
-    checkInitialAuth();
+  AuthNotifier(this._apiClient) : super(const AuthState());
+
+  Future<bool> checkInitialAuth() async {
+    if (_initialAuthFuture != null) {
+      return _initialAuthFuture!;
+    }
+    _initialAuthFuture = _performCheckInitialAuth();
+    return _initialAuthFuture!;
   }
 
-  Future<void> checkInitialAuth() async {
-    final token = await _apiClient.getToken();
-    if (token != null && token.isNotEmpty) {
-      state = state.copyWith(isAuthenticated: true);
+  Future<bool> _performCheckInitialAuth() async {
+    try {
+      final token = await _apiClient.getToken();
+      if (token != null && token.isNotEmpty) {
+        state = state.copyWith(
+          isInitialized: true,
+          isAuthenticated: true,
+        );
+        return true;
+      } else {
+        state = state.copyWith(
+          isInitialized: true,
+          isAuthenticated: false,
+        );
+        return false;
+      }
+    } catch (e) {
+      // Storage/read failure - do not pretend authenticated, but do not delete token
+      state = state.copyWith(
+        isInitialized: true,
+        isAuthenticated: false,
+        errorMessage: 'Failed to restore session: ${e.toString()}',
+      );
+      return false;
     }
   }
 
@@ -122,6 +152,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         await _apiClient.saveToken(token);
 
         state = state.copyWith(
+          isInitialized: true,
           isAuthenticated: true,
           userEmail: identifier,
           userName: studentName,
@@ -130,13 +161,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
           isLoading: false,
           clearError: true,
         );
-
-        // Reload fresh live data
-        _ref.read(studentProfileProvider.notifier).loadProfile();
-        _ref.read(placementPredictionProvider.notifier).loadPrediction();
-        _ref.read(opportunitiesProvider.notifier).loadJobs();
-        _ref.read(alertsProvider.notifier).loadAlerts();
-        _ref.read(readinessProvider.notifier).loadReadiness();
 
         return true;
       }
@@ -157,9 +181,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> signOut() async {
     await _apiClient.clearToken();
+    _initialAuthFuture = null;
     state = const AuthState(
+      isInitialized: true,
       isAuthenticated: false,
-      isOnboardingCompleted: false,
+      isOnboardingCompleted: true,
       userEmail: '',
       userName: '',
       collegeName: '',
@@ -171,16 +197,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
 final StateNotifierProvider<AuthNotifier, AuthState> authProvider =
     StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final apiClient = ref.watch(apiClientProvider);
-  return AuthNotifier(apiClient, ref);
+  return AuthNotifier(apiClient);
 });
 
 // --- Student Profile Provider ---
 class ProfileNotifier extends StateNotifier<AsyncValue<StudentProfile>> {
   final SipsRepository _repository;
 
-  ProfileNotifier(this._repository) : super(const AsyncValue.loading()) {
-    loadProfile();
-  }
+  ProfileNotifier(this._repository) : super(const AsyncValue.loading());
 
   Future<void> loadProfile() async {
     state = const AsyncValue.loading();
@@ -222,16 +246,19 @@ class ProfileNotifier extends StateNotifier<AsyncValue<StudentProfile>> {
 
 final studentProfileProvider = StateNotifierProvider<ProfileNotifier, AsyncValue<StudentProfile>>((ref) {
   final repo = ref.watch(sipsRepositoryProvider);
-  return ProfileNotifier(repo);
+  final auth = ref.watch(authProvider);
+  final notifier = ProfileNotifier(repo);
+  if (auth.isInitialized && auth.isAuthenticated) {
+    notifier.loadProfile();
+  }
+  return notifier;
 });
 
 // --- Placement Prediction Provider ---
 class PlacementPredictionNotifier extends StateNotifier<AsyncValue<PlacementPrediction?>> {
   final SipsRepository _repository;
 
-  PlacementPredictionNotifier(this._repository) : super(const AsyncValue.loading()) {
-    loadPrediction();
-  }
+  PlacementPredictionNotifier(this._repository) : super(const AsyncValue.loading());
 
   Future<void> loadPrediction() async {
     state = const AsyncValue.loading();
@@ -259,16 +286,19 @@ class PlacementPredictionNotifier extends StateNotifier<AsyncValue<PlacementPred
 final placementPredictionProvider =
     StateNotifierProvider<PlacementPredictionNotifier, AsyncValue<PlacementPrediction?>>((ref) {
   final repo = ref.watch(sipsRepositoryProvider);
-  return PlacementPredictionNotifier(repo);
+  final auth = ref.watch(authProvider);
+  final notifier = PlacementPredictionNotifier(repo);
+  if (auth.isInitialized && auth.isAuthenticated) {
+    notifier.loadPrediction();
+  }
+  return notifier;
 });
 
 // --- Readiness Metric Provider ---
 class ReadinessNotifier extends StateNotifier<AsyncValue<ReadinessMetric>> {
   final SipsRepository _repository;
 
-  ReadinessNotifier(this._repository) : super(const AsyncValue.loading()) {
-    loadReadiness();
-  }
+  ReadinessNotifier(this._repository) : super(const AsyncValue.loading());
 
   Future<void> loadReadiness() async {
     state = const AsyncValue.loading();
@@ -290,7 +320,12 @@ class ReadinessNotifier extends StateNotifier<AsyncValue<ReadinessMetric>> {
 
 final readinessProvider = StateNotifierProvider<ReadinessNotifier, AsyncValue<ReadinessMetric>>((ref) {
   final repo = ref.watch(sipsRepositoryProvider);
-  return ReadinessNotifier(repo);
+  final auth = ref.watch(authProvider);
+  final notifier = ReadinessNotifier(repo);
+  if (auth.isInitialized && auth.isAuthenticated) {
+    notifier.loadReadiness();
+  }
+  return notifier;
 });
 
 // --- Skills Provider ---
@@ -303,9 +338,7 @@ final skillsProvider = FutureProvider<List<SkillItem>>((ref) async {
 class OpportunitiesNotifier extends StateNotifier<AsyncValue<List<JobOpportunity>>> {
   final SipsRepository _repository;
 
-  OpportunitiesNotifier(this._repository) : super(const AsyncValue.loading()) {
-    loadJobs();
-  }
+  OpportunitiesNotifier(this._repository) : super(const AsyncValue.loading());
 
   Future<void> loadJobs() async {
     state = const AsyncValue.loading();
@@ -345,7 +378,12 @@ class OpportunitiesNotifier extends StateNotifier<AsyncValue<List<JobOpportunity
 final opportunitiesProvider =
     StateNotifierProvider<OpportunitiesNotifier, AsyncValue<List<JobOpportunity>>>((ref) {
   final repo = ref.watch(sipsRepositoryProvider);
-  return OpportunitiesNotifier(repo);
+  final auth = ref.watch(authProvider);
+  final notifier = OpportunitiesNotifier(repo);
+  if (auth.isInitialized && auth.isAuthenticated) {
+    notifier.loadJobs();
+  }
+  return notifier;
 });
 
 // --- Growth Tasks Provider (Local/Mock) ---
@@ -353,9 +391,7 @@ class GrowthTasksNotifier extends StateNotifier<AsyncValue<List<GrowthTask>>> {
   final SipsRepository _repository;
   final Ref _ref;
 
-  GrowthTasksNotifier(this._repository, this._ref) : super(const AsyncValue.loading()) {
-    loadTasks();
-  }
+  GrowthTasksNotifier(this._repository, this._ref) : super(const AsyncValue.loading());
 
   Future<void> loadTasks() async {
     state = const AsyncValue.loading();
@@ -381,7 +417,12 @@ class GrowthTasksNotifier extends StateNotifier<AsyncValue<List<GrowthTask>>> {
 
 final growthTasksProvider = StateNotifierProvider<GrowthTasksNotifier, AsyncValue<List<GrowthTask>>>((ref) {
   final repo = ref.watch(sipsRepositoryProvider);
-  return GrowthTasksNotifier(repo, ref);
+  final auth = ref.watch(authProvider);
+  final notifier = GrowthTasksNotifier(repo, ref);
+  if (auth.isInitialized && auth.isAuthenticated) {
+    notifier.loadTasks();
+  }
+  return notifier;
 });
 
 // --- Roadmap Provider (Local/Mock) ---
@@ -483,9 +524,7 @@ final peerMatchingProvider = FutureProvider<List<PeerMatch>>((ref) async {
 class AlertsNotifier extends StateNotifier<AsyncValue<List<PlacementAlert>>> {
   final SipsRepository _repository;
 
-  AlertsNotifier(this._repository) : super(const AsyncValue.loading()) {
-    loadAlerts();
-  }
+  AlertsNotifier(this._repository) : super(const AsyncValue.loading());
 
   Future<void> loadAlerts() async {
     state = const AsyncValue.loading();
@@ -512,5 +551,10 @@ class AlertsNotifier extends StateNotifier<AsyncValue<List<PlacementAlert>>> {
 
 final alertsProvider = StateNotifierProvider<AlertsNotifier, AsyncValue<List<PlacementAlert>>>((ref) {
   final repo = ref.watch(sipsRepositoryProvider);
-  return AlertsNotifier(repo);
+  final auth = ref.watch(authProvider);
+  final notifier = AlertsNotifier(repo);
+  if (auth.isInitialized && auth.isAuthenticated) {
+    notifier.loadAlerts();
+  }
+  return notifier;
 });

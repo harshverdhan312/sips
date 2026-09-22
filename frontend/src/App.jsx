@@ -3,6 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { ToastContainer } from "./components/common/ToastContainer";
+import { SplashScreen } from "./components/common/SplashScreen";
 import { AppRoutes } from "./routes/AppRoutes";
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <NotificationProvider>
+          <SplashScreen />
           <AppRoutes />
           <ToastContainer />
         </NotificationProvider>

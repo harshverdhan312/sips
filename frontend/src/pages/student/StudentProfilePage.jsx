@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from "react";
 import {
-  User,
   Mail,
   GraduationCap,
   Briefcase,
-  Code2,
-  Award,
   GitBranch,
   Edit2,
   Check,
@@ -14,21 +11,19 @@ import {
   FileText,
   Upload,
   CheckCircle2,
-  AlertCircle,
-  Building2,
-  Calendar,
   History,
   Home,
   Sparkles,
   Cpu,
-  TrendingUp,
   RefreshCw,
   Camera,
   X,
-  ImageIcon
+  Eye,
+  Calendar
 } from "lucide-react";
 import Avatar from "../../components/common/Avatar";
 import { studentService } from "../../services/studentService";
+import { resolveAssetUrl } from "../../services/api";
 import { Card, CardHeader } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
@@ -797,7 +792,18 @@ export function StudentProfilePage() {
             </div>
           </div>
 
-          <div>
+          <div className="flex flex-wrap items-center gap-2">
+            {student.resumeUrl && (
+              <a
+                href={resolveAssetUrl(student.resumeUrl)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors"
+              >
+                <Eye className="w-3.5 h-3.5 text-indigo-600" />
+                View Resume
+              </a>
+            )}
             <label className="cursor-pointer">
               <input
                 type="file"

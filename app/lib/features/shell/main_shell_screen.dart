@@ -78,84 +78,47 @@ class MainShellScreen extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
-                  // Brand Logo Mark & Live Radar Badge
-                  Container(
-                    width: 32,
+                  // Brand Compact Logo & Live Badge
+                  Image.asset(
+                    'assets/branding/sips-logo-compact.png',
                     height: 32,
-                    decoration: BoxDecoration(
-                      gradient: AppColors.cobaltGradient,
-                      borderRadius: AppRadius.mdRadius,
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.insights_rounded,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
+                    fit: BoxFit.contain,
+                    semanticLabel: 'SIPS',
                   ),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            'SIPS',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.onSurface,
-                              letterSpacing: -0.3,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFE6F8F0),
-                              borderRadius: AppRadius.fullRadius,
-                              border: Border.all(
-                                color: const Color(0xFF10B981).withValues(alpha: 0.4),
-                                width: 0.8,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 5,
-                                  height: 5,
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.emerald,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'LIVE',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w800,
-                                    color: const Color(0xFF047857),
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE6F8F0),
+                      borderRadius: AppRadius.fullRadius,
+                      border: Border.all(
+                        color: const Color(0xFF10B981).withValues(alpha: 0.4),
+                        width: 0.8,
                       ),
-                      Text(
-                        'Placement Hub',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.onSurfaceVariant,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 5,
+                          height: 5,
+                          decoration: const BoxDecoration(
+                            color: AppColors.emerald,
+                            shape: BoxShape.circle,
+                          ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 4),
+                        Text(
+                          'LIVE',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF047857),
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   const Spacer(),
                   // Notification Alerts Bell

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:http/testing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sips_app/core/network/api_client.dart';
@@ -16,6 +17,23 @@ void main() {
   group('ApiClient Tests', () {
     setUp(() {
       SharedPreferences.setMockInitialValues({});
+    });
+
+    test('ApiConfig.defaultBaseUrl returns valid non-empty URL', () {
+      expect(ApiConfig.defaultBaseUrl, isNotEmpty);
+      expect(ApiConfig.baseUrl, isNotEmpty);
+    });
+
+    test('ApiClient normalizes base URL with trailing slashes', () async {
+      late http.BaseRequest capturedRequest;
+      final mockClient = MockClient((request) async {
+        capturedRequest = request;
+        return http.Response(jsonEncode({'status': 'ok'}), 200, headers: {'content-type': 'application/json'});
+      });
+
+      final apiClient = ApiClient(client: mockClient, baseUrl: 'https://example.com/api/');
+      await apiClient.get('/health');
+      expect(capturedRequest.url.toString(), 'https://example.com/api/health');
     });
 
     test('GET request attaches Bearer token if present', () async {
@@ -63,14 +81,18 @@ void main() {
       expect(savedToken, isNull);
     });
 
-    test('POST multipart sends resume field', () async {
+    test('POST multipart sends resume with explicit application/pdf contentType', () async {
       SharedPreferences.setMockInitialValues({
         ApiConfig.tokenKey: 'valid-jwt',
       });
 
-      final mockClient = MockClient((request) async {
-        return http.Response(
-          jsonEncode({'message': 'Resume uploaded', 'resumeUrl': '/uploads/resume.pdf'}),
+      late http.MultipartFile capturedFile;
+      final mockClient = MockClient.streaming((request, bodyStream) async {
+        if (request is http.MultipartRequest) {
+          capturedFile = request.files.first;
+        }
+        return http.StreamedResponse(
+          Stream.value(utf8.encode(jsonEncode({'message': 'Resume uploaded', 'resumeUrl': '/uploads/resume.pdf'}))),
           200,
           headers: {'content-type': 'application/json'},
         );
@@ -80,11 +102,56 @@ void main() {
       final response = await apiClient.uploadMultipart(
         '/api/student/resume',
         fieldName: 'resume',
-        fileBytes: [1, 2, 3, 4],
-        filename: 'resume.pdf',
+        fileBytes: [0x25, 0x50, 0x44, 0x46, 0x2D], // %PDF-
+        filename: 'my_resume.pdf',
+        contentType: MediaType('application', 'pdf'),
       );
 
       expect(response['resumeUrl'], '/uploads/resume.pdf');
+      expect(capturedFile.contentType.type, 'application');
+      expect(capturedFile.contentType.subtype, 'pdf');
+      expect(capturedFile.field, 'resume');
+      expect(capturedFile.filename, 'my_resume.pdf');
+    });
+
+    test('POST multipart infers image/jpeg MediaType from magic bytes or extension', () async {
+      late http.MultipartFile capturedFile;
+      final mockClient = MockClient.streaming((request, bodyStream) async {
+        if (request is http.MultipartRequest) {
+          capturedFile = request.files.first;
+        }
+        return http.StreamedResponse(
+          Stream.value(utf8.encode(jsonEncode({'success': true, 'profileImageUrl': '/uploads/profile.jpg'}))),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+
+      final apiClient = ApiClient(client: mockClient, baseUrl: 'http://localhost:5000');
+      final response = await apiClient.uploadMultipart(
+        '/api/student/profile/image',
+        fieldName: 'image',
+        fileBytes: [0xFF, 0xD8, 0xFF, 0xE0], // JPEG SOI
+        filename: 'camera_capture_123', // Missing extension
+      );
+
+      expect(response['profileImageUrl'], '/uploads/profile.jpg');
+      expect(capturedFile.contentType.type, 'image');
+      expect(capturedFile.contentType.subtype, 'jpeg');
+      expect(capturedFile.filename, 'camera_capture_123.jpg');
+    });
+
+    test('inferMediaType correctly handles PNG, WEBP, GIF, and PDF', () {
+      expect(ApiClient.inferMediaType('doc.pdf').toString(), 'application/pdf');
+      expect(ApiClient.inferMediaType('pic.jpg').toString(), 'image/jpeg');
+      expect(ApiClient.inferMediaType('pic.jpeg').toString(), 'image/jpeg');
+      expect(ApiClient.inferMediaType('pic.png').toString(), 'image/png');
+      expect(ApiClient.inferMediaType('pic.webp').toString(), 'image/webp');
+      expect(ApiClient.inferMediaType('pic.gif').toString(), 'image/gif');
+
+      // Magic byte detection
+      expect(ApiClient.inferMediaType('unknown', [0x89, 0x50, 0x4E, 0x47]).toString(), 'image/png');
+      expect(ApiClient.inferMediaType('unknown', [0x25, 0x50, 0x44, 0x46]).toString(), 'application/pdf');
     });
   });
 

@@ -34,7 +34,7 @@ const upload = multer({
   limits: { fileSize: config.uploadLimitBytes }, // 5MB
   fileFilter: (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
-    if (file.mimetype === 'application/pdf' && ext === '.pdf') {
+    if (file.mimetype === 'application/pdf' && (ext === '.pdf' || !ext)) {
       cb(null, true);
     } else {
       cb(new Error('Only PDF files are allowed'), false);
@@ -48,7 +48,13 @@ const imageStorage = multer.diskStorage({
     cb(null, config.uploadDir);
   },
   filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
+    let ext = path.extname(file.originalname).toLowerCase();
+    if (!ext) {
+      if (file.mimetype === 'image/png') ext = '.png';
+      else if (file.mimetype === 'image/webp') ext = '.webp';
+      else if (file.mimetype === 'image/gif') ext = '.gif';
+      else ext = '.jpg';
+    }
     const uniqueName = `profile-${req.user ? req.user.id : 'user'}-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
     cb(null, uniqueName);
   }
@@ -61,7 +67,7 @@ const imageUpload = multer({
     const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
     const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     const ext = path.extname(file.originalname).toLowerCase();
-    if (allowedMimes.includes(file.mimetype) && allowedExts.includes(ext)) {
+    if (allowedMimes.includes(file.mimetype) && (allowedExts.includes(ext) || !ext)) {
       cb(null, true);
     } else {
       cb(new Error('Only image files (JPEG, PNG, WebP, GIF) are allowed'), false);

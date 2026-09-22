@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/alerts/alerts_screen.dart';
 import '../../features/auth/auth_screen.dart';
@@ -7,14 +8,15 @@ import '../../features/growth/roadmap_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/interview/interview_diagnostic_screen.dart';
 import '../../features/interview/mock_interview_screen.dart';
-import '../../features/onboarding/onboarding_screen.dart';
 import '../../features/opportunities/job_detail_screen.dart';
 import '../../features/opportunities/opportunities_screen.dart';
 import '../../features/peers/peer_matching_screen.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/shell/main_shell_screen.dart';
 import '../../features/skills/skills_screen.dart';
+import '../../features/splash/splash_screen.dart';
 import '../../features/welcome/welcome_screen.dart';
+import '../../providers/sips_providers.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -24,8 +26,12 @@ class AppRouter {
 
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/welcome',
+    initialLocation: '/splash',
     routes: [
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
       GoRoute(
         path: '/welcome',
         builder: (context, state) => const WelcomeScreen(),
@@ -36,7 +42,15 @@ class AppRouter {
       ),
       GoRoute(
         path: '/onboarding',
-        builder: (context, state) => const OnboardingScreen(),
+        redirect: (context, state) {
+          try {
+            final container = ProviderScope.containerOf(context, listen: false);
+            final auth = container.read(authProvider);
+            return auth.isAuthenticated ? '/home' : '/auth';
+          } catch (_) {
+            return '/auth';
+          }
+        },
       ),
 
       // Main App Shell with Bottom Navigation

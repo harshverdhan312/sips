@@ -70,6 +70,14 @@ module.exports = (err, req, res, next) => {
     });
   }
 
+  // File type filter errors (e.g., Image check in multer)
+  if (err.message && (err.message.includes('Only image files') || err.message.includes('image files (JPEG, PNG, WebP, GIF)'))) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please upload a valid image file (JPEG, PNG, WebP, GIF).'
+    });
+  }
+
   // JWT errors
   if (err.name === 'JsonWebTokenError') {
     return res.status(401).json({ success: false, message: 'Invalid token' });

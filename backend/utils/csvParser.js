@@ -1,5 +1,5 @@
 /**
- * Robust CSV line splitter that handles commas inside quotes
+ * Robust CSV line splitter that handles commas inside quotes and escaped quotes ("")
  */
 const splitCSVLine = (line) => {
   const result = [];
@@ -9,16 +9,22 @@ const splitCSVLine = (line) => {
   for (let i = 0; i < line.length; i++) {
     const char = line[i];
     if (char === '"') {
-      insideQuotes = !insideQuotes;
+      if (insideQuotes && i + 1 < line.length && line[i + 1] === '"') {
+        // Escaped quote inside quotes: "" -> "
+        current += '"';
+        i++;
+      } else {
+        insideQuotes = !insideQuotes;
+      }
     } else if (char === ',' && !insideQuotes) {
-      result.push(current.trim().replace(/^"|"$/g, '').trim());
+      result.push(current.trim());
       current = '';
     } else {
       current += char;
     }
   }
-  result.push(current.trim().replace(/^"|"$/g, '').trim());
-  return result;
+  result.push(current.trim());
+  return result.map(col => col.replace(/^"|"$/g, '').trim());
 };
 
 /**
@@ -27,7 +33,7 @@ const splitCSVLine = (line) => {
  * Optional columns: Branch, Batch, CGPA, Skills
  */
 const parseCSV = (csvText) => {
-  if (!csvText || typeof csvText !== 'string') {
+  if (!csvText || typeof csvText !== 'string' || !csvText.trim()) {
     throw new Error('CSV content must be a non-empty string');
   }
 
@@ -52,6 +58,8 @@ const parseCSV = (csvText) => {
 
   const students = [];
   const errors = [];
+  const seenEmailsInCsv = new Set();
+  const seenRollsInCsv = new Set();
 
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim();
@@ -68,20 +76,42 @@ const parseCSV = (csvText) => {
       continue;
     }
 
-    // Basic email validation
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    const cleanEmail = email.toLowerCase().trim();
+    const cleanRoll = rollNo.trim();
+
+    // Email validation regex
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
       errors.push(`Row ${i + 1}: Invalid email format "${email}"`);
       continue;
     }
 
+    // CGPA validation
+    let cgpa = 7.5;
+    if (cgpaIdx !== -1 && cols[cgpaIdx] !== undefined && cols[cgpaIdx] !== '') {
+      const parsedCgpa = parseFloat(cols[cgpaIdx]);
+      if (isNaN(parsedCgpa) || parsedCgpa < 0 || parsedCgpa > 10) {
+        errors.push(`Row ${i + 1}: CGPA must be a valid number between 0 and 10 (received "${cols[cgpaIdx]}")`);
+        continue;
+      }
+      cgpa = parsedCgpa;
+    }
+
+    // Check duplicate in same CSV batch
+    if (seenEmailsInCsv.has(cleanEmail) || seenRollsInCsv.has(cleanRoll)) {
+      errors.push(`Row ${i + 1}: Duplicate student in CSV upload (${cleanEmail} / ${cleanRoll})`);
+      continue;
+    }
+    seenEmailsInCsv.add(cleanEmail);
+    seenRollsInCsv.add(cleanRoll);
+
     const studentRecord = {
       name: name.trim(),
-      rollNo: rollNo.trim(),
-      usn: rollNo.trim(),
-      email: email.toLowerCase().trim(),
+      rollNo: cleanRoll,
+      usn: cleanRoll,
+      email: cleanEmail,
       branch: branchIdx !== -1 && cols[branchIdx] ? cols[branchIdx].trim() : 'Computer Science & Engineering',
       batch: batchIdx !== -1 && cols[batchIdx] ? cols[batchIdx].trim() : '2025',
-      cgpa: cgpaIdx !== -1 && !isNaN(parseFloat(cols[cgpaIdx])) ? parseFloat(cols[cgpaIdx]) : 7.5
+      cgpa
     };
 
     if (skillsIdx !== -1 && cols[skillsIdx]) {
