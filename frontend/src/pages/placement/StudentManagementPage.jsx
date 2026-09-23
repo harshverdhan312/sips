@@ -289,7 +289,7 @@ export function StudentManagementPage() {
       sortable: true,
       render: (row) => (
         <span className="font-semibold text-indigo-600">
-          {row.metrics?.technicalScore || 65}/100
+          {row.metrics?.technicalScore ?? 0}/100
         </span>
       )
     },
@@ -299,7 +299,7 @@ export function StudentManagementPage() {
       sortable: true,
       render: (row) => (
         <span className="font-semibold text-purple-600">
-          {row.metrics?.softSkillScore || 65}/100
+          {row.metrics?.softSkillScore ?? 0}/100
         </span>
       )
     },
@@ -309,7 +309,7 @@ export function StudentManagementPage() {
       sortable: true,
       render: (row) => (
         <span className="font-bold text-slate-900">
-          {row.metrics?.employabilityIndex || 65}/100
+          {row.metrics?.employabilityIndex ?? 0}/100
         </span>
       )
     },
@@ -319,7 +319,7 @@ export function StudentManagementPage() {
       sortable: true,
       render: (row) => (
         <span className="font-extrabold text-emerald-600">
-          {row.metrics?.placementProbability || 70}%
+          {row.metrics?.placementProbability ?? 0}%
         </span>
       )
     },
@@ -503,7 +503,7 @@ export function StudentManagementPage() {
                   Employability Index
                 </p>
                 <h4 className="text-2xl font-black text-indigo-700 mt-1">
-                  {activeStudent.metrics?.employabilityIndex || 65}/100
+                  {activeStudent.metrics?.employabilityIndex ?? 0}/100
                 </h4>
               </div>
 
@@ -512,7 +512,7 @@ export function StudentManagementPage() {
                   Placement Prob.
                 </p>
                 <h4 className="text-2xl font-black text-emerald-700 mt-1">
-                  {activeStudent.metrics?.placementProbability || 70}%
+                  {activeStudent.metrics?.placementProbability ?? 0}%
                 </h4>
               </div>
 
@@ -521,7 +521,7 @@ export function StudentManagementPage() {
                   Technical Score
                 </p>
                 <h4 className="text-2xl font-black text-blue-700 mt-1">
-                  {activeStudent.metrics?.technicalScore || 65}
+                  {activeStudent.metrics?.technicalScore ?? 0}
                 </h4>
               </div>
 
@@ -530,7 +530,7 @@ export function StudentManagementPage() {
                   Soft Skill Index
                 </p>
                 <h4 className="text-2xl font-black text-purple-700 mt-1">
-                  {activeStudent.metrics?.softSkillScore || 65}
+                  {activeStudent.metrics?.softSkillScore ?? 0}
                 </h4>
               </div>
             </div>

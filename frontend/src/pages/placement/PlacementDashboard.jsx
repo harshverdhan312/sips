@@ -71,7 +71,9 @@ export function PlacementDashboard() {
             Batch 2025 Placement Readiness Overview
           </h1>
           <p className="text-sm text-slate-500">
-            Real-time tracking of 480 engineering candidates across 5 departments.
+            {metrics.totalStudents > 0
+              ? `Real-time tracking of ${metrics.totalStudents} engineering candidate${metrics.totalStudents === 1 ? '' : 's'} registered in placement cell.`
+              : 'Real-time tracking of engineering candidates registered in placement cell.'}
           </p>
         </div>
 
@@ -96,7 +98,7 @@ export function PlacementDashboard() {
       </div>
 
       {/* Top 6 Batch KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-5">
         <StatCard
           title="Total Students"
           value={metrics.totalStudents}
@@ -153,9 +155,9 @@ export function PlacementDashboard() {
           />
           <BatchDonutChart data={analytics.batchDonut} height={230} />
           <div className="mt-2 pt-3 border-t border-slate-100 flex justify-between text-xs text-slate-500">
-            <span>Ready: <strong className="text-emerald-600">312</strong></span>
-            <span>Needs Imp: <strong className="text-amber-600">124</strong></span>
-            <span>At Risk: <strong className="text-rose-600">44</strong></span>
+            <span>Ready: <strong className="text-emerald-600">{metrics.placementReady ?? 0}</strong></span>
+            <span>Needs Imp: <strong className="text-amber-600">{metrics.needsImprovement ?? 0}</strong></span>
+            <span>At Risk: <strong className="text-rose-600">{metrics.atRisk ?? 0}</strong></span>
           </div>
         </Card>
 
@@ -163,7 +165,7 @@ export function PlacementDashboard() {
         <Card className="lg:col-span-2">
           <CardHeader
             title="Department-Wise Readiness Benchmarks"
-            subtitle="Comparing readiness counts across CSE, ISE, AI/ML, ECE, and EEE/Mech"
+            subtitle="Comparing readiness counts across engineering departments"
             action={
               <Button
                 variant="ghost"
@@ -184,71 +186,79 @@ export function PlacementDashboard() {
           title="Students Requiring Immediate Placement Intervention"
           subtitle="Identified through low interview readiness, severe skill gaps, or backlogs"
           action={
-            <Badge variant="danger" size="md">
+            <Badge variant={atRiskStudents.length > 0 ? "danger" : "success"} size="md">
               {atRiskStudents.length} Priority Interventions
             </Badge>
           }
         />
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs sm:text-sm text-slate-700">
-            <thead className="bg-slate-50 text-slate-500 font-semibold uppercase text-[11px] border-b border-slate-200">
-              <tr>
-                <th className="px-4 py-3">Student Name</th>
-                <th className="px-4 py-3">Branch</th>
-                <th className="px-4 py-3">CGPA</th>
-                <th className="px-4 py-3">Employability</th>
-                <th className="px-4 py-3">Critical Skill Gap</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right">Intervention Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {atRiskStudents.map((std) => (
-                <tr key={std.id} className="hover:bg-slate-50/80 transition-colors">
-                  <td className="px-4 py-3 font-semibold text-slate-900 flex items-center gap-2.5">
-                    <Avatar
-                      src={std.profileImageUrl || std.avatar}
-                      name={std.name}
-                      size="xs"
-                      className="w-7 h-7 border border-slate-200 shrink-0"
-                    />
-                    <div>
-                      <p className="font-bold">{std.name}</p>
-                      <span className="text-[10px] text-slate-400 font-normal">
-                        {std.usn}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-slate-600">{std.branch}</td>
-                  <td className="px-4 py-3 font-semibold text-slate-900">{std.cgpa}</td>
-                  <td className="px-4 py-3">
-                    <span className="font-bold text-rose-600">
-                      {std.metrics.employabilityIndex}/100
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-slate-500 text-xs">
-                    {std.weakSkills ? std.weakSkills.slice(0, 2).join(", ") : "DSA & Confidence"}
-                  </td>
-                  <td className="px-4 py-3">
-                    <Badge variant="danger" size="sm">
-                      {std.status}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <Button
-                      variant="outline"
-                      size="xs"
-                      icon={Send}
-                      onClick={() => handleNotifyStudent(std.name)}
-                    >
-                      Alert Counselor
-                    </Button>
-                  </td>
+          {atRiskStudents.length > 0 ? (
+            <table className="w-full text-left text-xs sm:text-sm text-slate-700">
+              <thead className="bg-slate-50 text-slate-500 font-semibold uppercase text-[11px] border-b border-slate-200">
+                <tr>
+                  <th className="px-4 py-3">Student Name</th>
+                  <th className="px-4 py-3">Branch</th>
+                  <th className="px-4 py-3">CGPA</th>
+                  <th className="px-4 py-3">Employability</th>
+                  <th className="px-4 py-3">Critical Skill Gap</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3 text-right">Intervention Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {atRiskStudents.map((std) => (
+                  <tr key={std.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="px-4 py-3 font-semibold text-slate-900 flex items-center gap-2.5">
+                      <Avatar
+                        src={std.profileImageUrl || std.avatar}
+                        name={std.name}
+                        size="xs"
+                        className="w-7 h-7 border border-slate-200 shrink-0"
+                      />
+                      <div>
+                        <p className="font-bold">{std.name}</p>
+                        <span className="text-[10px] text-slate-400 font-normal">
+                          {std.usn}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-slate-600">{std.branch}</td>
+                    <td className="px-4 py-3 font-semibold text-slate-900">{std.cgpa}</td>
+                    <td className="px-4 py-3">
+                      <span className="font-bold text-rose-600">
+                        {std.metrics.employabilityIndex}/100
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-slate-500 text-xs">
+                      {std.weakSkills ? std.weakSkills.slice(0, 2).join(", ") : "DSA & Confidence"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <Badge variant="danger" size="sm">
+                        {std.status}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Button
+                        variant="outline"
+                        size="xs"
+                        icon={Send}
+                        onClick={() => handleNotifyStudent(std.name)}
+                      >
+                        Alert Counselor
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="p-8 text-center text-slate-500 text-sm">
+              <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
+              <p className="font-medium text-slate-700">No critical student interventions required</p>
+              <p className="text-xs text-slate-400 mt-1">All enrolled students in this cohort meet baseline placement readiness standards.</p>
+            </div>
+          )}
         </div>
       </Card>
     </div>
