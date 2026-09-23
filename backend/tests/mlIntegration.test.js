@@ -76,13 +76,12 @@ describe('Phase 5: Node-Only ML Service Integration Boundary', () => {
       );
     });
 
-    it('should post multipart PDF and parse extracted skills', async () => {
+    it('should post multipart PDF and parse extracted skills from FastAPI schema', async () => {
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
         status: 200,
         json: async () => ({
-          skills: ['Python', 'Node.js', 'MongoDB'],
-          raw_text: 'Experienced developer in Python and Node.js'
+          extracted_skills: ['python', 'nodejs', 'mongodb']
         })
       });
 
@@ -90,11 +89,26 @@ describe('Phase 5: Node-Only ML Service Integration Boundary', () => {
       const dummyBuffer = Buffer.from('%PDF-1.4 dummy pdf content');
       const result = await client.extractResumeSkills(dummyBuffer, 'sample.pdf');
 
-      expect(result.skills).toEqual(['Python', 'Node.js', 'MongoDB']);
-      expect(result.raw_text).toContain('Experienced developer');
+      expect(result.extracted_skills).toEqual(['python', 'nodejs', 'mongodb']);
       expect(global.fetch).toHaveBeenCalledWith(
         expect.stringMatching(/\/resume\/extract$/),
         expect.objectContaining({ method: 'POST' })
+      );
+    });
+
+    it('should throw 502 when FastAPI response is missing extracted_skills array', async () => {
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          invalid_key: ['python']
+        })
+      });
+
+      const client = new MLService();
+      const dummyBuffer = Buffer.from('%PDF-1.4 dummy pdf content');
+      await expect(client.extractResumeSkills(dummyBuffer, 'sample.pdf')).rejects.toThrow(
+        'ML Service returned invalid resume extraction schema.'
       );
     });
   });
@@ -105,48 +119,73 @@ describe('Phase 5: Node-Only ML Service Integration Boundary', () => {
       await expect(client.matchResumeSkills('not-array', [])).rejects.toThrow(AppError);
     });
 
-    it('should post skill arrays and return match statistics', async () => {
+    it('should post skill arrays and return verified FastAPI match statistics', async () => {
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
         status: 200,
         json: async () => ({
-          match_score: 75.0,
-          matching_skills: ['React', 'Node.js', 'SQL'],
-          missing_skills: ['Docker']
+          matched_skills: ['react', 'nodejs', 'sql'],
+          missing_skills: ['docker'],
+          coverage_score: 75.0
         })
       });
 
       const client = new MLService();
       const res = await client.matchResumeSkills(['React', 'Node.js', 'SQL'], ['React', 'Node.js', 'SQL', 'Docker']);
 
-      expect(res.match_score).toBe(75);
-      expect(res.matching_skills).toHaveLength(3);
-      expect(res.missing_skills).toEqual(['Docker']);
+      expect(res.coverage_score).toBe(75.0);
+      expect(res.matched_skills).toEqual(['react', 'nodejs', 'sql']);
+      expect(res.missing_skills).toEqual(['docker']);
+    });
+
+    it('should throw 502 when FastAPI response is missing coverage_score', async () => {
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          matched_skills: ['react'],
+          missing_skills: []
+        })
+      });
+
+      const client = new MLService();
+      await expect(
+        client.matchResumeSkills(['react'], ['react'])
+      ).rejects.toThrow('ML Service returned invalid skill match schema.');
     });
   });
 
   describe('5. Semantic & Hybrid Matching', () => {
-    it('should compute semantic match score', async () => {
+    it('should compute semantic similarity and retain model_name', async () => {
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
         status: 200,
-        json: async () => ({ semantic_score: 84.5 })
+        json: async () => ({
+          semantic_similarity: 0.845,
+          model_name: 'all-MiniLM-L6-v2'
+        })
       });
 
       const client = new MLService();
       const res = await client.semanticMatchResume(['Pytorch', 'NLP'], 'Machine learning engineer wanted');
 
-      expect(res.semantic_score).toBe(84.5);
+      expect(res.semantic_similarity).toBe(0.845);
+      expect(res.model_name).toBe('all-MiniLM-L6-v2');
     });
 
-    it('should perform hybrid match with weights', async () => {
+    it('should perform hybrid match with verified FastAPI response schema', async () => {
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
         status: 200,
         json: async () => ({
-          hybrid_score: 80.0,
-          keyword_score: 70.0,
-          semantic_score: 95.0
+          matched_skills: ['javascript'],
+          missing_skills: ['aws'],
+          skill_coverage_score: 50.0,
+          semantic_similarity: 0.85,
+          semantic_score: 85.0,
+          hybrid_match_score: 67.5,
+          skill_weight: 0.5,
+          semantic_weight: 0.5
         })
       });
 
@@ -160,8 +199,14 @@ describe('Phase 5: Node-Only ML Service Integration Boundary', () => {
         semanticWeight: 0.5
       });
 
-      expect(res.hybrid_score).toBe(80);
-      expect(res.keyword_score).toBe(70);
+      expect(res.hybrid_match_score).toBe(67.5);
+      expect(res.skill_coverage_score).toBe(50.0);
+      expect(res.semantic_similarity).toBe(0.85);
+      expect(res.semantic_score).toBe(85.0);
+      expect(res.matched_skills).toEqual(['javascript']);
+      expect(res.missing_skills).toEqual(['aws']);
+      expect(res.skill_weight).toBe(0.5);
+      expect(res.semantic_weight).toBe(0.5);
     });
   });
 

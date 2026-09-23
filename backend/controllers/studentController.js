@@ -419,7 +419,35 @@ exports.uploadResume = async (req, res) => {
         safeDeleteUploadFile(oldResume);
       }
 
-      return res.json({ message: 'Resume uploaded', resumeUrl: student.resumeUrl });
+      // Trigger FastAPI ML resume skill extraction safely
+      let mlAnalysis = {
+        status: 'unavailable',
+        extracted_skills: []
+      };
+
+      try {
+        const pdfBuffer = await fs.promises.readFile(uploadedFilePath);
+        const extractionResult = await mlService.extractResumeSkills(pdfBuffer, req.file.originalname || req.file.filename);
+        if (extractionResult && Array.isArray(extractionResult.extracted_skills)) {
+          mlAnalysis = {
+            status: 'completed',
+            extracted_skills: extractionResult.extracted_skills
+          };
+        }
+      } catch (mlErr) {
+        logger.warn('ML resume skill extraction skipped/unavailable:', { error: mlErr.message });
+        mlAnalysis = {
+          status: 'unavailable',
+          extracted_skills: [],
+          message: 'ML skill extraction service is currently offline. Resume was saved successfully.'
+        };
+      }
+
+      return res.json({
+        message: 'Resume uploaded',
+        resumeUrl: student.resumeUrl,
+        mlAnalysis
+      });
     }
 
     // ----------------------------------------------------
@@ -450,7 +478,35 @@ exports.uploadResume = async (req, res) => {
       safeDeleteUploadFile(oldResume);
     }
 
-    res.json({ message: 'Resume uploaded', resumeUrl: student.resumeUrl });
+    // Trigger FastAPI ML resume skill extraction safely
+    let mlAnalysis = {
+      status: 'unavailable',
+      extracted_skills: []
+    };
+
+    try {
+      const pdfBuffer = await fs.promises.readFile(uploadedFilePath);
+      const extractionResult = await mlService.extractResumeSkills(pdfBuffer, req.file.originalname || req.file.filename);
+      if (extractionResult && Array.isArray(extractionResult.extracted_skills)) {
+        mlAnalysis = {
+          status: 'completed',
+          extracted_skills: extractionResult.extracted_skills
+        };
+      }
+    } catch (mlErr) {
+      logger.warn('ML resume skill extraction skipped/unavailable:', { error: mlErr.message });
+      mlAnalysis = {
+        status: 'unavailable',
+        extracted_skills: [],
+        message: 'ML skill extraction service is currently offline. Resume was saved successfully.'
+      };
+    }
+
+    res.json({
+      message: 'Resume uploaded',
+      resumeUrl: student.resumeUrl,
+      mlAnalysis
+    });
   } catch (error) {
     if (uploadedFilePath) {
       safeDeleteUploadFile(path.basename(uploadedFilePath));
@@ -1195,3 +1251,97 @@ exports.getLatestPlacementPrediction = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * POST /api/student/jobs/:id/analyze-match
+ * Authenticated student — analyze job match with student profile using FastAPI hybrid matching
+ */
+exports.analyzeJobMatch = async (req, res, next) => {
+  try {
+    const jobId = req.params.id;
+    let student = null;
+    let jd = null;
+
+    if (!memoryDb.isMongoConnected() && !Student.findOne.mock) {
+      student = memoryDb.findStudentById(req.user.id);
+      const allJobs = memoryDb.getJobs(req.collegeId);
+      jd = allJobs.find(j => String(j._id || j.id) === String(jobId));
+    } else {
+      student = await Student.findOne({
+        _id: req.user.id,
+        collegeId: req.collegeId
+      });
+      jd = await JobDescription.findOne({
+        _id: jobId,
+        collegeId: req.collegeId
+      });
+    }
+
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student profile not found' });
+    }
+    if (!jd) {
+      return res.status(404).json({ success: false, message: 'Job opportunity not found' });
+    }
+
+    const studentSkills = Array.isArray(student.skills) ? student.skills : [];
+    const requiredSkills = Array.isArray(jd.requiredSkills) ? jd.requiredSkills : [];
+    const jobText = [jd.title, jd.company, jd.description].filter(Boolean).join('. ');
+    const resumeText = studentSkills.length > 0 ? studentSkills.join(', ') : 'Student technical profile';
+
+    try {
+      const hybridResult = await mlService.hybridMatchResume({
+        studentSkills,
+        requiredSkills,
+        resumeText,
+        jobText,
+        skillWeight: 0.6,
+        semanticWeight: 0.4
+      });
+
+      return res.status(200).json({
+        success: true,
+        jobId: jd._id || jd.id,
+        jobTitle: jd.title,
+        company: jd.company,
+        mlStatus: 'completed',
+        hybridMatch: {
+          matched_skills: hybridResult.matched_skills,
+          missing_skills: hybridResult.missing_skills,
+          skill_coverage_score: hybridResult.skill_coverage_score,
+          semantic_similarity: hybridResult.semantic_similarity,
+          semantic_score: hybridResult.semantic_score,
+          hybrid_match_score: hybridResult.hybrid_match_score,
+          skill_weight: hybridResult.skill_weight,
+          semantic_weight: hybridResult.semantic_weight
+        }
+      });
+    } catch (mlErr) {
+      logger.warn('FastAPI hybrid match unavailable, falling back to deterministic matching:', { error: mlErr.message });
+      const localMatch = calculateMatch(studentSkills, requiredSkills);
+
+      return res.status(200).json({
+        success: true,
+        jobId: jd._id || jd.id,
+        jobTitle: jd.title,
+        company: jd.company,
+        mlStatus: 'offline',
+        message: 'FastAPI ML engine is currently offline. Showing local deterministic match.',
+        hybridMatch: {
+          matched_skills: localMatch.matchedSkills || [],
+          missing_skills: localMatch.missingSkills || [],
+          skill_coverage_score: localMatch.score || 0,
+          semantic_similarity: null,
+          semantic_score: null,
+          hybrid_match_score: localMatch.score || 0,
+          skill_weight: 1.0,
+          semantic_weight: 0.0
+        }
+      });
+    }
+  } catch (error) {
+    logger.error('Analyze job match error:', error);
+    next(error);
+  }
+};
+

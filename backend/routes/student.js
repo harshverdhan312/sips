@@ -93,6 +93,9 @@ router.post('/resume', auth, tenant, upload.single('resume'), studentController.
 // GET /api/student/jobs
 router.get('/jobs', auth, tenant, studentController.getJobs);
 
+// POST /api/student/jobs/:id/analyze-match
+router.post('/jobs/:id/analyze-match', auth, tenant, validateObjectId('id'), studentController.analyzeJobMatch);
+
 // POST /api/student/jobs/:id/apply
 router.post('/jobs/:id/apply', auth, tenant, validateObjectId('id'), studentController.applyToJob);
 

@@ -3,6 +3,7 @@ import '../core/network/api_client.dart';
 import '../core/widgets/skill_chip.dart';
 import '../models/growth_task.dart';
 import '../models/job_opportunity.dart';
+import '../models/job_match_analysis.dart';
 import '../models/mock_interview.dart';
 import '../models/peer_match.dart';
 import '../models/placement_alert.dart';
@@ -203,6 +204,15 @@ class ApiSipsRepository implements SipsRepository {
     }).toList();
   }
 
+  @override
+  Future<JobMatchAnalysis> analyzeJobMatch(String jobId) async {
+    final response = await _apiClient.post('/api/student/jobs/$jobId/analyze-match');
+    if (response is Map<String, dynamic>) {
+      return JobMatchAnalysis.fromJson(response);
+    }
+    throw Exception('Failed to analyze job match: invalid response');
+  }
+
   // ==========================================
   // 5. Placement Alerts (LIVE)
   // ==========================================
@@ -250,10 +260,15 @@ class ApiSipsRepository implements SipsRepository {
 
     if (response is Map<String, dynamic> && response['resumeUrl'] != null) {
       final resumeUrl = response['resumeUrl'] as String;
+      final mlAnalysis = response['mlAnalysis'] as Map<String, dynamic>?;
+      final rawExtracted = mlAnalysis?['extracted_skills'];
+      final extractedList = rawExtracted is List ? rawExtracted.map((s) => s.toString()).toList() : <String>[];
+
       if (_cachedProfile != null) {
         _cachedProfile = _cachedProfile!.copyWith(
           resumeUrl: resumeUrl,
           resumeVersion: 'Uploaded Resume ($filename)',
+          extractedSkills: extractedList,
         );
       }
       return resumeUrl;

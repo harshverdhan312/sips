@@ -131,13 +131,12 @@ class MLService {
       body: formData
     });
 
-    if (!data || typeof data !== 'object' || !Array.isArray(data.skills)) {
+    if (!data || typeof data !== 'object' || !Array.isArray(data.extracted_skills)) {
       throw new AppError('ML Service returned invalid resume extraction schema.', 502);
     }
 
     return {
-      skills: data.skills,
-      raw_text: data.raw_text || ''
+      extracted_skills: data.extracted_skills
     };
   }
 
@@ -159,14 +158,20 @@ class MLService {
       })
     });
 
-    if (!data || typeof data !== 'object' || typeof data.match_score !== 'number') {
+    if (
+      !data ||
+      typeof data !== 'object' ||
+      typeof data.coverage_score !== 'number' ||
+      !Array.isArray(data.matched_skills) ||
+      !Array.isArray(data.missing_skills)
+    ) {
       throw new AppError('ML Service returned invalid skill match schema.', 502);
     }
 
     return {
-      match_score: data.match_score,
-      matching_skills: Array.isArray(data.matching_skills) ? data.matching_skills : [],
-      missing_skills: Array.isArray(data.missing_skills) ? data.missing_skills : []
+      matched_skills: data.matched_skills,
+      missing_skills: data.missing_skills,
+      coverage_score: data.coverage_score
     };
   }
 
@@ -188,12 +193,13 @@ class MLService {
       })
     });
 
-    if (!data || typeof data !== 'object' || typeof data.semantic_score !== 'number') {
+    if (!data || typeof data !== 'object' || typeof data.semantic_similarity !== 'number') {
       throw new AppError('ML Service returned invalid semantic match schema.', 502);
     }
 
     return {
-      semantic_score: data.semantic_score
+      semantic_similarity: data.semantic_similarity,
+      model_name: data.model_name || ''
     };
   }
 
@@ -222,11 +228,20 @@ class MLService {
       })
     });
 
-    if (!data || typeof data !== 'object' || typeof data.hybrid_score !== 'number') {
+    if (!data || typeof data !== 'object' || typeof data.hybrid_match_score !== 'number') {
       throw new AppError('ML Service returned invalid hybrid match schema.', 502);
     }
 
-    return data;
+    return {
+      matched_skills: Array.isArray(data.matched_skills) ? data.matched_skills : [],
+      missing_skills: Array.isArray(data.missing_skills) ? data.missing_skills : [],
+      skill_coverage_score: data.skill_coverage_score,
+      semantic_similarity: data.semantic_similarity,
+      semantic_score: data.semantic_score,
+      hybrid_match_score: data.hybrid_match_score,
+      skill_weight: data.skill_weight,
+      semantic_weight: data.semantic_weight
+    };
   }
 
   /**

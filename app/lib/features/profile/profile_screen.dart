@@ -1379,7 +1379,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               : const Icon(Icons.upload_file_rounded, size: 18, color: AppColors.primary),
                           label: Text(
                             _isUploadingResume
-                                ? 'Uploading to Server...'
+                                ? 'Uploading & Extracting Skills...'
                                 : (profile.resumeUrl.isNotEmpty ? 'Replace PDF Resume' : 'Upload PDF Resume'),
                             style: GoogleFonts.plusJakartaSans(
                               color: AppColors.primary,
@@ -1389,6 +1389,33 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           ),
                         ),
                       ),
+                      if (profile.extractedSkills.isNotEmpty) ...[
+                        const SizedBox(height: 14),
+                        const Divider(height: 1),
+                        const SizedBox(height: 14),
+                        Row(
+                          children: [
+                            const Icon(Icons.auto_awesome_rounded, size: 16, color: AppColors.primary),
+                            const SizedBox(width: 6),
+                            Text(
+                              'AI-Extracted Skills (${profile.extractedSkills.length})',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.onSurface,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: profile.extractedSkills
+                              .map((s) => SkillChip(label: s, status: SkillStatus.strong))
+                              .toList(),
+                        ),
+                      ],
                     ],
                   ),
                 ),

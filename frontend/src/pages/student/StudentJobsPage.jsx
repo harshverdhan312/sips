@@ -12,7 +12,8 @@ import {
   ExternalLink,
   GraduationCap,
   Filter,
-  Check
+  Check,
+  RefreshCw
 } from "lucide-react";
 import { studentService } from "../../services/studentService";
 import { Card, CardHeader } from "../../components/common/Card";
@@ -31,6 +32,8 @@ export function StudentJobsPage() {
   const [matchFilter, setMatchFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [selectedJob, setSelectedJob] = useState(null);
+  const [analyzingMl, setAnalyzingMl] = useState(false);
+  const [mlAnalysisResult, setMlAnalysisResult] = useState(null);
   const [appliedJobIds, setAppliedJobIds] = useState(() => {
     try {
       const saved = localStorage.getItem("sips_applied_job_ids");
@@ -39,6 +42,24 @@ export function StudentJobsPage() {
       return [];
     }
   });
+
+  const handleSelectJob = (job) => {
+    setSelectedJob(job);
+    setMlAnalysisResult(null);
+  };
+
+  const handleAnalyzeMatch = async (jobId) => {
+    try {
+      setAnalyzingMl(true);
+      const res = await studentService.analyzeJobMatch(jobId);
+      setMlAnalysisResult(res);
+      addToast("AI Match Analysis computed successfully!", "success");
+    } catch (e) {
+      addToast(e.message || "Failed to analyze match", "error");
+    } finally {
+      setAnalyzingMl(false);
+    }
+  };
 
   useEffect(() => {
     async function load() {
@@ -301,7 +322,7 @@ export function StudentJobsPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setSelectedJob(job)}
+                      onClick={() => handleSelectJob(job)}
                     >
                       View Details
                     </Button>
@@ -364,18 +385,32 @@ export function StudentJobsPage() {
               <div>
                 <span className="text-xs text-slate-500 font-semibold block">Calculated Match Score</span>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-2xl font-black text-indigo-700">{selectedJob.matchScore}%</span>
+                  <span className="text-2xl font-black text-indigo-700">
+                    {mlAnalysisResult?.hybridMatch
+                      ? `${Math.round(mlAnalysisResult.hybridMatch.hybrid_match_score * 100)}%`
+                      : `${selectedJob.matchScore}%`}
+                  </span>
                   <Badge
                     variant={
-                      selectedJob.matchScore >= 80
+                      (mlAnalysisResult?.hybridMatch
+                        ? Math.round(mlAnalysisResult.hybridMatch.hybrid_match_score * 100)
+                        : selectedJob.matchScore) >= 80
                         ? "success"
-                        : selectedJob.matchScore >= 60
+                        : (mlAnalysisResult?.hybridMatch
+                            ? Math.round(mlAnalysisResult.hybridMatch.hybrid_match_score * 100)
+                            : selectedJob.matchScore) >= 60
                         ? "primary"
                         : "neutral"
                     }
                     size="sm"
                   >
-                    {selectedJob.matchScore >= 80 ? "High Compatibility" : selectedJob.matchScore >= 60 ? "Moderate Match" : "Developing"}
+                    {mlAnalysisResult?.mlStatus === "completed"
+                      ? "AI Hybrid Match"
+                      : selectedJob.matchScore >= 80
+                      ? "High Compatibility"
+                      : selectedJob.matchScore >= 60
+                      ? "Moderate Match"
+                      : "Developing"}
                   </Badge>
                 </div>
               </div>
@@ -384,6 +419,60 @@ export function StudentJobsPage() {
                 <span className="text-xs text-slate-500 font-semibold block">Annual Compensation</span>
                 <span className="text-xl font-black text-emerald-700">{selectedJob.ctc}</span>
               </div>
+            </div>
+
+            {/* AI Hybrid ML Breakdown & Trigger */}
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-indigo-600" />
+                  <span className="font-bold text-slate-900 text-xs sm:text-sm">
+                    AI Match Intelligence (FastAPI ML)
+                  </span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="xs"
+                  loading={analyzingMl}
+                  disabled={analyzingMl}
+                  onClick={() => handleAnalyzeMatch(selectedJob.id)}
+                  icon={RefreshCw}
+                >
+                  {mlAnalysisResult ? "Re-analyze with AI" : "Run ML Hybrid Match"}
+                </Button>
+              </div>
+
+              {mlAnalysisResult ? (
+                <div className="space-y-2 pt-2 border-t border-slate-200">
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <div className="p-2.5 rounded-lg bg-white border border-slate-200">
+                      <span className="text-slate-500 font-medium block">Keyword Match Coverage</span>
+                      <span className="font-bold text-slate-800 text-sm">
+                        {Math.round((mlAnalysisResult.hybridMatch?.skill_coverage_score || 0) * 100)}%
+                      </span>
+                      <span className="text-[10px] text-slate-400 block mt-0.5">Weight: 60%</span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-white border border-slate-200">
+                      <span className="text-slate-500 font-medium block">Semantic Similarity</span>
+                      <span className="font-bold text-indigo-600 text-sm">
+                        {mlAnalysisResult.hybridMatch?.semantic_similarity != null
+                          ? `${Math.round(mlAnalysisResult.hybridMatch.semantic_similarity * 100)}%`
+                          : "N/A"}
+                      </span>
+                      <span className="text-[10px] text-slate-400 block mt-0.5">Weight: 40%</span>
+                    </div>
+                  </div>
+                  {mlAnalysisResult.mlStatus === "offline" && (
+                    <p className="text-[11px] text-amber-700 bg-amber-50 p-2 rounded-lg border border-amber-200">
+                      ML service currently offline. Displaying deterministic keyword compatibility.
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500">
+                  Click "Run ML Hybrid Match" to compute multi-vector semantic and keyword alignment using our FastAPI ML model.
+                </p>
+              )}
             </div>
 
             {/* Description */}
