@@ -8,9 +8,35 @@ export const studentService = {
     try {
       const student = await api.get('/api/student/profile');
       if (student) {
-        const readiness = student.readinessScore || 0;
-        const status = readiness >= 80 ? "Tier-1 Contender • Placement Ready" : (readiness >= 60 ? "Tier-2 Candidate • Developing" : "Tier-3 • Needs Preparation");
         const skillsList = Array.isArray(student.skills) ? student.skills : [];
+        const technicalScore = typeof student.technicalScore === 'number' && student.technicalScore > 0
+          ? student.technicalScore
+          : (skillsList.length > 0 ? Math.min(95, Math.max(50, skillsList.length * 20)) : 0);
+        const resumeScore = typeof student.resumeScore === 'number' && student.resumeScore > 0
+          ? student.resumeScore
+          : (student.resumeUrl ? 85 : 0);
+        const softSkillScore = typeof student.softSkillScore === 'number' && student.softSkillScore > 0
+          ? student.softSkillScore
+          : (skillsList.length > 0 ? 70 : 0);
+        const academicScore = Math.round((student.cgpa || 0) * 10);
+        
+        const readiness = typeof student.readinessScore === 'number' && student.readinessScore > 0
+          ? student.readinessScore
+          : Math.round((technicalScore * 0.3) + (softSkillScore * 0.2) + (resumeScore * 0.2) + (academicScore * 0.3));
+
+        const status = readiness >= 75
+          ? "Tier-1 Contender • Placement Ready"
+          : (readiness >= 50 ? "Tier-2 Candidate • Developing" : "Tier-3 • Needs Preparation");
+
+        // Fetch latest real ML placement prediction if available
+        let placementProbability = student.placementStatus === 'PLACED' ? 100 : readiness;
+        try {
+          const predRes = await api.get('/api/student/analytics/placement/prediction').catch(() => null);
+          if (predRes?.prediction?.placement_probability !== undefined && predRes.prediction.placement_probability !== null) {
+            placementProbability = Math.round(predRes.prediction.placement_probability * 100);
+          }
+        } catch (_) {}
+
         return {
           id: student._id,
           _id: student._id,
@@ -40,13 +66,13 @@ export const studentService = {
           historyOfBacklogs: typeof student.historyOfBacklogs === 'number' ? student.historyOfBacklogs : null,
           metrics: {
             employabilityIndex: readiness,
-            placementProbability: student.placementStatus === 'PLACED' ? 100 : readiness,
-            technicalScore: student.technicalScore || 0,
-            softSkillScore: student.softSkillScore || 0,
-            resumeScore: student.resumeScore || 0,
+            placementProbability,
+            technicalScore,
+            softSkillScore,
+            resumeScore,
             interviewReadiness: readiness,
-            codingScore: student.technicalScore || 0,
-            academicScore: Math.round((student.cgpa || 0) * 10)
+            codingScore: technicalScore,
+            academicScore
           },
           codingProfiles: {
             github: { handle: student.github || "Not linked", verified: Boolean(student.github) }
@@ -189,12 +215,48 @@ export const studentService = {
   async getRadarData() {
     const student = await this.getCurrentStudent();
     if (!student) return [];
+    const metrics = student.metrics || {};
     return [
-      { subject: "Technical Depth", score: student.metrics?.technicalScore || 0, fullMark: 100 },
-      { subject: "Soft Skills", score: student.metrics?.softSkillScore || 0, fullMark: 100 },
-      { subject: "Resume / ATS", score: student.metrics?.resumeScore || 0, fullMark: 100 },
-      { subject: "Academic Standing", score: student.metrics?.academicScore || 0, fullMark: 100 },
-      { subject: "Overall Readiness", score: student.readinessScore || 0, fullMark: 100 }
+      {
+        subject: "Technical Depth",
+        A: metrics.technicalScore || 0,
+        B: 75,
+        score: metrics.technicalScore || 0,
+        benchmark: 75,
+        fullMark: 100
+      },
+      {
+        subject: "Soft Skills",
+        A: metrics.softSkillScore || 0,
+        B: 70,
+        score: metrics.softSkillScore || 0,
+        benchmark: 70,
+        fullMark: 100
+      },
+      {
+        subject: "Resume / ATS",
+        A: metrics.resumeScore || 0,
+        B: 80,
+        score: metrics.resumeScore || 0,
+        benchmark: 80,
+        fullMark: 100
+      },
+      {
+        subject: "Academic Standing",
+        A: metrics.academicScore || 0,
+        B: 75,
+        score: metrics.academicScore || 0,
+        benchmark: 75,
+        fullMark: 100
+      },
+      {
+        subject: "Overall Readiness",
+        A: student.readinessScore || 0,
+        B: 80,
+        score: student.readinessScore || 0,
+        benchmark: 80,
+        fullMark: 100
+      }
     ];
   },
 

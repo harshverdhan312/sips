@@ -39,7 +39,7 @@ export function AdminStudentsPage() {
   }, [batchYear]);
 
   const handleSyncErp = () => {
-    addToast("Synchronized 1,240 student records with College ERP SIS database.", "success");
+    addToast(`Synchronized ${students.length} student records with College ERP SIS database.`, "success");
   };
 
   const columns = [

@@ -96,7 +96,7 @@ export function PlacementAnalyticsPage() {
         <Card>
           <CardHeader
             title="Industry Skill Demand vs Student Supply"
-            subtitle="Identifies critical curriculum and training deficits across 480 candidates"
+            subtitle="Identifies critical curriculum and training deficits across enrolled cohort candidates"
           />
           <div style={{ width: "100%", height: 320 }}>
             <ResponsiveContainer width="100%" height="100%">

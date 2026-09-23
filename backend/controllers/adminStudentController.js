@@ -61,15 +61,24 @@ exports.getStudents = async (req, res) => {
       query.batch = batch.trim();
     }
 
-    // Placement status filter
+    // Placement status / Readiness tier filter
     if (status && status !== 'All') {
-      query.placementStatus = status.trim().toUpperCase();
+      const s = status.trim().toLowerCase();
+      if (s === 'ready' || s === 'placement ready') {
+        query.readinessScore = { $gte: 75 };
+      } else if (s === 'needs_improvement' || s === 'needs improvement') {
+        query.readinessScore = { $gte: 50, $lt: 75 };
+      } else if (s === 'at_risk' || s === 'at risk') {
+        query.readinessScore = { $lt: 50 };
+      } else {
+        query.placementStatus = status.trim().toUpperCase();
+      }
     }
 
     // Readiness score filter
     if (readiness && readiness !== 'All') {
       const r = readiness.toLowerCase();
-      if (r === 'ready') {
+      if (r === 'ready' || r === 'placement ready') {
         query.readinessScore = { $gte: 75 };
       } else if (r === 'needs_improvement' || r === 'needs improvement') {
         query.readinessScore = { $gte: 50, $lt: 75 };

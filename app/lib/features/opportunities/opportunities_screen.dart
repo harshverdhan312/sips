@@ -108,7 +108,7 @@ class _OpportunitiesScreenState extends ConsumerState<OpportunitiesScreen> {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              '${jobs.length} active opportunities calibrated to your 78/100 readiness telemetry.',
+                              '${jobs.length} active opportunities calibrated to your profile credentials.',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 12,
                                 color: AppColors.onSurfaceVariant,
@@ -166,7 +166,37 @@ class _OpportunitiesScreenState extends ConsumerState<OpportunitiesScreen> {
                 const SizedBox(height: 16),
 
                 // Jobs List
-                ...filteredJobs.map((job) => _buildJobCard(job)),
+                if (filteredJobs.isEmpty)
+                  SipsCard(
+                    padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 20),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          const Icon(Icons.work_outline_rounded, size: 40, color: AppColors.outline),
+                          const SizedBox(height: 12),
+                          Text(
+                            'No Active Opportunities Available',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'New campus placement drives will appear here once published by the placement cell.',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12,
+                              color: AppColors.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  ...filteredJobs.map((job) => _buildJobCard(job)),
               ],
             ),
           ),

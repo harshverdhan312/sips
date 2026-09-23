@@ -99,7 +99,37 @@ class AlertsScreen extends ConsumerWidget {
                 const SizedBox(height: 20),
 
                 // Alerts List
-                ...alerts.map((alert) => _buildAlertCard(context, ref, alert)),
+                if (alerts.isEmpty)
+                  SipsCard(
+                    padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 20),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          const Icon(Icons.notifications_none_rounded, size: 40, color: AppColors.outline),
+                          const SizedBox(height: 12),
+                          Text(
+                            'No Active Alerts',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Important campus drive announcements and placement cell bulletins will appear here.',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12,
+                              color: AppColors.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  ...alerts.map((alert) => _buildAlertCard(context, ref, alert)),
               ],
             ),
           ),
