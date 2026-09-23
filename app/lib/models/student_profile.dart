@@ -18,6 +18,7 @@ class StudentProfile {
   final List<String> targetRoles;
   final List<String> preferredLocations;
   final List<String> skills;
+  final List<String> extractedSkills;
   final String resumeUrl;
   final int readinessScore;
   final int technicalScore;
@@ -50,6 +51,7 @@ class StudentProfile {
     this.targetRoles = const [],
     this.preferredLocations = const [],
     this.skills = const [],
+    this.extractedSkills = const [],
     this.resumeUrl = '',
     this.readinessScore = 0,
     this.technicalScore = 0,
@@ -68,15 +70,14 @@ class StudentProfile {
     final technical = (json['technicalScore'] as num?)?.toInt() ?? 0;
     final softSkill = (json['softSkillScore'] as num?)?.toInt() ?? 0;
     final resumeScoreVal = (json['resumeScore'] as num?)?.toInt() ?? 0;
-    // Shared Cross-Platform Frontend Presentation Standard:
-    // >= 80 -> Tier-1 Contender • Placement Ready
-    // >= 60 -> Tier-2 Candidate • Developing
-    // < 60  -> Tier-3 • Needs Preparation
     final tier = readiness >= 80
         ? 'Tier-1 Contender • Placement Ready'
         : (readiness >= 60 ? 'Tier-2 Candidate • Developing' : 'Tier-3 • Needs Preparation');
     final rawSkills = json['skills'];
     final skillsList = rawSkills is List ? rawSkills.map((s) => s.toString()).toList() : <String>[];
+    final mlAnalysis = json['mlAnalysis'] as Map<String, dynamic>?;
+    final rawExtracted = mlAnalysis?['extracted_skills'] ?? json['extractedSkills'];
+    final extractedList = rawExtracted is List ? rawExtracted.map((s) => s.toString()).toList() : <String>[];
     final cgpaVal = (json['cgpa'] as num?)?.toDouble() ?? 0.0;
     final resumeUrl = json['resumeUrl'] as String? ?? '';
     final placementStatusVal = json['placementStatus'] as String? ?? 'Not Placed';
@@ -100,6 +101,7 @@ class StudentProfile {
       placementStatus: placementStatusVal,
       resumeVersion: resumeUrl.isNotEmpty ? 'Uploaded Resume' : 'No Resume Uploaded',
       skills: skillsList,
+      extractedSkills: extractedList,
       resumeUrl: resumeUrl,
       readinessScore: readiness,
       isVerified: true,
@@ -130,6 +132,7 @@ class StudentProfile {
     List<String>? targetRoles,
     List<String>? preferredLocations,
     List<String>? skills,
+    List<String>? extractedSkills,
     String? resumeUrl,
     int? readinessScore,
     int? technicalScore,
@@ -162,6 +165,7 @@ class StudentProfile {
       targetRoles: targetRoles ?? this.targetRoles,
       preferredLocations: preferredLocations ?? this.preferredLocations,
       skills: skills ?? this.skills,
+      extractedSkills: extractedSkills ?? this.extractedSkills,
       resumeUrl: resumeUrl ?? this.resumeUrl,
       readinessScore: readinessScore ?? this.readinessScore,
       technicalScore: technicalScore ?? this.technicalScore,

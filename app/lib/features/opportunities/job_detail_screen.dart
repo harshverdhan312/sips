@@ -21,6 +21,8 @@ class JobDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final jobsAsync = ref.watch(opportunitiesProvider);
 
+    final mlMatchAsync = ref.watch(jobMatchAnalysisProvider(jobId));
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -30,6 +32,11 @@ class JobDetailScreen extends ConsumerWidget {
         ),
         title: const Text('Job Detail & Match'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh_rounded),
+            tooltip: 'Re-analyze Match',
+            onPressed: () => ref.refresh(jobMatchAnalysisProvider(jobId)),
+          ),
           IconButton(
             icon: const Icon(Icons.share_outlined),
             onPressed: () {},
@@ -44,6 +51,17 @@ class JobDetailScreen extends ConsumerWidget {
             (j) => j.id == jobId,
             orElse: () => jobs.first,
           );
+
+          final mlMatch = mlMatchAsync.valueOrNull;
+          final effectiveScore = mlMatch != null
+              ? (mlMatch.hybridMatchScore * 100).round()
+              : job.matchScore;
+          final effectiveMatchedSkills = mlMatch != null && mlMatch.matchedSkills.isNotEmpty
+              ? mlMatch.matchedSkills
+              : job.matchedSkills;
+          final effectiveMissingSkills = mlMatch != null
+              ? mlMatch.missingSkills
+              : job.missingSkills;
 
           return Column(
             children: [
@@ -68,8 +86,12 @@ class JobDetailScreen extends ConsumerWidget {
                                   isSmall: true,
                                 ),
                                 SipsBadge(
-                                  label: job.deadlineText,
-                                  variant: SipsBadgeVariant.neutral,
+                                  label: mlMatch?.mlStatus == 'completed'
+                                      ? 'AI HYBRID MATCH'
+                                      : job.deadlineText,
+                                  variant: mlMatch?.mlStatus == 'completed'
+                                      ? SipsBadgeVariant.emerald
+                                      : SipsBadgeVariant.neutral,
                                   isSmall: true,
                                 ),
                               ],
@@ -97,19 +119,79 @@ class JobDetailScreen extends ConsumerWidget {
                             const SizedBox(height: 16),
                             // Match Telemetry Circle
                             ReadinessGauge(
-                              score: job.matchScore.toDouble(),
+                              score: effectiveScore.toDouble(),
                               size: 140,
-                              subtitle: 'Profile Affinity',
+                              subtitle: mlMatch?.mlStatus == 'completed' ? 'Hybrid Match' : 'Profile Affinity',
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'High Placement Affinity',
+                              effectiveScore >= 75 ? 'High Placement Affinity' : 'Moderate Placement Affinity',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.onSurface,
                               ),
                             ),
+                            if (mlMatch != null) ...[
+                              const SizedBox(height: 14),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: AppColors.surfaceContainerLow,
+                                  borderRadius: AppRadius.mdRadius,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Text(
+                                          'Keyword Score',
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontSize: 10,
+                                            color: AppColors.onSurfaceVariant,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          '${(mlMatch.skillCoverageScore * 100).toStringAsFixed(0)}%',
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w800,
+                                            color: AppColors.onSurface,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Container(width: 1, height: 20, color: AppColors.outlineVariant),
+                                    Column(
+                                      children: [
+                                        Text(
+                                          'Semantic Score',
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontSize: 10,
+                                            color: AppColors.onSurfaceVariant,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          mlMatch.semanticSimilarity != null
+                                              ? '${(mlMatch.semanticSimilarity! * 100).toStringAsFixed(0)}%'
+                                              : 'N/A',
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w800,
+                                            color: AppColors.primary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),
@@ -118,7 +200,7 @@ class JobDetailScreen extends ConsumerWidget {
 
                       // Matched Skills Section
                       SectionHeader(
-                        title: 'Matched Skills (${job.matchedSkills.length})',
+                        title: 'Matched Skills (${effectiveMatchedSkills.length})',
                         badge: const SipsBadge(
                           label: 'VERIFIED',
                           variant: SipsBadgeVariant.emerald,
@@ -128,23 +210,28 @@ class JobDetailScreen extends ConsumerWidget {
                       const SizedBox(height: 10),
                       SipsCard(
                         padding: const EdgeInsets.all(16),
-                        child: Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: job.matchedSkills
-                              .map((s) => SkillChip(label: s, status: SkillStatus.strong))
-                              .toList(),
-                        ),
+                        child: effectiveMatchedSkills.isNotEmpty
+                            ? Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: effectiveMatchedSkills
+                                    .map((s) => SkillChip(label: s, status: SkillStatus.strong))
+                                    .toList(),
+                              )
+                            : Text(
+                                'No matching skills found.',
+                                style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AppColors.onSurfaceVariant),
+                              ),
                       ),
 
                       const SizedBox(height: 20),
 
                       // Skill Gaps & Bridge Section
                       SectionHeader(
-                        title: 'Identified Skill Gaps (${job.missingSkills.length})',
-                        badge: const SipsBadge(
-                          label: 'INTERVENTION NEEDED',
-                          variant: SipsBadgeVariant.amber,
+                        title: 'Identified Skill Gaps (${effectiveMissingSkills.length})',
+                        badge: SipsBadge(
+                          label: effectiveMissingSkills.isEmpty ? 'NONE' : 'INTERVENTION NEEDED',
+                          variant: effectiveMissingSkills.isEmpty ? SipsBadgeVariant.emerald : SipsBadgeVariant.amber,
                           isSmall: true,
                         ),
                       ),
@@ -157,7 +244,7 @@ class JobDetailScreen extends ConsumerWidget {
                             Wrap(
                               spacing: 8,
                               runSpacing: 8,
-                              children: job.missingSkills
+                              children: effectiveMissingSkills
                                   .map((s) => SkillChip(label: s, status: SkillStatus.gap))
                                   .toList(),
                             ),

@@ -8,7 +8,8 @@ import {
   RefreshCw,
   ShieldCheck,
   ExternalLink,
-  Eye
+  Eye,
+  Sparkles
 } from "lucide-react";
 import { resumeService } from "../../services/resumeService";
 import { resolveAssetUrl } from "../../services/api";
@@ -77,11 +78,13 @@ export function ResumeAnalysisPage() {
     try {
       const res = await resumeService.uploadResume(file);
       const resumeUrl = res.resumeUrl || res.data?.resumeUrl || "";
+      const mlAnalysis = res.mlAnalysis || res.data?.mlAnalysis || null;
       setUploadedResume({
         fileName: file.name,
         fileSize: (file.size / (1024 * 1024)).toFixed(2) + " MB",
         uploadDate: new Date().toLocaleDateString(),
-        resumeUrl
+        resumeUrl,
+        mlAnalysis
       });
       showSuccess("Resume uploaded successfully.");
     } catch (err) {
@@ -231,6 +234,39 @@ export function ResumeAnalysisPage() {
               )}
             </div>
           </div>
+
+          {uploadedResume.mlAnalysis?.extracted_skills?.length > 0 && (
+            <div className="pt-3 border-t border-slate-100">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-indigo-600" />
+                  AI-Extracted Technical Skills ({uploadedResume.mlAnalysis.extracted_skills.length})
+                </span>
+                <Badge variant="primary" size="sm">
+                  FastAPI ML Verified
+                </Badge>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {uploadedResume.mlAnalysis.extracted_skills.map((skill, idx) => (
+                  <span
+                    key={idx}
+                    className="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 font-semibold text-xs border border-indigo-200"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {uploadedResume.mlAnalysis?.status === "offline" && (
+            <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
+              <span>
+                Resume stored securely. ML skill extraction service is currently offline.
+              </span>
+            </div>
+          )}
 
           <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-600 space-y-1">
             <p className="font-bold text-slate-800">Placement Drive Status:</p>

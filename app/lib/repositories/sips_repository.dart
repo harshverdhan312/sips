@@ -1,5 +1,6 @@
 import '../models/growth_task.dart';
 import '../models/job_opportunity.dart';
+import '../models/job_match_analysis.dart';
 import '../models/mock_interview.dart';
 import '../models/peer_match.dart';
 import '../models/placement_alert.dart';
@@ -23,6 +24,7 @@ abstract class SipsRepository {
   Future<JobOpportunity?> getJobDetail(String jobId);
   Future<void> toggleJobBookmark(String jobId);
   Future<void> applyForJob(String jobId);
+  Future<JobMatchAnalysis> analyzeJobMatch(String jobId);
 
   Future<List<GrowthTask>> getGrowthTasks();
   Future<GrowthTask> toggleTaskCompletion(String taskId);

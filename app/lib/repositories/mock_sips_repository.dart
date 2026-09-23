@@ -1,5 +1,6 @@
 import '../mock/mock_data.dart';
 import '../models/growth_task.dart';
+import '../models/job_match_analysis.dart';
 import '../models/job_opportunity.dart';
 import '../models/mock_interview.dart';
 import '../models/peer_match.dart';
@@ -67,6 +68,30 @@ class MockSipsRepository implements SipsRepository {
     } catch (_) {
       return null;
     }
+  }
+
+  @override
+  Future<JobMatchAnalysis> analyzeJobMatch(String jobId) async {
+    final job = await getJobDetail(jobId);
+    final role = job?.role ?? 'Role';
+    final company = job?.company ?? 'Company';
+    final matched = job?.matchedSkills ?? [];
+    final missing = job?.missingSkills ?? [];
+    final score = (job?.matchScore ?? 75) / 100.0;
+    return JobMatchAnalysis(
+      jobId: jobId,
+      jobTitle: role,
+      company: company,
+      mlStatus: 'completed',
+      matchedSkills: matched,
+      missingSkills: missing,
+      skillCoverageScore: score,
+      semanticSimilarity: score,
+      semanticScore: score,
+      hybridMatchScore: score,
+      skillWeight: 0.6,
+      semanticWeight: 0.4,
+    );
   }
 
   @override

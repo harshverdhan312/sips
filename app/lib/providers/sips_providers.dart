@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/network/api_client.dart';
 import '../core/network/api_exception.dart';
 import '../models/growth_task.dart';
+import '../models/job_match_analysis.dart';
 import '../models/job_opportunity.dart';
 import '../models/mock_interview.dart';
 import '../models/peer_match.dart';
@@ -384,6 +385,13 @@ final opportunitiesProvider =
     notifier.loadJobs();
   }
   return notifier;
+});
+
+// --- Job Match ML Analysis Provider ---
+final jobMatchAnalysisProvider =
+    FutureProvider.family<JobMatchAnalysis, String>((ref, jobId) async {
+  final repo = ref.watch(sipsRepositoryProvider);
+  return repo.analyzeJobMatch(jobId);
 });
 
 // --- Growth Tasks Provider (Local/Mock) ---

@@ -158,6 +158,19 @@ export const studentService = {
     return [];
   },
 
+  /**
+   * Run ML Hybrid Match Analysis for a specific job
+   */
+  async analyzeJobMatch(jobId) {
+    try {
+      const res = await api.post(`/api/student/jobs/${jobId}/analyze-match`);
+      return res;
+    } catch (e) {
+      console.error("Could not analyze job match:", e);
+      throw e;
+    }
+  },
+
   async getSkillsData(category = "All") {
     const student = await this.getCurrentStudent();
     if (!student || !Array.isArray(student.skills) || student.skills.length === 0) {
