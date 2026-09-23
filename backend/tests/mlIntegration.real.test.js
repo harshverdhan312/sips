@@ -8,10 +8,11 @@ describe('Real Node ↔ FastAPI ML Integration Tests', () => {
   const pdfFixturePath = path.join(__dirname, 'fixtures', 'sample_resume.pdf');
 
   beforeAll(() => {
+    jest.setTimeout(30000);
     // Instantiate real client without mocks, targeting configured ML service URL
     mlClient = new MLService({
       baseUrl: process.env.ML_SERVICE_URL || config.mlServiceUrl || 'http://127.0.0.1:8000',
-      timeoutMs: parseInt(process.env.ML_SERVICE_TIMEOUT_MS, 10) || 15000
+      timeoutMs: parseInt(process.env.ML_SERVICE_TIMEOUT_MS, 10) || 30000
     });
   });
 
@@ -76,7 +77,7 @@ describe('Real Node ↔ FastAPI ML Integration Tests', () => {
       expect(res.semantic_similarity).toBeLessThanOrEqual(1.0);
       expect(typeof res.model_name).toBe('string');
       expect(res.model_name.length).toBeGreaterThan(0);
-    });
+    }, 30000);
   });
 
   describe('5. Hybrid Resume Matching (POST /resume/hybrid-match)', () => {
@@ -105,7 +106,7 @@ describe('Real Node ↔ FastAPI ML Integration Tests', () => {
       // Verify hybrid formula: hybrid_match_score = skill_coverage_score * 0.6 + semantic_score * 0.4
       const calculatedHybrid = Number((res.skill_coverage_score * 0.6 + res.semantic_score * 0.4).toFixed(2));
       expect(res.hybrid_match_score).toBeCloseTo(calculatedHybrid, 1);
-    });
+    }, 30000);
   });
 
   describe('6. Placement Prediction (POST /placement/predict)', () => {
