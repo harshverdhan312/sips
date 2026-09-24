@@ -204,14 +204,16 @@ final StateNotifierProvider<AuthNotifier, AuthState> authProvider =
 // --- Student Profile Provider ---
 class ProfileNotifier extends StateNotifier<AsyncValue<StudentProfile>> {
   final SipsRepository _repository;
+  final Ref? _ref;
 
-  ProfileNotifier(this._repository) : super(const AsyncValue.loading());
+  ProfileNotifier(this._repository, [this._ref]) : super(const AsyncValue.loading());
 
   Future<void> loadProfile() async {
     state = const AsyncValue.loading();
     try {
       final profile = await _repository.getStudentProfile();
       state = AsyncValue.data(profile);
+      _ref?.read(readinessProvider.notifier).loadReadiness();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -222,6 +224,7 @@ class ProfileNotifier extends StateNotifier<AsyncValue<StudentProfile>> {
     try {
       final updated = await _repository.updateStudentProfile(profile);
       state = AsyncValue.data(updated);
+      _ref?.read(readinessProvider.notifier).loadReadiness();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -248,7 +251,7 @@ class ProfileNotifier extends StateNotifier<AsyncValue<StudentProfile>> {
 final studentProfileProvider = StateNotifierProvider<ProfileNotifier, AsyncValue<StudentProfile>>((ref) {
   final repo = ref.watch(sipsRepositoryProvider);
   final auth = ref.watch(authProvider);
-  final notifier = ProfileNotifier(repo);
+  final notifier = ProfileNotifier(repo, ref);
   if (auth.isInitialized && auth.isAuthenticated) {
     notifier.loadProfile();
   }
