@@ -108,14 +108,14 @@ class ApiSipsRepository implements SipsRepository {
           ? 'Calibrated readiness profile based on verified backend credentials.'
           : 'Complete your profile and add technical skills to compute your readiness score.',
       scoreGainText: overall > 0 ? 'Active Assessment' : 'Pending',
-      techDepthScore: overall > 0 ? (overall * 0.95).round().clamp(0, 100) : 0,
-      starBehaviorScore: overall > 0 ? 80 : 0,
+      techDepthScore: profile.technicalScore > 0 ? profile.technicalScore : (overall > 0 ? (overall * 0.95).round().clamp(0, 100) : 0),
+      starBehaviorScore: profile.softSkillScore > 0 ? profile.softSkillScore : (overall > 0 ? 80 : 0),
       systemArchScore: overall > 0 ? (overall * 0.9).round().clamp(0, 100) : 0,
       domainScores: [
-        DomainScore(title: 'Core Technical Skills', score: overall > 0 ? (overall * 0.95).round().clamp(0, 100) : 0, category: 'technical'),
+        DomainScore(title: 'Core Technical Skills', score: profile.technicalScore > 0 ? profile.technicalScore : (overall > 0 ? (overall * 0.95).round().clamp(0, 100) : 0), category: 'technical'),
         DomainScore(title: 'System Architecture', score: overall > 0 ? (overall * 0.9).round().clamp(0, 100) : 0, category: 'arch'),
-        DomainScore(title: 'Soft Skills & Communication', score: overall > 0 ? 80 : 0, category: 'soft_skills'),
-        DomainScore(title: 'Resume & Portfolio Impact', score: profile.atsScore, category: 'resume'),
+        DomainScore(title: 'Soft Skills & Communication', score: profile.softSkillScore > 0 ? profile.softSkillScore : (overall > 0 ? 80 : 0), category: 'soft_skills'),
+        DomainScore(title: 'Resume & Portfolio Impact', score: profile.resumeScore > 0 ? profile.resumeScore : profile.atsScore, category: 'resume'),
       ],
     );
   }

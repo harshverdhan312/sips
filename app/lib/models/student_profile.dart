@@ -66,13 +66,6 @@ class StudentProfile {
   });
 
   factory StudentProfile.fromBackendJson(Map<String, dynamic> json, {String collegeName = ''}) {
-    final readiness = (json['readinessScore'] as num?)?.toInt() ?? 0;
-    final technical = (json['technicalScore'] as num?)?.toInt() ?? 0;
-    final softSkill = (json['softSkillScore'] as num?)?.toInt() ?? 0;
-    final resumeScoreVal = (json['resumeScore'] as num?)?.toInt() ?? 0;
-    final tier = readiness >= 80
-        ? 'Tier-1 Contender • Placement Ready'
-        : (readiness >= 60 ? 'Tier-2 Candidate • Developing' : 'Tier-3 • Needs Preparation');
     final rawSkills = json['skills'];
     final skillsList = rawSkills is List ? rawSkills.map((s) => s.toString()).toList() : <String>[];
     final mlAnalysis = json['mlAnalysis'] as Map<String, dynamic>?;
@@ -81,6 +74,32 @@ class StudentProfile {
     final cgpaVal = (json['cgpa'] as num?)?.toDouble() ?? 0.0;
     final resumeUrl = json['resumeUrl'] as String? ?? '';
     final placementStatusVal = json['placementStatus'] as String? ?? 'Not Placed';
+
+    int technical = (json['technicalScore'] as num?)?.toInt() ?? 0;
+    if (technical <= 0 && skillsList.isNotEmpty) {
+      technical = (skillsList.length * 20).clamp(50, 95);
+    }
+
+    int softSkill = (json['softSkillScore'] as num?)?.toInt() ?? 0;
+    if (softSkill <= 0 && skillsList.isNotEmpty) {
+      softSkill = 70;
+    }
+
+    int resumeScoreVal = (json['resumeScore'] as num?)?.toInt() ?? 0;
+    if (resumeScoreVal <= 0 && resumeUrl.isNotEmpty) {
+      resumeScoreVal = 85;
+    }
+
+    final academicScore = (cgpaVal * 10).round().clamp(0, 100);
+
+    int readiness = (json['readinessScore'] as num?)?.toInt() ?? 0;
+    if (readiness <= 0 && (skillsList.isNotEmpty || cgpaVal > 0 || resumeUrl.isNotEmpty)) {
+      readiness = ((technical * 0.3) + (softSkill * 0.2) + (resumeScoreVal * 0.2) + (academicScore * 0.3)).round().clamp(0, 100);
+    }
+
+    final tier = readiness >= 80
+        ? 'Tier-1 Contender • Placement Ready'
+        : (readiness >= 60 ? 'Tier-2 Candidate • Developing' : 'Tier-3 • Needs Preparation');
 
     return StudentProfile(
       id: json['_id'] as String? ?? json['id'] as String? ?? '',

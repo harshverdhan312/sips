@@ -4,10 +4,22 @@ describe('Matching Engine Utility', () => {
   test('should normalize synonymous tech skills', () => {
     expect(normalizeSkill('js')).toBe('javascript');
     expect(normalizeSkill('reactjs')).toBe('react.js');
+    expect(normalizeSkill('react js')).toBe('react.js');
+    expect(normalizeSkill('node js')).toBe('node.js');
     expect(normalizeSkill('mongo')).toBe('mongodb');
     expect(normalizeSkill('py')).toBe('python');
     expect(normalizeSkill('cplusplus')).toBe('c++');
     expect(normalizeSkill('k8s')).toBe('kubernetes');
+  });
+
+  test('should match react js in student skills with react in JD', () => {
+    const studentSkills = ['python', 'react js', 'sql'];
+    const requiredSkills = ['python', 'react', 'sql', 'algorithms'];
+
+    const result = calculateMatch(studentSkills, requiredSkills);
+    expect(result.score).toBe(75);
+    expect(result.matchedSkills).toEqual(expect.arrayContaining(['python', 'react.js', 'sql']));
+    expect(result.missingSkills).toEqual(['algorithms']);
   });
 
   test('should compute 100% score when all skills match', () => {

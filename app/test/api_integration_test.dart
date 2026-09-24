@@ -261,5 +261,41 @@ void main() {
       final peers = await repo.getPeerMatches();
       expect(peers.isEmpty, true);
     });
+
+    test('All Drives shows 50% match job while High Match (85%+) hides it', () {
+      final moderateMatchJob = JobOpportunity.fromBackendJson({
+        '_id': 'job_50pct',
+        'company': 'Google',
+        'role': 'Associate Software Developer',
+        'matchScore': 50,
+        'requiredSkills': ['python', 'react', 'sql', 'algorithms'],
+        'matchedSkills': ['python', 'sql'],
+        'missingSkills': ['react.js', 'algorithms'],
+        'deadline': '2026-10-15T00:00:00.000Z',
+      });
+
+      final highMatchJob = JobOpportunity.fromBackendJson({
+        '_id': 'job_90pct',
+        'company': 'Atlassian',
+        'role': 'Frontend Engineer',
+        'matchScore': 90,
+        'requiredSkills': ['react.js', 'typescript'],
+        'matchedSkills': ['react.js', 'typescript'],
+        'missingSkills': [],
+      });
+
+      final allJobs = [moderateMatchJob, highMatchJob];
+
+      // Filter 0: All Drives (default)
+      final allDrives = allJobs.where((job) => true).toList();
+      expect(allDrives.length, 2);
+      expect(allDrives.any((j) => j.id == 'job_50pct'), isTrue);
+
+      // Filter 1: High Match (85%+)
+      final highMatchDrives = allJobs.where((job) => job.matchScore >= 85).toList();
+      expect(highMatchDrives.length, 1);
+      expect(highMatchDrives.first.id, 'job_90pct');
+      expect(highMatchDrives.any((j) => j.id == 'job_50pct'), isFalse);
+    });
   });
 }
