@@ -495,5 +495,69 @@ export const placementService = {
       throw e;
     }
     return { job: null, totalMatches: 0, matches: [] };
+  },
+
+  /**
+   * Fetch actual student applications for a job from backend
+   */
+  async getJobApplications(jobId) {
+    try {
+      const res = await api.get(`/api/admin/jobs/${jobId}/applicants`);
+      if (res && res.applicants) {
+        return {
+          job: res.job,
+          count: res.count || res.applicants.length,
+          applicants: res.applicants.map((a, idx) => ({
+            rank: idx + 1,
+            applicationId: a.applicationId || a._id,
+            status: a.status || "APPLIED",
+            matchScore: a.matchScore !== undefined ? a.matchScore : 0,
+            matchedSkills: a.matchedSkills || [],
+            missingSkills: a.missingSkills || [],
+            appliedAt: a.appliedAt,
+            updatedAt: a.updatedAt,
+            student: a.student ? {
+              id: a.student._id || a.student.id,
+              _id: a.student._id || a.student.id,
+              name: a.student.name,
+              rollNo: a.student.rollNo,
+              usn: a.student.usn || a.student.rollNo,
+              email: a.student.email,
+              branch: a.student.branch,
+              batch: a.student.batch,
+              cgpa: a.student.cgpa || 7.5,
+              placementStatus: a.student.placementStatus || "UNPLACED",
+              readinessScore: a.student.readinessScore || 65,
+              skills: a.student.skills || [],
+              avatar: a.student.profileImageUrl || null,
+              profileImageUrl: a.student.profileImageUrl || null
+            } : null
+          })).filter(a => a.student !== null)
+        };
+      }
+    } catch (e) {
+      console.warn(`Could not fetch applicants for job ${jobId}:`, e.message);
+      throw e;
+    }
+    return { job: null, count: 0, applicants: [] };
+  },
+
+  /**
+   * Download Matched or Applied candidates CSV for a job
+   */
+  async downloadJobCandidatesCSV(jobId, type = "matched") {
+    const endpoint = type === "applied"
+      ? `/api/admin/jobs/${jobId}/applications/export`
+      : `/api/admin/jobs/${jobId}/matched/export`;
+    const { blob, filename } = await api.getBlob(endpoint);
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    return filename;
   }
 };

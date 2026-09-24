@@ -77,7 +77,7 @@ class MockSipsRepository implements SipsRepository {
     final company = job?.company ?? 'Company';
     final matched = job?.matchedSkills ?? [];
     final missing = job?.missingSkills ?? [];
-    final score = (job?.matchScore ?? 75) / 100.0;
+    final score = (job?.matchScore ?? 75).toDouble();
     return JobMatchAnalysis(
       jobId: jobId,
       jobTitle: role,
@@ -86,7 +86,7 @@ class MockSipsRepository implements SipsRepository {
       matchedSkills: matched,
       missingSkills: missing,
       skillCoverageScore: score,
-      semanticSimilarity: score,
+      semanticSimilarity: score / 100.0,
       semanticScore: score,
       hybridMatchScore: score,
       skillWeight: 0.6,
