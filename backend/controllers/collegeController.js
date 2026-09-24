@@ -65,6 +65,187 @@ function safeDeleteUploadFile(fileUrlOrName) {
 }
 
 /**
+ * Validate academic structure payload (Courses -> Branches -> Sections)
+ */
+function validateAcademicStructure(structure) {
+  if (!structure) return [];
+  if (!Array.isArray(structure)) {
+    throw new Error('Academic structure must be a list of courses');
+  }
+
+  const seenCourses = new Set();
+  const validated = [];
+
+  for (let cIdx = 0; cIdx < structure.length; cIdx++) {
+    const course = structure[cIdx];
+    if (!course || typeof course !== 'object') {
+      throw new Error(`Course #${cIdx + 1} must be an object`);
+    }
+
+    const courseName = String(course.courseName || '').trim();
+    if (!courseName) {
+      throw new Error(`Course #${cIdx + 1} requires a valid course/program name (e.g. B.Tech, BCA, MBA)`);
+    }
+
+    const lowerCourse = courseName.toLowerCase();
+    if (seenCourses.has(lowerCourse)) {
+      throw new Error(`Duplicate course name "${courseName}". Each course must be unique.`);
+    }
+    seenCourses.add(lowerCourse);
+
+    if (!Array.isArray(course.branches) || course.branches.length === 0) {
+      throw new Error(`Course "${courseName}" must have at least one branch/specialization.`);
+    }
+
+    const seenBranches = new Set();
+    const validatedBranches = [];
+
+    for (let bIdx = 0; bIdx < course.branches.length; bIdx++) {
+      const branch = course.branches[bIdx];
+      if (!branch || typeof branch !== 'object') {
+        throw new Error(`Branch #${bIdx + 1} in course "${courseName}" must be an object`);
+      }
+
+      const branchName = String(branch.branchName || '').trim();
+      if (!branchName) {
+        throw new Error(`Branch #${bIdx + 1} in course "${courseName}" requires a valid name`);
+      }
+
+      const lowerBranch = branchName.toLowerCase();
+      if (seenBranches.has(lowerBranch)) {
+        throw new Error(`Duplicate branch name "${branchName}" in course "${courseName}".`);
+      }
+      seenBranches.add(lowerBranch);
+
+      let sections = [];
+      if (Array.isArray(branch.sections) && branch.sections.length > 0) {
+        const seenSections = new Set();
+        sections = branch.sections
+          .map(s => String(s || '').trim())
+          .filter(s => {
+            if (!s) return false;
+            const l = s.toLowerCase();
+            if (seenSections.has(l)) return false;
+            seenSections.add(l);
+            return true;
+          });
+      }
+
+      // Default to ['A'] if empty
+      if (sections.length === 0) {
+        sections = ['A'];
+      }
+
+      validatedBranches.push({
+        branchName,
+        sections
+      });
+    }
+
+    validated.push({
+      courseName,
+      branches: validatedBranches
+    });
+  }
+
+  return validated;
+}
+
+/**
+ * Validate candidate academic fields against college's academic structure
+ */
+function validateStudentAgainstStructure(academicStructure, { course, branch, section }) {
+  if (!academicStructure || !Array.isArray(academicStructure) || academicStructure.length === 0) {
+    return { valid: true };
+  }
+
+  const cleanCourse = String(course || '').trim();
+  const cleanBranch = String(branch || '').trim();
+  const cleanSection = String(section || '').trim();
+
+  // If no course or branch is specified, allow through if flexible
+  if (!cleanCourse && !cleanBranch) {
+    return { valid: true };
+  }
+
+  let matchedCourse = null;
+  if (cleanCourse) {
+    matchedCourse = academicStructure.find(
+      c => c.courseName.toLowerCase() === cleanCourse.toLowerCase()
+    );
+    if (!matchedCourse) {
+      const msg = `Course "${cleanCourse}" is not offered at this institution.`;
+      return {
+        valid: false,
+        message: msg,
+        error: msg
+      };
+    }
+  }
+
+  if (cleanBranch) {
+    if (matchedCourse) {
+      const matchedBranch = matchedCourse.branches.find(
+        b => b.branchName.toLowerCase() === cleanBranch.toLowerCase()
+      );
+      if (!matchedBranch) {
+        const msg = `Branch "${cleanBranch}" is not offered under course "${matchedCourse.courseName}".`;
+        return {
+          valid: false,
+          message: msg,
+          error: msg
+        };
+      }
+      if (cleanSection && Array.isArray(matchedBranch.sections) && matchedBranch.sections.length > 0) {
+        const matchedSec = matchedBranch.sections.find(
+          s => s.toLowerCase() === cleanSection.toLowerCase()
+        );
+        if (!matchedSec) {
+          const msg = `Section "${cleanSection}" is not defined for branch "${matchedBranch.branchName}".`;
+          return {
+            valid: false,
+            message: msg,
+            error: msg
+          };
+        }
+      }
+    } else {
+      let foundInAny = null;
+      for (const c of academicStructure) {
+        const b = c.branches.find(br => br.branchName.toLowerCase() === cleanBranch.toLowerCase());
+        if (b) {
+          foundInAny = { course: c, branch: b };
+          break;
+        }
+      }
+      if (!foundInAny) {
+        const msg = `Branch "${cleanBranch}" is not recognized at this institution.`;
+        return {
+          valid: false,
+          message: msg,
+          error: msg
+        };
+      }
+      if (cleanSection && Array.isArray(foundInAny.branch.sections) && foundInAny.branch.sections.length > 0) {
+        const matchedSec = foundInAny.branch.sections.find(
+          s => s.toLowerCase() === cleanSection.toLowerCase()
+        );
+        if (!matchedSec) {
+          const msg = `Section "${cleanSection}" is not defined for branch "${foundInAny.branch.branchName}".`;
+          return {
+            valid: false,
+            message: msg,
+            error: msg
+          };
+        }
+      }
+    }
+  }
+
+  return { valid: true };
+}
+
+/**
  * POST /api/auth/register-college
  * Public endpoint — registers a new college tenant
  */
@@ -119,6 +300,15 @@ exports.registerCollege = async (req, res) => {
     const masterPasswordHash = await bcrypt.hash(masterPassword, salt);
     const config = require('../config');
 
+    let validatedAcademicStructure = [];
+    if (req.body.academicStructure) {
+      try {
+        validatedAcademicStructure = validateAcademicStructure(req.body.academicStructure);
+      } catch (structErr) {
+        return res.status(400).json({ message: structErr.message });
+      }
+    }
+
     // 1. Mongoose Connected Mode
     if (memoryDb.isMongoConnected()) {
       const existingSlug = await College.findOne({ slug: cleanSlug });
@@ -142,7 +332,8 @@ exports.registerCollege = async (req, res) => {
         slug: cleanSlug,
         adminEmail: adminEmail.toLowerCase().trim(),
         masterPasswordHash,
-        acceptedDomains: normalizedDomains
+        acceptedDomains: normalizedDomains,
+        academicStructure: validatedAcademicStructure
       });
 
       await college.save();
@@ -166,7 +357,8 @@ exports.registerCollege = async (req, res) => {
         role: 'COLLEGE_ADMIN',
         collegeSlug: college.slug,
         collegeName: college.name,
-        userId: college._id
+        userId: college._id,
+        academicStructure: college.academicStructure
       });
     }
 
@@ -183,7 +375,8 @@ exports.registerCollege = async (req, res) => {
       slug: cleanSlug,
       adminEmail: adminEmail.toLowerCase().trim(),
       masterPasswordHash,
-      acceptedDomains: normalizedDomains
+      acceptedDomains: normalizedDomains,
+      academicStructure: validatedAcademicStructure
     });
 
     const token = jwt.sign(
@@ -205,7 +398,8 @@ exports.registerCollege = async (req, res) => {
       role: 'COLLEGE_ADMIN',
       collegeSlug: memoryCollege.slug,
       collegeName: memoryCollege.name,
-      userId: memoryCollege._id
+      userId: memoryCollege._id,
+      academicStructure: memoryCollege.academicStructure
     });
 
   } catch (error) {
@@ -262,6 +456,19 @@ exports.uploadStudents = async (req, res) => {
           continue;
         }
 
+        if (college.academicStructure && college.academicStructure.length > 0) {
+          const structCheck = validateStudentAgainstStructure(college.academicStructure, {
+            course: s.course,
+            branch: s.branch,
+            section: s.section
+          });
+          if (!structCheck.valid) {
+            results.failed++;
+            results.errors.push(`${s.email}: ${structCheck.message}`);
+            continue;
+          }
+        }
+
         const passwordHash = await bcrypt.hash(s.rollNo, salt);
         memoryDb.saveStudent({
           collegeId,
@@ -270,10 +477,16 @@ exports.uploadStudents = async (req, res) => {
           usn: s.usn || s.rollNo.trim(),
           email: s.email.toLowerCase().trim(),
           passwordHash,
-          branch: s.branch || 'Computer Science & Engineering',
+          course: (s.course || '').trim(),
+          branch: (s.branch || '').trim(),
+          section: (s.section || '').trim(),
           batch: s.batch ? String(s.batch).trim() : '',
           cgpa: (s.cgpa !== undefined && s.cgpa !== '' && !isNaN(Number(s.cgpa))) ? Number(s.cgpa) : 0,
-          skills: s.skills || []
+          skills: s.skills || [],
+          readinessScore: 0,
+          technicalScore: 0,
+          softSkillScore: 0,
+          resumeScore: 0
         });
         results.success++;
       }
@@ -312,6 +525,20 @@ exports.uploadStudents = async (req, res) => {
           continue;
         }
 
+        // Validate against college academic structure
+        if (college.academicStructure && college.academicStructure.length > 0) {
+          const structCheck = validateStudentAgainstStructure(college.academicStructure, {
+            course: s.course,
+            branch: s.branch,
+            section: s.section
+          });
+          if (!structCheck.valid) {
+            results.failed++;
+            results.errors.push(`${s.email}: ${structCheck.message}`);
+            continue;
+          }
+        }
+
         // Check duplicate
         const existing = await Student.findOne({ 
           email: s.email.toLowerCase(), 
@@ -334,12 +561,18 @@ exports.uploadStudents = async (req, res) => {
           usn: s.usn || s.rollNo.trim(),
           email: s.email.toLowerCase().trim(),
           passwordHash,
-          branch: s.branch || 'Computer Science & Engineering',
+          course: (s.course || '').trim(),
+          branch: (s.branch || '').trim(),
+          section: (s.section || '').trim(),
           batch: s.batch ? String(s.batch).trim() : '',
           cgpa: (s.cgpa !== undefined && s.cgpa !== '' && !isNaN(Number(s.cgpa))) ? Number(s.cgpa) : 0,
           skills: s.skills || [],
           github: '',
-          resumeUrl: ''
+          resumeUrl: '',
+          readinessScore: 0,
+          technicalScore: 0,
+          softSkillScore: 0,
+          resumeScore: 0
         });
 
         await student.save();
@@ -741,3 +974,106 @@ exports.deleteLogo = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error deleting college logo' });
   }
 };
+
+/**
+ * GET /api/college/academic-structure
+ * Retrieve the college's configured courses, branches, and sections
+ */
+exports.getAcademicStructure = async (req, res) => {
+  try {
+    if (!memoryDb.isMongoConnected() && !College.findById.mock) {
+      const college = memoryDb.findCollegeById(req.collegeId);
+      if (!college) {
+        return res.status(404).json({ success: false, message: 'College not found' });
+      }
+      const structure = college.academicStructure || [];
+      const branches = [];
+      structure.forEach(c => {
+        (c.branches || []).forEach(b => {
+          if (b.branchName && !branches.includes(b.branchName)) {
+            branches.push(b.branchName);
+          }
+        });
+      });
+      return res.status(200).json({
+        success: true,
+        academicStructure: structure,
+        branches
+      });
+    }
+
+    const college = await College.findById(req.collegeId).select('academicStructure name slug');
+    if (!college) {
+      return res.status(404).json({ success: false, message: 'College not found' });
+    }
+
+    const structure = college.academicStructure || [];
+    const branches = [];
+    structure.forEach(c => {
+      (c.branches || []).forEach(b => {
+        if (b.branchName && !branches.includes(b.branchName)) {
+          branches.push(b.branchName);
+        }
+      });
+    });
+
+    res.status(200).json({
+      success: true,
+      academicStructure: structure,
+      branches
+    });
+  } catch (error) {
+    logger.error('Get academic structure error:', error);
+    res.status(500).json({ success: false, message: 'Server error retrieving academic structure' });
+  }
+};
+
+/**
+ * PUT /api/college/academic-structure
+ * Admin endpoint — update courses, branches, and sections structure
+ */
+exports.updateAcademicStructure = async (req, res) => {
+  try {
+    const { academicStructure } = req.body;
+    let validated = [];
+    try {
+      validated = validateAcademicStructure(academicStructure);
+    } catch (err) {
+      return res.status(400).json({ success: false, message: err.message });
+    }
+
+    if (!memoryDb.isMongoConnected() && !College.findByIdAndUpdate.mock) {
+      const college = memoryDb.updateCollege(req.collegeId, { academicStructure: validated });
+      if (!college) {
+        return res.status(404).json({ success: false, message: 'College not found' });
+      }
+      return res.status(200).json({
+        success: true,
+        message: 'Academic structure updated successfully',
+        academicStructure: college.academicStructure
+      });
+    }
+
+    const college = await College.findByIdAndUpdate(
+      req.collegeId,
+      { $set: { academicStructure: validated } },
+      { new: true, runValidators: true }
+    ).select('academicStructure name slug');
+
+    if (!college) {
+      return res.status(404).json({ success: false, message: 'College not found' });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Academic structure updated successfully',
+      academicStructure: college.academicStructure
+    });
+  } catch (error) {
+    logger.error('Update academic structure error:', error);
+    res.status(500).json({ success: false, message: 'Server error updating academic structure' });
+  }
+};
+
+exports.validateAcademicStructure = validateAcademicStructure;
+exports.validateStudentAgainstStructure = validateStudentAgainstStructure;

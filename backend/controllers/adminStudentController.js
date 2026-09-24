@@ -1,9 +1,11 @@
 const Student = require('../models/Student');
 const Match = require('../models/Match');
 const AuditLog = require('../models/AuditLog');
+const College = require('../models/College');
 const bcrypt = require('bcryptjs');
 const { parseCSV } = require('../utils/csvParser');
 const memoryDb = require('../utils/memoryDb');
+const collegeController = require('./collegeController');
 
 /**
  * GET /api/admin/students
@@ -373,6 +375,7 @@ exports.uploadStudentsCSV = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
 
     if (!memoryDb.isMongoConnected()) {
+      const college = memoryDb.findCollegeById(req.collegeId);
       for (const s of parsedStudents) {
         const cleanEmail = (s.email || '').toLowerCase().trim();
         const cleanRoll = (s.rollNo || s.usn || '').trim();
@@ -385,6 +388,19 @@ exports.uploadStudentsCSV = async (req, res) => {
           continue;
         }
 
+        if (college?.academicStructure && college.academicStructure.length > 0) {
+          const structCheck = collegeController.validateStudentAgainstStructure(college.academicStructure, {
+            course: s.course,
+            branch: s.branch,
+            section: s.section
+          });
+          if (!structCheck.valid) {
+            results.failed++;
+            results.errors.push(`${s.email} / ${s.rollNo}: ${structCheck.message}`);
+            continue;
+          }
+        }
+
         const passwordHash = await bcrypt.hash(cleanRoll || '123456', salt);
         memoryDb.saveStudent({
           collegeId: req.collegeId,
@@ -393,10 +409,16 @@ exports.uploadStudentsCSV = async (req, res) => {
           usn: s.usn || cleanRoll,
           email: cleanEmail,
           passwordHash,
-          branch: s.branch,
+          course: (s.course || '').trim(),
+          branch: (s.branch || '').trim(),
+          section: (s.section || '').trim(),
           batch: s.batch ? String(s.batch).trim() : '',
           cgpa: (s.cgpa !== undefined && s.cgpa !== '' && !isNaN(Number(s.cgpa))) ? Number(s.cgpa) : 0,
-          skills: s.skills || []
+          skills: s.skills || [],
+          readinessScore: 0,
+          technicalScore: 0,
+          softSkillScore: 0,
+          resumeScore: 0
         });
         results.success++;
       }
@@ -408,6 +430,7 @@ exports.uploadStudentsCSV = async (req, res) => {
       });
     }
 
+    const college = await College.findById(req.collegeId);
     for (const s of parsedStudents) {
       try {
         const existing = await Student.findOne({
@@ -423,6 +446,19 @@ exports.uploadStudentsCSV = async (req, res) => {
           continue;
         }
 
+        if (college?.academicStructure && college.academicStructure.length > 0) {
+          const structCheck = collegeController.validateStudentAgainstStructure(college.academicStructure, {
+            course: s.course,
+            branch: s.branch,
+            section: s.section
+          });
+          if (!structCheck.valid) {
+            results.failed++;
+            results.errors.push(`${s.email} / ${s.rollNo}: ${structCheck.message}`);
+            continue;
+          }
+        }
+
         const passwordHash = await bcrypt.hash(s.rollNo, salt);
 
         const student = new Student({
@@ -432,12 +468,18 @@ exports.uploadStudentsCSV = async (req, res) => {
           usn: s.usn || s.rollNo,
           email: s.email,
           passwordHash,
-          branch: s.branch || 'Computer Science & Engineering',
+          course: (s.course || '').trim(),
+          branch: (s.branch || '').trim(),
+          section: (s.section || '').trim(),
           batch: s.batch ? String(s.batch).trim() : '',
           cgpa: (s.cgpa !== undefined && s.cgpa !== '' && !isNaN(Number(s.cgpa))) ? Number(s.cgpa) : 0,
           skills: s.skills || [],
           github: '',
-          resumeUrl: ''
+          resumeUrl: '',
+          readinessScore: 0,
+          technicalScore: 0,
+          softSkillScore: 0,
+          resumeScore: 0
         });
 
         await student.save();
@@ -524,7 +566,9 @@ exports.createStudent = async (req, res) => {
       rollNo,
       usn,
       password,
+      course,
       branch,
+      section,
       batch,
       cgpa,
       skills
@@ -538,6 +582,28 @@ exports.createStudent = async (req, res) => {
 
     const emailClean = email.toLowerCase().trim();
     const finalRollNo = (rollNo || usn).trim();
+
+    // Fetch college to check academic structure
+    let college = null;
+    if (memoryDb.isMongoConnected()) {
+      college = await College.findById(req.collegeId);
+    } else {
+      college = memoryDb.findCollegeById ? memoryDb.findCollegeById(req.collegeId) : memoryDb.getCollege(req.collegeId);
+    }
+
+    if (college && Array.isArray(college.academicStructure) && college.academicStructure.length > 0) {
+      const validation = collegeController.validateStudentAgainstStructure(college.academicStructure, {
+        course: course || '',
+        branch: branch || '',
+        section: section || ''
+      });
+      if (!validation.valid) {
+        return res.status(400).json({
+          message: validation.error,
+          academicStructure: college.academicStructure
+        });
+      }
+    }
 
     if (!memoryDb.isMongoConnected()) {
       const existingEmail = memoryDb.findStudentByEmail(emailClean, req.collegeId);
@@ -561,15 +627,17 @@ exports.createStudent = async (req, res) => {
         usn: (usn || finalRollNo).trim(),
         email: emailClean,
         passwordHash,
+        course: (course || '').trim(),
         branch: (branch || 'Computer Science & Engineering').trim(),
+        section: (section || '').trim(),
         batch: (batch ? String(batch) : '').trim(),
         cgpa: (cgpa !== undefined && cgpa !== '' && cgpa !== null && !isNaN(Number(cgpa))) ? Math.max(0, Math.min(10, parseFloat(cgpa))) : 0,
         skills: Array.isArray(skills) ? skills.map(s => s.trim()).filter(Boolean) : [],
         placementStatus: 'UNPLACED',
-        readinessScore: 65,
-        technicalScore: 65,
-        softSkillScore: 65,
-        resumeScore: 65
+        readinessScore: 0,
+        technicalScore: 0,
+        softSkillScore: 0,
+        resumeScore: 0
       });
 
       return res.status(201).json({
@@ -582,11 +650,16 @@ exports.createStudent = async (req, res) => {
           email: student.email,
           rollNo: student.rollNo,
           usn: student.usn,
+          course: student.course || '',
           branch: student.branch,
+          section: student.section || '',
           batch: student.batch,
           cgpa: student.cgpa,
           placementStatus: student.placementStatus,
-          readinessScore: student.readinessScore,
+          readinessScore: student.readinessScore || 0,
+          technicalScore: student.technicalScore || 0,
+          softSkillScore: student.softSkillScore || 0,
+          resumeScore: student.resumeScore || 0,
           skills: student.skills,
           initialPassword: initialPassword
         }
@@ -620,15 +693,17 @@ exports.createStudent = async (req, res) => {
       usn: (usn || finalRollNo).trim(),
       email: emailClean,
       passwordHash,
+      course: (course || '').trim(),
       branch: (branch || 'Computer Science & Engineering').trim(),
+      section: (section || '').trim(),
       batch: (batch ? String(batch) : '').trim(),
       cgpa: (cgpa !== undefined && cgpa !== '' && cgpa !== null && !isNaN(Number(cgpa))) ? Math.max(0, Math.min(10, parseFloat(cgpa))) : 0,
       skills: Array.isArray(skills) ? skills.map(s => s.trim()).filter(Boolean) : [],
       placementStatus: 'UNPLACED',
-      readinessScore: 65,
-      technicalScore: 65,
-      softSkillScore: 65,
-      resumeScore: 65
+      readinessScore: 0,
+      technicalScore: 0,
+      softSkillScore: 0,
+      resumeScore: 0
     });
 
     await student.save();
@@ -652,11 +727,16 @@ exports.createStudent = async (req, res) => {
         email: student.email,
         rollNo: student.rollNo,
         usn: student.usn,
+        course: student.course || '',
         branch: student.branch,
+        section: student.section || '',
         batch: student.batch,
         cgpa: student.cgpa,
         placementStatus: student.placementStatus,
-        readinessScore: student.readinessScore,
+        readinessScore: student.readinessScore || 0,
+        technicalScore: student.technicalScore || 0,
+        softSkillScore: student.softSkillScore || 0,
+        resumeScore: student.resumeScore || 0,
         skills: student.skills,
         initialPassword: initialPassword
       }

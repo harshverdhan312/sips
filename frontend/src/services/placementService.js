@@ -31,26 +31,26 @@ export const placementService = {
         let compRisk = 0;
 
         studentList.forEach(s => {
+          const hasResume = Boolean(s.resumeUrl);
           const cgpa = typeof s.cgpa === 'number' ? s.cgpa : (parseFloat(s.cgpa) || 0);
           const academicScore = Math.min(100, Math.max(0, Math.round((cgpa / 10) * 100)));
           const skillsList = Array.isArray(s.skills) ? s.skills : [];
-          const verifiedSkillCount = skillsList.length;
 
           const tScore = (typeof s.technicalScore === 'number' && s.technicalScore > 0)
             ? s.technicalScore
-            : (verifiedSkillCount > 0 ? Math.min(100, Math.round(50 + (verifiedSkillCount * 8))) : (cgpa > 0 ? Math.round(cgpa * 8.5) : 0));
+            : (hasResume && skillsList.length > 0 ? Math.min(100, Math.round(50 + (skillsList.length * 5))) : 0);
 
           const sScore = (typeof s.softSkillScore === 'number' && s.softSkillScore > 0)
             ? s.softSkillScore
-            : (cgpa >= 8.0 ? 82 : (cgpa >= 7.0 ? 74 : (cgpa >= 6.0 ? 66 : 55)));
+            : (hasResume ? (cgpa >= 8.0 ? 82 : (cgpa >= 7.0 ? 74 : (cgpa >= 6.0 ? 66 : 55))) : 0);
 
           const rScore = (typeof s.resumeScore === 'number' && s.resumeScore > 0)
             ? s.resumeScore
-            : (s.resumeUrl ? 80 : 0);
+            : (hasResume ? 80 : 0);
 
           const rdScore = (typeof s.readinessScore === 'number' && s.readinessScore > 0)
             ? s.readinessScore
-            : Math.round((tScore * 0.35) + (sScore * 0.20) + (rScore * 0.15) + (academicScore * 0.30));
+            : (hasResume ? Math.round((tScore * 0.35) + (sScore * 0.20) + (rScore * 0.15) + (academicScore * 0.30)) : 0);
 
           totalReadinessSum += rdScore;
           totalSoftSum += sScore;
@@ -135,6 +135,21 @@ export const placementService = {
   },
 
   /**
+   * Fetch college academic structure (Courses, Branches, Sections)
+   */
+  async getAcademicStructure() {
+    try {
+      const res = await api.get('/api/college/academic-structure');
+      if (res && res.academicStructure) {
+        return res.academicStructure;
+      }
+    } catch (e) {
+      console.warn("Could not fetch academic structure:", e.message);
+    }
+    return [];
+  },
+
+  /**
    * Fetch students from backend API with filtering
    */
   async getStudents(filters = {}) {
@@ -151,31 +166,35 @@ export const placementService = {
           const cgpa = typeof s.cgpa === 'number' ? s.cgpa : (parseFloat(s.cgpa) || 0);
           const academicScore = Math.min(100, Math.max(0, Math.round((cgpa / 10) * 100)));
           const skillsList = Array.isArray(s.skills) ? s.skills : [];
-          const verifiedSkillCount = skillsList.length;
+          const hasResume = Boolean(s.resumeUrl);
 
           const technicalScore = (typeof s.technicalScore === 'number' && s.technicalScore > 0)
             ? s.technicalScore
-            : (verifiedSkillCount > 0 ? Math.min(100, Math.round(50 + (verifiedSkillCount * 8))) : (cgpa > 0 ? Math.round(cgpa * 8.5) : 0));
+            : (hasResume && skillsList.length > 0 ? Math.min(100, Math.round(50 + (skillsList.length * 5))) : 0);
 
           const softSkillScore = (typeof s.softSkillScore === 'number' && s.softSkillScore > 0)
             ? s.softSkillScore
-            : (cgpa >= 8.0 ? 82 : (cgpa >= 7.0 ? 74 : (cgpa >= 6.0 ? 66 : 55)));
+            : (hasResume ? (cgpa >= 8.0 ? 82 : (cgpa >= 7.0 ? 74 : (cgpa >= 6.0 ? 66 : 55))) : 0);
 
           const resumeScore = (typeof s.resumeScore === 'number' && s.resumeScore > 0)
             ? s.resumeScore
-            : (s.resumeUrl ? 80 : 0);
+            : (hasResume ? 80 : 0);
 
           const readinessScore = (typeof s.readinessScore === 'number' && s.readinessScore > 0)
             ? s.readinessScore
-            : Math.round((technicalScore * 0.35) + (softSkillScore * 0.20) + (resumeScore * 0.15) + (academicScore * 0.30));
+            : (hasResume ? Math.round((technicalScore * 0.35) + (softSkillScore * 0.20) + (resumeScore * 0.15) + (academicScore * 0.30)) : 0);
 
           const placementProb = s.placementStatus === 'PLACED'
             ? 100
-            : Math.min(95, Math.max(10, Math.round((readinessScore * 0.85) + (cgpa >= 8.0 ? 10 : (cgpa < 6.0 ? -15 : 0)))));
+            : (hasResume ? Math.min(95, Math.max(10, Math.round((readinessScore * 0.85) + (cgpa >= 8.0 ? 10 : (cgpa < 6.0 ? -15 : 0))))) : 0);
 
-          const status = readinessScore >= 75
-            ? "Placement Ready"
-            : (readinessScore >= 50 ? "Needs Improvement" : "At Risk");
+          const status = s.placementStatus === 'PLACED'
+            ? "Placed"
+            : (!hasResume
+                ? "Resume Pending"
+                : (readinessScore >= 75
+                    ? "Placement Ready"
+                    : (readinessScore >= 50 ? "Needs Improvement" : "At Risk")));
 
           return {
             id: s._id,
@@ -184,11 +203,14 @@ export const placementService = {
             usn: s.usn || s.rollNo,
             rollNo: s.rollNo,
             email: s.email,
+            course: s.course || '',
             branch: s.branch,
+            section: s.section || '',
             batch: s.batch,
             cgpa: cgpa > 0 ? cgpa : 0,
             status,
             placementStatus: s.placementStatus || "UNPLACED",
+            resumeUrl: s.resumeUrl || null,
             avatar: s.profileImageUrl || null,
             profileImageUrl: s.profileImageUrl || null,
             metrics: {
@@ -197,8 +219,8 @@ export const placementService = {
               employabilityIndex: readinessScore,
               placementProbability: placementProb
             },
-            strongSkills: skillsList.length > 0 ? skillsList.slice(0, 4) : ["Problem Solving", "Core CS"],
-            weakSkills: skillsList.length > 0 ? (skillsList.length < 3 ? ["System Design", "Cloud Services"] : ["Advanced System Architecture"]) : ["DSA", "System Design"]
+            strongSkills: hasResume && skillsList.length > 0 ? skillsList.slice(0, 4) : [],
+            weakSkills: hasResume && skillsList.length > 0 ? (skillsList.length < 3 ? ["System Design", "Cloud Services"] : ["Advanced System Architecture"]) : []
           };
         });
 

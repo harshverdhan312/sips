@@ -10,7 +10,14 @@ import {
   UserPlus,
   Globe,
   Info,
-  AlertCircle
+  AlertCircle,
+  Plus,
+  Trash2,
+  GraduationCap,
+  Layers,
+  ChevronLeft,
+  ChevronRight,
+  BookOpen
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/NotificationContext";
@@ -36,6 +43,7 @@ export function LoginPage() {
   const [errors, setErrors] = useState({});
 
   // College Register states
+  const [regStep, setRegStep] = useState(1); // Step 1: Details, Step 2: Academic Structure
   const [regCollegeName, setRegCollegeName] = useState("");
   const [regCollegeSlug, setRegCollegeSlug] = useState("");
   const [regAdminEmail, setRegAdminEmail] = useState("");
@@ -43,6 +51,24 @@ export function LoginPage() {
   const [regConfirmMasterPassword, setRegConfirmMasterPassword] = useState("");
   const [regAcceptedDomains, setRegAcceptedDomains] = useState("");
   const [regErrors, setRegErrors] = useState({});
+
+  // Academic Structure State for Step 2
+  const [regCourses, setRegCourses] = useState([
+    {
+      courseName: "B.Tech",
+      branches: [
+        {
+          branchName: "Computer Science & Engineering",
+          sections: ["A", "B"]
+        },
+        {
+          branchName: "Information Technology",
+          sections: ["A"]
+        }
+      ]
+    }
+  ]);
+  const [customSecInput, setCustomSecInput] = useState({});
 
   const handleSignInSubmit = async (e) => {
     e.preventDefault();
@@ -109,8 +135,118 @@ export function LoginPage() {
     }, 800);
   };
 
-  const handleCollegeRegister = async (e) => {
-    e.preventDefault();
+  // Course, Branch & Section Management Helpers
+  const addCourse = () => {
+    setRegCourses((prev) => [
+      ...prev,
+      {
+        courseName: "",
+        branches: [{ branchName: "", sections: ["A", "B"] }]
+      }
+    ]);
+  };
+
+  const removeCourse = (courseIndex) => {
+    if (regCourses.length <= 1) return;
+    setRegCourses((prev) => prev.filter((_, i) => i !== courseIndex));
+  };
+
+  const updateCourseName = (courseIndex, name) => {
+    setRegCourses((prev) =>
+      prev.map((c, i) => (i === courseIndex ? { ...c, courseName: name } : c))
+    );
+  };
+
+  const addBranch = (courseIndex) => {
+    setRegCourses((prev) =>
+      prev.map((c, i) => {
+        if (i !== courseIndex) return c;
+        return {
+          ...c,
+          branches: [...c.branches, { branchName: "", sections: ["A", "B"] }]
+        };
+      })
+    );
+  };
+
+  const removeBranch = (courseIndex, branchIndex) => {
+    setRegCourses((prev) =>
+      prev.map((c, i) => {
+        if (i !== courseIndex) return c;
+        if (c.branches.length <= 1) return c;
+        return {
+          ...c,
+          branches: c.branches.filter((_, bi) => bi !== branchIndex)
+        };
+      })
+    );
+  };
+
+  const updateBranchName = (courseIndex, branchIndex, name) => {
+    setRegCourses((prev) =>
+      prev.map((c, i) => {
+        if (i !== courseIndex) return c;
+        return {
+          ...c,
+          branches: c.branches.map((b, bi) => (bi === branchIndex ? { ...b, branchName: name } : b))
+        };
+      })
+    );
+  };
+
+  const updateBranchSectionCount = (courseIndex, branchIndex, count) => {
+    const num = Math.max(1, Math.min(10, parseInt(count, 10) || 1));
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const newSections = Array.from({ length: num }, (_, idx) => alphabet[idx] || `S${idx + 1}`);
+    setRegCourses((prev) =>
+      prev.map((c, i) => {
+        if (i !== courseIndex) return c;
+        return {
+          ...c,
+          branches: c.branches.map((b, bi) => (bi === branchIndex ? { ...b, sections: newSections } : b))
+        };
+      })
+    );
+  };
+
+  const addCustomSection = (courseIndex, branchIndex) => {
+    const key = `${courseIndex}_${branchIndex}`;
+    const val = (customSecInput[key] || "").trim();
+    if (!val) return;
+    setRegCourses((prev) =>
+      prev.map((c, i) => {
+        if (i !== courseIndex) return c;
+        return {
+          ...c,
+          branches: c.branches.map((b, bi) => {
+            if (bi !== branchIndex) return b;
+            if (b.sections.includes(val)) return b;
+            return { ...b, sections: [...b.sections, val] };
+          })
+        };
+      })
+    );
+    setCustomSecInput((prev) => ({ ...prev, [key]: "" }));
+  };
+
+  const removeSection = (courseIndex, branchIndex, secIndex) => {
+    setRegCourses((prev) =>
+      prev.map((c, i) => {
+        if (i !== courseIndex) return c;
+        return {
+          ...c,
+          branches: c.branches.map((b, bi) => {
+            if (bi !== branchIndex) return b;
+            if (b.sections.length <= 1) return b;
+            return { ...b, sections: b.sections.filter((_, si) => si !== secIndex) };
+          })
+        };
+      })
+    );
+  };
+
+  const handleProceedToAcademicSetup = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
     const newErrors = {};
 
     if (!regCollegeName.trim()) {
@@ -162,9 +298,66 @@ export function LoginPage() {
       if (newErrors.confirmPassword === "Passwords do not match.") {
         showError("Passwords do not match. Please re-enter.");
       } else {
-        showWarning("Please fill in all required fields correctly.");
+        showWarning("Please complete institution details before continuing.");
       }
       return;
+    }
+
+    setRegErrors({});
+    setRegStep(2);
+  };
+
+  const handleCollegeRegister = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+
+    // Validate academic structure
+    if (!regCourses || regCourses.length === 0) {
+      showError("Please define at least one degree program / course.");
+      return;
+    }
+
+    for (let cIdx = 0; cIdx < regCourses.length; cIdx++) {
+      const c = regCourses[cIdx];
+      if (!c.courseName.trim()) {
+        showError(`Degree Program #${cIdx + 1} is missing a course/program name.`);
+        return;
+      }
+      if (!c.branches || c.branches.length === 0) {
+        showError(`Course "${c.courseName}" must have at least one branch.`);
+        return;
+      }
+      for (let bIdx = 0; bIdx < c.branches.length; bIdx++) {
+        const b = c.branches[bIdx];
+        if (!b.branchName.trim()) {
+          showError(`Branch #${bIdx + 1} in course "${c.courseName}" is missing a name.`);
+          return;
+        }
+        if (!b.sections || b.sections.length === 0) {
+          showError(`Branch "${b.branchName}" must have at least one section.`);
+          return;
+        }
+      }
+    }
+
+    const cleanAcademicStructure = regCourses.map((c) => ({
+      courseName: c.courseName.trim(),
+      branches: c.branches.map((b) => ({
+        branchName: b.branchName.trim(),
+        sections: b.sections.map((s) => String(s).trim()).filter(Boolean)
+      })).filter((b) => b.branchName)
+    })).filter((c) => c.courseName);
+
+    const domains = regAcceptedDomains
+      .split(",")
+      .map((d) => d.trim().toLowerCase().replace(/^@/, ""))
+      .filter(Boolean);
+
+    const emailParts = regAdminEmail.trim().split("@");
+    if (emailParts.length === 2) {
+      const adminDomain = emailParts[1].toLowerCase().trim();
+      if (adminDomain && !domains.includes(adminDomain)) {
+        domains.push(adminDomain);
+      }
     }
 
     setRegErrors({});
@@ -175,7 +368,8 @@ export function LoginPage() {
         slug: regCollegeSlug.toLowerCase().trim(),
         adminEmail: regAdminEmail.toLowerCase().trim(),
         masterPassword: regMasterPassword,
-        acceptedDomains: domains
+        acceptedDomains: domains,
+        academicStructure: cleanAcademicStructure
       });
 
       showSuccess(`Account created successfully. Welcome to SIPS, ${regCollegeName.trim()}!`);
@@ -210,7 +404,7 @@ export function LoginPage() {
         </p>
       </div>
 
-      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md">
+      <div className={`mt-6 sm:mx-auto sm:w-full transition-all duration-300 ${isRegisterMode && regStep === 2 ? "sm:max-w-2xl" : "sm:max-w-md"}`}>
         {/* Main Auth Card */}
         <div className="bg-white py-6 px-6 sm:px-8 shadow-xl shadow-slate-200/50 rounded-2xl border border-slate-200/80">
           {/* Sign In vs Register Toggle Header */}
@@ -371,18 +565,64 @@ export function LoginPage() {
           )}
 
           {/* ================================================= */}
-          {/* INSTITUTION / COLLEGE REGISTRATION               */}
+          {/* INSTITUTION / COLLEGE REGISTRATION WIZARD        */}
           {/* ================================================= */}
           {isRegisterMode && (
             <div>
               <div className="mb-4">
-                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                  <Building2 className="w-4 h-4 text-indigo-600" />
-                  Register College / Placement Cell
-                </h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                    <Building2 className="w-4 h-4 text-indigo-600" />
+                    College Onboarding Portal
+                  </h3>
+                  <span className="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100">
+                    Step {regStep} of 2
+                  </span>
+                </div>
                 <p className="text-[11px] text-slate-500 mt-0.5">
-                  Onboard your college to provision student rosters and manage placement drives.
+                  {regStep === 1
+                    ? "Step 1: Enter institutional credentials & official email domain authorization."
+                    : "Step 2: Define your college's dynamic academic structure (Programs, Branches, Sections)."}
                 </p>
+              </div>
+
+              {/* Wizard Step Progress Tracker */}
+              <div className="flex items-center justify-between mb-4 px-1">
+                <button
+                  type="button"
+                  onClick={() => setRegStep(1)}
+                  className={`flex items-center gap-1.5 text-xs font-semibold cursor-pointer ${
+                    regStep === 1 ? "text-indigo-600 font-bold" : "text-emerald-600"
+                  }`}
+                >
+                  <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                    regStep === 1 ? "bg-indigo-600 text-white" : "bg-emerald-600 text-white"
+                  }`}>
+                    {regStep > 1 ? "✓" : "1"}
+                  </span>
+                  Institution Info
+                </button>
+
+                <div className="h-0.5 flex-1 mx-3 bg-slate-200">
+                  <div
+                    className={`h-full bg-indigo-600 transition-all duration-300 ${
+                      regStep === 2 ? "w-full" : "w-0"
+                    }`}
+                  />
+                </div>
+
+                <div
+                  className={`flex items-center gap-1.5 text-xs font-semibold ${
+                    regStep === 2 ? "text-indigo-600 font-bold" : "text-slate-400"
+                  }`}
+                >
+                  <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                    regStep === 2 ? "bg-indigo-600 text-white" : "bg-slate-200 text-slate-500"
+                  }`}>
+                    2
+                  </span>
+                  Academic Structure
+                </div>
               </div>
 
               {/* General Error Banner */}
@@ -393,213 +633,432 @@ export function LoginPage() {
                 </div>
               )}
 
-              <form onSubmit={handleCollegeRegister} className="space-y-3" noValidate>
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                    Institution Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    disabled={loading}
-                    value={regCollegeName}
-                    onChange={(e) => {
-                      setRegCollegeName(e.target.value);
-                      if (regErrors.name || regErrors.general) {
-                        setRegErrors((prev) => ({ ...prev, name: "", general: "" }));
-                      }
-                    }}
-                    placeholder="e.g. RV College of Engineering"
-                    className={`w-full px-3.5 py-2 rounded-xl border text-xs focus:outline-none focus:ring-2 ${
-                      regErrors.name
-                        ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
-                        : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
-                    } ${loading ? "opacity-60 bg-slate-50 cursor-not-allowed" : ""}`}
-                  />
-                  {regErrors.name && (
-                    <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3 shrink-0" />
-                      {regErrors.name}
-                    </p>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
+              {/* STEP 1: INSTITUTION DETAILS */}
+              {regStep === 1 && (
+                <form onSubmit={handleProceedToAcademicSetup} className="space-y-3" noValidate>
                   <div>
                     <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                      Institution Slug *
+                      Institution Name *
                     </label>
-                    <div className="relative">
-                      <Globe className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      required
+                      disabled={loading}
+                      value={regCollegeName}
+                      onChange={(e) => {
+                        setRegCollegeName(e.target.value);
+                        if (regErrors.name || regErrors.general) {
+                          setRegErrors((prev) => ({ ...prev, name: "", general: "" }));
+                        }
+                      }}
+                      placeholder="e.g. RV College of Engineering"
+                      className={`w-full px-3.5 py-2 rounded-xl border text-xs focus:outline-none focus:ring-2 ${
+                        regErrors.name
+                          ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                          : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                      } ${loading ? "opacity-60 bg-slate-50 cursor-not-allowed" : ""}`}
+                    />
+                    {regErrors.name && (
+                      <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3 shrink-0" />
+                        {regErrors.name}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                        Institution Slug *
+                      </label>
+                      <div className="relative">
+                        <Globe className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="text"
+                          required
+                          disabled={loading}
+                          value={regCollegeSlug}
+                          onChange={(e) => {
+                            setRegCollegeSlug(e.target.value);
+                            if (regErrors.slug || regErrors.general) {
+                              setRegErrors((prev) => ({ ...prev, slug: "", general: "" }));
+                            }
+                          }}
+                          placeholder="rvce"
+                          className={`w-full pl-8 pr-2 py-2 rounded-xl border text-xs focus:outline-none focus:ring-2 ${
+                            regErrors.slug
+                              ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                              : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                          } ${loading ? "opacity-60 bg-slate-50 cursor-not-allowed" : ""}`}
+                        />
+                      </div>
+                      {regErrors.slug && (
+                        <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3 shrink-0" />
+                          {regErrors.slug}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                        Placement Admin Email *
+                      </label>
                       <input
-                        type="text"
+                        type="email"
                         required
                         disabled={loading}
-                        value={regCollegeSlug}
+                        value={regAdminEmail}
                         onChange={(e) => {
-                          setRegCollegeSlug(e.target.value);
-                          if (regErrors.slug || regErrors.general) {
-                            setRegErrors((prev) => ({ ...prev, slug: "", general: "" }));
+                          setRegAdminEmail(e.target.value);
+                          if (regErrors.adminEmail || regErrors.general) {
+                            setRegErrors((prev) => ({ ...prev, adminEmail: "", general: "" }));
                           }
                         }}
-                        placeholder="rvce"
-                        className={`w-full pl-8 pr-2 py-2 rounded-xl border text-xs focus:outline-none focus:ring-2 ${
-                          regErrors.slug
+                        placeholder="placement@rvce.edu"
+                        className={`w-full px-2.5 py-2 rounded-xl border text-xs focus:outline-none focus:ring-2 ${
+                          regErrors.adminEmail
                             ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
                             : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
                         } ${loading ? "opacity-60 bg-slate-50 cursor-not-allowed" : ""}`}
                       />
+                      {regErrors.adminEmail && (
+                        <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3 shrink-0" />
+                          {regErrors.adminEmail}
+                        </p>
+                      )}
                     </div>
-                    {regErrors.slug && (
-                      <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3 shrink-0" />
-                        {regErrors.slug}
-                      </p>
-                    )}
                   </div>
 
                   <div>
                     <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                      Placement Admin Email *
+                      Accepted Student Email Domains *
                     </label>
                     <input
-                      type="email"
+                      type="text"
                       required
                       disabled={loading}
-                      value={regAdminEmail}
+                      value={regAcceptedDomains}
                       onChange={(e) => {
-                        setRegAdminEmail(e.target.value);
-                        if (regErrors.adminEmail || regErrors.general) {
-                          setRegErrors((prev) => ({ ...prev, adminEmail: "", general: "" }));
+                        setRegAcceptedDomains(e.target.value);
+                        if (regErrors.domains || regErrors.general) {
+                          setRegErrors((prev) => ({ ...prev, domains: "", general: "" }));
                         }
                       }}
-                      placeholder="placement@rvce.edu"
-                      className={`w-full px-2.5 py-2 rounded-xl border text-xs focus:outline-none focus:ring-2 ${
-                        regErrors.adminEmail
+                      placeholder="e.g. rvce.edu, student.rvce.edu"
+                      className={`w-full px-3.5 py-2 rounded-xl border text-xs focus:outline-none focus:ring-2 ${
+                        regErrors.domains
                           ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
                           : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
                       } ${loading ? "opacity-60 bg-slate-50 cursor-not-allowed" : ""}`}
                     />
-                    {regErrors.adminEmail && (
+                    {regErrors.domains && (
                       <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
                         <AlertCircle className="w-3 h-3 shrink-0" />
-                        {regErrors.adminEmail}
+                        {regErrors.domains}
                       </p>
                     )}
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                    Accepted Student Email Domains *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    disabled={loading}
-                    value={regAcceptedDomains}
-                    onChange={(e) => {
-                      setRegAcceptedDomains(e.target.value);
-                      if (regErrors.domains || regErrors.general) {
-                        setRegErrors((prev) => ({ ...prev, domains: "", general: "" }));
-                      }
-                    }}
-                    placeholder="e.g. rvce.edu, student.rvce.edu"
-                    className={`w-full px-3.5 py-2 rounded-xl border text-xs focus:outline-none focus:ring-2 ${
-                      regErrors.domains
-                        ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
-                        : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
-                    } ${loading ? "opacity-60 bg-slate-50 cursor-not-allowed" : ""}`}
-                  />
-                  {regErrors.domains && (
-                    <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3 shrink-0" />
-                      {regErrors.domains}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                        Master Password *
+                      </label>
+                      <input
+                        type="password"
+                        required
+                        minLength={6}
+                        disabled={loading}
+                        value={regMasterPassword}
+                        onChange={(e) => {
+                          setRegMasterPassword(e.target.value);
+                          if (regErrors.masterPassword || regErrors.general) {
+                            setRegErrors((prev) => ({ ...prev, masterPassword: "", general: "" }));
+                          }
+                        }}
+                        placeholder="••••••••"
+                        className={`w-full px-3 py-2 rounded-xl border text-xs focus:outline-none focus:ring-2 ${
+                          regErrors.masterPassword
+                            ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                            : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                        } ${loading ? "opacity-60 bg-slate-50 cursor-not-allowed" : ""}`}
+                      />
+                      {regErrors.masterPassword && (
+                        <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3 shrink-0" />
+                          {regErrors.masterPassword}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                        Confirm Password *
+                      </label>
+                      <input
+                        type="password"
+                        required
+                        minLength={6}
+                        disabled={loading}
+                        value={regConfirmMasterPassword}
+                        onChange={(e) => {
+                          setRegConfirmMasterPassword(e.target.value);
+                          if (regErrors.confirmPassword || regErrors.general) {
+                            setRegErrors((prev) => ({ ...prev, confirmPassword: "", general: "" }));
+                          }
+                        }}
+                        placeholder="••••••••"
+                        className={`w-full px-3 py-2 rounded-xl border text-xs focus:outline-none focus:ring-2 ${
+                          regErrors.confirmPassword
+                            ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                            : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                        } ${loading ? "opacity-60 bg-slate-50 cursor-not-allowed" : ""}`}
+                      />
+                      {regErrors.confirmPassword && (
+                        <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3 shrink-0" />
+                          {regErrors.confirmPassword}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full py-2.5 mt-2"
+                    icon={ChevronRight}
+                    iconPosition="right"
+                  >
+                    Continue to Academic Setup (Step 2)
+                  </Button>
+                </form>
+              )}
+
+              {/* STEP 2: DYNAMIC ACADEMIC STRUCTURE SETUP */}
+              {regStep === 2 && (
+                <form onSubmit={handleCollegeRegister} className="space-y-4" noValidate>
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-1.5 font-bold text-slate-800">
+                        <GraduationCap className="w-4 h-4 text-indigo-600" />
+                        Degree Programs Offered
+                      </div>
+                      <button
+                        type="button"
+                        onClick={addCourse}
+                        className="flex items-center gap-1 px-2.5 py-1 bg-white hover:bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-lg font-bold text-[11px] transition-all cursor-pointer shadow-2xs"
+                      >
+                        <Plus className="w-3 h-3" />
+                        Add Degree / Course
+                      </button>
+                    </div>
+                    <p className="text-slate-500 text-[11px]">
+                      Specify the degree programs (e.g. B.Tech, BCA, MBA), their respective branches/specializations, and active section divisions.
                     </p>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                      Master Password *
-                    </label>
-                    <input
-                      type="password"
-                      required
-                      minLength={6}
-                      disabled={loading}
-                      value={regMasterPassword}
-                      onChange={(e) => {
-                        setRegMasterPassword(e.target.value);
-                        if (regErrors.masterPassword || regErrors.general) {
-                          setRegErrors((prev) => ({ ...prev, masterPassword: "", general: "" }));
-                        }
-                      }}
-                      placeholder="••••••••"
-                      className={`w-full px-3 py-2 rounded-xl border text-xs focus:outline-none focus:ring-2 ${
-                        regErrors.masterPassword
-                          ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
-                          : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
-                      } ${loading ? "opacity-60 bg-slate-50 cursor-not-allowed" : ""}`}
-                    />
-                    {regErrors.masterPassword && (
-                      <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3 shrink-0" />
-                        {regErrors.masterPassword}
-                      </p>
-                    )}
                   </div>
 
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                      Confirm Password *
-                    </label>
-                    <input
-                      type="password"
-                      required
-                      minLength={6}
-                      disabled={loading}
-                      value={regConfirmMasterPassword}
-                      onChange={(e) => {
-                        setRegConfirmMasterPassword(e.target.value);
-                        if (regErrors.confirmPassword || regErrors.general) {
-                          setRegErrors((prev) => ({ ...prev, confirmPassword: "", general: "" }));
-                        }
-                      }}
-                      placeholder="••••••••"
-                      className={`w-full px-3 py-2 rounded-xl border text-xs focus:outline-none focus:ring-2 ${
-                        regErrors.confirmPassword
-                          ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
-                          : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
-                      } ${loading ? "opacity-60 bg-slate-50 cursor-not-allowed" : ""}`}
-                    />
-                    {regErrors.confirmPassword && (
-                      <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3 shrink-0" />
-                        {regErrors.confirmPassword}
-                      </p>
-                    )}
-                  </div>
-                </div>
+                  <div className="space-y-3 max-h-[380px] overflow-y-auto pr-1">
+                    {regCourses.map((course, cIdx) => (
+                      <div
+                        key={cIdx}
+                        className="p-3.5 bg-white border border-slate-200 rounded-xl shadow-xs space-y-3"
+                      >
+                        {/* Course Header */}
+                        <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+                          <div className="flex-1 flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 flex items-center justify-center font-bold text-[10px]">
+                              {cIdx + 1}
+                            </span>
+                            <div className="flex-1">
+                              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">
+                                Program / Course Name
+                              </label>
+                              <input
+                                type="text"
+                                required
+                                value={course.courseName}
+                                onChange={(e) => updateCourseName(cIdx, e.target.value)}
+                                placeholder="e.g. B.Tech, BCA, M.Tech, MBA"
+                                className="w-full px-2.5 py-1.5 text-xs font-bold text-slate-900 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+                              />
+                            </div>
+                          </div>
 
-                <Button
-                  type="submit"
-                  loading={loading}
-                  disabled={loading}
-                  className="w-full py-2.5 mt-2"
-                  icon={Building2}
-                  iconPosition="left"
-                >
-                  {loading ? "Creating account..." : "Register & Onboard Institution"}
-                </Button>
-              </form>
+                          {regCourses.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removeCourse(cIdx)}
+                              className="text-slate-400 hover:text-rose-600 p-1 rounded-lg transition-colors cursor-pointer mt-3"
+                              title="Delete Course"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Branches Container */}
+                        <div className="space-y-2.5 pl-2 border-l-2 border-indigo-100">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1">
+                              <Layers className="w-3 h-3 text-indigo-500" />
+                              Branches in {course.courseName || `Program #${cIdx + 1}`}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => addBranch(cIdx)}
+                              className="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-0.5 cursor-pointer"
+                            >
+                              <Plus className="w-3 h-3" />
+                              Add Branch
+                            </button>
+                          </div>
+
+                          {course.branches.map((branch, bIdx) => {
+                            const key = `${cIdx}_${bIdx}`;
+                            return (
+                              <div
+                                key={bIdx}
+                                className="p-2.5 bg-slate-50/70 border border-slate-200/80 rounded-lg space-y-2"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <div className="flex-1">
+                                    <input
+                                      type="text"
+                                      required
+                                      value={branch.branchName}
+                                      onChange={(e) => updateBranchName(cIdx, bIdx, e.target.value)}
+                                      placeholder="Branch Name (e.g. Computer Science, AI & DS, ECE)"
+                                      className="w-full px-2.5 py-1.5 text-xs font-semibold text-slate-800 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+                                    />
+                                  </div>
+
+                                  <div className="w-28 shrink-0 flex items-center gap-1">
+                                    <label className="text-[10px] font-bold text-slate-500 uppercase whitespace-nowrap">
+                                      Secs:
+                                    </label>
+                                    <select
+                                      value={branch.sections.length}
+                                      onChange={(e) => updateBranchSectionCount(cIdx, bIdx, e.target.value)}
+                                      className="w-full px-2 py-1 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                    >
+                                      {[1, 2, 3, 4, 5, 6, 8, 10].map((num) => (
+                                        <option key={num} value={num}>
+                                          {num} {num === 1 ? "Sec" : "Secs"}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
+
+                                  {course.branches.length > 1 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => removeBranch(cIdx, bIdx)}
+                                      className="text-slate-400 hover:text-rose-600 p-1 rounded-md transition-colors cursor-pointer"
+                                      title="Remove Branch"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  )}
+                                </div>
+
+                                {/* Active Section Badges & Custom Section Input */}
+                                <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                                  <span className="text-[10px] text-slate-400 font-semibold mr-1">
+                                    Sections:
+                                  </span>
+                                  {branch.sections.map((sec, sIdx) => (
+                                    <span
+                                      key={sIdx}
+                                      className="inline-flex items-center gap-1 px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-md text-[11px] font-bold"
+                                    >
+                                      {sec}
+                                      {branch.sections.length > 1 && (
+                                        <button
+                                          type="button"
+                                          onClick={() => removeSection(cIdx, bIdx, sIdx)}
+                                          className="text-indigo-400 hover:text-rose-600 cursor-pointer ml-0.5 font-bold"
+                                          title="Remove Section"
+                                        >
+                                          ×
+                                        </button>
+                                      )}
+                                    </span>
+                                  ))}
+
+                                  <div className="inline-flex items-center gap-1">
+                                    <input
+                                      type="text"
+                                      placeholder="+ Section"
+                                      value={customSecInput[key] || ""}
+                                      onChange={(e) =>
+                                        setCustomSecInput((prev) => ({
+                                          ...prev,
+                                          [key]: e.target.value
+                                        }))
+                                      }
+                                      onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                          e.preventDefault();
+                                          addCustomSection(cIdx, bIdx);
+                                        }
+                                      }}
+                                      className="w-16 px-1.5 py-0.5 text-[10px] bg-white border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                    />
+                                    {Boolean(customSecInput[key]) && (
+                                      <button
+                                        type="button"
+                                        onClick={() => addCustomSection(cIdx, bIdx)}
+                                        className="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 px-1"
+                                      >
+                                        Add
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center justify-between gap-3 pt-3 border-t border-slate-100">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={loading}
+                      onClick={() => setRegStep(1)}
+                      icon={ChevronLeft}
+                      iconPosition="left"
+                    >
+                      Back
+                    </Button>
+
+                    <Button
+                      type="submit"
+                      loading={loading}
+                      disabled={loading}
+                      className="flex-1 py-2.5"
+                      icon={Building2}
+                      iconPosition="left"
+                    >
+                      {loading ? "Registering Institution..." : "Complete Registration & Launch"}
+                    </Button>
+                  </div>
+                </form>
+              )}
 
               <div className="pt-3 text-center text-xs text-slate-500">
                 Already registered with SIPS?{" "}
                 <button
                   type="button"
-                  onClick={() => setIsRegisterMode(false)}
+                  onClick={() => {
+                    setIsRegisterMode(false);
+                    setRegStep(1);
+                  }}
                   className="font-bold text-indigo-600 hover:text-indigo-800 cursor-pointer"
                 >
                   Sign in here

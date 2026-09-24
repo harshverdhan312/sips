@@ -37,11 +37,14 @@ export function StudentManagementPage() {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [savingStudent, setSavingStudent] = useState(false);
   const [addStudentErrors, setAddStudentErrors] = useState({});
+  const [academicStructure, setAcademicStructure] = useState([]);
   const [newStudent, setNewStudent] = useState({
     name: "",
     email: "",
     rollNo: "",
+    course: "",
     branch: "Computer Science & Engineering",
+    section: "",
     batch: "",
     cgpa: "",
     password: ""
@@ -57,7 +60,7 @@ export function StudentManagementPage() {
   const [importError, setImportError] = useState(null);
   const [exporting, setExporting] = useState(false);
 
-  // Load students from backend
+  // Load students and academic structure from backend
   const loadStudents = async () => {
     try {
       const data = await placementService.getStudents({
@@ -70,9 +73,71 @@ export function StudentManagementPage() {
     }
   };
 
+  const loadAcademicStructure = async () => {
+    try {
+      const structure = await placementService.getAcademicStructure();
+      if (Array.isArray(structure) && structure.length > 0) {
+        setAcademicStructure(structure);
+        const firstCourse = structure[0];
+        const firstBranch = firstCourse?.branches?.[0];
+        const firstSec = firstBranch?.sections?.[0] || "";
+        setNewStudent((prev) => ({
+          ...prev,
+          course: prev.course || firstCourse?.courseName || "",
+          branch: prev.branch || firstBranch?.branchName || "Computer Science & Engineering",
+          section: prev.section || firstSec
+        }));
+      }
+    } catch (e) {
+      console.warn("Could not load academic structure:", e);
+    }
+  };
+
   useEffect(() => {
     loadStudents();
+    loadAcademicStructure();
   }, [selectedBranch, selectedStatus]);
+
+  // Derived academic structure helper lists
+  const allBranches = Array.from(
+    new Set(academicStructure.flatMap((c) => (c.branches || []).map((b) => b.branchName)))
+  ).filter(Boolean);
+
+  const selectedCourseObj =
+    academicStructure.find((c) => c.courseName === newStudent.course) || academicStructure[0];
+  const availableBranches = selectedCourseObj?.branches || [];
+  const selectedBranchObj =
+    availableBranches.find((b) => b.branchName === newStudent.branch) || availableBranches[0];
+  const availableSections = selectedBranchObj?.sections || [];
+
+  const handleCourseChange = (courseName) => {
+    const courseObj = academicStructure.find((c) => c.courseName === courseName);
+    const firstBranch = courseObj?.branches?.[0];
+    const firstSection = firstBranch?.sections?.[0] || "";
+    setNewStudent((prev) => ({
+      ...prev,
+      course: courseName,
+      branch: firstBranch?.branchName || "",
+      section: firstSection
+    }));
+  };
+
+  const handleBranchChange = (branchName) => {
+    const branchObj = availableBranches.find((b) => b.branchName === branchName);
+    const firstSection = branchObj?.sections?.[0] || "";
+    setNewStudent((prev) => ({
+      ...prev,
+      branch: branchName,
+      section: firstSection
+    }));
+  };
+
+  const handleSectionChange = (section) => {
+    setNewStudent((prev) => ({
+      ...prev,
+      section
+    }));
+  };
 
   const handleExportCsv = async () => {
     if (exporting) return;
@@ -147,7 +212,9 @@ export function StudentManagementPage() {
         name: "",
         email: "",
         rollNo: "",
-        branch: "Computer Science & Engineering",
+        course: academicStructure[0]?.courseName || "",
+        branch: academicStructure[0]?.branches?.[0]?.branchName || "Computer Science & Engineering",
+        section: academicStructure[0]?.branches?.[0]?.sections?.[0] || "",
         batch: "",
         cgpa: "",
         password: ""
@@ -273,7 +340,16 @@ export function StudentManagementPage() {
       title: "Branch",
       key: "branch",
       sortable: true,
-      render: (row) => <span className="text-slate-600">{row.branch}</span>
+      render: (row) => (
+        <div>
+          <span className="text-slate-800 font-medium">{row.branch}</span>
+          {(row.course || row.section) && (
+            <p className="text-[11px] text-slate-400">
+              {row.course ? row.course : ""}{row.course && row.section ? " • " : ""}{row.section ? `Sec ${row.section}` : ""}
+            </p>
+          )}
+        </div>
+      )
     },
     {
       title: "CGPA",
@@ -430,10 +506,20 @@ export function StudentManagementPage() {
               className="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             >
               <option value="All">All Branches</option>
-              <option value="Computer Science & Engineering">CSE</option>
-              <option value="Information Science">ISE</option>
-              <option value="Artificial Intelligence">AI/ML</option>
-              <option value="Electronics & Communication">ECE</option>
+              {allBranches.length > 0 ? (
+                allBranches.map((b) => (
+                  <option key={b} value={b}>
+                    {b}
+                  </option>
+                ))
+              ) : (
+                <>
+                  <option value="Computer Science & Engineering">CSE</option>
+                  <option value="Information Science">ISE</option>
+                  <option value="Artificial Intelligence">AI/ML</option>
+                  <option value="Electronics & Communication">ECE</option>
+                </>
+              )}
             </select>
 
             <select
@@ -480,6 +566,10 @@ export function StudentManagementPage() {
                         ? "success"
                         : activeStudent.status === "Needs Improvement"
                         ? "warning"
+                        : activeStudent.status === "Placed"
+                        ? "success"
+                        : activeStudent.status === "Resume Pending"
+                        ? "neutral"
                         : "danger"
                     }
                     size="sm"
@@ -488,7 +578,7 @@ export function StudentManagementPage() {
                   </Badge>
                 </div>
                 <p className="text-xs text-slate-500">
-                  {activeStudent.branch} • Batch {activeStudent.batch}
+                  {activeStudent.course ? `${activeStudent.course} • ` : ""}{activeStudent.branch}{activeStudent.section ? ` (Sec ${activeStudent.section})` : ""} • Batch {activeStudent.batch}
                 </p>
                 <p className="text-xs font-semibold text-slate-700 mt-1">
                   CGPA: {activeStudent.cgpa}/10 • Email: {activeStudent.email}
@@ -503,7 +593,7 @@ export function StudentManagementPage() {
                   Employability Index
                 </p>
                 <h4 className="text-2xl font-black text-indigo-700 mt-1">
-                  {activeStudent.metrics?.employabilityIndex ?? 0}/100
+                  {activeStudent.resumeUrl ? `${activeStudent.metrics?.employabilityIndex ?? 0}/100` : "Pending Resume"}
                 </h4>
               </div>
 
@@ -512,7 +602,7 @@ export function StudentManagementPage() {
                   Placement Prob.
                 </p>
                 <h4 className="text-2xl font-black text-emerald-700 mt-1">
-                  {activeStudent.metrics?.placementProbability ?? 0}%
+                  {activeStudent.resumeUrl ? `${activeStudent.metrics?.placementProbability ?? 0}%` : "Not Evaluated"}
                 </h4>
               </div>
 
@@ -521,7 +611,7 @@ export function StudentManagementPage() {
                   Technical Score
                 </p>
                 <h4 className="text-2xl font-black text-blue-700 mt-1">
-                  {activeStudent.metrics?.technicalScore ?? 0}
+                  {activeStudent.resumeUrl ? (activeStudent.metrics?.technicalScore ?? 0) : "Pending"}
                 </h4>
               </div>
 
@@ -530,7 +620,7 @@ export function StudentManagementPage() {
                   Soft Skill Index
                 </p>
                 <h4 className="text-2xl font-black text-purple-700 mt-1">
-                  {activeStudent.metrics?.softSkillScore ?? 0}
+                  {activeStudent.resumeUrl ? (activeStudent.metrics?.softSkillScore ?? 0) : "Pending"}
                 </h4>
               </div>
             </div>
@@ -539,34 +629,42 @@ export function StudentManagementPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div className="p-4 rounded-xl border border-slate-200 bg-white">
                 <h4 className="font-bold text-slate-900 mb-2">Verified Strengths</h4>
-                <div className="flex flex-wrap gap-1.5">
-                  {(activeStudent.strongSkills || ["React.js", "Python", "Problem Solving"]).map(
-                    (s, i) => (
+                {activeStudent.resumeUrl && Array.isArray(activeStudent.strongSkills) && activeStudent.strongSkills.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {activeStudent.strongSkills.map((s, i) => (
                       <span
                         key={i}
                         className="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 font-semibold border border-emerald-100"
                       >
                         ✓ {s}
                       </span>
-                    )
-                  )}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-slate-400 italic py-2 text-xs">
+                    No verified strengths yet. Upload your resume to analyze your skills.
+                  </p>
+                )}
               </div>
 
               <div className="p-4 rounded-xl border border-slate-200 bg-white">
                 <h4 className="font-bold text-slate-900 mb-2">Skill Gaps Requiring Action</h4>
-                <div className="flex flex-wrap gap-1.5">
-                  {(activeStudent.weakSkills || ["Cloud AWS", "Docker Containerization"]).map(
-                    (w, i) => (
+                {activeStudent.resumeUrl && Array.isArray(activeStudent.weakSkills) && activeStudent.weakSkills.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {activeStudent.weakSkills.map((w, i) => (
                       <span
                         key={i}
                         className="px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 font-semibold border border-rose-100"
                       >
                         ! {w}
                       </span>
-                    )
-                  )}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-slate-400 italic py-2 text-xs">
+                    No skill-gap analysis available yet. Upload your resume to identify your skill gaps.
+                  </p>
+                )}
               </div>
             </div>
 
@@ -736,37 +834,111 @@ export function StudentManagementPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                Department / Branch
-              </label>
-              <select
-                disabled={savingStudent}
-                value={newStudent.branch}
-                onChange={(e) => setNewStudent({ ...newStudent, branch: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-              >
-                <option value="Computer Science & Engineering">CSE</option>
-                <option value="Information Science">ISE</option>
-                <option value="Artificial Intelligence">AI/ML</option>
-                <option value="Electronics & Communication">ECE</option>
-              </select>
+          {/* Academic Structure: Course, Branch, Section Cascading Fields */}
+          {academicStructure.length > 0 ? (
+            <div className="space-y-3 p-3 bg-slate-50/80 border border-slate-200/80 rounded-xl">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Degree Program / Course *
+                  </label>
+                  <select
+                    disabled={savingStudent}
+                    value={newStudent.course}
+                    onChange={(e) => handleCourseChange(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  >
+                    {academicStructure.map((c) => (
+                      <option key={c.courseName} value={c.courseName}>
+                        {c.courseName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Branch / Department *
+                  </label>
+                  <select
+                    disabled={savingStudent}
+                    value={newStudent.branch}
+                    onChange={(e) => handleBranchChange(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  >
+                    {availableBranches.map((b) => (
+                      <option key={b.branchName} value={b.branchName}>
+                        {b.branchName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Section
+                  </label>
+                  <select
+                    disabled={savingStudent}
+                    value={newStudent.section}
+                    onChange={(e) => handleSectionChange(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  >
+                    {availableSections.map((s) => (
+                      <option key={s} value={s}>
+                        Section {s}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Batch Year
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 2026"
+                    disabled={savingStudent}
+                    value={newStudent.batch}
+                    onChange={(e) => setNewStudent({ ...newStudent, batch: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+              </div>
             </div>
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                Batch Year
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. 2026"
-                disabled={savingStudent}
-                value={newStudent.batch}
-                onChange={(e) => setNewStudent({ ...newStudent, batch: e.target.value })}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-              />
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                  Department / Branch
+                </label>
+                <input
+                  type="text"
+                  disabled={savingStudent}
+                  placeholder="e.g. Computer Science & Engineering"
+                  value={newStudent.branch}
+                  onChange={(e) => setNewStudent({ ...newStudent, branch: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                  Batch Year
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. 2026"
+                  disabled={savingStudent}
+                  value={newStudent.batch}
+                  onChange={(e) => setNewStudent({ ...newStudent, batch: e.target.value })}
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           <div>
             <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
@@ -814,12 +986,12 @@ export function StudentManagementPage() {
               Required CSV Header Format
             </div>
             <p className="text-slate-600 mb-2">
-              The first row must include: <code className="font-mono bg-white px-1.5 py-0.5 rounded border border-indigo-200 text-indigo-700 font-bold">Name, Roll No, Email</code> (optional: <code className="font-mono bg-white px-1 py-0.5 rounded border border-indigo-200 text-slate-700">Branch, Batch, CGPA, Skills</code>)
+              The first row must include: <code className="font-mono bg-white px-1.5 py-0.5 rounded border border-indigo-200 text-indigo-700 font-bold">Name, Roll No, Email</code> (supported: <code className="font-mono bg-white px-1 py-0.5 rounded border border-indigo-200 text-slate-700">Course, Branch, Section, Batch, CGPA, Skills</code>)
             </p>
             <div className="p-2 rounded-lg bg-white border border-indigo-100 font-mono text-[11px] text-slate-600 overflow-x-auto">
-              Name, Roll No, Email, Branch, Batch, CGPA, Skills<br />
-              Aarav Sharma, 1RV21CS001, aarav@college.edu, Computer Science, 2025, 8.8, "Python, React, SQL"<br />
-              Diya Patel, 1RV21CS002, diya@college.edu, Information Science, 2025, 9.1, "Java, Spring, Docker"
+              Name, Roll No, Email, Course, Branch, Section, Batch, CGPA, Skills<br />
+              Aarav Sharma, 1RV21CS001, aarav@college.edu, B.Tech, Computer Science, A, 2025, 8.8, "Python, React, SQL"<br />
+              Diya Patel, 1RV21CS002, diya@college.edu, B.Tech, Information Science, B, 2025, 9.1, "Java, Spring, Docker"
             </div>
           </div>
 
@@ -874,7 +1046,7 @@ export function StudentManagementPage() {
                 rows={6}
                 value={csvText}
                 onChange={(e) => setCsvText(e.target.value)}
-                placeholder={'Name, Roll No, Email, Branch, Batch, CGPA, Skills\nAarav Sharma, 1RV21CS001, aarav@college.edu, Computer Science, 2025, 8.8, "Python, React, SQL"'}
+                placeholder={'Name, Roll No, Email, Course, Branch, Section, Batch, CGPA, Skills\nAarav Sharma, 1RV21CS001, aarav@college.edu, B.Tech, Computer Science, A, 2025, 8.8, "Python, React, SQL"'}
                 className="w-full p-3 rounded-xl border border-slate-200 font-mono text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 resize-none"
               />
             </div>
