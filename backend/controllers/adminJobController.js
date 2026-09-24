@@ -576,10 +576,14 @@ exports.getJobApplicants = async (req, res) => {
       const applicants = apps.map(app => {
         const student = memoryDb.findStudentById(app.studentId);
         const { passwordHash, ...cleanStudent } = student || {};
+        const calc = student ? calculateMatch(student.skills || [], job.requiredSkills || []) : { score: 0, matchedSkills: [], missingSkills: [] };
         return {
           applicationId: app._id,
           student: cleanStudent,
           status: app.status,
+          matchScore: calc.score,
+          matchedSkills: calc.matchedSkills,
+          missingSkills: calc.missingSkills,
           appliedAt: app.appliedAt,
           updatedAt: app.updatedAt
         };
@@ -609,15 +613,55 @@ exports.getJobApplicants = async (req, res) => {
       .sort({ appliedAt: -1 })
       .populate('studentId', 'name rollNo usn email branch batch cgpa placementStatus readinessScore skills resumeUrl');
 
-    const applicants = applications
-      .filter(app => app.studentId)
-      .map(app => ({
+    const validApps = applications.filter(app => app.studentId);
+    const studentIds = validApps.map(app => app.studentId._id);
+
+    const matchMap = {};
+    try {
+      if (Match && typeof Match.find === 'function') {
+        const queryRes = Match.find({
+          jdId: jd._id,
+          collegeId: req.collegeId,
+          studentId: { $in: studentIds }
+        });
+        const matches = typeof queryRes?.lean === 'function'
+          ? await queryRes.lean()
+          : (typeof queryRes?.then === 'function' ? await queryRes : []);
+        if (Array.isArray(matches)) {
+          matches.forEach(m => {
+            matchMap[String(m.studentId)] = m;
+          });
+        }
+      }
+    } catch (_) {
+      // Graceful fallback if Match collection query fails or unmocked
+    }
+
+    const applicants = validApps.map(app => {
+      const studentIdStr = String(app.studentId._id || app.studentId.id);
+      const match = matchMap[studentIdStr];
+      let score = match ? match.score : 0;
+      let matchedSkills = match ? match.matchedSkills : [];
+      let missingSkills = match ? match.missingSkills : [];
+
+      if (!match && app.studentId.skills) {
+        const calc = calculateMatch(app.studentId.skills || [], jd.requiredSkills || []);
+        score = calc.score;
+        matchedSkills = calc.matchedSkills;
+        missingSkills = calc.missingSkills;
+      }
+
+      return {
         applicationId: app._id,
         student: app.studentId,
         status: app.status,
+        matchScore: score,
+        matchedSkills,
+        missingSkills,
         appliedAt: app.appliedAt,
         updatedAt: app.updatedAt
-      }));
+      };
+    });
 
     res.json({
       success: true,
@@ -632,6 +676,217 @@ exports.getJobApplicants = async (req, res) => {
   } catch (error) {
     logger.error('Admin getJobApplicants error:', error);
     res.status(500).json({ success: false, message: 'Server error retrieving applicants' });
+  }
+};
+
+/**
+ * GET /api/admin/jobs/:id/matched/export
+ * Export matched candidates for a specific job as CSV
+ */
+exports.exportJobMatchedCSV = async (req, res) => {
+  try {
+    const jobId = req.params.id;
+
+    if (!memoryDb.isMongoConnected()) {
+      const job = memoryDb.findJobById(jobId);
+      if (!job || String(job.collegeId) !== String(req.collegeId)) {
+        return res.status(404).json({ success: false, message: 'Job not found' });
+      }
+
+      const students = memoryDb.getStudents(req.collegeId);
+      const ranked = students
+        .map(s => {
+          const result = calculateMatch(s.skills || [], job.requiredSkills || []);
+          return {
+            student: s,
+            score: result.score,
+            matchedSkills: result.matchedSkills,
+            missingSkills: result.missingSkills
+          };
+        })
+        .sort((a, b) => b.score - a.score);
+
+      const headers = ['Student Name', 'Email', 'Roll Number', 'USN', 'Branch', 'Batch', 'CGPA', 'Match Score', 'Matched Skills', 'Missing Skills'];
+      const rows = ranked.map(m => [
+        `"${(m.student?.name || '').replace(/"/g, '""')}"`,
+        `"${(m.student?.email || '').replace(/"/g, '""')}"`,
+        `"${(m.student?.rollNo || '').replace(/"/g, '""')}"`,
+        `"${(m.student?.usn || m.student?.rollNo || '').replace(/"/g, '""')}"`,
+        `"${(m.student?.branch || '').replace(/"/g, '""')}"`,
+        `"${(m.student?.batch || '').replace(/"/g, '""')}"`,
+        m.student?.cgpa !== undefined && m.student?.cgpa !== null ? m.student.cgpa : '',
+        `${m.score}%`,
+        `"${(m.matchedSkills || []).join(', ').replace(/"/g, '""')}"`,
+        `"${(m.missingSkills || []).join(', ').replace(/"/g, '""')}"`
+      ]);
+
+      const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const filename = `${(job.company || 'job').toLowerCase().replace(/[^a-z0-9]+/g, '-')}-matched-students.csv`;
+
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      return res.status(200).send(csvContent);
+    }
+
+    const jd = await JobDescription.findOne({
+      _id: jobId,
+      collegeId: req.collegeId
+    });
+
+    if (!jd) {
+      return res.status(404).json({ success: false, message: 'Job not found' });
+    }
+
+    const matches = await Match.find({
+      jdId: jd._id,
+      collegeId: req.collegeId
+    })
+      .sort({ score: -1 })
+      .populate('studentId', 'name rollNo usn email branch batch cgpa placementStatus readinessScore skills')
+      .lean();
+
+    const validMatches = matches.filter(m => m.studentId);
+
+    const headers = ['Student Name', 'Email', 'Roll Number', 'USN', 'Branch', 'Batch', 'CGPA', 'Match Score', 'Matched Skills', 'Missing Skills'];
+    const rows = validMatches.map(m => {
+      const s = m.studentId;
+      return [
+        `"${(s.name || '').replace(/"/g, '""')}"`,
+        `"${(s.email || '').replace(/"/g, '""')}"`,
+        `"${(s.rollNo || '').replace(/"/g, '""')}"`,
+        `"${(s.usn || s.rollNo || '').replace(/"/g, '""')}"`,
+        `"${(s.branch || '').replace(/"/g, '""')}"`,
+        `"${(s.batch || '').replace(/"/g, '""')}"`,
+        s.cgpa !== undefined && s.cgpa !== null ? s.cgpa : '',
+        `${m.score}%`,
+        `"${(m.matchedSkills || []).join(', ').replace(/"/g, '""')}"`,
+        `"${(m.missingSkills || []).join(', ').replace(/"/g, '""')}"`
+      ];
+    });
+
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const filename = `${(jd.company || 'job').toLowerCase().replace(/[^a-z0-9]+/g, '-')}-matched-students.csv`;
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.status(200).send(csvContent);
+  } catch (error) {
+    logger.error('Admin exportJobMatchedCSV error:', error);
+    res.status(500).json({ success: false, message: 'Server error exporting matched candidates' });
+  }
+};
+
+/**
+ * GET /api/admin/jobs/:id/applications/export
+ * Export applied candidates for a specific job as CSV
+ */
+exports.exportJobApplicationsCSV = async (req, res) => {
+  try {
+    const jobId = req.params.id;
+
+    if (!memoryDb.isMongoConnected()) {
+      const job = memoryDb.findJobById(jobId);
+      if (!job || String(job.collegeId) !== String(req.collegeId)) {
+        return res.status(404).json({ success: false, message: 'Job not found' });
+      }
+
+      const apps = memoryDb.getJobApplications(req.collegeId, jobId);
+      const headers = ['Student Name', 'Email', 'Roll Number', 'USN', 'Branch', 'Batch', 'CGPA', 'Match Score', 'Application Status', 'Applied At'];
+      const rows = apps.map(app => {
+        const student = memoryDb.findStudentById(app.studentId);
+        const calc = student ? calculateMatch(student.skills || [], job.requiredSkills || []) : { score: 0 };
+        return [
+          `"${(student?.name || '').replace(/"/g, '""')}"`,
+          `"${(student?.email || '').replace(/"/g, '""')}"`,
+          `"${(student?.rollNo || '').replace(/"/g, '""')}"`,
+          `"${(student?.usn || student?.rollNo || '').replace(/"/g, '""')}"`,
+          `"${(student?.branch || '').replace(/"/g, '""')}"`,
+          `"${(student?.batch || '').replace(/"/g, '""')}"`,
+          student?.cgpa !== undefined && student?.cgpa !== null ? student.cgpa : '',
+          `${calc.score}%`,
+          `"${(app.status || 'APPLIED').replace(/"/g, '""')}"`,
+          `"${app.appliedAt ? new Date(app.appliedAt).toISOString() : ''}"`
+        ];
+      });
+
+      const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const filename = `${(job.company || 'job').toLowerCase().replace(/[^a-z0-9]+/g, '-')}-applied-students.csv`;
+
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      return res.status(200).send(csvContent);
+    }
+
+    const jd = await JobDescription.findOne({
+      _id: jobId,
+      collegeId: req.collegeId
+    });
+
+    if (!jd) {
+      return res.status(404).json({ success: false, message: 'Job not found' });
+    }
+
+    const applications = await Application.find({
+      jobId: jd._id,
+      collegeId: req.collegeId
+    })
+      .sort({ appliedAt: -1 })
+      .populate('studentId', 'name rollNo usn email branch batch cgpa placementStatus readinessScore skills');
+
+    const validApps = applications.filter(app => app.studentId);
+    const studentIds = validApps.map(app => app.studentId._id);
+
+    const matchMap = {};
+    try {
+      if (Match && typeof Match.find === 'function') {
+        const queryRes = Match.find({
+          jdId: jd._id,
+          collegeId: req.collegeId,
+          studentId: { $in: studentIds }
+        });
+        const matches = typeof queryRes?.lean === 'function'
+          ? await queryRes.lean()
+          : (typeof queryRes?.then === 'function' ? await queryRes : []);
+        if (Array.isArray(matches)) {
+          matches.forEach(m => {
+            matchMap[String(m.studentId)] = m;
+          });
+        }
+      }
+    } catch (_) {
+      // Graceful fallback if Match collection query fails or unmocked
+    }
+
+    const headers = ['Student Name', 'Email', 'Roll Number', 'USN', 'Branch', 'Batch', 'CGPA', 'Match Score', 'Application Status', 'Applied At'];
+    const rows = validApps.map(app => {
+      const s = app.studentId;
+      const studentIdStr = String(s._id || s.id);
+      const match = matchMap[studentIdStr];
+      const score = match ? match.score : (s.skills ? calculateMatch(s.skills, jd.requiredSkills).score : 0);
+
+      return [
+        `"${(s.name || '').replace(/"/g, '""')}"`,
+        `"${(s.email || '').replace(/"/g, '""')}"`,
+        `"${(s.rollNo || '').replace(/"/g, '""')}"`,
+        `"${(s.usn || s.rollNo || '').replace(/"/g, '""')}"`,
+        `"${(s.branch || '').replace(/"/g, '""')}"`,
+        `"${(s.batch || '').replace(/"/g, '""')}"`,
+        s.cgpa !== undefined && s.cgpa !== null ? s.cgpa : '',
+        `${score}%`,
+        `"${(app.status || 'APPLIED').replace(/"/g, '""')}"`,
+        `"${app.appliedAt ? new Date(app.appliedAt).toISOString() : ''}"`
+      ];
+    });
+
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const filename = `${(jd.company || 'job').toLowerCase().replace(/[^a-z0-9]+/g, '-')}-applied-students.csv`;
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.status(200).send(csvContent);
+  } catch (error) {
+    logger.error('Admin exportJobApplicationsCSV error:', error);
+    res.status(500).json({ success: false, message: 'Server error exporting applied candidates' });
   }
 };
 

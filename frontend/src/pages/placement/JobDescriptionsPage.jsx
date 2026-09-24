@@ -14,7 +14,8 @@ import {
   TrendingUp,
   RefreshCw,
   Eye,
-  GraduationCap
+  GraduationCap,
+  Download
 } from "lucide-react";
 import { placementService } from "../../services/placementService";
 import { Card, CardHeader } from "../../components/common/Card";
@@ -31,10 +32,16 @@ export function JobDescriptionsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedJob, setSelectedJob] = useState(null);
 
-  // Dynamic candidate matches state
+  // Dynamic candidate matches & applications state
+  const [candidateView, setCandidateView] = useState("matched"); // "matched" | "applied"
   const [matches, setMatches] = useState([]);
   const [matchesLoading, setMatchesLoading] = useState(false);
   const [matchesError, setMatchesError] = useState(null);
+
+  const [applicants, setApplicants] = useState([]);
+  const [applicantsLoading, setApplicantsLoading] = useState(false);
+  const [applicantsError, setApplicantsError] = useState(null);
+  const [exportingCsv, setExportingCsv] = useState(false);
 
   // Candidate detail modal state
   const [activeStudent, setActiveStudent] = useState(null);
@@ -75,39 +82,56 @@ export function JobDescriptionsPage() {
     load();
   }, []);
 
-  // Fetch dynamic candidate matches whenever selectedJob changes
+  // Fetch dynamic candidate matches and applications whenever selectedJob changes
   useEffect(() => {
     let isCurrent = true;
 
-    async function fetchMatches() {
+    async function fetchCandidates() {
       if (!selectedJob) {
         setMatches([]);
+        setApplicants([]);
         return;
       }
 
       const jobId = selectedJob._id || selectedJob.id;
       setMatchesLoading(true);
       setMatchesError(null);
-      setMatches([]); // Reset to avoid stale candidate data
+      setApplicantsLoading(true);
+      setApplicantsError(null);
+      setMatches([]);
+      setApplicants([]);
 
+      // Fetch matches and applications concurrently
       try {
-        const res = await placementService.getJobMatches(jobId);
+        const [matchesRes, appsRes] = await Promise.allSettled([
+          placementService.getJobMatches(jobId),
+          placementService.getJobApplications(jobId)
+        ]);
+
         if (isCurrent) {
-          setMatches(res.matches || []);
-        }
-      } catch (err) {
-        if (isCurrent) {
-          console.error(`Error loading matches for job ${jobId}:`, err);
-          setMatchesError(err.message || "Could not retrieve candidate matches");
+          if (matchesRes.status === "fulfilled") {
+            setMatches(matchesRes.value.matches || []);
+          } else {
+            console.error(`Error loading matches for job ${jobId}:`, matchesRes.reason);
+            setMatchesError(matchesRes.reason?.message || "Could not retrieve candidate matches");
+          }
+
+          if (appsRes.status === "fulfilled") {
+            setApplicants(appsRes.value.applicants || []);
+          } else {
+            console.error(`Error loading applicants for job ${jobId}:`, appsRes.reason);
+            setApplicantsError(appsRes.reason?.message || "Could not retrieve drive applicants");
+          }
         }
       } finally {
         if (isCurrent) {
           setMatchesLoading(false);
+          setApplicantsLoading(false);
         }
       }
     }
 
-    fetchMatches();
+    fetchCandidates();
 
     return () => {
       isCurrent = false;
@@ -194,11 +218,41 @@ export function JobDescriptionsPage() {
     if (candidate?.student) {
       setActiveStudent({
         ...candidate.student,
-        matchScore: candidate.score,
+        matchScore: candidate.matchScore !== undefined ? candidate.matchScore : candidate.score,
         matchedSkills: candidate.matchedSkills,
         missingSkills: candidate.missingSkills
       });
       setStudentModalOpen(true);
+    }
+  };
+
+  const getStatusBadgeVariant = (status) => {
+    switch (status?.toUpperCase()) {
+      case "SELECTED":
+        return "success";
+      case "SHORTLISTED":
+        return "primary";
+      case "REJECTED":
+      case "WITHDRAWN":
+        return "danger";
+      case "APPLIED":
+      default:
+        return "neutral";
+    }
+  };
+
+  const handleExportCandidates = async () => {
+    if (!selectedJob) return;
+    const jobId = selectedJob._id || selectedJob.id;
+    try {
+      setExportingCsv(true);
+      const filename = await placementService.downloadJobCandidatesCSV(jobId, candidateView);
+      showSuccess(`Exported ${candidateView === "matched" ? "matched" : "applied"} candidates (${filename})`);
+    } catch (err) {
+      console.error("Export error:", err);
+      showError(err.message || "Failed to export candidates CSV");
+    } finally {
+      setExportingCsv(false);
     }
   };
 
@@ -366,133 +420,291 @@ export function JobDescriptionsPage() {
                 )}
               </div>
 
-              {/* Top Student Matches in Batch */}
+              {/* Candidate Management Header & Segmented View Switcher */}
               <div>
-                <div className="flex justify-between items-center mb-3">
-                  <h4 className="font-bold text-slate-900 text-sm">
-                    Top Matched Candidates for {selectedJob.company} ({matches.length})
-                  </h4>
-                  {matches.length > 0 && (
-                    <span className="text-xs text-slate-500 font-medium">
-                      Ranked by Jaccard Skill Overlap
-                    </span>
-                  )}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                  <div>
+                    <h4 className="font-bold text-slate-900 text-sm">
+                      {candidateView === "matched"
+                        ? `Top Matched Candidates for ${selectedJob.company}`
+                        : `Students Applied to ${selectedJob.company}`}
+                    </h4>
+                    <p className="text-xs text-slate-500">
+                      {candidateView === "matched"
+                        ? "Ranked by Jaccard skill overlap & eligibility criteria."
+                        : "Students who have submitted formal applications for this recruitment drive."}
+                    </p>
+                  </div>
+
+                  {/* Segmented View Toggle */}
+                  <div className="inline-flex p-1 bg-slate-100 rounded-xl border border-slate-200 self-start sm:self-auto">
+                    <button
+                      type="button"
+                      onClick={() => setCandidateView("matched")}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        candidateView === "matched"
+                          ? "bg-white text-indigo-700 shadow-xs border border-slate-200/60"
+                          : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
+                      Matched Students ({matches.length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCandidateView("applied")}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        candidateView === "applied"
+                          ? "bg-white text-indigo-700 shadow-xs border border-slate-200/60"
+                          : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
+                      Applied Students ({applicants.length})
+                    </button>
+                  </div>
                 </div>
 
-                {/* Loading State */}
-                {matchesLoading && (
-                  <div className="space-y-2 py-4">
-                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 animate-pulse flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-7 h-7 rounded-full bg-slate-200" />
-                        <div className="space-y-1">
-                          <div className="w-24 h-3 bg-slate-200 rounded" />
-                          <div className="w-16 h-2 bg-slate-200 rounded" />
-                        </div>
-                      </div>
-                      <div className="w-16 h-6 bg-slate-200 rounded-lg" />
-                    </div>
-                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 animate-pulse flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-7 h-7 rounded-full bg-slate-200" />
-                        <div className="space-y-1">
-                          <div className="w-24 h-3 bg-slate-200 rounded" />
-                          <div className="w-16 h-2 bg-slate-200 rounded" />
-                        </div>
-                      </div>
-                      <div className="w-16 h-6 bg-slate-200 rounded-lg" />
-                    </div>
-                  </div>
-                )}
 
-                {/* Error State */}
-                {matchesError && !matchesLoading && (
-                  <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center justify-between">
-                    <span>{matchesError}</span>
-                    <Button
-                      variant="outline"
-                      size="xs"
-                      icon={RefreshCw}
-                      onClick={() => {
-                        const jobId = selectedJob._id || selectedJob.id;
-                        placementService.getJobMatches(jobId).then((r) => setMatches(r.matches || []));
-                      }}
-                    >
-                      Retry
-                    </Button>
-                  </div>
-                )}
-
-                {/* Empty State */}
-                {!matchesLoading && !matchesError && matches.length === 0 && (
-                  <div className="p-8 text-center rounded-xl bg-slate-50 border border-slate-100 text-slate-400 text-xs">
-                    No matching candidates found for this drive. Ensure registered students have skills matching the target competencies.
-                  </div>
-                )}
-
-                {/* Live Matches List */}
-                {!matchesLoading && matches.length > 0 && (
-                  <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
-                    {matches.map((m, idx) => {
-                      const scoreBadgeVariant = m.score >= 80 ? "success" : m.score >= 50 ? "primary" : "warning";
-                      return (
-                        <div
-                          key={m.id || m.student?.id || m.student?._id || idx}
-                          className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs hover:bg-slate-100/70 transition-colors"
-                        >
-                          <div className="flex items-center gap-2.5">
-                            <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-800 font-bold flex items-center justify-center text-xs shrink-0">
-                              {m.rank || idx + 1}
-                            </span>
-                            <Avatar
-                              src={m.student?.profileImageUrl || m.student?.avatar}
-                              name={m.student?.name || "Candidate"}
-                              size="xs"
-                              className="w-7 h-7 border border-slate-200 shrink-0"
-                            />
-                            <div>
-                              <p className="font-bold text-slate-900">{m.student?.name || "Candidate"}</p>
-                              <span className="text-slate-500">
-                                {m.student?.branch || "Engineering"} • CGPA {m.student?.cgpa > 0 ? m.student.cgpa.toFixed(2) : "Not Set"}
-                              </span>
+                {/* ============================================================ */}
+                {/* 1. MATCHED STUDENTS VIEW */}
+                {/* ============================================================ */}
+                {candidateView === "matched" && (
+                  <div>
+                    {/* Loading State */}
+                    {matchesLoading && (
+                      <div className="space-y-2 py-4">
+                        <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 animate-pulse flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-7 h-7 rounded-full bg-slate-200" />
+                            <div className="space-y-1">
+                              <div className="w-24 h-3 bg-slate-200 rounded" />
+                              <div className="w-16 h-2 bg-slate-200 rounded" />
                             </div>
                           </div>
-
-                          <div className="flex items-center gap-2 self-end sm:self-auto">
-                            <Badge variant={scoreBadgeVariant} size="sm">
-                              {m.score}% Match
-                            </Badge>
-                            <Button
-                              variant="outline"
-                              size="xs"
-                              icon={Eye}
-                              onClick={() => handleViewCandidate(m)}
-                            >
-                              Profile
-                            </Button>
-                          </div>
+                          <div className="w-16 h-6 bg-slate-200 rounded-lg" />
                         </div>
-                      );
-                    })}
+                        <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 animate-pulse flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-7 h-7 rounded-full bg-slate-200" />
+                            <div className="space-y-1">
+                              <div className="w-24 h-3 bg-slate-200 rounded" />
+                              <div className="w-16 h-2 bg-slate-200 rounded" />
+                            </div>
+                          </div>
+                          <div className="w-16 h-6 bg-slate-200 rounded-lg" />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Error State */}
+                    {matchesError && !matchesLoading && (
+                      <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center justify-between">
+                        <span>{matchesError}</span>
+                        <Button
+                          variant="outline"
+                          size="xs"
+                          icon={RefreshCw}
+                          onClick={() => {
+                            const jobId = selectedJob._id || selectedJob.id;
+                            placementService.getJobMatches(jobId).then((r) => setMatches(r.matches || []));
+                          }}
+                        >
+                          Retry
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* Empty State */}
+                    {!matchesLoading && !matchesError && matches.length === 0 && (
+                      <div className="p-8 text-center rounded-xl bg-slate-50 border border-slate-100 text-slate-400 text-xs">
+                        No matching candidates found for this drive. Ensure registered students have skills matching the target competencies.
+                      </div>
+                    )}
+
+                    {/* Live Matches List */}
+                    {!matchesLoading && matches.length > 0 && (
+                      <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+                        {matches.map((m, idx) => {
+                          const scoreBadgeVariant = m.score >= 80 ? "success" : m.score >= 50 ? "primary" : "warning";
+                          return (
+                            <div
+                              key={m.id || m.student?.id || m.student?._id || idx}
+                              className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs hover:bg-slate-100/70 transition-colors"
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-800 font-bold flex items-center justify-center text-xs shrink-0">
+                                  {m.rank || idx + 1}
+                                </span>
+                                <Avatar
+                                  src={m.student?.profileImageUrl || m.student?.avatar}
+                                  name={m.student?.name || "Candidate"}
+                                  size="xs"
+                                  className="w-7 h-7 border border-slate-200 shrink-0"
+                                />
+                                <div>
+                                  <p className="font-bold text-slate-900">{m.student?.name || "Candidate"}</p>
+                                  <span className="text-slate-500">
+                                    {m.student?.branch || "Engineering"} • CGPA {m.student?.cgpa || 7.5}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-2 self-end sm:self-auto">
+                                <Badge variant={scoreBadgeVariant} size="sm">
+                                  {m.score}% Match
+                                </Badge>
+                                <Button
+                                  variant="outline"
+                                  size="xs"
+                                  icon={Eye}
+                                  onClick={() => handleViewCandidate(m)}
+                                >
+                                  Profile
+                                </Button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* ============================================================ */}
+                {/* 2. APPLIED STUDENTS VIEW */}
+                {/* ============================================================ */}
+                {candidateView === "applied" && (
+                  <div>
+                    {/* Loading State */}
+                    {applicantsLoading && (
+                      <div className="space-y-2 py-4">
+                        <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 animate-pulse flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-7 h-7 rounded-full bg-slate-200" />
+                            <div className="space-y-1">
+                              <div className="w-24 h-3 bg-slate-200 rounded" />
+                              <div className="w-16 h-2 bg-slate-200 rounded" />
+                            </div>
+                          </div>
+                          <div className="w-16 h-6 bg-slate-200 rounded-lg" />
+                        </div>
+                        <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 animate-pulse flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-7 h-7 rounded-full bg-slate-200" />
+                            <div className="space-y-1">
+                              <div className="w-24 h-3 bg-slate-200 rounded" />
+                              <div className="w-16 h-2 bg-slate-200 rounded" />
+                            </div>
+                          </div>
+                          <div className="w-16 h-6 bg-slate-200 rounded-lg" />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Error State */}
+                    {applicantsError && !applicantsLoading && (
+                      <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center justify-between">
+                        <span>{applicantsError}</span>
+                        <Button
+                          variant="outline"
+                          size="xs"
+                          icon={RefreshCw}
+                          onClick={() => {
+                            const jobId = selectedJob._id || selectedJob.id;
+                            placementService.getJobApplications(jobId).then((r) => setApplicants(r.applicants || []));
+                          }}
+                        >
+                          Retry
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* Empty State for Applied Students */}
+                    {!applicantsLoading && !applicantsError && applicants.length === 0 && (
+                      <div className="p-8 text-center rounded-xl bg-slate-50 border border-slate-100 text-slate-400 text-xs">
+                        No students have applied to this drive yet.
+                      </div>
+                    )}
+
+                    {/* Live Applicants List */}
+                    {!applicantsLoading && applicants.length > 0 && (
+                      <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+                        {applicants.map((a, idx) => {
+                          const scoreBadgeVariant = a.matchScore >= 80 ? "success" : a.matchScore >= 50 ? "primary" : "warning";
+                          const statusVariant = getStatusBadgeVariant(a.status);
+                          const appliedDateStr = a.appliedAt ? new Date(a.appliedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "";
+                          return (
+                            <div
+                              key={a.applicationId || a.student?.id || a.student?._id || idx}
+                              className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs hover:bg-slate-100/70 transition-colors"
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center text-xs shrink-0">
+                                  {a.rank || idx + 1}
+                                </span>
+                                <Avatar
+                                  src={a.student?.profileImageUrl || a.student?.avatar}
+                                  name={a.student?.name || "Applicant"}
+                                  size="xs"
+                                  className="w-7 h-7 border border-slate-200 shrink-0"
+                                />
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <p className="font-bold text-slate-900">{a.student?.name || "Applicant"}</p>
+                                    <Badge variant={statusVariant} size="xs">
+                                      {a.status || "APPLIED"}
+                                    </Badge>
+                                  </div>
+                                  <span className="text-slate-500">
+                                    {a.student?.branch || "Engineering"} • CGPA {a.student?.cgpa || 7.5}
+                                    {appliedDateStr ? ` • Applied ${appliedDateStr}` : ""}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-2 self-end sm:self-auto">
+                                <Badge variant={scoreBadgeVariant} size="sm">
+                                  {a.matchScore}% Match
+                                </Badge>
+                                <Button
+                                  variant="outline"
+                                  size="xs"
+                                  icon={Eye}
+                                  onClick={() => handleViewCandidate(a)}
+                                >
+                                  Profile
+                                </Button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
 
-              {/* Action */}
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+              {/* Action Buttons */}
+              <div className="flex flex-wrap justify-end gap-3 pt-4 border-t border-slate-100">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => addToast(`Shortlist broadcast notification triggered for ${matches.length} candidate matches!`, "success")}
+                  onClick={() => {
+                    const count = candidateView === "matched" ? matches.length : applicants.length;
+                    const label = candidateView === "matched" ? "candidate matches" : "active applicants";
+                    showSuccess(`Shortlist broadcast notification triggered for ${count} ${label}!`);
+                  }}
                 >
-                  Broadcast Invitation ({matches.length})
+                  Broadcast Invitation ({candidateView === "matched" ? matches.length : applicants.length})
                 </Button>
                 <Button
                   variant="primary"
                   size="sm"
-                  onClick={() => addToast("Candidate match records exported successfully.", "success")}
+                  icon={Download}
+                  loading={exportingCsv}
+                  disabled={exportingCsv}
+                  onClick={handleExportCandidates}
                 >
-                  Export Candidates
+                  {candidateView === "matched" ? "Export Matched Students CSV" : "Export Applied Students CSV"}
                 </Button>
               </div>
             </Card>

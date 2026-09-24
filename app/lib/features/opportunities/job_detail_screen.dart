@@ -54,7 +54,7 @@ class JobDetailScreen extends ConsumerWidget {
 
           final mlMatch = mlMatchAsync.valueOrNull;
           final effectiveScore = mlMatch != null
-              ? (mlMatch.hybridMatchScore * 100).round()
+              ? mlMatch.hybridMatchScore.round()
               : job.matchScore;
           final effectiveMatchedSkills = mlMatch != null && mlMatch.matchedSkills.isNotEmpty
               ? mlMatch.matchedSkills
@@ -155,7 +155,7 @@ class JobDetailScreen extends ConsumerWidget {
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
-                                          '${(mlMatch.skillCoverageScore * 100).toStringAsFixed(0)}%',
+                                          '${mlMatch.skillCoverageScore.toStringAsFixed(0)}%',
                                           style: GoogleFonts.plusJakartaSans(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w800,

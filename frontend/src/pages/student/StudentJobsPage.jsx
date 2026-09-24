@@ -387,17 +387,17 @@ export function StudentJobsPage() {
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="text-2xl font-black text-indigo-700">
                     {mlAnalysisResult?.hybridMatch
-                      ? `${Math.round(mlAnalysisResult.hybridMatch.hybrid_match_score * 100)}%`
+                      ? `${Math.round(mlAnalysisResult.hybridMatch.hybrid_match_score)}%`
                       : `${selectedJob.matchScore}%`}
                   </span>
                   <Badge
                     variant={
                       (mlAnalysisResult?.hybridMatch
-                        ? Math.round(mlAnalysisResult.hybridMatch.hybrid_match_score * 100)
+                        ? Math.round(mlAnalysisResult.hybridMatch.hybrid_match_score)
                         : selectedJob.matchScore) >= 80
                         ? "success"
                         : (mlAnalysisResult?.hybridMatch
-                            ? Math.round(mlAnalysisResult.hybridMatch.hybrid_match_score * 100)
+                            ? Math.round(mlAnalysisResult.hybridMatch.hybrid_match_score)
                             : selectedJob.matchScore) >= 60
                         ? "primary"
                         : "neutral"
@@ -448,7 +448,7 @@ export function StudentJobsPage() {
                     <div className="p-2.5 rounded-lg bg-white border border-slate-200">
                       <span className="text-slate-500 font-medium block">Keyword Match Coverage</span>
                       <span className="font-bold text-slate-800 text-sm">
-                        {Math.round((mlAnalysisResult.hybridMatch?.skill_coverage_score || 0) * 100)}%
+                        {Math.round(mlAnalysisResult.hybridMatch?.skill_coverage_score || 0)}%
                       </span>
                       <span className="text-[10px] text-slate-400 block mt-0.5">Weight: 60%</span>
                     </div>

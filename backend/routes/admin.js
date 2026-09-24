@@ -86,6 +86,10 @@ router.put('/jobs/:id', validateObjectId('id'), adminJobController.updateJob);
 router.delete('/jobs/:id', validateObjectId('id'), adminJobController.deleteJob);
 router.get('/jobs/:id/matches', validateObjectId('id'), adminJobController.getJobMatches);
 router.get('/jobs/:id/applicants', validateObjectId('id'), adminJobController.getJobApplicants);
+router.get('/jobs/:id/applications', validateObjectId('id'), adminJobController.getJobApplicants);
+router.get('/jobs/:id/matched/export', validateObjectId('id'), adminJobController.exportJobMatchedCSV);
+router.get('/jobs/:id/applications/export', validateObjectId('id'), adminJobController.exportJobApplicationsCSV);
+router.get('/jobs/:id/applicants/export', validateObjectId('id'), adminJobController.exportJobApplicationsCSV);
 router.post('/jobs/:id/recompute', validateObjectId('id'), adminJobController.recomputeJobMatches);
 router.patch('/applications/:id/status', validateObjectId('id'), adminJobController.updateApplicationStatus);
 
