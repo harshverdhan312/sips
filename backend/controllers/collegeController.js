@@ -271,8 +271,8 @@ exports.uploadStudents = async (req, res) => {
           email: s.email.toLowerCase().trim(),
           passwordHash,
           branch: s.branch || 'Computer Science & Engineering',
-          batch: s.batch || '2025',
-          cgpa: s.cgpa !== undefined ? s.cgpa : 7.5,
+          batch: s.batch ? String(s.batch).trim() : '',
+          cgpa: (s.cgpa !== undefined && s.cgpa !== '' && !isNaN(Number(s.cgpa))) ? Number(s.cgpa) : 0,
           skills: s.skills || []
         });
         results.success++;
@@ -335,8 +335,8 @@ exports.uploadStudents = async (req, res) => {
           email: s.email.toLowerCase().trim(),
           passwordHash,
           branch: s.branch || 'Computer Science & Engineering',
-          batch: s.batch || '2025',
-          cgpa: s.cgpa !== undefined ? s.cgpa : 7.5,
+          batch: s.batch ? String(s.batch).trim() : '',
+          cgpa: (s.cgpa !== undefined && s.cgpa !== '' && !isNaN(Number(s.cgpa))) ? Number(s.cgpa) : 0,
           skills: s.skills || [],
           github: '',
           resumeUrl: ''

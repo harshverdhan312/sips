@@ -14,6 +14,7 @@ const mlService = require('../services/mlService');
 const memoryDb = require('../utils/memoryDb');
 const config = require('../config');
 const logger = require('../utils/logger');
+const resumeExtractor = require('../utils/resumeExtractor');
 
 /**
  * Helper to verify if a file starts with PDF magic bytes (%PDF-)
@@ -123,7 +124,7 @@ exports.getProfile = async (req, res) => {
  */
 exports.updateProfile = async (req, res) => {
   try {
-    const { skills, github, newPassword, password, name, tags, notes, age, internships, hostel, historyOfBacklogs } = req.body;
+    const { skills, github, newPassword, password, name, tags, notes, age, internships, hostel, historyOfBacklogs, cgpa, batch, branch } = req.body;
     const pwd = newPassword || password;
 
     // Validate password if supplied
@@ -274,6 +275,47 @@ exports.updateProfile = async (req, res) => {
       sanitizedNotes = notes.trim().slice(0, 500);
     }
 
+    // Validate CGPA if supplied
+    let sanitizedCgpa = undefined;
+    if (cgpa !== undefined) {
+      if (cgpa === null || cgpa === '') {
+        sanitizedCgpa = 0;
+      } else {
+        const parsed = parseFloat(cgpa);
+        if (isNaN(parsed) || parsed < 0 || parsed > 10) {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid CGPA: CGPA must be a number between 0 and 10.'
+          });
+        }
+        sanitizedCgpa = Math.round(parsed * 100) / 100;
+      }
+    }
+
+    // Validate Batch / Graduation Year if supplied
+    let sanitizedBatch = undefined;
+    if (batch !== undefined) {
+      if (typeof batch !== 'string') {
+        return res.status(400).json({
+          success: false,
+          message: 'Batch / Graduation Year must be a string.'
+        });
+      }
+      sanitizedBatch = batch.trim().slice(0, 30);
+    }
+
+    // Validate Branch / Department if supplied
+    let sanitizedBranch = undefined;
+    if (branch !== undefined) {
+      if (typeof branch !== 'string') {
+        return res.status(400).json({
+          success: false,
+          message: 'Branch must be a string.'
+        });
+      }
+      sanitizedBranch = branch.trim().slice(0, 100);
+    }
+
     // ----------------------------------------------------
     // Resilient In-Memory Mode
     // ----------------------------------------------------
@@ -293,6 +335,9 @@ exports.updateProfile = async (req, res) => {
       if (sanitizedInternships !== undefined) updates.internships = sanitizedInternships;
       if (sanitizedHostel !== undefined) updates.hostel = sanitizedHostel;
       if (sanitizedHistoryOfBacklogs !== undefined) updates.historyOfBacklogs = sanitizedHistoryOfBacklogs;
+      if (sanitizedCgpa !== undefined) updates.cgpa = sanitizedCgpa;
+      if (sanitizedBatch !== undefined) updates.batch = sanitizedBatch;
+      if (sanitizedBranch !== undefined) updates.branch = sanitizedBranch;
       if (pwd) {
         const salt = await bcrypt.genSalt(10);
         updates.passwordHash = await bcrypt.hash(pwd.trim(), salt);
@@ -341,6 +386,15 @@ exports.updateProfile = async (req, res) => {
     }
     if (sanitizedHistoryOfBacklogs !== undefined) {
       student.historyOfBacklogs = sanitizedHistoryOfBacklogs;
+    }
+    if (sanitizedCgpa !== undefined) {
+      student.cgpa = sanitizedCgpa;
+    }
+    if (sanitizedBatch !== undefined) {
+      student.batch = sanitizedBatch;
+    }
+    if (sanitizedBranch !== undefined) {
+      student.branch = sanitizedBranch;
     }
     if (pwd) {
       const salt = await bcrypt.genSalt(10);
@@ -400,6 +454,18 @@ exports.uploadResume = async (req, res) => {
     }
 
     const newResumeUrl = `/uploads/${req.file.filename}`;
+    const pdfBuffer = await fs.promises.readFile(uploadedFilePath);
+
+    // Extract academic details (CGPA and Graduation Year) from PDF resume
+    let extractedCgpa = null;
+    let extractedBatch = null;
+    try {
+      const extracted = resumeExtractor.extractFromPdfBuffer(pdfBuffer);
+      if (extracted.extractedCgpa !== null) extractedCgpa = extracted.extractedCgpa;
+      if (extracted.extractedBatch !== null) extractedBatch = extracted.extractedBatch;
+    } catch (parseErr) {
+      logger.warn('Resume academic extraction error:', parseErr.message);
+    }
 
     // ----------------------------------------------------
     // Resilient In-Memory Mode
@@ -413,6 +479,12 @@ exports.uploadResume = async (req, res) => {
 
       const oldResume = student.resumeUrl;
       student.resumeUrl = newResumeUrl;
+      if (extractedCgpa !== null) {
+        student.cgpa = extractedCgpa;
+      }
+      if (extractedBatch !== null) {
+        student.batch = extractedBatch;
+      }
 
       // Clean up previous resume file if different
       if (oldResume && oldResume !== newResumeUrl) {
@@ -426,7 +498,6 @@ exports.uploadResume = async (req, res) => {
       };
 
       try {
-        const pdfBuffer = await fs.promises.readFile(uploadedFilePath);
         const extractionResult = await mlService.extractResumeSkills(pdfBuffer, req.file.originalname || req.file.filename);
         if (extractionResult && Array.isArray(extractionResult.extracted_skills)) {
           mlAnalysis = {
@@ -446,6 +517,10 @@ exports.uploadResume = async (req, res) => {
       return res.json({
         message: 'Resume uploaded',
         resumeUrl: student.resumeUrl,
+        extractedCgpa,
+        extractedBatch,
+        cgpa: student.cgpa,
+        batch: student.batch,
         mlAnalysis
       });
     }
@@ -465,6 +540,12 @@ exports.uploadResume = async (req, res) => {
 
     const oldResume = student.resumeUrl;
     student.resumeUrl = newResumeUrl;
+    if (extractedCgpa !== null) {
+      student.cgpa = extractedCgpa;
+    }
+    if (extractedBatch !== null) {
+      student.batch = extractedBatch;
+    }
 
     try {
       await student.save();
@@ -485,7 +566,6 @@ exports.uploadResume = async (req, res) => {
     };
 
     try {
-      const pdfBuffer = await fs.promises.readFile(uploadedFilePath);
       const extractionResult = await mlService.extractResumeSkills(pdfBuffer, req.file.originalname || req.file.filename);
       if (extractionResult && Array.isArray(extractionResult.extracted_skills)) {
         mlAnalysis = {
@@ -505,6 +585,10 @@ exports.uploadResume = async (req, res) => {
     res.json({
       message: 'Resume uploaded',
       resumeUrl: student.resumeUrl,
+      extractedCgpa,
+      extractedBatch,
+      cgpa: student.cgpa,
+      batch: student.batch,
       mlAnalysis
     });
   } catch (error) {

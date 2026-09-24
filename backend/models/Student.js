@@ -9,8 +9,8 @@ const studentSchema = new mongoose.Schema({
   email: { type: String, required: true, lowercase: true, trim: true },
   passwordHash: { type: String, required: true },
   branch: { type: String, trim: true, default: 'Computer Science & Engineering' },
-  batch: { type: String, trim: true, default: '2025' },
-  cgpa: { type: Number, default: 7.5, min: 0, max: 10 },
+  batch: { type: String, trim: true, default: '' },
+  cgpa: { type: Number, default: 0, min: 0, max: 10 },
   placementStatus: {
     type: String,
     enum: ['UNPLACED', 'PLACED', 'IN_PROCESS', 'OPTED_OUT'],

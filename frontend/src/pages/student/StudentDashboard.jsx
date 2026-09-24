@@ -102,8 +102,8 @@ export function StudentDashboard() {
         <div className="absolute right-0 top-0 -bottom-10 w-96 bg-gradient-to-l from-indigo-500/20 to-transparent pointer-events-none" />
       </div>
 
-      {/* Main Metric Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+      {/* Main Metric Cards - Enlarged and spacious layout */}
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-5">
         <StatCard
           title="Readiness Score"
           value={`${student.readinessScore}/100`}
@@ -136,7 +136,7 @@ export function StudentDashboard() {
         />
         <StatCard
           title="Academic CGPA"
-          value={student.cgpa > 0 ? student.cgpa.toFixed(2) : "N/A"}
+          value={student.cgpa > 0 ? student.cgpa.toFixed(2) : "Not Set"}
           icon={Award}
           iconBg="bg-amber-50 text-amber-600"
         />

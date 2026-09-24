@@ -83,8 +83,10 @@ export const adminService = {
       rollNo: userData.rollNo || userData.usn,
       usn: userData.usn || userData.rollNo,
       branch: userData.branch || userData.department || 'Computer Science & Engineering',
-      batch: userData.batch || '2025',
-      cgpa: userData.cgpa || 7.5,
+      batch: userData.batch ? String(userData.batch).trim() : '',
+      cgpa: (userData.cgpa !== undefined && userData.cgpa !== '' && userData.cgpa !== null && !isNaN(Number(userData.cgpa)))
+        ? parseFloat(userData.cgpa)
+        : 0,
       password: userData.password || userData.rollNo
     });
     return res;

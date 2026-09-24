@@ -86,7 +86,7 @@ const parseCSV = (csvText) => {
     }
 
     // CGPA validation
-    let cgpa = 7.5;
+    let cgpa = 0;
     if (cgpaIdx !== -1 && cols[cgpaIdx] !== undefined && cols[cgpaIdx] !== '') {
       const parsedCgpa = parseFloat(cols[cgpaIdx]);
       if (isNaN(parsedCgpa) || parsedCgpa < 0 || parsedCgpa > 10) {
@@ -110,7 +110,7 @@ const parseCSV = (csvText) => {
       usn: cleanRoll,
       email: cleanEmail,
       branch: branchIdx !== -1 && cols[branchIdx] ? cols[branchIdx].trim() : 'Computer Science & Engineering',
-      batch: batchIdx !== -1 && cols[batchIdx] ? cols[batchIdx].trim() : '2025',
+      batch: batchIdx !== -1 && cols[batchIdx] ? cols[batchIdx].trim() : '',
       cgpa
     };
 

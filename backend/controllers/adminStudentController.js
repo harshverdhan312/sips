@@ -394,8 +394,8 @@ exports.uploadStudentsCSV = async (req, res) => {
           email: cleanEmail,
           passwordHash,
           branch: s.branch,
-          batch: s.batch,
-          cgpa: s.cgpa !== undefined ? s.cgpa : 7.5,
+          batch: s.batch ? String(s.batch).trim() : '',
+          cgpa: (s.cgpa !== undefined && s.cgpa !== '' && !isNaN(Number(s.cgpa))) ? Number(s.cgpa) : 0,
           skills: s.skills || []
         });
         results.success++;
@@ -433,8 +433,8 @@ exports.uploadStudentsCSV = async (req, res) => {
           email: s.email,
           passwordHash,
           branch: s.branch || 'Computer Science & Engineering',
-          batch: s.batch || '2025',
-          cgpa: s.cgpa !== undefined ? s.cgpa : 7.5,
+          batch: s.batch ? String(s.batch).trim() : '',
+          cgpa: (s.cgpa !== undefined && s.cgpa !== '' && !isNaN(Number(s.cgpa))) ? Number(s.cgpa) : 0,
           skills: s.skills || [],
           github: '',
           resumeUrl: ''
@@ -562,8 +562,8 @@ exports.createStudent = async (req, res) => {
         email: emailClean,
         passwordHash,
         branch: (branch || 'Computer Science & Engineering').trim(),
-        batch: (batch || '2025').trim(),
-        cgpa: cgpa !== undefined ? Math.max(0, Math.min(10, parseFloat(cgpa) || 7.0)) : 7.0,
+        batch: (batch ? String(batch) : '').trim(),
+        cgpa: (cgpa !== undefined && cgpa !== '' && cgpa !== null && !isNaN(Number(cgpa))) ? Math.max(0, Math.min(10, parseFloat(cgpa))) : 0,
         skills: Array.isArray(skills) ? skills.map(s => s.trim()).filter(Boolean) : [],
         placementStatus: 'UNPLACED',
         readinessScore: 65,
@@ -621,8 +621,8 @@ exports.createStudent = async (req, res) => {
       email: emailClean,
       passwordHash,
       branch: (branch || 'Computer Science & Engineering').trim(),
-      batch: (batch || '2025').trim(),
-      cgpa: cgpa !== undefined ? Math.max(0, Math.min(10, parseFloat(cgpa) || 7.0)) : 7.0,
+      batch: (batch ? String(batch) : '').trim(),
+      cgpa: (cgpa !== undefined && cgpa !== '' && cgpa !== null && !isNaN(Number(cgpa))) ? Math.max(0, Math.min(10, parseFloat(cgpa))) : 0,
       skills: Array.isArray(skills) ? skills.map(s => s.trim()).filter(Boolean) : [],
       placementStatus: 'UNPLACED',
       readinessScore: 65,

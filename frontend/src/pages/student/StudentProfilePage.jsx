@@ -27,6 +27,7 @@ import { resolveAssetUrl } from "../../services/api";
 import { Card, CardHeader } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
+import { Modal } from "../../components/common/Modal";
 import { DashboardSkeleton } from "../../components/common/LoadingSkeleton";
 import { useNotifications } from "../../context/NotificationContext";
 import { useAuth } from "../../context/AuthContext";
@@ -40,6 +41,14 @@ export function StudentProfilePage() {
   const [isEditingSkills, setIsEditingSkills] = useState(false);
   const [isEditingGithub, setIsEditingGithub] = useState(false);
   const [isEditingPlacement, setIsEditingPlacement] = useState(false);
+  const [editAcademicModalOpen, setEditAcademicModalOpen] = useState(false);
+  const [academicForm, setAcademicForm] = useState({
+    name: "",
+    branch: "",
+    batch: "",
+    cgpa: ""
+  });
+  const [savingAcademic, setSavingAcademic] = useState(false);
   const [skillsList, setSkillsList] = useState([]);
   const [newSkill, setNewSkill] = useState("");
   const [githubHandle, setGithubHandle] = useState("");
@@ -56,6 +65,12 @@ export function StudentProfilePage() {
       const data = await studentService.getCurrentStudent();
       if (data) {
         setStudent(data);
+        setAcademicForm({
+          name: data.name || "",
+          branch: data.branch || "",
+          batch: data.batch || "",
+          cgpa: data.cgpa > 0 ? String(data.cgpa) : ""
+        });
         setSkillsList(data.skills || []);
         setGithubHandle(data.github || "");
         setAgeInput(data.age !== null && data.age !== undefined ? String(data.age) : "");
@@ -72,6 +87,44 @@ export function StudentProfilePage() {
   }, []);
 
   if (!student) return <DashboardSkeleton />;
+
+  const handleSaveAcademic = async (e) => {
+    e.preventDefault();
+    if (!academicForm.name.trim()) {
+      showError("Full name is required.");
+      return;
+    }
+
+    let parsedCgpa = 0;
+    if (academicForm.cgpa.trim() !== "") {
+      const c = parseFloat(academicForm.cgpa);
+      if (isNaN(c) || c < 0 || c > 10) {
+        showError("Invalid CGPA: Must be a number between 0 and 10.");
+        return;
+      }
+      parsedCgpa = Math.round(c * 100) / 100;
+    }
+
+    setSavingAcademic(true);
+    try {
+      await studentService.updateCurrentStudent({
+        name: academicForm.name.trim(),
+        branch: academicForm.branch.trim(),
+        batch: academicForm.batch.trim(),
+        cgpa: parsedCgpa
+      });
+      const updated = await studentService.getCurrentStudent();
+      setStudent(updated);
+      updateUser({ name: updated.name });
+      setEditAcademicModalOpen(false);
+      showSuccess("Academic profile updated successfully.");
+    } catch (err) {
+      console.error(err);
+      showError(err.message || "Failed to update academic profile.");
+    } finally {
+      setSavingAcademic(false);
+    }
+  };
 
   const handleSaveSkills = async () => {
     setSaving(true);
@@ -195,10 +248,24 @@ export function StudentProfilePage() {
 
     setUploadingResume(true);
     try {
-      await studentService.uploadResume(file);
+      const res = await studentService.uploadResume(file);
       const updated = await studentService.getCurrentStudent();
       setStudent(updated);
-      showSuccess("Resume uploaded successfully.");
+      setAcademicForm({
+        name: updated.name || "",
+        branch: updated.branch || "",
+        batch: updated.batch || "",
+        cgpa: updated.cgpa > 0 ? String(updated.cgpa) : ""
+      });
+
+      let feedback = "Resume uploaded successfully.";
+      if (res?.extractedCgpa || res?.extractedBatch) {
+        const parts = [];
+        if (res.extractedCgpa) parts.push(`CGPA: ${res.extractedCgpa.toFixed(2)}`);
+        if (res.extractedBatch) parts.push(`Graduation Year: ${res.extractedBatch}`);
+        feedback += ` Extracted ${parts.join(" and ")} from resume.`;
+      }
+      showSuccess(feedback);
     } catch (err) {
       console.error(err);
       showError(err.message || "Failed to process the uploaded file.");
@@ -325,10 +392,28 @@ export function StudentProfilePage() {
                   </Badge>
                 </div>
                 <p className="text-xs font-semibold text-slate-500 mt-1">
-                  USN: {student.usn} • {student.branch} ({student.batch})
+                  USN: {student.usn} • {student.branch || "General"} {student.batch ? `(${student.batch})` : "(Batch Not Set)"}
                 </p>
               </div>
             </div>
+
+            <Button
+              variant="outline"
+              size="xs"
+              icon={Edit2}
+              onClick={() => {
+                setAcademicForm({
+                  name: student.name || "",
+                  branch: student.branch || "",
+                  batch: student.batch || "",
+                  cgpa: student.cgpa > 0 ? String(student.cgpa) : ""
+                });
+                setEditAcademicModalOpen(true);
+              }}
+              className="bg-white hover:bg-slate-50 border-slate-200 shadow-xs"
+            >
+              Edit Academic Profile
+            </Button>
           </div>
 
           {/* Quick Contact & Verification Badges */}
@@ -337,7 +422,7 @@ export function StudentProfilePage() {
               <Mail className="w-3.5 h-3.5 text-slate-400" /> {student.email}
             </span>
             <span className="flex items-center gap-1.5 font-semibold text-indigo-700">
-              <GraduationCap className="w-3.5 h-3.5 text-indigo-600" /> CGPA: {student.cgpa > 0 ? student.cgpa.toFixed(2) : "N/A"}
+              <GraduationCap className="w-3.5 h-3.5 text-indigo-600" /> CGPA: {student.cgpa > 0 ? student.cgpa.toFixed(2) : "Not Set"}
             </span>
             <span className="flex items-center gap-1.5 font-medium text-slate-600">
               <Briefcase className="w-3.5 h-3.5 text-slate-400" /> Status: {student.placementStatus}
@@ -820,6 +905,99 @@ export function StudentProfilePage() {
           </div>
         </div>
       </Card>
+
+      {/* Edit Academic & Student Profile Details Modal */}
+      <Modal
+        isOpen={editAcademicModalOpen}
+        onClose={() => setEditAcademicModalOpen(false)}
+        maxWidth="max-w-lg"
+        title="Edit Academic Profile"
+        subtitle="Update your name, degree specialization, graduation batch, and verified CGPA"
+      >
+        <form onSubmit={handleSaveAcademic} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Full Name *
+            </label>
+            <input
+              type="text"
+              required
+              disabled={savingAcademic}
+              value={academicForm.name}
+              onChange={(e) => setAcademicForm({ ...academicForm, name: e.target.value })}
+              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              placeholder="e.g. Harsh Verdhan Singh"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Department / Branch
+            </label>
+            <input
+              type="text"
+              disabled={savingAcademic}
+              value={academicForm.branch}
+              onChange={(e) => setAcademicForm({ ...academicForm, branch: e.target.value })}
+              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              placeholder="e.g. Computer Science & Engineering"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Batch / Graduation Year
+              </label>
+              <input
+                type="text"
+                disabled={savingAcademic}
+                value={academicForm.batch}
+                onChange={(e) => setAcademicForm({ ...academicForm, batch: e.target.value })}
+                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                placeholder="e.g. 2026 or 2022-2026"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Academic CGPA (0 - 10)
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                max="10"
+                disabled={savingAcademic}
+                value={academicForm.cgpa}
+                onChange={(e) => setAcademicForm({ ...academicForm, cgpa: e.target.value })}
+                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                placeholder="e.g. 8.5"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={savingAcademic}
+              onClick={() => setEditAcademicModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              loading={savingAcademic}
+            >
+              Save Profile
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

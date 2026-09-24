@@ -18,17 +18,17 @@ export function StatCard({
       hover={!!onClick}
       onClick={onClick}
       padding="normal"
-      className={cn("flex flex-col justify-between relative overflow-hidden p-4 sm:p-5", className)}
+      className={cn("flex flex-col justify-between relative overflow-hidden p-5 sm:p-6 min-h-[145px] sm:min-h-[155px] transition-all duration-200 shadow-sm", className)}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <p className="text-xs sm:text-sm font-semibold text-slate-500 truncate" title={title}>{title}</p>
+          <p className="text-xs sm:text-sm font-semibold text-slate-500 leading-snug line-clamp-2 min-h-[2.25rem] flex items-center" title={title}>{title}</p>
           <div className="mt-2.5 flex items-baseline gap-2">
             <h4
               className={cn(
-                "font-extrabold text-slate-900 tracking-tight",
+                "font-black text-slate-900 tracking-tight",
                 typeof value === "string" && value.length > 8
-                  ? "text-lg sm:text-xl break-words"
+                  ? "text-lg sm:text-xl font-bold break-words"
                   : "text-2xl sm:text-3xl"
               )}
             >
@@ -37,8 +37,8 @@ export function StatCard({
           </div>
         </div>
         {Icon && (
-          <div className={cn("p-2.5 rounded-xl flex items-center justify-center shrink-0 shadow-xs", iconBg)}>
-            <Icon className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
+          <div className={cn("p-3 rounded-2xl flex items-center justify-center shrink-0 shadow-xs", iconBg)}>
+            <Icon className="w-5.5 h-5.5 sm:w-6 sm:h-6" />
           </div>
         )}
       </div>

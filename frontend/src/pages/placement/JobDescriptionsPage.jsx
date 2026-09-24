@@ -453,7 +453,7 @@ export function JobDescriptionsPage() {
                             <div>
                               <p className="font-bold text-slate-900">{m.student?.name || "Candidate"}</p>
                               <span className="text-slate-500">
-                                {m.student?.branch || "Engineering"} • CGPA {m.student?.cgpa || 7.5}
+                                {m.student?.branch || "Engineering"} • CGPA {m.student?.cgpa > 0 ? m.student.cgpa.toFixed(2) : "Not Set"}
                               </span>
                             </div>
                           </div>
@@ -524,7 +524,7 @@ export function JobDescriptionsPage() {
               />
               <div className="flex-1">
                 <h4 className="font-bold text-slate-900 text-sm">{activeStudent.name}</h4>
-                <p className="text-xs text-slate-500">{activeStudent.branch} • Batch {activeStudent.batch || "2025"}</p>
+                <p className="text-xs text-slate-500">{activeStudent.branch} {activeStudent.batch ? `• Batch ${activeStudent.batch}` : ""}</p>
                 <p className="text-xs text-slate-400 font-mono">{activeStudent.email}</p>
               </div>
               <div className="text-right">

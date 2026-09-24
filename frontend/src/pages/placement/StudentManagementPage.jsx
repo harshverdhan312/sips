@@ -42,8 +42,8 @@ export function StudentManagementPage() {
     email: "",
     rollNo: "",
     branch: "Computer Science & Engineering",
-    batch: "2025",
-    cgpa: "7.5",
+    batch: "",
+    cgpa: "",
     password: ""
   });
 
@@ -148,8 +148,8 @@ export function StudentManagementPage() {
         email: "",
         rollNo: "",
         branch: "Computer Science & Engineering",
-        batch: "2025",
-        cgpa: "7.5",
+        batch: "",
+        cgpa: "",
         password: ""
       });
 
@@ -712,6 +712,7 @@ export function StudentManagementPage() {
                 step="0.01"
                 min="0"
                 max="10"
+                placeholder="e.g. 8.5"
                 disabled={savingStudent}
                 value={newStudent.cgpa}
                 onChange={(e) => {
@@ -758,6 +759,7 @@ export function StudentManagementPage() {
               </label>
               <input
                 type="text"
+                placeholder="e.g. 2026"
                 disabled={savingStudent}
                 value={newStudent.batch}
                 onChange={(e) => setNewStudent({ ...newStudent, batch: e.target.value })}
