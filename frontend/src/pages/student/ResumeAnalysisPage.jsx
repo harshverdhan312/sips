@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   UploadCloud,
   FileText,
@@ -9,9 +9,11 @@ import {
   ShieldCheck,
   ExternalLink,
   Eye,
-  Sparkles
+  Sparkles,
+  Trash2
 } from "lucide-react";
 import { resumeService } from "../../services/resumeService";
+import { studentService } from "../../services/studentService";
 import { resolveAssetUrl } from "../../services/api";
 import { Card, CardHeader } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
@@ -24,6 +26,47 @@ export function ResumeAnalysisPage() {
   const [uploading, setUploading] = useState(false);
   const [uploadedResume, setUploadedResume] = useState(null);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function loadInitialResume() {
+      try {
+        const student = await studentService.getCurrentStudent();
+        if (student && student.resumeUrl) {
+          setUploadedResume({
+            fileName: student.resumeUrl.split("/").pop() || "Resume.pdf",
+            fileSize: "PDF Document",
+            uploadDate: "Active",
+            resumeUrl: student.resumeUrl,
+            mlAnalysis: student.skills?.length > 0 ? {
+              extracted_skills: student.skills,
+              status: "active"
+            } : null
+          });
+        }
+      } catch (err) {
+        console.warn("Could not load initial resume:", err);
+      }
+    }
+    loadInitialResume();
+  }, []);
+
+  const handleDeleteResume = async () => {
+    if (!window.confirm("Are you sure you want to remove your resume? Your skill evaluations and scores will be reset.")) {
+      return;
+    }
+    setUploading(true);
+    try {
+      await resumeService.deleteResume();
+      setUploadedResume(null);
+      setFile(null);
+      showSuccess("Resume removed successfully. Skill evaluations and scores have been reset.");
+    } catch (err) {
+      console.error("Failed to remove resume:", err);
+      showError(err.message || "Failed to remove resume.");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const validateAndSetFile = (selectedFile) => {
     setError(null);
@@ -119,10 +162,23 @@ export function ResumeAnalysisPage() {
         )}
       </div>
 
+      {/* Empty State Banner if no resume */}
+      {!uploadedResume && (
+        <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+          <div className="text-xs text-amber-800 space-y-1">
+            <p className="font-bold">No active resume linked to your student profile</p>
+            <p className="text-amber-700">
+              Please upload your verified PDF resume below. Once uploaded, technical skills, verified strengths, and skill gaps will be automatically evaluated for placement drives.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Upload Zone Card */}
       <Card>
         <CardHeader
-          title="Upload Verified Resume"
+          title={uploadedResume ? "Upload Replacement Resume" : "Upload Verified Resume"}
           subtitle="Supports PDF documents up to 5MB. This file will be shared with recruiters for eligible campus drives."
         />
 
@@ -226,12 +282,21 @@ export function ResumeAnalysisPage() {
                   href={resolveAssetUrl(uploadedResume.resumeUrl)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
                 >
                   <Eye className="w-3.5 h-3.5 text-indigo-600" />
                   View File
                 </a>
               )}
+              <button
+                type="button"
+                disabled={uploading}
+                onClick={handleDeleteResume}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-rose-200 bg-rose-50 text-xs font-semibold text-rose-700 hover:bg-rose-100 transition-colors cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                Remove Resume
+              </button>
             </div>
           </div>
 

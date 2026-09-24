@@ -27,6 +27,13 @@ const collegeSchema = new mongoose.Schema({
   contactEmail: { type: String, trim: true, lowercase: true, default: '' },
   contactPhone: { type: String, trim: true, default: '' },
   establishedYear: { type: Number, default: null },
+  academicStructure: [{
+    courseName: { type: String, required: true, trim: true },
+    branches: [{
+      branchName: { type: String, required: true, trim: true },
+      sections: [{ type: String, trim: true }]
+    }]
+  }],
   createdAt: { type: Date, default: Date.now }
 });
 

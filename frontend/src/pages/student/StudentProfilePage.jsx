@@ -274,6 +274,25 @@ export function StudentProfilePage() {
     }
   };
 
+  const handleResumeDelete = async () => {
+    if (!window.confirm("Are you sure you want to remove your resume? Your resume-derived skill evaluations will be reset.")) {
+      return;
+    }
+    setUploadingResume(true);
+    try {
+      await studentService.deleteResume();
+      const updated = await studentService.getCurrentStudent();
+      setStudent(updated);
+      setSkillsList(updated.skills || []);
+      showSuccess("Resume removed and skill evaluations reset.");
+    } catch (err) {
+      console.error(err);
+      showError(err.message || "Failed to remove resume.");
+    } finally {
+      setUploadingResume(false);
+    }
+  };
+
   const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -879,15 +898,26 @@ export function StudentProfilePage() {
 
           <div className="flex flex-wrap items-center gap-2">
             {student.resumeUrl && (
-              <a
-                href={resolveAssetUrl(student.resumeUrl)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors"
-              >
-                <Eye className="w-3.5 h-3.5 text-indigo-600" />
-                View Resume
-              </a>
+              <>
+                <a
+                  href={resolveAssetUrl(student.resumeUrl)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors"
+                >
+                  <Eye className="w-3.5 h-3.5 text-indigo-600" />
+                  View Resume
+                </a>
+                <button
+                  type="button"
+                  disabled={uploadingResume}
+                  onClick={handleResumeDelete}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 transition-colors cursor-pointer"
+                >
+                  <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                  Remove Resume
+                </button>
+              </>
             )}
             <label className="cursor-pointer">
               <input

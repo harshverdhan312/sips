@@ -47,7 +47,9 @@ const parseCSV = (csvText) => {
   const nameIdx = header.findIndex(h => h.includes('name'));
   const rollIdx = header.findIndex(h => h.includes('roll') || h.includes('usn'));
   const emailIdx = header.findIndex(h => h.includes('email'));
-  const branchIdx = header.findIndex(h => h.includes('branch') || h.includes('dept') || h.includes('department'));
+  const branchIdx = header.findIndex(h => h.includes('branch') || h.includes('dept') || h.includes('department') || h.includes('specialization'));
+  const courseIdx = header.findIndex(h => h.includes('course') || h.includes('program') || h.includes('degree'));
+  const sectionIdx = header.findIndex(h => h.includes('section') || h.includes('sec'));
   const batchIdx = header.findIndex(h => h.includes('batch') || h.includes('year') || h.includes('grad'));
   const cgpaIdx = header.findIndex(h => h.includes('cgpa') || h.includes('gpa'));
   const skillsIdx = header.findIndex(h => h.includes('skill'));
@@ -109,7 +111,9 @@ const parseCSV = (csvText) => {
       rollNo: cleanRoll,
       usn: cleanRoll,
       email: cleanEmail,
-      branch: branchIdx !== -1 && cols[branchIdx] ? cols[branchIdx].trim() : 'Computer Science & Engineering',
+      course: courseIdx !== -1 && cols[courseIdx] ? cols[courseIdx].trim() : '',
+      branch: branchIdx !== -1 && cols[branchIdx] ? cols[branchIdx].trim() : '',
+      section: sectionIdx !== -1 && cols[sectionIdx] ? cols[sectionIdx].trim() : '',
       batch: batchIdx !== -1 && cols[batchIdx] ? cols[batchIdx].trim() : '',
       cgpa
     };

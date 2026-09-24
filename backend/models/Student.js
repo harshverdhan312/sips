@@ -8,7 +8,9 @@ const studentSchema = new mongoose.Schema({
   usn: { type: String, trim: true },
   email: { type: String, required: true, lowercase: true, trim: true },
   passwordHash: { type: String, required: true },
+  course: { type: String, trim: true, default: '' },
   branch: { type: String, trim: true, default: 'Computer Science & Engineering' },
+  section: { type: String, trim: true, default: '' },
   batch: { type: String, trim: true, default: '' },
   cgpa: { type: Number, default: 0, min: 0, max: 10 },
   placementStatus: {

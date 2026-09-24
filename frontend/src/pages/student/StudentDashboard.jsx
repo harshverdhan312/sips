@@ -106,31 +106,31 @@ export function StudentDashboard() {
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-5">
         <StatCard
           title="Readiness Score"
-          value={`${student.readinessScore}/100`}
+          value={student.resumeUrl ? `${student.readinessScore}/100` : "Pending Resume"}
           icon={TrendingUp}
           iconBg="bg-indigo-50 text-indigo-600"
         />
         <StatCard
           title="Placement Probability"
-          value={`${metrics.placementProbability}%`}
+          value={student.resumeUrl ? `${metrics.placementProbability}%` : "Not Evaluated"}
           icon={Target}
           iconBg="bg-emerald-50 text-emerald-600"
         />
         <StatCard
           title="Technical Score"
-          value={metrics.technicalScore > 0 ? `${metrics.technicalScore}/100` : "Not evaluated"}
+          value={student.resumeUrl && metrics.technicalScore > 0 ? `${metrics.technicalScore}/100` : "Not evaluated"}
           icon={Sparkles}
           iconBg="bg-blue-50 text-blue-600"
         />
         <StatCard
           title="Soft Skills Score"
-          value={metrics.softSkillScore > 0 ? `${metrics.softSkillScore}/100` : "Not evaluated"}
+          value={student.resumeUrl && metrics.softSkillScore > 0 ? `${metrics.softSkillScore}/100` : "Not evaluated"}
           icon={Mic}
           iconBg="bg-purple-50 text-purple-600"
         />
         <StatCard
           title="Resume Score"
-          value={metrics.resumeScore > 0 ? `${metrics.resumeScore}/100` : (student.resumeUrl ? "Uploaded" : "Pending")}
+          value={student.resumeUrl ? (metrics.resumeScore > 0 ? `${metrics.resumeScore}/100` : "Uploaded") : "Pending Resume"}
           icon={FileText}
           iconBg="bg-sky-50 text-sky-600"
         />
@@ -235,13 +235,17 @@ export function StudentDashboard() {
             </div>
           ) : (
             <div className="p-6 text-center rounded-2xl bg-slate-50 border border-dashed border-slate-200">
-              <p className="text-xs text-slate-500 mb-3">No verified technical skills added yet.</p>
+              <p className="text-xs text-slate-600 font-medium mb-3">
+                {student.resumeUrl
+                  ? "No verified technical skills added yet."
+                  : "No verified strengths yet. Upload your resume to analyze your skills."}
+              </p>
               <Button
                 variant="primary"
                 size="xs"
-                onClick={() => navigate("/student/profile")}
+                onClick={() => navigate(student.resumeUrl ? "/student/profile" : "/student/resume")}
               >
-                Add Skills in Profile
+                {student.resumeUrl ? "Add Skills in Profile" : "Upload Resume"}
               </Button>
             </div>
           )}
