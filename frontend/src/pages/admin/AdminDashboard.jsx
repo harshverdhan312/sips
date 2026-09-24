@@ -90,42 +90,42 @@ export function AdminDashboard() {
         <StatCard
           title="Total Platform Users"
           value={stats.totalUsers}
-          subtitle="412 active today"
+          subtitle={stats.activeToday > 0 ? `${stats.activeToday} active` : "Platform active"}
           icon={Users}
           iconBg="bg-indigo-50 text-indigo-600"
         />
         <StatCard
           title="Students Enrolled"
           value={stats.studentsEnrolled}
-          subtitle="Batches 2024-2026"
+          subtitle={stats.studentsEnrolled > 0 ? "Registered students" : "No students"}
           icon={GraduationCap}
           iconBg="bg-blue-50 text-blue-600"
         />
         <StatCard
           title="Placement Officers"
           value={stats.placementOfficers}
-          subtitle="Across 5 depts"
+          subtitle="Placement admin"
           icon={Building2}
           iconBg="bg-purple-50 text-purple-600"
         />
         <StatCard
           title="Resumes Parsed"
           value={stats.resumesParsedTotal}
-          trend={{ value: "+140", direction: "up", label: "this wk" }}
+          subtitle={stats.resumesParsedTotal > 0 ? `${stats.resumesParsedTotal} uploaded` : "No resumes"}
           icon={FileCheck}
           iconBg="bg-emerald-50 text-emerald-600"
         />
         <StatCard
           title="AI Mock Drills"
           value={stats.mockInterviewsCompleted}
-          trend={{ value: "+210", direction: "up", label: "this wk" }}
+          subtitle="Simulations"
           icon={Activity}
           iconBg="bg-amber-50 text-amber-600"
         />
         <StatCard
           title="System Health"
-          value="99.98%"
-          subtitle={`Latency: ${stats.apiLatency}`}
+          value={stats.systemHealth || "Operational"}
+          subtitle={`Status: ${stats.apiLatency}`}
           icon={Server}
           iconBg="bg-teal-50 text-teal-600"
         />

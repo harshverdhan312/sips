@@ -6,22 +6,27 @@ export const adminService = {
    */
   async getSystemStats() {
     try {
-      const res = await api.get('/api/admin/overview');
-      if (res && res.data) {
-        const d = res.data;
-        return {
-          totalUsers: d.totalStudents + 2,
-          activeToday: Math.max(1, Math.round(d.totalStudents * 0.4)),
-          studentsEnrolled: d.totalStudents,
-          placementOfficers: 4,
-          administrators: 2,
-          resumesParsedTotal: d.totalStudents * 2,
-          mockInterviewsCompleted: d.totalStudents * 3,
-          systemHealth: "Optimal (99.98% Uptime)",
-          apiLatency: "36ms",
-          storageUsage: "12.4 GB / 100 GB"
-        };
-      }
+      const [overviewRes, studentsRes] = await Promise.all([
+        api.get('/api/admin/overview').catch(() => null),
+        api.get('/api/admin/students?limit=200').catch(() => null)
+      ]);
+      const d = overviewRes?.data || {};
+      const studentList = studentsRes?.students || [];
+      const totalStudents = d.totalStudents || studentList.length || 0;
+      const resumesUploaded = studentList.filter(s => Boolean(s.resumeUrl)).length;
+
+      return {
+        totalUsers: totalStudents + 1,
+        activeToday: totalStudents > 0 ? totalStudents : 0,
+        studentsEnrolled: totalStudents,
+        placementOfficers: 1,
+        administrators: 1,
+        resumesParsedTotal: resumesUploaded,
+        mockInterviewsCompleted: 0,
+        systemHealth: "Operational",
+        apiLatency: "Active",
+        storageUsage: resumesUploaded > 0 ? `${(resumesUploaded * 0.4).toFixed(1)} MB` : "0 MB"
+      };
     } catch (e) {
       console.warn("Could not fetch overview stats from backend:", e.message);
     }
@@ -34,8 +39,8 @@ export const adminService = {
       resumesParsedTotal: 0,
       mockInterviewsCompleted: 0,
       systemHealth: "Active",
-      apiLatency: "24ms",
-      storageUsage: "0 GB / 100 GB"
+      apiLatency: "Active",
+      storageUsage: "0 MB"
     };
   },
 

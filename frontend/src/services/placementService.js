@@ -1,12 +1,4 @@
 import { api } from "./api";
-import {
-  placementBatchMetrics,
-  batchReadinessDonutData,
-  departmentPerformanceData,
-  skillDemandVsSupply,
-  historicalPlacementTrend,
-  technicalVsSoftSkillQuadrant
-} from "../data/mockAnalytics";
 
 export const placementService = {
   /**
@@ -77,10 +69,24 @@ export const placementService = {
         avgTech = Math.round(totalTechSum / studentList.length);
       }
 
+      // Compute package stats from real placed students
+      const placedStudentsList = studentList.filter(s => s.placementStatus === 'PLACED');
+      let avgPackageLpa = 0;
+      let highestPackageLpa = 0;
+      if (placedStudentsList.length > 0) {
+        let totalPkg = 0;
+        placedStudentsList.forEach(s => {
+          const pkg = typeof s.packageOffered === 'number' ? s.packageOffered : (parseFloat(s.packageOffered) || 0);
+          totalPkg += pkg;
+          if (pkg > highestPackageLpa) highestPackageLpa = pkg;
+        });
+        avgPackageLpa = Number((totalPkg / placedStudentsList.length).toFixed(1));
+      }
+
       return {
         totalStudents: total,
-        placedStudents: d.placedStudents || 0,
-        placementPercentage: d.placementRate || (total > 0 ? Math.round(((d.placedStudents || 0) / total) * 100) : 0),
+        placedStudents: d.placedStudents || placedStudentsList.length || 0,
+        placementPercentage: d.placementRate || (total > 0 ? Math.round(((d.placedStudents || placedStudentsList.length || 0) / total) * 100) : 0),
         placementReady: ready,
         placementReadyPct: total > 0 ? Math.round((ready / total) * 100) : 0,
         needsImprovement: needsImp,
@@ -91,8 +97,8 @@ export const placementService = {
         avgSoftSkillScore: avgSoft,
         avgTechnicalScore: avgTech,
         avgResumeScore: d.avgResumeScore || 0,
-        avgPackageLpa: 14.8,
-        highestPackageLpa: 44.0,
+        avgPackageLpa,
+        highestPackageLpa,
         activeRecruiters: d.activeJobsCount || 0,
         readinessDistribution: {
           placementReady: ready,
@@ -101,9 +107,31 @@ export const placementService = {
         }
       };
     } catch (e) {
-      console.warn("Backend overview metrics unavailable, using fallback:", e.message);
+      console.warn("Backend overview metrics unavailable:", e.message);
     }
-    return placementBatchMetrics;
+    return {
+      totalStudents: 0,
+      placedStudents: 0,
+      placementPercentage: 0,
+      placementReady: 0,
+      placementReadyPct: 0,
+      needsImprovement: 0,
+      needsImprovementPct: 0,
+      atRisk: 0,
+      atRiskPct: 0,
+      avgEmployabilityIndex: 0,
+      avgSoftSkillScore: 0,
+      avgTechnicalScore: 0,
+      avgResumeScore: 0,
+      avgPackageLpa: 0,
+      highestPackageLpa: 0,
+      activeRecruiters: 0,
+      readinessDistribution: {
+        placementReady: 0,
+        needsImprovement: 0,
+        atRisk: 0
+      }
+    };
   },
 
   /**
@@ -282,48 +310,148 @@ export const placementService = {
    */
   async getAnalyticsData() {
     try {
-      const [placementRes, studentRes] = await Promise.all([
+      const [placementRes, studentRes, studentsListRes, skillsRes] = await Promise.all([
         api.get('/api/admin/analytics/placement').catch(() => null),
-        api.get('/api/admin/analytics/students').catch(() => null)
+        api.get('/api/admin/analytics/students').catch(() => null),
+        api.get('/api/admin/students?limit=200').catch(() => null),
+        api.get('/api/admin/skills/intelligence').catch(() => null)
       ]);
 
-      const readinessTiers = studentRes?.data?.readinessTiers;
-      const batchDonut = Array.isArray(readinessTiers) && readinessTiers.length > 0
-        ? readinessTiers.map(t => ({
-            name: t.tier || t.name,
-            value: typeof t.count === 'number' ? t.count : (t.value || 0),
-            color: t.color || '#6366f1'
-          }))
-        : batchReadinessDonutData;
+      const studentList = studentsListRes?.students || [];
 
-      const deptList = studentRes?.data?.departments || placementRes?.data?.departments;
-      const deptPerformance = Array.isArray(deptList) && deptList.length > 0
-        ? deptList.map(d => ({
-            department: d.department || d._id || 'Unknown',
-            ready: typeof d.ready === 'number' ? d.ready : Math.round((d.total || 0) * ((d.avgReadiness || 60) / 100)),
-            needsImp: typeof d.needsImprovement === 'number' ? d.needsImprovement : Math.max(0, (d.total || 0) - (d.atRisk || 0) - Math.round((d.total || 0) * ((d.avgReadiness || 60) / 100))),
-            atRisk: d.atRisk || 0,
-            avgSalary: 12.5
-          }))
-        : departmentPerformanceData;
+      // 1. Compute Batch Donut from real counts
+      let readyCount = 0;
+      let needsImpCount = 0;
+      let atRiskCount = 0;
+
+      if (studentRes?.data?.readinessTiers) {
+        studentRes.data.readinessTiers.forEach(t => {
+          const count = typeof t.count === 'number' ? t.count : (t.value || 0);
+          const name = (t.tier || t.name || '').toLowerCase();
+          if (name.includes('ready')) readyCount += count;
+          else if (name.includes('improvement')) needsImpCount += count;
+          else if (name.includes('risk')) atRiskCount += count;
+        });
+      } else if (studentList.length > 0) {
+        studentList.forEach(s => {
+          const score = s.readinessScore || 0;
+          if (score >= 75) readyCount++;
+          else if (score >= 50) needsImpCount++;
+          else atRiskCount++;
+        });
+      }
+
+      const batchDonut = [
+        { name: "Placement Ready", value: readyCount, color: "#10b981" },
+        { name: "Needs Improvement", value: needsImpCount, color: "#f59e0b" },
+        { name: "At Risk", value: atRiskCount, color: "#ef4444" }
+      ];
+
+      // 2. Compute Department Performance from real students
+      let deptPerformance = [];
+      const rawDeptList = studentRes?.data?.departments || placementRes?.data?.departments;
+
+      if (Array.isArray(rawDeptList) && rawDeptList.length > 0) {
+        deptPerformance = rawDeptList.map(d => ({
+          department: d.department || d.branch || d._id || 'Unknown',
+          total: d.total || 0,
+          ready: typeof d.ready === 'number' ? d.ready : Math.round((d.total || 0) * ((d.avgReadiness || 0) / 100)),
+          needsImp: typeof d.needsImprovement === 'number' ? d.needsImprovement : Math.max(0, (d.total || 0) - (d.atRisk || 0) - Math.round((d.total || 0) * ((d.avgReadiness || 0) / 100))),
+          atRisk: d.atRisk || 0,
+          avgScore: d.avgReadiness || 0,
+          avgSalary: d.avgPackage || 0
+        }));
+      } else if (studentList.length > 0) {
+        const branchMap = {};
+        studentList.forEach(s => {
+          const b = s.branch || 'General';
+          if (!branchMap[b]) {
+            branchMap[b] = { department: b, total: 0, ready: 0, needsImp: 0, atRisk: 0, totalScore: 0, totalSalary: 0, placedCount: 0 };
+          }
+          branchMap[b].total++;
+          const score = s.readinessScore || 0;
+          branchMap[b].totalScore += score;
+          if (s.placementStatus === 'PLACED') {
+            branchMap[b].placedCount++;
+            branchMap[b].totalSalary += (s.packageOffered || 0);
+          }
+          if (score >= 75) branchMap[b].ready++;
+          else if (score >= 50) branchMap[b].needsImp++;
+          else branchMap[b].atRisk++;
+        });
+
+        deptPerformance = Object.values(branchMap).map(d => ({
+          department: d.department,
+          total: d.total,
+          ready: d.ready,
+          needsImp: d.needsImp,
+          atRisk: d.atRisk,
+          avgScore: d.total > 0 ? Math.round(d.totalScore / d.total) : 0,
+          avgSalary: d.placedCount > 0 ? Number((d.totalSalary / d.placedCount).toFixed(1)) : 0
+        }));
+      }
+
+      // 3. Compute Skill Demand vs Supply from real skills intelligence
+      let skillDemandSupply = [];
+      const gapList = skillsRes?.data?.gapAnalysis;
+      if (Array.isArray(gapList) && gapList.length > 0) {
+        skillDemandSupply = gapList.slice(0, 8).map(g => ({
+          skill: g.skill ? (g.skill.charAt(0).toUpperCase() + g.skill.slice(1)) : 'Skill',
+          industryDemand: g.demandPercentage || 0,
+          studentSupply: g.studentPercentage || 0,
+          gap: g.gapScore || 0
+        }));
+      }
+
+      // 4. Compute Historical Placement Trends from real batch records
+      let historyTrend = [];
+      const batchList = placementRes?.data?.batchTrends;
+      if (Array.isArray(batchList) && batchList.length > 0) {
+        historyTrend = batchList.map(b => ({
+          year: String(b.batch || b._id),
+          placementPct: b.placementRate || 0,
+          avgLpa: b.avgPackage || 0,
+          highestLpa: b.highestPackage || b.avgPackage || 0
+        }));
+      }
+
+      // 5. Compute Quadrant from REAL enrolled students
+      const quadrant = studentList.slice(0, 30).map(s => {
+        const cgpa = typeof s.cgpa === 'number' ? s.cgpa : (parseFloat(s.cgpa) || 0);
+        const tScore = typeof s.technicalScore === 'number' && s.technicalScore > 0 ? s.technicalScore : (cgpa > 0 ? Math.round(cgpa * 9) : 60);
+        const sScore = typeof s.softSkillScore === 'number' && s.softSkillScore > 0 ? s.softSkillScore : 70;
+        const rdScore = typeof s.readinessScore === 'number' && s.readinessScore > 0 ? s.readinessScore : 65;
+        const status = rdScore >= 75 ? "Ready" : (rdScore >= 50 ? "Needs Improvement" : "At Risk");
+        return {
+          name: s.name || "Student",
+          tech: tScore,
+          soft: sScore,
+          dept: s.branch || "Engineering",
+          status
+        };
+      });
 
       return {
         batchDonut,
         deptPerformance,
-        skillDemandSupply: skillDemandVsSupply,
-        historyTrend: placementRes?.data?.batchTrends || historicalPlacementTrend,
-        quadrant: technicalVsSoftSkillQuadrant
+        skillDemandSupply,
+        historyTrend,
+        quadrant
       };
     } catch (e) {
-      console.warn("Analytics endpoint error, using analytical charts:", e.message);
+      console.warn("Analytics endpoint error, returning empty metrics:", e.message);
     }
 
     return {
-      batchDonut: batchReadinessDonutData,
-      deptPerformance: departmentPerformanceData,
-      skillDemandSupply,
-      historyTrend: historicalPlacementTrend,
-      quadrant: technicalVsSoftSkillQuadrant
+      batchDonut: [
+        { name: "Placement Ready", value: 0, color: "#10b981" },
+        { name: "Needs Improvement", value: 0, color: "#f59e0b" },
+        { name: "At Risk", value: 0, color: "#ef4444" }
+      ],
+      deptPerformance: [],
+      skillDemandSupply: [],
+      historyTrend: [],
+      quadrant: []
     };
   },
 

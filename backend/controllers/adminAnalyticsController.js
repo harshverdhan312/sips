@@ -159,6 +159,11 @@ exports.getStudentAnalytics = async (req, res) => {
   try {
     const collegeId = req.collegeId;
 
+    if (!memoryDb.isMongoConnected() && !Student.aggregate?.mock) {
+      const data = memoryDb.getStudentAnalytics(collegeId);
+      return res.json({ success: true, data });
+    }
+
     // 1. Department/Branch distribution
     const departmentDistribution = await Student.aggregate([
       { $match: { collegeId } },
@@ -170,6 +175,23 @@ exports.getStudentAnalytics = async (req, res) => {
           avgCgpa: { $avg: '$cgpa' },
           placed: {
             $sum: { $cond: [{ $eq: ['$placementStatus', 'PLACED'] }, 1, 0] }
+          },
+          ready: {
+            $sum: { $cond: [{ $gte: ['$readinessScore', 75] }, 1, 0] }
+          },
+          needsImprovement: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $gte: ['$readinessScore', 50] },
+                    { $lt: ['$readinessScore', 75] }
+                  ]
+                },
+                1,
+                0
+              ]
+            }
           },
           atRisk: {
             $sum: { $cond: [{ $lt: ['$readinessScore', 50] }, 1, 0] }
@@ -243,15 +265,18 @@ exports.getStudentAnalytics = async (req, res) => {
       success: true,
       data: {
         readinessTiers: [
-          { tier: 'Placement Ready (≥75)', count: tiers.ready, color: '#10B981' },
-          { tier: 'Needs Improvement (50-74)', count: tiers.needsImprovement, color: '#F59E0B' },
-          { tier: 'At Risk (<50)', count: tiers.atRisk, color: '#EF4444' }
+          { tier: 'Placement Ready (≥75)', name: 'Placement Ready', count: tiers.ready, color: '#10B981' },
+          { tier: 'Needs Improvement (50-74)', name: 'Needs Improvement', count: tiers.needsImprovement, color: '#F59E0B' },
+          { tier: 'At Risk (<50)', name: 'At Risk', count: tiers.atRisk, color: '#EF4444' }
         ],
         departments: departmentDistribution.map(d => ({
           branch: d._id || 'Unknown',
+          department: d._id || 'Unknown',
           total: d.total,
           placed: d.placed,
-          atRisk: d.atRisk,
+          ready: d.ready || 0,
+          needsImprovement: d.needsImprovement || 0,
+          atRisk: d.atRisk || 0,
           avgReadiness: Math.round(d.avgReadiness || 0),
           avgCgpa: Number((d.avgCgpa || 0).toFixed(2))
         })),
@@ -271,6 +296,11 @@ exports.getStudentAnalytics = async (req, res) => {
 exports.getPlacementAnalytics = async (req, res) => {
   try {
     const collegeId = req.collegeId;
+
+    if (!memoryDb.isMongoConnected() && !Student.aggregate?.mock) {
+      const data = memoryDb.getPlacementAnalytics(collegeId);
+      return res.json({ success: true, data });
+    }
 
     // 1. Placement Status breakdown
     const statusCounts = await Student.aggregate([

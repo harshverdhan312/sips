@@ -11,10 +11,23 @@ import {
 } from "recharts";
 
 export function DepartmentBarChart({ data, height = 280 }) {
+  const chartData = Array.isArray(data) ? data : [];
+
+  if (chartData.length === 0) {
+    return (
+      <div style={{ width: "100%", height }} className="flex flex-col items-center justify-center text-slate-400 text-xs py-10">
+        <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 font-bold mb-2">
+          📊
+        </div>
+        <span>No department readiness benchmarks recorded yet</span>
+      </div>
+    );
+  }
+
   return (
     <div style={{ width: "100%", height }}>
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+        <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
           <XAxis dataKey="department" tick={{ fill: "#64748b", fontSize: 12 }} />
           <YAxis tick={{ fill: "#94a3b8", fontSize: 11 }} />

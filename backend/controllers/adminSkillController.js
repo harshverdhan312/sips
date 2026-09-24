@@ -1,6 +1,7 @@
 const Student = require('../models/Student');
 const JobDescription = require('../models/JobDescription');
 const Match = require('../models/Match');
+const memoryDb = require('../utils/memoryDb');
 
 /**
  * GET /api/admin/skills/intelligence
@@ -13,6 +14,11 @@ const Match = require('../models/Match');
 exports.getSkillIntelligence = async (req, res) => {
   try {
     const collegeId = req.collegeId;
+
+    if (!memoryDb.isMongoConnected() && !Student.aggregate?.mock) {
+      const data = memoryDb.getSkillIntelligence(collegeId);
+      return res.json({ success: true, data });
+    }
 
     // 1. Student Skills aggregation
     const studentSkillsAgg = await Student.aggregate([

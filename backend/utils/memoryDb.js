@@ -497,6 +497,33 @@ class MemoryDatabase {
     const avgResume = totalStudents > 0 ? Math.round(students.reduce((acc, s) => acc + (s.resumeScore || 0), 0) / totalStudents) : 65;
     const avgCgpa = totalStudents > 0 ? parseFloat((students.reduce((acc, s) => acc + (s.cgpa || 0), 0) / totalStudents).toFixed(2)) : 7.5;
 
+    // Group students by branch to compute REAL departmentReadiness
+    const deptMap = {};
+    students.forEach(s => {
+      const b = s.branch || 'General';
+      if (!deptMap[b]) {
+        deptMap[b] = { branch: b, count: 0, totalScore: 0, placed: 0, ready: 0, needsImprovement: 0, atRisk: 0 };
+      }
+      deptMap[b].count++;
+      deptMap[b].totalScore += (s.readinessScore || 0);
+      if (s.placementStatus === 'PLACED') deptMap[b].placed++;
+      if ((s.readinessScore || 0) >= 75) deptMap[b].ready++;
+      else if ((s.readinessScore || 0) >= 50) deptMap[b].needsImprovement++;
+      else deptMap[b].atRisk++;
+    });
+
+    const departmentReadiness = Object.values(deptMap).map(d => ({
+      branch: d.branch,
+      department: d.branch,
+      count: d.count,
+      total: d.count,
+      avgReadiness: d.count > 0 ? Math.round(d.totalScore / d.count) : 0,
+      placed: d.placed,
+      ready: d.ready,
+      needsImprovement: d.needsImprovement,
+      atRisk: d.atRisk
+    }));
+
     return {
       totalStudents,
       placedStudents,
@@ -515,13 +542,195 @@ class MemoryDatabase {
       atRiskCount,
       readyCount,
       needsImprovementCount,
-      departmentReadiness: [
-        { branch: 'Computer Science', count: Math.round(totalStudents * 0.4), avgReadiness: 76, placed: Math.round(placedStudents * 0.5) },
-        { branch: 'Information Science', count: Math.round(totalStudents * 0.25), avgReadiness: 72, placed: Math.round(placedStudents * 0.25) },
-        { branch: 'Electronics & Communication', count: Math.round(totalStudents * 0.2), avgReadiness: 68, placed: Math.round(placedStudents * 0.15) },
-        { branch: 'Mechanical Engineering', count: Math.round(totalStudents * 0.15), avgReadiness: 58, placed: Math.round(placedStudents * 0.1) }
-      ],
+      departmentReadiness,
       recentLogs: this.auditLogs.slice(0, 5)
+    };
+  }
+
+  getStudentAnalytics(collegeId) {
+    const students = this.getStudents(collegeId);
+    const ready = students.filter(s => (s.readinessScore || 0) >= 75).length;
+    const needsImprovement = students.filter(s => (s.readinessScore || 0) >= 50 && (s.readinessScore || 0) < 75).length;
+    const atRisk = students.filter(s => (s.readinessScore || 0) < 50).length;
+
+    const deptMap = {};
+    students.forEach(s => {
+      const b = s.branch || 'General';
+      if (!deptMap[b]) {
+        deptMap[b] = { branch: b, total: 0, totalScore: 0, totalCgpa: 0, placed: 0, ready: 0, needsImprovement: 0, atRisk: 0 };
+      }
+      deptMap[b].total++;
+      deptMap[b].totalScore += (s.readinessScore || 0);
+      deptMap[b].totalCgpa += (s.cgpa || 0);
+      if (s.placementStatus === 'PLACED') deptMap[b].placed++;
+      if ((s.readinessScore || 0) >= 75) deptMap[b].ready++;
+      else if ((s.readinessScore || 0) >= 50) deptMap[b].needsImprovement++;
+      else deptMap[b].atRisk++;
+    });
+
+    const departments = Object.values(deptMap).map(d => ({
+      branch: d.branch,
+      department: d.branch,
+      total: d.total,
+      placed: d.placed,
+      ready: d.ready,
+      needsImprovement: d.needsImprovement,
+      atRisk: d.atRisk,
+      avgReadiness: d.total > 0 ? Math.round(d.totalScore / d.total) : 0,
+      avgCgpa: d.total > 0 ? Number((d.totalCgpa / d.total).toFixed(2)) : 0
+    }));
+
+    const cgpaBrackets = [
+      { bracket: '< 6.0', count: students.filter(s => (s.cgpa || 0) < 6.0).length },
+      { bracket: '6.0 - 7.0', count: students.filter(s => (s.cgpa || 0) >= 6.0 && (s.cgpa || 0) < 7.0).length },
+      { bracket: '7.0 - 8.0', count: students.filter(s => (s.cgpa || 0) >= 7.0 && (s.cgpa || 0) < 8.0).length },
+      { bracket: '8.0 - 9.0', count: students.filter(s => (s.cgpa || 0) >= 8.0 && (s.cgpa || 0) < 9.0).length },
+      { bracket: '9.0 - 10.0', count: students.filter(s => (s.cgpa || 0) >= 9.0).length }
+    ];
+
+    return {
+      readinessTiers: [
+        { tier: 'Placement Ready (≥75)', name: 'Placement Ready', count: ready, color: '#10B981' },
+        { tier: 'Needs Improvement (50-74)', name: 'Needs Improvement', count: needsImprovement, color: '#F59E0B' },
+        { tier: 'At Risk (<50)', name: 'At Risk', count: atRisk, color: '#EF4444' }
+      ],
+      departments,
+      cgpaDistribution: cgpaBrackets
+    };
+  }
+
+  getPlacementAnalytics(collegeId) {
+    const students = this.getStudents(collegeId);
+    const statusMap = { PLACED: 0, UNPLACED: 0, IN_PROCESS: 0, OPTED_OUT: 0 };
+    students.forEach(s => {
+      const st = s.placementStatus || 'UNPLACED';
+      if (statusMap[st] !== undefined) statusMap[st]++;
+      else statusMap.UNPLACED++;
+    });
+
+    const deptMap = {};
+    students.forEach(s => {
+      const b = s.branch || 'General';
+      if (!deptMap[b]) {
+        deptMap[b] = { branch: b, total: 0, placed: 0, totalPkg: 0 };
+      }
+      deptMap[b].total++;
+      if (s.placementStatus === 'PLACED') {
+        deptMap[b].placed++;
+        deptMap[b].totalPkg += (s.packageOffered || 0);
+      }
+    });
+
+    const departments = Object.values(deptMap).map(d => ({
+      branch: d.branch,
+      department: d.branch,
+      total: d.total,
+      placed: d.placed,
+      placementRate: d.total > 0 ? Math.round((d.placed / d.total) * 100) : 0,
+      avgPackage: d.placed > 0 ? Number((d.totalPkg / d.placed).toFixed(1)) : 0
+    }));
+
+    const placedStudents = students.filter(s => s.placementStatus === 'PLACED');
+    const ctcDistribution = [
+      { tier: '< 5 LPA', count: placedStudents.filter(s => (s.packageOffered || 0) < 5).length },
+      { tier: '5 - 10 LPA', count: placedStudents.filter(s => (s.packageOffered || 0) >= 5 && (s.packageOffered || 0) < 10).length },
+      { tier: '10 - 15 LPA', count: placedStudents.filter(s => (s.packageOffered || 0) >= 10 && (s.packageOffered || 0) < 15).length },
+      { tier: '15+ LPA', count: placedStudents.filter(s => (s.packageOffered || 0) >= 15).length }
+    ];
+
+    const recruiterMap = {};
+    placedStudents.forEach(s => {
+      if (s.companyPlaced) {
+        if (!recruiterMap[s.companyPlaced]) recruiterMap[s.companyPlaced] = { company: s.companyPlaced, hires: 0, totalPkg: 0 };
+        recruiterMap[s.companyPlaced].hires++;
+        recruiterMap[s.companyPlaced].totalPkg += (s.packageOffered || 0);
+      }
+    });
+    const topRecruiters = Object.values(recruiterMap).map(r => ({
+      company: r.company,
+      hires: r.hires,
+      avgPackage: r.hires > 0 ? Number((r.totalPkg / r.hires).toFixed(1)) : 0
+    }));
+
+    const batchMap = {};
+    students.forEach(s => {
+      const b = s.batch || 'Current';
+      if (!batchMap[b]) batchMap[b] = { batch: b, total: 0, placed: 0, totalPkg: 0 };
+      batchMap[b].total++;
+      if (s.placementStatus === 'PLACED') {
+        batchMap[b].placed++;
+        batchMap[b].totalPkg += (s.packageOffered || 0);
+      }
+    });
+    const batchTrends = Object.values(batchMap).map(b => ({
+      batch: b.batch,
+      total: b.total,
+      placed: b.placed,
+      placementRate: b.total > 0 ? Math.round((b.placed / b.total) * 100) : 0,
+      avgPackage: b.placed > 0 ? Number((b.totalPkg / b.placed).toFixed(1)) : 0
+    }));
+
+    const applicationStats = this.getCollegeApplicationStats(collegeId);
+
+    return {
+      statusBreakdown: statusMap,
+      departments,
+      ctcDistribution,
+      topRecruiters,
+      batchTrends,
+      applications: applicationStats
+    };
+  }
+
+  getSkillIntelligence(collegeId) {
+    const students = this.getStudents(collegeId);
+    const jobs = this.getJobs(collegeId).filter(j => j.status === 'ACTIVE');
+
+    const studentSkillMap = {};
+    students.forEach(s => {
+      if (Array.isArray(s.skills)) {
+        s.skills.forEach(sk => {
+          const lower = sk.toLowerCase().trim();
+          studentSkillMap[lower] = (studentSkillMap[lower] || 0) + 1;
+        });
+      }
+    });
+
+    const demandedSkillMap = {};
+    jobs.forEach(j => {
+      if (Array.isArray(j.requiredSkills)) {
+        j.requiredSkills.forEach(sk => {
+          const lower = sk.toLowerCase().trim();
+          demandedSkillMap[lower] = (demandedSkillMap[lower] || 0) + 1;
+        });
+      }
+    });
+
+    const allSkills = Array.from(new Set([...Object.keys(studentSkillMap), ...Object.keys(demandedSkillMap)]));
+    const totalStudents = students.length || 1;
+    const totalJobs = jobs.length || 1;
+
+    const gapAnalysis = allSkills.map(skill => {
+      const studentCount = studentSkillMap[skill] || 0;
+      const demandCount = demandedSkillMap[skill] || 0;
+      const studentPercentage = Math.round((studentCount / totalStudents) * 100);
+      const demandPercentage = Math.round((demandCount / totalJobs) * 100);
+      return {
+        skill,
+        studentCount,
+        demandCount,
+        studentPercentage,
+        demandPercentage,
+        gapScore: Math.max(0, demandPercentage - studentPercentage)
+      };
+    }).sort((a, b) => b.gapScore - a.gapScore);
+
+    return {
+      studentSkills: Object.entries(studentSkillMap).map(([skill, count]) => ({ skill, count })).sort((a, b) => b.count - a.count),
+      demandedSkills: Object.entries(demandedSkillMap).map(([skill, count]) => ({ skill, count })).sort((a, b) => b.count - a.count),
+      topMissingSkills: [],
+      gapAnalysis: gapAnalysis.slice(0, 15),
+      branchSkills: []
     };
   }
 

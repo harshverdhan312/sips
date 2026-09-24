@@ -84,8 +84,8 @@ export function PlacementAnalyticsPage() {
       {/* 5-Year Historical Placement & CTC Trend */}
       <Card>
         <CardHeader
-          title="Historical Placement & Average Package Growth (2021-2025)"
-          subtitle="Showing consistent year-over-year gains in placement conversion and compensation"
+          title="Cohort Placement & Average Package Trends"
+          subtitle="Tracking placement conversion and package progression across graduating batches"
         />
         <ReadinessTrendChart data={data.historyTrend} height={300} />
       </Card>
@@ -98,36 +98,45 @@ export function PlacementAnalyticsPage() {
             title="Industry Skill Demand vs Student Supply"
             subtitle="Identifies critical curriculum and training deficits across enrolled cohort candidates"
           />
-          <div style={{ width: "100%", height: 320 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={data.skillDemandSupply}
-                layout="vertical"
-                margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
-                <XAxis type="number" domain={[0, 100]} tick={{ fill: "#94a3b8", fontSize: 11 }} />
-                <YAxis
-                  type="category"
-                  dataKey="skill"
-                  tick={{ fill: "#475569", fontSize: 11, fontWeight: 500 }}
-                  width={130}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#ffffff",
-                    borderColor: "#e2e8f0",
-                    borderRadius: "12px",
-                    boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                    fontSize: "12px"
-                  }}
-                />
-                <Legend wrapperStyle={{ fontSize: "12px" }} />
-                <Bar dataKey="industryDemand" name="Recruiter Demand %" fill="#4f46e5" radius={[0, 4, 4, 0]} />
-                <Bar dataKey="studentSupply" name="Batch Proficiency %" fill="#10b981" radius={[0, 4, 4, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          {data.skillDemandSupply && data.skillDemandSupply.length > 0 ? (
+            <div style={{ width: "100%", height: 320 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={data.skillDemandSupply}
+                  layout="vertical"
+                  margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                  <XAxis type="number" domain={[0, 100]} tick={{ fill: "#94a3b8", fontSize: 11 }} />
+                  <YAxis
+                    type="category"
+                    dataKey="skill"
+                    tick={{ fill: "#475569", fontSize: 11, fontWeight: 500 }}
+                    width={130}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#ffffff",
+                      borderColor: "#e2e8f0",
+                      borderRadius: "12px",
+                      boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                      fontSize: "12px"
+                    }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: "12px" }} />
+                  <Bar dataKey="industryDemand" name="Recruiter Demand %" fill="#4f46e5" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="studentSupply" name="Batch Proficiency %" fill="#10b981" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <div style={{ width: "100%", height: 320 }} className="flex flex-col items-center justify-center text-slate-400 text-xs py-10">
+              <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 font-bold mb-2">
+                🎯
+              </div>
+              <span>No skill demand vs supply data available yet</span>
+            </div>
+          )}
         </Card>
 
         {/* Department-Wise Readiness Comparison */}
@@ -146,42 +155,51 @@ export function PlacementAnalyticsPage() {
           title="Technical vs Soft Skill Readiness Matrix"
           subtitle="Identifies candidates who excel technically but require communication / interview coaching"
         />
-        <div style={{ width: "100%", height: 300 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 10 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis
-                type="number"
-                dataKey="tech"
-                name="Technical Score"
-                domain={[40, 100]}
-                unit="/100"
-                tick={{ fill: "#64748b", fontSize: 11 }}
-                label={{ value: "Technical Score →", position: "bottom", offset: 0, fill: "#94a3b8", fontSize: 12 }}
-              />
-              <YAxis
-                type="number"
-                dataKey="soft"
-                name="Soft Skill Score"
-                domain={[40, 100]}
-                unit="/100"
-                tick={{ fill: "#64748b", fontSize: 11 }}
-                label={{ value: "Soft Skill Score ↑", angle: -90, position: "left", offset: 10, fill: "#94a3b8", fontSize: 12 }}
-              />
-              <Tooltip
-                cursor={{ strokeDasharray: "3 3" }}
-                contentStyle={{
-                  backgroundColor: "#ffffff",
-                  borderColor: "#e2e8f0",
-                  borderRadius: "12px",
-                  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                  fontSize: "12px"
-                }}
-              />
-              <Scatter name="Students" data={data.quadrant} fill="#6366f1" shape="circle" />
-            </ScatterChart>
-          </ResponsiveContainer>
-        </div>
+        {data.quadrant && data.quadrant.length > 0 ? (
+          <div style={{ width: "100%", height: 300 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 10 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <XAxis
+                  type="number"
+                  dataKey="tech"
+                  name="Technical Score"
+                  domain={[0, 100]}
+                  unit="/100"
+                  tick={{ fill: "#64748b", fontSize: 11 }}
+                  label={{ value: "Technical Score →", position: "bottom", offset: 0, fill: "#94a3b8", fontSize: 12 }}
+                />
+                <YAxis
+                  type="number"
+                  dataKey="soft"
+                  name="Soft Skill Score"
+                  domain={[0, 100]}
+                  unit="/100"
+                  tick={{ fill: "#64748b", fontSize: 11 }}
+                  label={{ value: "Soft Skill Score ↑", angle: -90, position: "left", offset: 10, fill: "#94a3b8", fontSize: 12 }}
+                />
+                <Tooltip
+                  cursor={{ strokeDasharray: "3 3" }}
+                  contentStyle={{
+                    backgroundColor: "#ffffff",
+                    borderColor: "#e2e8f0",
+                    borderRadius: "12px",
+                    boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                    fontSize: "12px"
+                  }}
+                />
+                <Scatter name="Students" data={data.quadrant} fill="#6366f1" shape="circle" />
+              </ScatterChart>
+            </ResponsiveContainer>
+          </div>
+        ) : (
+          <div style={{ width: "100%", height: 300 }} className="flex flex-col items-center justify-center text-slate-400 text-xs py-10">
+            <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 font-bold mb-2">
+              👥
+            </div>
+            <span>No student performance records available for matrix plotting</span>
+          </div>
+        )}
 
         <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-slate-500">
           <div className="flex items-center gap-2">

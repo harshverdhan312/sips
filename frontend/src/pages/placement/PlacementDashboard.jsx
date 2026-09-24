@@ -68,7 +68,7 @@ export function PlacementDashboard() {
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
-            Batch 2025 Placement Readiness Overview
+            Institutional Placement Readiness Overview
           </h1>
           <p className="text-sm text-slate-500">
             {metrics.totalStudents > 0
@@ -102,7 +102,7 @@ export function PlacementDashboard() {
         <StatCard
           title="Total Students"
           value={metrics.totalStudents}
-          subtitle="Batch 2021-2025"
+          subtitle={metrics.totalStudents > 0 ? "Registered Candidates" : "No candidates"}
           icon={Users}
           iconBg="bg-indigo-50 text-indigo-600"
         />
@@ -110,7 +110,6 @@ export function PlacementDashboard() {
           title="Placement Ready"
           value={metrics.placementReady}
           subtitle={`${metrics.placementReadyPct}% of cohort`}
-          trend={{ value: "+8%", direction: "up", label: "vs last mo" }}
           icon={CheckCircle2}
           iconBg="bg-emerald-50 text-emerald-600"
         />
@@ -125,21 +124,20 @@ export function PlacementDashboard() {
           title="Students At Risk"
           value={metrics.atRisk}
           subtitle={`${metrics.atRiskPct}% critical focus`}
-          trend={{ value: "-4 students", direction: "down", label: "intervened" }}
           icon={ShieldAlert}
           iconBg="bg-rose-50 text-rose-600"
         />
         <StatCard
           title="Avg Employability"
           value={`${metrics.avgEmployabilityIndex}/100`}
-          trend={{ value: "+2.4", direction: "up" }}
+          subtitle={metrics.avgEmployabilityIndex > 0 ? "Readiness score" : "Not evaluated"}
           icon={TrendingUp}
           iconBg="bg-blue-50 text-blue-600"
         />
         <StatCard
           title="Avg Soft Skill"
           value={`${metrics.avgSoftSkillScore}/100`}
-          subtitle="Target 75"
+          subtitle={metrics.avgSoftSkillScore > 0 ? "Communication index" : "Not evaluated"}
           icon={BarChart3}
           iconBg="bg-purple-50 text-purple-600"
         />

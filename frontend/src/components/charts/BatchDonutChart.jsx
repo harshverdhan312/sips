@@ -9,21 +9,38 @@ import {
 } from "recharts";
 
 export function BatchDonutChart({ data, height = 240 }) {
+  const chartData = Array.isArray(data) ? data : [];
+  const total = chartData.reduce((acc, curr) => acc + (curr.value || 0), 0);
+
+  if (total === 0) {
+    return (
+      <div style={{ width: "100%", height }} className="flex flex-col items-center justify-center text-slate-400 text-xs py-6">
+        <div className="w-20 h-20 rounded-full border-4 border-dashed border-slate-200 flex items-center justify-center text-slate-400 font-semibold mb-2">
+          0
+        </div>
+        <span>No student readiness data recorded</span>
+      </div>
+    );
+  }
+
+  const activeSlices = chartData.filter((d) => (d.value || 0) > 0);
+  const paddingAngle = activeSlices.length > 1 ? 4 : 0;
+
   return (
     <div style={{ width: "100%", height }}>
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
-            data={data}
+            data={chartData}
             cx="50%"
             cy="50%"
             innerRadius={60}
             outerRadius={85}
-            paddingAngle={4}
+            paddingAngle={paddingAngle}
             dataKey="value"
           >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
+            {chartData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color || "#6366f1"} />
             ))}
           </Pie>
           <Tooltip

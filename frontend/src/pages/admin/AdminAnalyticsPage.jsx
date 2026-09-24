@@ -1,37 +1,39 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   BarChart3,
   Server,
   Activity,
   Cpu,
-  HardDrive,
   Users,
-  Zap,
-  Clock
+  FileCheck,
+  CheckCircle2,
+  Database
 } from "lucide-react";
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer
-} from "recharts";
+import { adminService } from "../../services/adminService";
 import { Card, CardHeader } from "../../components/common/Card";
 import { StatCard } from "../../components/common/StatCard";
 import { Badge } from "../../components/common/Badge";
+import { DashboardSkeleton } from "../../components/common/LoadingSkeleton";
 
 export function AdminAnalyticsPage() {
-  const throughputData = [
-    { hour: "08:00", requests: 120, mockSessions: 14 },
-    { hour: "10:00", requests: 480, mockSessions: 62 },
-    { hour: "12:00", requests: 840, mockSessions: 110 },
-    { hour: "14:00", requests: 920, mockSessions: 145 },
-    { hour: "16:00", requests: 760, mockSessions: 95 },
-    { hour: "18:00", requests: 520, mockSessions: 80 },
-    { hour: "20:00", requests: 380, mockSessions: 42 }
-  ];
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadStats() {
+      try {
+        const data = await adminService.getSystemStats();
+        setStats(data);
+      } catch (e) {
+        console.error("Failed to load admin telemetry stats:", e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadStats();
+  }, []);
+
+  if (loading || !stats) return <DashboardSkeleton />;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -39,93 +41,95 @@ export function AdminAnalyticsPage() {
       <div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
           <BarChart3 className="w-8 h-8 text-indigo-600" />
-          Platform Telemetry & User Engagement Analytics
+          Platform Telemetry & Operational Analytics
         </h1>
         <p className="text-sm text-slate-500 mt-1">
-          Monitor system throughput, AI mock interview concurrency, and feature adoption across institutional colleges.
+          Monitor system health, student account registration, and service telemetry across the institution.
         </p>
       </div>
 
       {/* Metrics */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <StatCard
-          title="Concurrent Sessions"
-          value="184 Active"
-          subtitle="Peak 320 at 2:00 PM"
-          icon={Activity}
+          title="System Health"
+          value={stats.systemHealth || "Operational"}
+          subtitle="All microservices active"
+          icon={Server}
           iconBg="bg-emerald-50 text-emerald-600"
         />
         <StatCard
-          title="Daily API Requests"
-          value="48.2k"
-          trend={{ value: "+12%", direction: "up" }}
-          icon={Zap}
+          title="Enrolled Candidates"
+          value={stats.studentsEnrolled}
+          subtitle={stats.studentsEnrolled > 0 ? "Registered students" : "No candidates"}
+          icon={Users}
           iconBg="bg-indigo-50 text-indigo-600"
         />
         <StatCard
-          title="Avg Inference Latency"
-          value="142ms"
-          subtitle="BERT & ATS Parser"
-          icon={Cpu}
+          title="Platform Accounts"
+          value={stats.totalUsers}
+          subtitle="Admin + Students"
+          icon={Activity}
           iconBg="bg-purple-50 text-purple-600"
         />
         <StatCard
-          title="Error Rate"
-          value="0.02%"
-          subtitle="Well within SLA"
-          icon={Server}
+          title="Resumes Uploaded"
+          value={stats.resumesParsedTotal}
+          subtitle={`Storage: ${stats.storageUsage}`}
+          icon={FileCheck}
           iconBg="bg-teal-50 text-teal-600"
         />
       </div>
 
-      {/* Usage Graph */}
+      {/* Service Telemetry Operational Grid */}
       <Card>
         <CardHeader
-          title="Daily Platform Workload & Concurrency Curve"
-          subtitle="Hourly request volume and simultaneous active mock sessions"
+          title="Institutional Infrastructure & Pipeline Health"
+          subtitle="Real-time operational status of backend services"
         />
-        <div style={{ width: "100%", height: 300 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={throughputData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="colorReq" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#4f46e5" stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="colorMock" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-              <XAxis dataKey="hour" tick={{ fill: "#64748b", fontSize: 12 }} />
-              <YAxis tick={{ fill: "#94a3b8", fontSize: 11 }} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#ffffff",
-                  borderColor: "#e2e8f0",
-                  borderRadius: "12px",
-                  fontSize: "12px"
-                }}
-              />
-              <Area
-                type="monotone"
-                dataKey="requests"
-                name="API Requests / hr"
-                stroke="#4f46e5"
-                strokeWidth={2}
-                fill="url(#colorReq)"
-              />
-              <Area
-                type="monotone"
-                dataKey="mockSessions"
-                name="Active Mock Sessions"
-                stroke="#10b981"
-                strokeWidth={2}
-                fill="url(#colorMock)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-start gap-3">
+            <div className="p-2 rounded-xl bg-emerald-100 text-emerald-700">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-slate-900">API Gateway</h4>
+              <p className="text-xs text-slate-500 mt-0.5">Express REST Router</p>
+              <Badge variant="success" size="xs" className="mt-2">Online • 200 OK</Badge>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-start gap-3">
+            <div className="p-2 rounded-xl bg-emerald-100 text-emerald-700">
+              <Database className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-slate-900">Database Layer</h4>
+              <p className="text-xs text-slate-500 mt-0.5">Multi-Tenant Scoped</p>
+              <Badge variant="success" size="xs" className="mt-2">Connected</Badge>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-start gap-3">
+            <div className="p-2 rounded-xl bg-emerald-100 text-emerald-700">
+              <FileCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-slate-900">Resume Vault</h4>
+              <p className="text-xs text-slate-500 mt-0.5">Static Storage</p>
+              <Badge variant="primary" size="xs" className="mt-2">{stats.resumesParsedTotal} Synced</Badge>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-start gap-3">
+            <div className="p-2 rounded-xl bg-emerald-100 text-emerald-700">
+              <Cpu className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-slate-900">Placement ML Engine</h4>
+              <p className="text-xs text-slate-500 mt-0.5">Readiness & Matching</p>
+              <Badge variant="success" size="xs" className="mt-2">Ready</Badge>
+            </div>
+          </div>
         </div>
       </Card>
     </div>

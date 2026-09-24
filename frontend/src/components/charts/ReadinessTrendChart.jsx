@@ -11,10 +11,23 @@ import {
 } from "recharts";
 
 export function ReadinessTrendChart({ data, height = 280 }) {
+  const chartData = Array.isArray(data) ? data : [];
+
+  if (chartData.length === 0) {
+    return (
+      <div style={{ width: "100%", height }} className="flex flex-col items-center justify-center text-slate-400 text-xs py-10">
+        <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 font-bold mb-2">
+          📈
+        </div>
+        <span>No historical placement trends recorded yet</span>
+      </div>
+    );
+  }
+
   return (
     <div style={{ width: "100%", height }}>
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+        <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="colorPlacement" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3} />
