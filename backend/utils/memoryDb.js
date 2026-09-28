@@ -67,6 +67,7 @@ class MemoryDatabase {
       contactEmail: collegeData.contactEmail || '',
       contactPhone: collegeData.contactPhone || '',
       establishedYear: typeof collegeData.establishedYear === 'number' ? collegeData.establishedYear : null,
+      academicStructure: collegeData.academicStructure || [],
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -155,17 +156,19 @@ class MemoryDatabase {
       usn: studentData.usn || studentData.rollNo,
       email: (studentData.email || '').toLowerCase().trim(),
       passwordHash: studentData.passwordHash,
+      course: (studentData.course || '').trim(),
       branch: studentData.branch || 'Computer Science & Engineering',
+      section: (studentData.section || '').trim(),
       batch: studentData.batch ? String(studentData.batch).trim() : '',
       cgpa: (studentData.cgpa !== undefined && studentData.cgpa !== null && !isNaN(Number(studentData.cgpa))) ? Number(studentData.cgpa) : 0,
       placementStatus: studentData.placementStatus || 'UNPLACED',
       companyPlaced: studentData.companyPlaced || '',
       packageOffered: studentData.packageOffered || 0,
-      readinessScore: studentData.readinessScore || 65,
-      technicalScore: studentData.technicalScore || 65,
-      softSkillScore: studentData.softSkillScore || 65,
-      resumeScore: studentData.resumeScore || 65,
-      skills: studentData.skills || [],
+      readinessScore: studentData.readinessScore || 0,
+      technicalScore: studentData.technicalScore || 0,
+      softSkillScore: studentData.softSkillScore || 0,
+      resumeScore: studentData.resumeScore || 0,
+      skills: Array.isArray(studentData.skills) ? studentData.skills : [],
       tags: studentData.tags || [],
       notes: studentData.notes || '',
       github: studentData.github || '',
@@ -491,11 +494,11 @@ class MemoryDatabase {
     const needsImprovementCount = students.filter(s => (s.readinessScore || 0) >= 50 && (s.readinessScore || 0) < 75).length;
     const atRiskCount = students.filter(s => (s.readinessScore || 0) < 50).length;
 
-    const avgReadiness = totalStudents > 0 ? Math.round(students.reduce((acc, s) => acc + (s.readinessScore || 0), 0) / totalStudents) : 65;
-    const avgTechnical = totalStudents > 0 ? Math.round(students.reduce((acc, s) => acc + (s.technicalScore || 0), 0) / totalStudents) : 65;
-    const avgSoftSkill = totalStudents > 0 ? Math.round(students.reduce((acc, s) => acc + (s.softSkillScore || 0), 0) / totalStudents) : 65;
-    const avgResume = totalStudents > 0 ? Math.round(students.reduce((acc, s) => acc + (s.resumeScore || 0), 0) / totalStudents) : 65;
-    const avgCgpa = totalStudents > 0 ? parseFloat((students.reduce((acc, s) => acc + (s.cgpa || 0), 0) / totalStudents).toFixed(2)) : 7.5;
+    const avgReadiness = totalStudents > 0 ? Math.round(students.reduce((acc, s) => acc + (s.readinessScore || 0), 0) / totalStudents) : 0;
+    const avgTechnical = totalStudents > 0 ? Math.round(students.reduce((acc, s) => acc + (s.technicalScore || 0), 0) / totalStudents) : 0;
+    const avgSoftSkill = totalStudents > 0 ? Math.round(students.reduce((acc, s) => acc + (s.softSkillScore || 0), 0) / totalStudents) : 0;
+    const avgResume = totalStudents > 0 ? Math.round(students.reduce((acc, s) => acc + (s.resumeScore || 0), 0) / totalStudents) : 0;
+    const avgCgpa = totalStudents > 0 ? parseFloat((students.reduce((acc, s) => acc + (s.cgpa || 0), 0) / totalStudents).toFixed(2)) : 0;
 
     // Group students by branch to compute REAL departmentReadiness
     const deptMap = {};

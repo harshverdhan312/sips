@@ -80,10 +80,16 @@ export function SkillGapPage() {
           />
           <div className="py-4 text-center">
             <div className="inline-flex items-baseline gap-1 text-5xl font-extrabold text-indigo-600">
-              {student.readinessScore}<span className="text-xl text-slate-400 font-medium">/100</span>
+              {student.resumeUrl ? (
+                <>
+                  {student.readinessScore}<span className="text-xl text-slate-400 font-medium">/100</span>
+                </>
+              ) : (
+                <span className="text-2xl font-bold text-slate-400">Pending Resume</span>
+              )}
             </div>
             <p className="text-xs font-semibold text-slate-700 mt-2">
-              {student.status}
+              {student.resumeUrl ? student.status : "Resume Upload Required"}
             </p>
             <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
               Live placement status: {student.placementStatus}
@@ -93,7 +99,9 @@ export function SkillGapPage() {
           <div className="pt-4 border-t border-slate-100 space-y-2 text-xs">
             <div className="flex justify-between">
               <span className="text-slate-500">Technical Score:</span>
-              <span className="font-semibold text-slate-800">{student.metrics?.technicalScore || 0}/100</span>
+              <span className="font-semibold text-slate-800">
+                {student.resumeUrl && student.metrics?.technicalScore > 0 ? `${student.metrics.technicalScore}/100` : "Not evaluated"}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500">Resume Status:</span>
@@ -111,49 +119,93 @@ export function SkillGapPage() {
         </Card>
       </div>
 
-      {/* Verified Skills Grid or Clean Empty State */}
-      <div>
-        <h3 className="font-bold text-slate-900 text-lg mb-3">
-          Verified Competencies
-        </h3>
+      {/* Verified Strengths and Competencies */}
+      <div className="space-y-6">
+        <div>
+          <h3 className="font-bold text-slate-900 text-lg mb-3">
+            Verified Strengths & Competencies
+          </h3>
 
-        {skills.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {skills.map((skill, index) => (
-              <Card key={index} className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs shrink-0">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+          {skills.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {skills.map((skill, index) => (
+                <Card key={index} className="p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs shrink-0">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-slate-900 text-sm">{skill}</h4>
+                      <span className="text-[11px] text-slate-400">Verified Technical Skill</span>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-bold text-slate-900 text-sm">{skill}</h4>
-                    <span className="text-[11px] text-slate-400">Verified Technical Skill</span>
-                  </div>
-                </div>
-                <Badge variant="success" size="sm">
-                  Verified
-                </Badge>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <Card className="p-8 text-center max-w-md mx-auto">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-3">
-              <Layers className="w-6 h-6" />
+                  <Badge variant="success" size="sm">
+                    Verified
+                  </Badge>
+                </Card>
+              ))}
             </div>
-            <h4 className="font-bold text-slate-900 text-base mb-1">No verified technical skills yet</h4>
-            <p className="text-xs text-slate-500 mb-4">
-              Add your programming languages and technical competencies in your Profile to calculate company drive match scores.
-            </p>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => navigate("/student/profile")}
-            >
-              Add Skills from Profile
-            </Button>
-          </Card>
-        )}
+          ) : (
+            <Card className="p-8 text-center max-w-md mx-auto">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-3">
+                <Layers className="w-6 h-6" />
+              </div>
+              <h4 className="font-bold text-slate-900 text-base mb-1">Verified Strengths</h4>
+              <p className="text-xs text-slate-500 mb-4">
+                {student.resumeUrl
+                  ? "No verified technical skills found. Add skills in your profile."
+                  : "No verified strengths yet. Upload your resume to analyze your skills."}
+              </p>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => navigate(student.resumeUrl ? "/student/profile" : "/student/resume")}
+              >
+                {student.resumeUrl ? "Manage Skills" : "Upload Resume"}
+              </Button>
+            </Card>
+          )}
+        </div>
+
+        {/* Skill Gap Analysis */}
+        <div>
+          <h3 className="font-bold text-slate-900 text-lg mb-3">
+            Skill Gap Analysis
+          </h3>
+
+          {!student.resumeUrl ? (
+            <Card className="p-8 text-center max-w-md mx-auto">
+              <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-3">
+                <Target className="w-6 h-6" />
+              </div>
+              <h4 className="font-bold text-slate-900 text-base mb-1">Skill Gaps</h4>
+              <p className="text-xs text-slate-500 mb-4">
+                No skill-gap analysis available yet. Upload your resume to identify your skill gaps.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate("/student/resume")}
+              >
+                Upload Resume
+              </Button>
+            </Card>
+          ) : (
+            <Card className="p-6">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-900 text-sm">Resume Synchronized</h4>
+                  <p className="text-xs text-slate-500">
+                    Your skills have been extracted and mapped. Apply for campus recruitment drives to view role-specific alignment and gaps.
+                  </p>
+                </div>
+              </div>
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   );

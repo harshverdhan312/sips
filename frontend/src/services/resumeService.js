@@ -11,5 +11,14 @@ export const resumeService = {
 
     const res = await api.post('/api/student/resume', formData);
     return res;
+  },
+
+  /**
+   * Delete active resume from backend
+   * Calls DELETE /api/student/resume
+   */
+  async deleteResume() {
+    const res = await api.delete('/api/student/resume');
+    return res;
   }
 };

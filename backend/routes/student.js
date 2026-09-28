@@ -90,6 +90,9 @@ router.delete('/profile/image', auth, tenant, studentController.deleteProfileIma
 // POST /api/student/resume
 router.post('/resume', auth, tenant, upload.single('resume'), studentController.uploadResume);
 
+// DELETE /api/student/resume
+router.delete('/resume', auth, tenant, studentController.deleteResume);
+
 // GET /api/student/jobs
 router.get('/jobs', auth, tenant, studentController.getJobs);
 

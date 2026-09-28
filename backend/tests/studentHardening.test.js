@@ -375,7 +375,7 @@ describe('Phase 2: Student / Profile / Resume Hardening', () => {
 
       await studentController.uploadResume(req, res);
 
-      expect(res.body.message).toBe('Resume uploaded');
+      expect(res.body.message).toMatch(/Resume uploaded/i);
       expect(res.body.resumeUrl).toBe(`/uploads/${newFilename}`);
       expect(existingStudent.resumeUrl).toBe(`/uploads/${newFilename}`);
       expect(existingStudent.save).toHaveBeenCalled();

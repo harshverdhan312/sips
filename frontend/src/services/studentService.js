@@ -9,27 +9,33 @@ export const studentService = {
       const student = await api.get('/api/student/profile');
       if (student) {
         const skillsList = Array.isArray(student.skills) ? student.skills : [];
+        const hasResume = Boolean(student.resumeUrl);
+
         const technicalScore = typeof student.technicalScore === 'number' && student.technicalScore > 0
           ? student.technicalScore
-          : (skillsList.length > 0 ? Math.min(95, Math.max(50, skillsList.length * 20)) : 0);
+          : (hasResume && skillsList.length > 0 ? Math.min(95, Math.max(50, skillsList.length * 20)) : 0);
         const resumeScore = typeof student.resumeScore === 'number' && student.resumeScore > 0
           ? student.resumeScore
-          : (student.resumeUrl ? 85 : 0);
+          : (hasResume ? 85 : 0);
         const softSkillScore = typeof student.softSkillScore === 'number' && student.softSkillScore > 0
           ? student.softSkillScore
-          : (skillsList.length > 0 ? 70 : 0);
+          : (hasResume && skillsList.length > 0 ? 70 : 0);
         const academicScore = Math.round((student.cgpa || 0) * 10);
         
         const readiness = typeof student.readinessScore === 'number' && student.readinessScore > 0
           ? student.readinessScore
-          : Math.round((technicalScore * 0.3) + (softSkillScore * 0.2) + (resumeScore * 0.2) + (academicScore * 0.3));
+          : (hasResume ? Math.round((technicalScore * 0.3) + (softSkillScore * 0.2) + (resumeScore * 0.2) + (academicScore * 0.3)) : 0);
 
-        const status = readiness >= 75
-          ? "Tier-1 Contender • Placement Ready"
-          : (readiness >= 50 ? "Tier-2 Candidate • Developing" : "Tier-3 • Needs Preparation");
+        const status = !hasResume
+          ? "Resume Upload Required"
+          : (student.placementStatus === 'PLACED'
+              ? "Placed"
+              : (readiness >= 75
+                  ? "Tier-1 Contender • Placement Ready"
+                  : (readiness >= 50 ? "Tier-2 Candidate • Developing" : "Tier-3 • Needs Preparation")));
 
         // Fetch latest real ML placement prediction if available
-        let placementProbability = student.placementStatus === 'PLACED' ? 100 : readiness;
+        let placementProbability = student.placementStatus === 'PLACED' ? 100 : (hasResume ? readiness : 0);
         try {
           const predRes = await api.get('/api/student/analytics/placement/prediction').catch(() => null);
           if (predRes?.prediction?.placement_probability !== undefined && predRes.prediction.placement_probability !== null) {
@@ -149,6 +155,13 @@ export const studentService = {
     const formData = new FormData();
     formData.append('resume', file);
     return await api.postMultipart('/api/student/resume', formData);
+  },
+
+  /**
+   * Delete uploaded resume from backend
+   */
+  async deleteResume() {
+    return await api.delete('/api/student/resume');
   },
 
   /**

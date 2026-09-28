@@ -82,7 +82,9 @@ export const adminService = {
       email: userData.email,
       rollNo: userData.rollNo || userData.usn,
       usn: userData.usn || userData.rollNo,
+      course: userData.course || '',
       branch: userData.branch || userData.department || 'Computer Science & Engineering',
+      section: userData.section || '',
       batch: userData.batch ? String(userData.batch).trim() : '',
       cgpa: (userData.cgpa !== undefined && userData.cgpa !== '' && userData.cgpa !== null && !isNaN(Number(userData.cgpa)))
         ? parseFloat(userData.cgpa)
