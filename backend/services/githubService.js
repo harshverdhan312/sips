@@ -84,7 +84,10 @@ async function fetchUserRepositories(rawUsername, bypassCache = false) {
   }
 
   if (response.status === 403 || response.status === 429) {
-    const error = new Error('GitHub API rate limit exceeded or access forbidden. Please try again shortly.');
+    if (cached && Array.isArray(cached.data) && cached.data.length > 0) {
+      return cached.data;
+    }
+    const error = new Error('GitHub API rate limit exceeded or access forbidden. Please try again shortly or configure GITHUB_TOKEN on the server.');
     error.statusCode = response.status === 429 ? 429 : 403;
     throw error;
   }
