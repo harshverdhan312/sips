@@ -40,6 +40,17 @@ This updates: `models/placement_model.joblib` and evaluates metadata against `da
 pip install --no-cache-dir -r requirements.txt
 ```
 
+### Render Dashboard Configuration
+- **Root Directory**: `ml-service`
+- **Build Command**:
+  ```bash
+  pip install --no-cache-dir -r requirements.txt && python -c "from huggingface_hub import hf_hub_download; hf_hub_download('sentence-transformers/all-MiniLM-L6-v2', 'onnx/model.onnx'); hf_hub_download('sentence-transformers/all-MiniLM-L6-v2', 'tokenizer.json')"
+  ```
+- **Start Command**:
+  ```bash
+  uvicorn src.api.main:app --host 0.0.0.0 --port $PORT
+  ```
+
 ### Development & Testing
 ```bash
 pip install -r requirements-dev.txt
