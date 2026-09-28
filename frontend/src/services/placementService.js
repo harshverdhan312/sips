@@ -219,7 +219,11 @@ export const placementService = {
               placementProbability: placementProb
             },
             strongSkills: hasResume && skillsList.length > 0 ? skillsList.slice(0, 4) : [],
-            weakSkills: hasResume && skillsList.length > 0 ? (skillsList.length < 3 ? ["System Design", "Cloud Services"] : ["Advanced System Architecture"]) : []
+            weakSkills: hasResume && skillsList.length > 0 ? (skillsList.length < 3 ? ["System Design", "Cloud Services"] : ["Advanced System Architecture"]) : [],
+            publicProfile: s.publicProfile || {
+              enabled: false,
+              username: ''
+            }
           };
         });
 

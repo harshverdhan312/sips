@@ -28,8 +28,43 @@ const studentSchema = new mongoose.Schema({
   tags: [{ type: String, trim: true }],
   notes: { type: String, default: '' },
   github: { type: String, trim: true, default: '' },
+  projects: [
+    {
+      repoId: { type: Number, required: true },
+      name: { type: String, required: true, trim: true },
+      fullName: { type: String, required: true, trim: true },
+      owner: { type: String, required: true, trim: true },
+      htmlUrl: { type: String, required: true, trim: true },
+      description: { type: String, trim: true, default: '' },
+      primaryLanguage: { type: String, trim: true, default: '' },
+      languages: [{ type: String, trim: true }],
+      topics: [{ type: String, trim: true }],
+      stars: { type: Number, default: 0 },
+      forks: { type: Number, default: 0 },
+      isFork: { type: Boolean, default: false },
+      order: { type: Number, default: 1 },
+      updatedAt: { type: Date, default: null },
+      selectedAt: { type: Date, default: Date.now }
+    }
+  ],
   resumeUrl: { type: String, default: '' },
   profileImageUrl: { type: String, default: null },
+  linkedin: { type: String, trim: true, default: '' },
+  publicProfile: {
+    enabled: { type: Boolean, default: false },
+    username: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      default: ''
+    },
+    bio: { type: String, trim: true, default: '', maxlength: 500 },
+    showResume: { type: Boolean, default: false },
+    showGithub: { type: Boolean, default: true },
+    showLinkedIn: { type: Boolean, default: true },
+    showSkills: { type: Boolean, default: true },
+    showProjects: { type: Boolean, default: true }
+  },
   age: { type: Number, default: null },
   internships: { type: Number, default: null, min: 0 },
   hostel: { type: Boolean, default: null },
@@ -42,6 +77,15 @@ const studentSchema = new mongoose.Schema({
 studentSchema.index({ email: 1, collegeId: 1 }, { unique: true });
 // Compound index for rollNo + college uniqueness
 studentSchema.index({ rollNo: 1, collegeId: 1 }, { unique: true });
+// Public profile unique sparse index
+studentSchema.index(
+  { 'publicProfile.username': 1 },
+  { 
+    unique: true, 
+    sparse: true,
+    partialFilterExpression: { 'publicProfile.username': { $type: 'string', $gt: '' } }
+  }
+);
 // Tenant query indexes
 studentSchema.index({ collegeId: 1 });
 studentSchema.index({ collegeId: 1, branch: 1 });

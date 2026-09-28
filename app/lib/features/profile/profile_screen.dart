@@ -2,6 +2,7 @@ import 'dart:io' as io;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -806,6 +807,265 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  Future<void> _showPublicProfileDialog(BuildContext context, StudentProfile profile) async {
+    final pub = profile.publicProfile;
+    bool enabled = pub.enabled;
+    final usernameCtrl = TextEditingController(text: pub.username);
+    final bioCtrl = TextEditingController(text: pub.bio);
+    final linkedinCtrl = TextEditingController(text: profile.linkedin);
+    bool showResume = pub.showResume;
+    bool showGithub = pub.showGithub;
+    bool showLinkedIn = pub.showLinkedIn;
+    bool showSkills = pub.showSkills;
+    bool showProjects = pub.showProjects;
+    final messenger = ScaffoldMessenger.of(context);
+    bool isSaving = false;
+
+    await showDialog(
+      context: context,
+      builder: (dialogCtx) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: AppColors.surface,
+              shape: RoundedRectangleBorder(borderRadius: AppRadius.xlRadius),
+              title: Row(
+                children: [
+                  const Icon(Icons.public, color: AppColors.primary, size: 22),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Public Career Profile',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                      color: AppColors.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Configure your public, shareable portfolio accessible at /u/:username.',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12,
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Enabled Toggle
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceContainerLow,
+                          borderRadius: AppRadius.mdRadius,
+                          border: Border.all(color: AppColors.outlineVariant),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Enable Public Profile',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.onSurface,
+                              ),
+                            ),
+                            Switch(
+                              value: enabled,
+                              activeThumbColor: AppColors.primary,
+                              onChanged: isSaving ? null : (val) => setDialogState(() => enabled = val),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      // Username
+                      Text('Username *', style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.onSurface)),
+                      const SizedBox(height: 4),
+                      TextField(
+                        controller: usernameCtrl,
+                        enabled: !isSaving,
+                        decoration: InputDecoration(
+                          hintText: 'e.g. rahul-sharma',
+                          prefixText: '/u/ ',
+                          prefixStyle: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, color: AppColors.primary),
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          filled: true,
+                          fillColor: AppColors.surfaceContainerLow,
+                          border: OutlineInputBorder(borderRadius: AppRadius.mdRadius, borderSide: const BorderSide(color: AppColors.outlineVariant)),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      // Bio
+                      Text('Professional Bio (Max 500 chars)', style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.onSurface)),
+                      const SizedBox(height: 4),
+                      TextField(
+                        controller: bioCtrl,
+                        maxLines: 3,
+                        maxLength: 500,
+                        enabled: !isSaving,
+                        decoration: InputDecoration(
+                          hintText: 'Brief summary of your technical interests...',
+                          isDense: true,
+                          contentPadding: const EdgeInsets.all(12),
+                          filled: true,
+                          fillColor: AppColors.surfaceContainerLow,
+                          border: OutlineInputBorder(borderRadius: AppRadius.mdRadius, borderSide: const BorderSide(color: AppColors.outlineVariant)),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // LinkedIn
+                      Text('LinkedIn Profile URL', style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.onSurface)),
+                      const SizedBox(height: 4),
+                      TextField(
+                        controller: linkedinCtrl,
+                        enabled: !isSaving,
+                        decoration: InputDecoration(
+                          hintText: 'https://www.linkedin.com/in/username',
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          filled: true,
+                          fillColor: AppColors.surfaceContainerLow,
+                          border: OutlineInputBorder(borderRadius: AppRadius.mdRadius, borderSide: const BorderSide(color: AppColors.outlineVariant)),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Visibility Toggles
+                      Text('Public Visibility', style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.onSurface)),
+                      const SizedBox(height: 6),
+                      CheckboxListTile(
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                        title: Text('Show Resume PDF', style: GoogleFonts.plusJakartaSans(fontSize: 12)),
+                        value: showResume,
+                        onChanged: isSaving ? null : (v) => setDialogState(() => showResume = v ?? false),
+                      ),
+                      CheckboxListTile(
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                        title: Text('Show Verified Skills', style: GoogleFonts.plusJakartaSans(fontSize: 12)),
+                        value: showSkills,
+                        onChanged: isSaving ? null : (v) => setDialogState(() => showSkills = v ?? true),
+                      ),
+                      CheckboxListTile(
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                        title: Text('Show Featured Projects', style: GoogleFonts.plusJakartaSans(fontSize: 12)),
+                        value: showProjects,
+                        onChanged: isSaving ? null : (v) => setDialogState(() => showProjects = v ?? true),
+                      ),
+                      CheckboxListTile(
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                        title: Text('Show GitHub Handle', style: GoogleFonts.plusJakartaSans(fontSize: 12)),
+                        value: showGithub,
+                        onChanged: isSaving ? null : (v) => setDialogState(() => showGithub = v ?? true),
+                      ),
+                      CheckboxListTile(
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                        title: Text('Show LinkedIn Profile', style: GoogleFonts.plusJakartaSans(fontSize: 12)),
+                        value: showLinkedIn,
+                        onChanged: isSaving ? null : (v) => setDialogState(() => showLinkedIn = v ?? true),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isSaving ? null : () => Navigator.of(dialogCtx).pop(),
+                  child: Text('Cancel', style: GoogleFonts.plusJakartaSans(color: AppColors.outline)),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(borderRadius: AppRadius.mdRadius),
+                  ),
+                  onPressed: isSaving
+                      ? null
+                      : () async {
+                          setDialogState(() => isSaving = true);
+                          try {
+                            final newConfig = StudentPublicProfile(
+                              enabled: enabled,
+                              username: usernameCtrl.text.trim().toLowerCase(),
+                              bio: bioCtrl.text.trim(),
+                              showResume: showResume,
+                              showGithub: showGithub,
+                              showLinkedIn: showLinkedIn,
+                              showSkills: showSkills,
+                              showProjects: showProjects,
+                            );
+                            await ref.read(sipsRepositoryProvider).updatePublicProfileConfig(
+                              newConfig,
+                              linkedin: linkedinCtrl.text.trim(),
+                            );
+                            await ref.read(studentProfileProvider.notifier).loadProfile();
+                            if (dialogCtx.mounted) {
+                              Navigator.of(dialogCtx).pop();
+                            }
+                            if (mounted) {
+                              messenger.showSnackBar(
+                                const SnackBar(
+                                  content: Text('Public Career Profile settings updated!'),
+                                  backgroundColor: Color(0xFF047857),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            setDialogState(() => isSaving = false);
+                            if (mounted) {
+                              messenger.showSnackBar(
+                                SnackBar(
+                                  content: Text('Update failed: ${e.toString()}'),
+                                  backgroundColor: AppColors.error,
+                                ),
+                              );
+                            }
+                          }
+                        },
+                  child: isSaving
+                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : Text('Save Settings', style: GoogleFonts.plusJakartaSans(color: Colors.white, fontWeight: FontWeight.w700)),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildVisibilityChip(String label, bool isVisible) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: isVisible ? const Color(0xFFECFDF5) : AppColors.surfaceContainerLow,
+        borderRadius: AppRadius.smRadius,
+        border: Border.all(
+          color: isVisible ? const Color(0xFFA7F3D0) : AppColors.outlineVariant,
+        ),
+      ),
+      child: Text(
+        '$label: ${isVisible ? "On" : "Off"}',
+        style: GoogleFonts.plusJakartaSans(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: isVisible ? const Color(0xFF065F46) : AppColors.outline,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(studentProfileProvider);
@@ -1226,6 +1486,106 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
                 const SizedBox(height: 20),
 
+                // Public Career Profile Management
+                SectionHeader(
+                  title: 'Public Career Profile',
+                  badge: SipsBadge(
+                    label: profile.publicProfile.enabled ? 'PUBLIC' : 'PRIVATE',
+                    variant: profile.publicProfile.enabled ? SipsBadgeVariant.emerald : SipsBadgeVariant.neutral,
+                    isSmall: true,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SipsCard(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Shareable Recruiter Profile',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14,
+                                    color: AppColors.onSurface,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  profile.publicProfile.username.isNotEmpty
+                                      ? '/u/${profile.publicProfile.username}'
+                                      : 'No username configured',
+                                  style: GoogleFonts.firaCode(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: profile.publicProfile.enabled ? AppColors.primary : AppColors.outline,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              if (profile.publicProfile.username.isNotEmpty)
+                                IconButton(
+                                  icon: const Icon(Icons.copy_rounded, size: 18, color: AppColors.primary),
+                                  tooltip: 'Copy Profile Link',
+                                  onPressed: () {
+                                    final link = 'https://sips-six.vercel.app/u/${profile.publicProfile.username}';
+                                    Clipboard.setData(ClipboardData(text: link));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Public profile link copied to clipboard!'),
+                                        backgroundColor: Color(0xFF047857),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              IconButton(
+                                icon: const Icon(Icons.settings_outlined, size: 18, color: AppColors.primary),
+                                tooltip: 'Configure Public Profile',
+                                onPressed: () => _showPublicProfileDialog(context, profile),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      if (profile.publicProfile.bio.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          profile.publicProfile.bio,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 12,
+                            color: AppColors.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: [
+                          _buildVisibilityChip('Skills', profile.publicProfile.showSkills),
+                          _buildVisibilityChip('Projects', profile.publicProfile.showProjects),
+                          _buildVisibilityChip('Resume', profile.publicProfile.showResume),
+                          _buildVisibilityChip('GitHub', profile.publicProfile.showGithub),
+                          _buildVisibilityChip('LinkedIn', profile.publicProfile.showLinkedIn),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
                 // Connected Telemetry Accounts
                 SectionHeader(
                   title: 'Connected Accounts',
@@ -1261,6 +1621,240 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ],
                   ),
                 ),
+
+                const SizedBox(height: 20),
+
+                // Featured GitHub Projects
+                SectionHeader(
+                  title: 'Featured GitHub Projects',
+                  badge: SipsBadge(
+                    label: '${profile.projects.length} / 3 SELECTED',
+                    variant: profile.projects.isNotEmpty
+                        ? SipsBadgeVariant.emerald
+                        : SipsBadgeVariant.neutral,
+                    isSmall: true,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                if (profile.githubHandle.isEmpty)
+                  SipsCard(
+                    padding: const EdgeInsets.all(20),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          const Icon(Icons.folder_off_outlined, size: 36, color: AppColors.outline),
+                          const SizedBox(height: 8),
+                          Text(
+                            'GitHub Account Not Linked',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
+                              color: AppColors.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Connect your GitHub profile above to showcase your best public repositories.',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12,
+                              color: AppColors.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else if (profile.projects.isEmpty)
+                  SipsCard(
+                    padding: const EdgeInsets.all(20),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          const Icon(Icons.folder_special_outlined, size: 36, color: AppColors.primary),
+                          const SizedBox(height: 8),
+                          Text(
+                            'No Featured Projects Selected',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
+                              color: AppColors.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Select up to 3 repositories from @${profile.githubHandle} on the SIPS web portal to showcase on your profile.',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12,
+                              color: AppColors.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  ...profile.projects.map((project) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: SipsCard(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.primary.withValues(alpha: 0.1),
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        child: Text(
+                                          '#${project.order}',
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 11,
+                                            color: AppColors.primary,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          project.name,
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 14,
+                                            color: AppColors.onSurface,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                if (project.isFork)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.amber.withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      'FORK',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 9,
+                                        color: Colors.amber.shade900,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            if (project.description.isNotEmpty) ...[
+                              const SizedBox(height: 6),
+                              Text(
+                                project.description,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 12,
+                                  color: AppColors.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                            if (project.topics.isNotEmpty) ...[
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 6,
+                                runSpacing: 4,
+                                children: project.topics.take(4).map((topic) {
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.surfaceContainerLow,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      '#$topic',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ],
+                            const SizedBox(height: 10),
+                            const Divider(height: 1, color: AppColors.outlineVariant),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                if (project.primaryLanguage.isNotEmpty)
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 8,
+                                        height: 8,
+                                        decoration: const BoxDecoration(
+                                          color: AppColors.primary,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        project.primaryLanguage,
+                                        style: GoogleFonts.plusJakartaSans(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 11,
+                                          color: AppColors.onSurface,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                else
+                                  const SizedBox.shrink(),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.star_rounded, size: 14, color: Colors.amber),
+                                    const SizedBox(width: 2),
+                                    Text(
+                                      '${project.stars}',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.onSurfaceVariant,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    const Icon(Icons.alt_route_rounded, size: 13, color: AppColors.outline),
+                                    const SizedBox(width: 2),
+                                    Text(
+                                      '${project.forks}',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
 
                 const SizedBox(height: 20),
 

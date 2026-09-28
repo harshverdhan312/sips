@@ -199,4 +199,33 @@ class MockSipsRepository implements SipsRepository {
   Future<void> deleteProfileImage() async {
     _profile = _profile.copyWith(profileImageUrl: '');
   }
+
+  @override
+  Future<List<StudentProject>> getFeaturedProjects() async {
+    return _profile.projects;
+  }
+
+  @override
+  Future<List<StudentProject>> updateFeaturedProjects(List<int> repoIds) async {
+    return _profile.projects;
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getGithubRepositories() async {
+    return [];
+  }
+
+  @override
+  Future<StudentPublicProfile> getPublicProfileConfig() async {
+    return _profile.publicProfile;
+  }
+
+  @override
+  Future<StudentPublicProfile> updatePublicProfileConfig(StudentPublicProfile config, {String? linkedin}) async {
+    _profile = _profile.copyWith(
+      publicProfile: config,
+      linkedin: linkedin ?? _profile.linkedin,
+    );
+    return _profile.publicProfile;
+  }
 }

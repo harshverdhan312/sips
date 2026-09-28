@@ -10,7 +10,9 @@ import {
   CheckCircle2,
   AlertCircle,
   RefreshCw,
-  FileText
+  FileText,
+  ExternalLink,
+  Share2
 } from "lucide-react";
 import { placementService } from "../../services/placementService";
 import { adminService } from "../../services/adminService";
@@ -393,6 +395,17 @@ export function StudentManagementPage() {
     setModalOpen(true);
   };
 
+  const handleCopyProfileLink = (username) => {
+    if (!username) return;
+    try {
+      const url = `${window.location.origin}/u/${encodeURIComponent(username)}`;
+      navigator.clipboard.writeText(url);
+      showSuccess("Profile link copied to clipboard");
+    } catch (e) {
+      showError("Failed to copy link to clipboard");
+    }
+  };
+
   const columns = [
     {
       title: "Student",
@@ -500,17 +513,33 @@ export function StudentManagementPage() {
       key: "actions",
       className: "text-right",
       render: (row) => (
-        <Button
-          variant="outline"
-          size="xs"
-          icon={Eye}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleViewStudent(row);
-          }}
-        >
-          View Profile
-        </Button>
+        <div className="flex items-center justify-end gap-1.5">
+          <Button
+            variant="outline"
+            size="xs"
+            icon={Eye}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleViewStudent(row);
+            }}
+            title="Candidate Placement Intelligence Profile"
+          >
+            Placement Profile
+          </Button>
+          {row.publicProfile?.enabled && row.publicProfile?.username && (
+            <a
+              href={`/u/${encodeURIComponent(row.publicProfile.username)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 border border-indigo-200 transition-colors"
+              title="Open Student's Public Career Profile (New Tab)"
+            >
+              <span>Career Profile</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          )}
+        </div>
       )
     }
   ];
@@ -754,21 +783,53 @@ export function StudentManagementPage() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setModalOpen(false)}
-              >
-                Close Window
-              </Button>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => setCounselingComingSoon(true)}
-              >
-                Schedule Career Counseling
-              </Button>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-100">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                {activeStudent.publicProfile?.enabled && activeStudent.publicProfile?.username ? (
+                  <>
+                    <a
+                      href={`/u/${encodeURIComponent(activeStudent.publicProfile.username)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold text-xs transition-colors border border-indigo-200"
+                      title="Open student's public career profile in a new tab"
+                    >
+                      <span>View Career Profile</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyProfileLink(activeStudent.publicProfile.username)}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs transition-colors border border-slate-200 cursor-pointer"
+                      title="Copy public career profile URL"
+                    >
+                      <Share2 className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Copy Link</span>
+                    </button>
+                  </>
+                ) : (
+                  <span className="text-xs text-slate-400 italic">
+                    Student has not enabled a public career profile.
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setModalOpen(false)}
+                >
+                  Close Window
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => setCounselingComingSoon(true)}
+                >
+                  Schedule Career Counseling
+                </Button>
+              </div>
             </div>
           </div>
         )}

@@ -352,4 +352,81 @@ class ApiSipsRepository implements SipsRepository {
   Future<List<PeerMatch>> getPeerMatches() async {
     return const [];
   }
+
+  @override
+  Future<List<StudentProject>> getFeaturedProjects() async {
+    final response = await _apiClient.get('/api/student/projects');
+    if (response is Map<String, dynamic> && response['projects'] is List) {
+      final rawList = response['projects'] as List;
+      return rawList
+          .whereType<Map<String, dynamic>>()
+          .map((p) => StudentProject.fromBackendJson(p))
+          .toList();
+    }
+    return [];
+  }
+
+  @override
+  Future<List<StudentProject>> updateFeaturedProjects(List<int> repoIds) async {
+    final response = await _apiClient.put('/api/student/projects', body: {
+      'repoIds': repoIds,
+    });
+    if (response is Map<String, dynamic> && response['projects'] is List) {
+      final rawList = response['projects'] as List;
+      final updatedList = rawList
+          .whereType<Map<String, dynamic>>()
+          .map((p) => StudentProject.fromBackendJson(p))
+          .toList();
+      if (_cachedProfile != null) {
+        _cachedProfile = _cachedProfile!.copyWith(projects: updatedList);
+      }
+      return updatedList;
+    }
+    return [];
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getGithubRepositories() async {
+    final response = await _apiClient.get('/api/student/github/repos');
+    if (response is Map<String, dynamic> && response['repositories'] is List) {
+      return (response['repositories'] as List).whereType<Map<String, dynamic>>().toList();
+    }
+    return [];
+  }
+
+  @override
+  Future<StudentPublicProfile> getPublicProfileConfig() async {
+    final response = await _apiClient.get('/api/student/public-profile');
+    if (response is Map<String, dynamic> && response['publicProfile'] is Map<String, dynamic>) {
+      final pub = StudentPublicProfile.fromJson(response['publicProfile'] as Map<String, dynamic>);
+      if (_cachedProfile != null) {
+        _cachedProfile = _cachedProfile!.copyWith(
+          publicProfile: pub,
+          linkedin: response['linkedin'] as String? ?? _cachedProfile!.linkedin,
+        );
+      }
+      return pub;
+    }
+    return const StudentPublicProfile();
+  }
+
+  @override
+  Future<StudentPublicProfile> updatePublicProfileConfig(StudentPublicProfile config, {String? linkedin}) async {
+    final body = <String, dynamic>{
+      ...config.toJson(),
+      'linkedin': ?linkedin,
+    };
+    final response = await _apiClient.put('/api/student/public-profile', body: body);
+    if (response is Map<String, dynamic> && response['publicProfile'] is Map<String, dynamic>) {
+      final updated = StudentPublicProfile.fromJson(response['publicProfile'] as Map<String, dynamic>);
+      if (_cachedProfile != null) {
+        _cachedProfile = _cachedProfile!.copyWith(
+          publicProfile: updated,
+          linkedin: response['linkedin'] as String? ?? _cachedProfile!.linkedin,
+        );
+      }
+      return updated;
+    }
+    return config;
+  }
 }

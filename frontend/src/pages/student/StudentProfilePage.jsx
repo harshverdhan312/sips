@@ -19,7 +19,20 @@ import {
   Camera,
   X,
   Eye,
-  Calendar
+  Calendar,
+  Star,
+  GitFork,
+  ExternalLink,
+  FolderGit2,
+  ArrowUp,
+  ArrowDown,
+  Search,
+  Layers,
+  Share2,
+  Globe,
+  Copy,
+  Lock,
+  ShieldCheck
 } from "lucide-react";
 import Avatar from "../../components/common/Avatar";
 import { studentService } from "../../services/studentService";
@@ -31,6 +44,16 @@ import { Modal } from "../../components/common/Modal";
 import { DashboardSkeleton } from "../../components/common/LoadingSkeleton";
 import { useNotifications } from "../../context/NotificationContext";
 import { useAuth } from "../../context/AuthContext";
+
+function LinkedinIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+      <rect width="4" height="12" x="2" y="9" />
+      <circle cx="4" cy="4" r="2" />
+    </svg>
+  );
+}
 
 export function StudentProfilePage() {
   const { showSuccess, showError, showWarning } = useNotifications();
@@ -60,6 +83,42 @@ export function StudentProfilePage() {
   const [calculatingPrediction, setCalculatingPrediction] = useState(false);
   const [uploadingResume, setUploadingResume] = useState(false);
 
+  // Featured Projects State
+  const [isProjectsModalOpen, setIsProjectsModalOpen] = useState(false);
+  const [githubRepos, setGithubRepos] = useState([]);
+  const [loadingRepos, setLoadingRepos] = useState(false);
+  const [selectedRepoIds, setSelectedRepoIds] = useState([]);
+  const [savingProjects, setSavingProjects] = useState(false);
+  const [repoSearchFilter, setRepoSearchFilter] = useState("");
+
+  // Public Career Profile State
+  const [publicProfileConfig, setPublicProfileConfig] = useState({
+    enabled: false,
+    username: "",
+    bio: "",
+    showResume: false,
+    showGithub: true,
+    showLinkedIn: true,
+    showSkills: true,
+    showProjects: true
+  });
+  const [linkedinUrl, setLinkedinUrl] = useState("");
+  const [isPublicProfileModalOpen, setIsPublicProfileModalOpen] = useState(false);
+  const [publicProfileForm, setPublicProfileForm] = useState({
+    enabled: false,
+    username: "",
+    bio: "",
+    showResume: false,
+    showGithub: true,
+    showLinkedIn: true,
+    showSkills: true,
+    showProjects: true,
+    linkedin: ""
+  });
+  const [savingPublicProfile, setSavingPublicProfile] = useState(false);
+  const [copiedPublicUrl, setCopiedPublicUrl] = useState(false);
+  const [publicProfileError, setPublicProfileError] = useState("");
+
   useEffect(() => {
     async function load() {
       const data = await studentService.getCurrentStudent();
@@ -73,6 +132,7 @@ export function StudentProfilePage() {
         });
         setSkillsList(data.skills || []);
         setGithubHandle(data.github || "");
+        setLinkedinUrl(data.linkedin || "");
         setAgeInput(data.age !== null && data.age !== undefined ? String(data.age) : "");
         setInternshipsInput(data.internships !== null && data.internships !== undefined ? String(data.internships) : "");
         setHostelInput(data.hostel === true ? "true" : (data.hostel === false ? "false" : ""));
@@ -81,6 +141,17 @@ export function StudentProfilePage() {
       const pred = await studentService.getPlacementPrediction();
       if (pred) {
         setPrediction(pred);
+      }
+
+      // Load Public Profile Configuration
+      try {
+        const pubRes = await studentService.getPublicProfileConfig();
+        if (pubRes && pubRes.success) {
+          setPublicProfileConfig(pubRes.publicProfile || {});
+          if (pubRes.linkedin) setLinkedinUrl(pubRes.linkedin);
+        }
+      } catch (err) {
+        console.warn("Could not fetch public profile config:", err.message);
       }
     }
     load();
@@ -155,6 +226,133 @@ export function StudentProfilePage() {
       showError(e.message || "Failed to save GitHub handle. Please try again.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleOpenProjectsModal = async () => {
+    if (!student.github || !student.github.trim()) {
+      showWarning("Please connect your GitHub profile handle first.");
+      setIsEditingGithub(true);
+      return;
+    }
+
+    setIsProjectsModalOpen(true);
+    setSelectedRepoIds((student.projects || []).map(p => Number(p.repoId)));
+    setLoadingRepos(true);
+    setRepoSearchFilter("");
+
+    try {
+      const res = await studentService.fetchGithubRepositories();
+      setGithubRepos(res?.repositories || []);
+    } catch (e) {
+      showError(e.message || "Could not fetch repositories from GitHub. Please try again.");
+    } finally {
+      setLoadingRepos(false);
+    }
+  };
+
+  const handleToggleProject = (repoId) => {
+    const id = Number(repoId);
+    if (selectedRepoIds.includes(id)) {
+      setSelectedRepoIds(selectedRepoIds.filter(item => item !== id));
+    } else {
+      if (selectedRepoIds.length >= 3) {
+        showWarning("You can select up to 3 featured projects.");
+        return;
+      }
+      setSelectedRepoIds([...selectedRepoIds, id]);
+    }
+  };
+
+  const handleMoveProject = (repoId, direction) => {
+    const id = Number(repoId);
+    const index = selectedRepoIds.indexOf(id);
+    if (index === -1) return;
+
+    const newIds = [...selectedRepoIds];
+    if (direction === "up" && index > 0) {
+      const temp = newIds[index - 1];
+      newIds[index - 1] = newIds[index];
+      newIds[index] = temp;
+      setSelectedRepoIds(newIds);
+    } else if (direction === "down" && index < newIds.length - 1) {
+      const temp = newIds[index + 1];
+      newIds[index + 1] = newIds[index];
+      newIds[index] = temp;
+      setSelectedRepoIds(newIds);
+    }
+  };
+
+  const handleSaveProjects = async () => {
+    setSavingProjects(true);
+    try {
+      const updatedProjects = await studentService.saveStudentProjects(selectedRepoIds);
+      setStudent(prev => ({
+        ...prev,
+        projects: updatedProjects
+      }));
+      setIsProjectsModalOpen(false);
+      showSuccess("Featured projects updated successfully!");
+    } catch (e) {
+      showError(e.message || "Failed to update featured projects. Please try again.");
+    } finally {
+      setSavingProjects(false);
+    }
+  };
+
+  const handleOpenPublicProfileModal = () => {
+    setPublicProfileForm({
+      enabled: publicProfileConfig.enabled === true,
+      username: publicProfileConfig.username || "",
+      bio: publicProfileConfig.bio || "",
+      showResume: publicProfileConfig.showResume === true,
+      showGithub: publicProfileConfig.showGithub !== false,
+      showLinkedIn: publicProfileConfig.showLinkedIn !== false,
+      showSkills: publicProfileConfig.showSkills !== false,
+      showProjects: publicProfileConfig.showProjects !== false,
+      linkedin: linkedinUrl || ""
+    });
+    setPublicProfileError("");
+    setIsPublicProfileModalOpen(true);
+  };
+
+  const handleSavePublicProfile = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    setPublicProfileError("");
+    setSavingPublicProfile(true);
+    try {
+      const res = await studentService.updatePublicProfileConfig(publicProfileForm);
+      if (res && res.success) {
+        setPublicProfileConfig(res.publicProfile || {});
+        if (res.linkedin !== undefined) {
+          setLinkedinUrl(res.linkedin);
+          setStudent(prev => ({ ...prev, linkedin: res.linkedin }));
+        }
+        setIsPublicProfileModalOpen(false);
+        showSuccess("Public career profile settings updated successfully!");
+      } else {
+        setPublicProfileError(res?.message || "Failed to update public career profile settings.");
+      }
+    } catch (err) {
+      setPublicProfileError(err.message || "Failed to update public career profile settings.");
+    } finally {
+      setSavingPublicProfile(false);
+    }
+  };
+
+  const handleCopyPublicLink = () => {
+    if (!publicProfileConfig.username) {
+      showWarning("Please configure a username for your public profile first.");
+      return;
+    }
+    const publicUrl = `${window.location.origin}/u/${publicProfileConfig.username}`;
+    try {
+      navigator.clipboard.writeText(publicUrl);
+      setCopiedPublicUrl(true);
+      showSuccess("Public profile URL copied to clipboard!");
+      setTimeout(() => setCopiedPublicUrl(false), 2500);
+    } catch (e) {
+      showError("Could not copy link to clipboard.");
     }
   };
 
@@ -628,6 +826,253 @@ export function StudentProfilePage() {
         </Card>
       </div>
 
+      {/* Public Career Profile Management Card */}
+      <Card className="mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
+                <Globe className="w-5 h-5 text-indigo-600" /> Public Career Profile
+              </h3>
+              <Badge
+                variant={publicProfileConfig.enabled ? "emerald" : "neutral"}
+                size="sm"
+              >
+                {publicProfileConfig.enabled ? "Publicly Accessible" : "Disabled / Private"}
+              </Badge>
+            </div>
+            <p className="text-xs text-slate-500 mt-1">
+              Create a shareable, recruiter-facing portfolio link to showcase your verified skills, projects, and resume
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="xs"
+              icon={Edit2}
+              onClick={handleOpenPublicProfileModal}
+            >
+              Configure Profile
+            </Button>
+          </div>
+        </div>
+
+        <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-1.5">
+              <span className="text-xs font-semibold text-slate-700 block">Your Shareable Public Link:</span>
+              <div className="flex flex-wrap items-center gap-2">
+                <code className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-mono text-indigo-700 font-semibold select-all">
+                  {publicProfileConfig.username 
+                    ? `${window.location.origin}/u/${publicProfileConfig.username}`
+                    : `${window.location.origin}/u/<your-username>`
+                  }
+                </code>
+                {publicProfileConfig.username && (
+                  <Button
+                    variant="ghost"
+                    size="xs"
+                    icon={copiedPublicUrl ? Check : Copy}
+                    onClick={handleCopyPublicLink}
+                    className="text-slate-600 hover:text-indigo-600"
+                  >
+                    {copiedPublicUrl ? "Copied" : "Copy Link"}
+                  </Button>
+                )}
+                {publicProfileConfig.enabled && publicProfileConfig.username && (
+                  <a
+                    href={`/u/${publicProfileConfig.username}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-semibold hover:bg-indigo-100 transition-colors"
+                  >
+                    <span>View Public Page</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
+              </div>
+            </div>
+
+            {/* Visibility Settings Summary */}
+            <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-600">
+              <span className="font-semibold text-slate-700">Visibility:</span>
+              <span className={`px-2 py-0.5 rounded-md border ${publicProfileConfig.showSkills !== false ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
+                Skills: {publicProfileConfig.showSkills !== false ? 'On' : 'Off'}
+              </span>
+              <span className={`px-2 py-0.5 rounded-md border ${publicProfileConfig.showProjects !== false ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
+                Projects: {publicProfileConfig.showProjects !== false ? 'On' : 'Off'}
+              </span>
+              <span className={`px-2 py-0.5 rounded-md border ${publicProfileConfig.showResume ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
+                Resume: {publicProfileConfig.showResume ? 'On' : 'Off'}
+              </span>
+              <span className={`px-2 py-0.5 rounded-md border ${publicProfileConfig.showGithub !== false ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
+                GitHub: {publicProfileConfig.showGithub !== false ? 'On' : 'Off'}
+              </span>
+              <span className={`px-2 py-0.5 rounded-md border ${publicProfileConfig.showLinkedIn !== false ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
+                LinkedIn: {publicProfileConfig.showLinkedIn !== false ? 'On' : 'Off'}
+              </span>
+            </div>
+          </div>
+          {!publicProfileConfig.enabled && (
+            <p className="text-[11px] text-amber-700 mt-2.5 flex items-center gap-1 font-medium">
+              <Lock className="w-3 h-3" /> Profile is currently disabled. External visitors will receive a 404 response until you enable it.
+            </p>
+          )}
+        </div>
+      </Card>
+
+      {/* Featured GitHub Projects Section */}
+      <Card className="mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
+                <FolderGit2 className="w-5 h-5 text-indigo-600" /> Featured GitHub Projects
+              </h3>
+              <Badge variant={student.projects && student.projects.length > 0 ? "indigo" : "neutral"} size="sm">
+                {student.projects?.length || 0} / 3 Selected
+              </Badge>
+            </div>
+            <p className="text-xs text-slate-500 mt-1">
+              Showcase your top 3 public repositories to institutional placement cells and visiting enterprise recruiters
+            </p>
+          </div>
+          <div>
+            {student.github ? (
+              <Button
+                variant="outline"
+                size="xs"
+                icon={Edit2}
+                onClick={handleOpenProjectsModal}
+              >
+                {student.projects && student.projects.length > 0 ? "Manage Projects" : "Select Projects"}
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="xs"
+                icon={GitBranch}
+                onClick={() => setIsEditingGithub(true)}
+              >
+                Connect GitHub First
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* State A: GitHub Not Linked */}
+        {!student.github ? (
+          <div className="p-8 text-center rounded-2xl bg-slate-50/70 border border-dashed border-slate-200">
+            <GitBranch className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+            <p className="text-sm font-semibold text-slate-700">GitHub Profile Not Linked</p>
+            <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto mb-4">
+              Connect your GitHub account handle above to automatically fetch and showcase your best public repositories.
+            </p>
+            <Button
+              variant="primary"
+              size="xs"
+              icon={Plus}
+              onClick={() => setIsEditingGithub(true)}
+            >
+              Add GitHub Handle
+            </Button>
+          </div>
+        ) : !student.projects || student.projects.length === 0 ? (
+          /* State B: GitHub Linked, No Projects Selected */
+          <div className="p-8 text-center rounded-2xl bg-indigo-50/30 border border-dashed border-indigo-200/70">
+            <FolderGit2 className="w-8 h-8 text-indigo-500 mx-auto mb-2" />
+            <p className="text-sm font-semibold text-slate-800">No Featured Projects Selected Yet</p>
+            <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto mb-4">
+              Select up to 3 of your best public repositories from <span className="font-semibold text-indigo-600">@{student.github}</span> to highlight on your placement portfolio.
+            </p>
+            <Button
+              variant="primary"
+              size="xs"
+              icon={Plus}
+              onClick={handleOpenProjectsModal}
+            >
+              Select Featured Projects
+            </Button>
+          </div>
+        ) : (
+          /* State C: 1–3 Featured Projects */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {student.projects.map((proj, idx) => (
+              <div
+                key={proj.repoId || idx}
+                className="relative flex flex-col justify-between p-4 rounded-xl border border-slate-200/80 bg-white hover:border-indigo-300 hover:shadow-sm transition-all group"
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 font-bold text-[10px]">
+                        #{idx + 1}
+                      </span>
+                      <h4 className="font-bold text-slate-900 text-sm truncate" title={proj.name}>
+                        {proj.name}
+                      </h4>
+                    </div>
+                    <a
+                      href={proj.htmlUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1 rounded text-slate-400 hover:text-indigo-600 hover:bg-slate-50 transition-colors shrink-0"
+                      title="View on GitHub"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+
+                  <p className="text-xs text-slate-600 line-clamp-2 mb-3 min-h-[32px]">
+                    {proj.description || "No description provided for this repository."}
+                  </p>
+
+                  {/* Tech stack / topics */}
+                  {proj.topics && proj.topics.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {proj.topics.slice(0, 3).map((topic, tIdx) => (
+                        <span
+                          key={tIdx}
+                          className="px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-medium text-slate-600"
+                        >
+                          #{topic}
+                        </span>
+                      ))}
+                      {proj.topics.length > 3 && (
+                        <span className="text-[10px] text-slate-400 self-center">
+                          +{proj.topics.length - 3}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 text-xs text-slate-500 mt-2">
+                  <div className="flex items-center gap-1.5">
+                    {proj.primaryLanguage && (
+                      <span className="flex items-center gap-1 font-medium text-slate-700 text-[11px]">
+                        <span className="w-2 h-2 rounded-full bg-indigo-500 inline-block" />
+                        {proj.primaryLanguage}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 text-[11px]">
+                    <span className="flex items-center gap-1" title="Stars">
+                      <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                      {proj.stars || 0}
+                    </span>
+                    <span className="flex items-center gap-1" title="Forks">
+                      <GitFork className="w-3 h-3 text-slate-400" />
+                      {proj.forks || 0}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
+
       {/* Placement Profile Information */}
       <Card>
         <div className="flex items-center justify-between mb-4">
@@ -1024,6 +1469,402 @@ export function StudentProfilePage() {
               loading={savingAcademic}
             >
               Save Profile
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Featured Projects Selection & Reordering Modal */}
+      <Modal
+        isOpen={isProjectsModalOpen}
+        onClose={() => setIsProjectsModalOpen(false)}
+        maxWidth="max-w-2xl"
+        title="Manage Featured GitHub Projects"
+        subtitle={`Select and prioritize up to 3 repositories from @${student.github} for your placement profile`}
+      >
+        <div className="space-y-4">
+          {/* Top Status & Limit Banner */}
+          <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-slate-700">Selection Limit:</span>
+              <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                selectedRepoIds.length === 3
+                  ? "bg-amber-100 text-amber-800"
+                  : selectedRepoIds.length > 0
+                  ? "bg-indigo-100 text-indigo-800"
+                  : "bg-slate-200 text-slate-700"
+              }`}>
+                {selectedRepoIds.length} / 3 Selected
+              </span>
+            </div>
+            {selectedRepoIds.length === 3 && (
+              <span className="text-[11px] text-amber-700 font-medium">
+                Limit reached. Deselect a repo to choose another.
+              </span>
+            )}
+          </div>
+
+          {/* Selected Projects Ordering Drawer (if any selected) */}
+          {selectedRepoIds.length > 0 && (
+            <div className="p-3.5 rounded-xl border border-indigo-100 bg-indigo-50/40">
+              <h4 className="text-xs font-bold text-indigo-900 mb-2 flex items-center gap-1.5">
+                <Layers className="w-3.5 h-3.5 text-indigo-600" /> Featured Projects Priority (Display Order)
+              </h4>
+              <div className="space-y-1.5">
+                {selectedRepoIds.map((id, index) => {
+                  const repo = githubRepos.find(r => r.repoId === id) || (student.projects || []).find(p => p.repoId === id);
+                  return (
+                    <div
+                      key={id}
+                      className="flex items-center justify-between p-2 rounded-lg bg-white border border-indigo-200/60 shadow-2xs"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="w-5 h-5 rounded-full bg-indigo-600 text-white font-bold text-[10px] flex items-center justify-center shrink-0">
+                          #{index + 1}
+                        </span>
+                        <span className="text-xs font-semibold text-slate-800 truncate">
+                          {repo ? repo.name : `Repo #${id}`}
+                        </span>
+                        {repo?.primaryLanguage && (
+                          <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">
+                            {repo.primaryLanguage}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          disabled={index === 0}
+                          onClick={() => handleMoveProject(id, "up")}
+                          className="p-1 rounded hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent text-slate-600 cursor-pointer"
+                          title="Move up"
+                        >
+                          <ArrowUp className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          disabled={index === selectedRepoIds.length - 1}
+                          onClick={() => handleMoveProject(id, "down")}
+                          className="p-1 rounded hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent text-slate-600 cursor-pointer"
+                          title="Move down"
+                        >
+                          <ArrowDown className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleProject(id)}
+                          className="p-1 rounded hover:bg-rose-50 text-slate-400 hover:text-rose-600 cursor-pointer"
+                          title="Remove from featured"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Search input */}
+          <div className="relative">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+            <input
+              type="text"
+              placeholder="Search repositories by name, language, or topic..."
+              value={repoSearchFilter}
+              onChange={(e) => setRepoSearchFilter(e.target.value)}
+              className="w-full pl-9 pr-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            />
+          </div>
+
+          {/* Repository List */}
+          <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
+            {loadingRepos ? (
+              <div className="py-12 text-center text-xs text-slate-500 flex flex-col items-center gap-2">
+                <RefreshCw className="w-5 h-5 text-indigo-600 animate-spin" />
+                <span>Fetching public repositories from GitHub...</span>
+              </div>
+            ) : githubRepos.length === 0 ? (
+              <div className="py-8 text-center text-xs text-slate-500 rounded-xl bg-slate-50 border border-slate-200">
+                No public repositories found for @{student.github}.
+              </div>
+            ) : (
+              githubRepos
+                .filter(r => {
+                  if (!repoSearchFilter.trim()) return true;
+                  const q = repoSearchFilter.toLowerCase();
+                  return (
+                    r.name.toLowerCase().includes(q) ||
+                    (r.description && r.description.toLowerCase().includes(q)) ||
+                    (r.primaryLanguage && r.primaryLanguage.toLowerCase().includes(q)) ||
+                    (r.topics && r.topics.some(t => t.toLowerCase().includes(q)))
+                  );
+                })
+                .map((repo) => {
+                  const isSelected = selectedRepoIds.includes(repo.repoId);
+                  const canSelect = isSelected || selectedRepoIds.length < 3;
+
+                  return (
+                    <div
+                      key={repo.repoId}
+                      onClick={() => canSelect && handleToggleProject(repo.repoId)}
+                      className={`flex items-start justify-between p-3 rounded-xl border transition-all cursor-pointer ${
+                        isSelected
+                          ? "border-indigo-500 bg-indigo-50/30"
+                          : canSelect
+                          ? "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50"
+                          : "border-slate-200 bg-slate-50/60 opacity-60 cursor-not-allowed"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3 min-w-0">
+                        <div className="pt-0.5">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            disabled={!canSelect}
+                            onChange={() => {}}
+                            className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4 pointer-events-none"
+                          />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-slate-900 text-xs truncate">
+                              {repo.name}
+                            </span>
+                            {repo.isFork && (
+                              <span className="px-1.5 py-0.2 text-[9px] font-semibold rounded bg-amber-50 text-amber-700 border border-amber-200">
+                                Fork
+                              </span>
+                            )}
+                          </div>
+                          {repo.description && (
+                            <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">
+                              {repo.description}
+                            </p>
+                          )}
+                          <div className="flex items-center gap-3 mt-1.5 text-[10px] text-slate-500">
+                            {repo.primaryLanguage && (
+                              <span className="flex items-center gap-1 font-medium text-slate-700">
+                                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 inline-block" />
+                                {repo.primaryLanguage}
+                              </span>
+                            )}
+                            <span className="flex items-center gap-0.5">
+                              <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
+                              {repo.stars}
+                            </span>
+                            <span className="flex items-center gap-0.5">
+                              <GitFork className="w-2.5 h-2.5 text-slate-400" />
+                              {repo.forks}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+            )}
+          </div>
+
+          {/* Modal Actions */}
+          <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => setSelectedRepoIds([])}
+              className="text-xs text-slate-500 hover:text-rose-600 cursor-pointer"
+            >
+              Clear selection
+            </button>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={savingProjects}
+                onClick={() => setIsProjectsModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                size="sm"
+                loading={savingProjects}
+                onClick={handleSaveProjects}
+              >
+                Save Featured Projects
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Configure Public Career Profile Modal */}
+      <Modal
+        isOpen={isPublicProfileModalOpen}
+        onClose={() => setIsPublicProfileModalOpen(false)}
+        title="Public Career Profile Settings"
+        maxWidth="max-w-lg"
+      >
+        <form onSubmit={handleSavePublicProfile} className="space-y-5">
+          {publicProfileError && (
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700">
+              {publicProfileError}
+            </div>
+          )}
+
+          {/* Enabled Toggle */}
+          <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+            <div>
+              <span className="text-xs font-bold text-slate-900 block">Enable Public Career Profile</span>
+              <span className="text-[11px] text-slate-500">Allow recruiters to view your public portfolio at /u/:username</span>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={publicProfileForm.enabled}
+                onChange={(e) => setPublicProfileForm(prev => ({ ...prev, enabled: e.target.checked }))}
+                className="sr-only peer"
+              />
+              <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+            </label>
+          </div>
+
+          {/* Username Input */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Public Profile Username <span className="text-rose-500">*</span>
+            </label>
+            <div className="flex items-center rounded-xl border border-slate-200 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500">
+              <span className="px-3 py-2 bg-slate-100 text-xs font-mono text-slate-500 border-r border-slate-200 select-none">
+                /u/
+              </span>
+              <input
+                type="text"
+                placeholder="e.g. rahul-sharma"
+                value={publicProfileForm.username}
+                onChange={(e) => setPublicProfileForm(prev => ({ ...prev, username: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') }))}
+                className="w-full px-3 py-2 text-xs font-mono text-slate-900 focus:outline-none"
+              />
+            </div>
+            <p className="text-[10px] text-slate-500 mt-1">
+              3–30 lowercase letters, numbers, and hyphens (e.g. rahul-sharma, arjun-2026).
+            </p>
+          </div>
+
+          {/* Bio Input */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-semibold text-slate-700">
+                Professional Bio (Plain text)
+              </label>
+              <span className="text-[10px] text-slate-400 font-mono">
+                {publicProfileForm.bio.length} / 500
+              </span>
+            </div>
+            <textarea
+              rows={3}
+              maxLength={500}
+              placeholder="A brief summary of your career interests, skills, and technical goals..."
+              value={publicProfileForm.bio}
+              onChange={(e) => setPublicProfileForm(prev => ({ ...prev, bio: e.target.value }))}
+              className="w-full p-3 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            />
+          </div>
+
+          {/* LinkedIn Profile URL */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              LinkedIn Profile URL
+            </label>
+            <div className="relative">
+              <LinkedinIcon className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+              <input
+                type="url"
+                placeholder="https://www.linkedin.com/in/username"
+                value={publicProfileForm.linkedin}
+                onChange={(e) => setPublicProfileForm(prev => ({ ...prev, linkedin: e.target.value }))}
+                className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              />
+            </div>
+          </div>
+
+          {/* Visibility Controls */}
+          <div className="space-y-2 pt-2 border-t border-slate-100">
+            <span className="text-xs font-bold text-slate-900 block">Public Visibility Controls</span>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label className="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs">
+                <input
+                  type="checkbox"
+                  checked={publicProfileForm.showResume}
+                  onChange={(e) => setPublicProfileForm(prev => ({ ...prev, showResume: e.target.checked }))}
+                  className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4"
+                />
+                <span className="font-medium text-slate-700">Show Resume PDF</span>
+              </label>
+
+              <label className="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs">
+                <input
+                  type="checkbox"
+                  checked={publicProfileForm.showSkills}
+                  onChange={(e) => setPublicProfileForm(prev => ({ ...prev, showSkills: e.target.checked }))}
+                  className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4"
+                />
+                <span className="font-medium text-slate-700">Show Verified Skills</span>
+              </label>
+
+              <label className="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs">
+                <input
+                  type="checkbox"
+                  checked={publicProfileForm.showProjects}
+                  onChange={(e) => setPublicProfileForm(prev => ({ ...prev, showProjects: e.target.checked }))}
+                  className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4"
+                />
+                <span className="font-medium text-slate-700">Show Featured Projects</span>
+              </label>
+
+              <label className="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs">
+                <input
+                  type="checkbox"
+                  checked={publicProfileForm.showGithub}
+                  onChange={(e) => setPublicProfileForm(prev => ({ ...prev, showGithub: e.target.checked }))}
+                  className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4"
+                />
+                <span className="font-medium text-slate-700">Show GitHub Link</span>
+              </label>
+
+              <label className="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs">
+                <input
+                  type="checkbox"
+                  checked={publicProfileForm.showLinkedIn}
+                  onChange={(e) => setPublicProfileForm(prev => ({ ...prev, showLinkedIn: e.target.checked }))}
+                  className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4"
+                />
+                <span className="font-medium text-slate-700">Show LinkedIn Link</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Modal Actions */}
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={savingPublicProfile}
+              onClick={() => setIsPublicProfileModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              loading={savingPublicProfile}
+            >
+              Save Public Settings
             </Button>
           </div>
         </form>
