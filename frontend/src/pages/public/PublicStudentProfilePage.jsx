@@ -149,18 +149,15 @@ export function PublicStudentProfilePage() {
       {/* Top Navigation Bar */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/85 border-b border-slate-200/80 px-4 sm:px-8 py-3.5">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-indigo-500 flex items-center justify-center shadow-md shadow-indigo-500/20">
-              <Sparkles className="w-4 h-4 text-white" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-base tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors">
-                SIPS
-              </span>
-              <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold -mt-1">
-                Verified Career Profile
-              </span>
-            </div>
+          <Link to="/" className="flex items-center gap-3 group">
+            <img
+              src="/branding/sips-logo-compact.png"
+              alt="SIPS - Skill Intelligence Placement System"
+              className="h-8 sm:h-9 w-auto max-w-[160px] sm:max-w-[190px] object-contain"
+            />
+            <span className="hidden sm:inline-flex text-[10px] uppercase font-mono font-bold px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
+              Verified Profile
+            </span>
           </Link>
 
           <button
