@@ -28,6 +28,56 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   bool _isUploadingResume = false;
   bool _isUploadingImage = false;
   bool _isPredicting = false;
+  bool _isSyncingProjects = false;
+
+  String _formatTimeAgo(DateTime dt) {
+    final diff = DateTime.now().difference(dt);
+    if (diff.inSeconds < 60) return 'just now';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    if (diff.inDays < 30) return '${diff.inDays}d ago';
+    return '${dt.day}/${dt.month}/${dt.year}';
+  }
+
+  Future<void> _handleSyncProjects(StudentProfile profile) async {
+    if (_isSyncingProjects) return;
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _isSyncingProjects = true);
+    try {
+      final res = await ref.read(sipsRepositoryProvider).syncFeaturedProjects();
+      await ref.read(studentProfileProvider.notifier).loadProfile();
+      if (!mounted) return;
+      final missingCount = res['missingCount'] as int? ?? 0;
+      final updatedCount = res['updatedCount'] as int? ?? (res['projects'] as List?)?.length ?? 0;
+      if (missingCount > 0) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('Projects synced: $updatedCount updated, $missingCount unavailable on GitHub.'),
+            backgroundColor: Colors.amber.shade800,
+          ),
+        );
+      } else {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('Successfully refreshed $updatedCount GitHub project(s)!'),
+            backgroundColor: const Color(0xFF047857),
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('GitHub sync failed: ${e.toString()}'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSyncingProjects = false);
+      }
+    }
+  }
 
   Future<void> _handlePredictPlacement() async {
     final messenger = ScaffoldMessenger.of(context);
@@ -1625,15 +1675,59 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 const SizedBox(height: 20),
 
                 // Featured GitHub Projects
-                SectionHeader(
-                  title: 'Featured GitHub Projects',
-                  badge: SipsBadge(
-                    label: '${profile.projects.length} / 3 SELECTED',
-                    variant: profile.projects.isNotEmpty
-                        ? SipsBadgeVariant.emerald
-                        : SipsBadgeVariant.neutral,
-                    isSmall: true,
-                  ),
+                Builder(
+                  builder: (context) {
+                    DateTime? latestSynced;
+                    for (final p in profile.projects) {
+                      if (p.syncedAt != null) {
+                        if (latestSynced == null || p.syncedAt!.isAfter(latestSynced)) {
+                          latestSynced = p.syncedAt;
+                        }
+                      }
+                    }
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SectionHeader(
+                          title: 'Featured GitHub Projects',
+                          badge: SipsBadge(
+                            label: '${profile.projects.length} / 3 SELECTED',
+                            variant: profile.projects.isNotEmpty
+                                ? SipsBadgeVariant.emerald
+                                : SipsBadgeVariant.neutral,
+                            isSmall: true,
+                          ),
+                          actionLabel: profile.projects.isNotEmpty
+                              ? (_isSyncingProjects ? 'Syncing...' : 'Sync GitHub')
+                              : null,
+                          onActionTap: profile.projects.isNotEmpty && !_isSyncingProjects
+                              ? () => _handleSyncProjects(profile)
+                              : null,
+                        ),
+                        if (latestSynced != null) ...[
+                          const SizedBox(height: 2),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.sync_rounded, size: 12, color: AppColors.outline),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Last synced: ${_formatTimeAgo(latestSynced)}',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 11,
+                                    color: AppColors.onSurfaceVariant,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
+                    );
+                  },
                 ),
                 const SizedBox(height: 8),
                 if (profile.githubHandle.isEmpty)

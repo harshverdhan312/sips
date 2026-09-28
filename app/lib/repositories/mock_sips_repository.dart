@@ -211,6 +211,16 @@ class MockSipsRepository implements SipsRepository {
   }
 
   @override
+  Future<Map<String, dynamic>> syncFeaturedProjects() async {
+    return {
+      'projects': _profile.projects,
+      'updatedCount': _profile.projects.length,
+      'missingCount': 0,
+      'missingProjects': [],
+    };
+  }
+
+  @override
   Future<List<Map<String, dynamic>>> getGithubRepositories() async {
     return [];
   }

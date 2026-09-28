@@ -160,6 +160,19 @@ export const studentService = {
   },
 
   /**
+   * Sync saved featured projects with GitHub
+   */
+  async syncStudentProjects() {
+    try {
+      const res = await api.post('/api/student/projects/sync');
+      return res;
+    } catch (e) {
+      console.error("Failed to sync student projects:", e);
+      throw e;
+    }
+  },
+
+  /**
    * Update student profile fields in backend
    */
   async updateCurrentStudent(updatedFields) {

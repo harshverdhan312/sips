@@ -14,6 +14,7 @@ class StudentProject {
   final int order;
   final DateTime? updatedAt;
   final DateTime? selectedAt;
+  final DateTime? syncedAt;
 
   const StudentProject({
     required this.repoId,
@@ -31,6 +32,7 @@ class StudentProject {
     this.order = 1,
     this.updatedAt,
     this.selectedAt,
+    this.syncedAt,
   });
 
   factory StudentProject.fromBackendJson(Map<String, dynamic> json) {
@@ -49,6 +51,11 @@ class StudentProject {
       parsedSelected = DateTime.tryParse(json['selectedAt'].toString());
     }
 
+    DateTime? parsedSynced;
+    if (json['syncedAt'] != null) {
+      parsedSynced = DateTime.tryParse(json['syncedAt'].toString());
+    }
+
     return StudentProject(
       repoId: (json['repoId'] as num?)?.toInt() ?? 0,
       name: json['name'] as String? ?? '',
@@ -65,6 +72,7 @@ class StudentProject {
       order: (json['order'] as num?)?.toInt() ?? 1,
       updatedAt: parsedUpdated,
       selectedAt: parsedSelected,
+      syncedAt: parsedSynced,
     );
   }
 
@@ -85,6 +93,7 @@ class StudentProject {
       'order': order,
       'updatedAt': updatedAt?.toIso8601String(),
       'selectedAt': selectedAt?.toIso8601String(),
+      'syncedAt': syncedAt?.toIso8601String(),
     };
   }
 }
