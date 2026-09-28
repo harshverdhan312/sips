@@ -23,6 +23,7 @@ Thumbs.db
 # Generated model artifacts
 models/**/*.joblib
 models/**/*.pkl
+!models/placement_model.joblib
 
 # Temporary files
 *.tmp

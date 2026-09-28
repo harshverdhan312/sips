@@ -597,19 +597,20 @@ cd sips
      source .venv/bin/activate
      ```
 3. Install Python dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Generate the placement model artifact:
-   ```bash
-   python scripts/train_placement_model.py
-   ```
-   *(This creates `ml-service/models/placement_model.joblib` for inference).*
-5. Start the FastAPI microservice:
+   - For production / lightweight run:
+     ```bash
+     pip install --no-cache-dir -r requirements.txt
+     ```
+   - For development & tests:
+     ```bash
+     pip install -r requirements-dev.txt
+     ```
+4. Start the FastAPI microservice (`models/placement_model.joblib` is pre-trained and tracked in the repository):
    ```bash
    uvicorn src.api.main:app --host 127.0.0.1 --port 8000 --reload
    ```
    *The ML service will be live on `http://127.0.0.1:8000` (interactive Swagger docs at `/docs`).*
+   *(Optional: Run `python scripts/train_placement_model.py` only if re-training against modified datasets).*
 
 ---
 

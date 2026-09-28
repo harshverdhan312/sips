@@ -6,9 +6,8 @@ python-dotenv
 fastapi
 uvicorn
 xgboost==3.2.0
-
-pytest
-httpx
 pypdf
-sentence-transformers
+onnxruntime
+tokenizers
+huggingface_hub
 python-multipart
