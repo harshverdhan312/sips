@@ -8,6 +8,7 @@ import { DashboardLayout } from "../components/layout/DashboardLayout";
 import { LoginPage } from "../pages/auth/LoginPage";
 import { LandingPage } from "../pages/LandingPage";
 import { NotFoundPage } from "../pages/NotFoundPage";
+import { PublicStudentProfilePage } from "../pages/public/PublicStudentProfilePage";
 
 // Student Pages
 import { StudentDashboard } from "../pages/student/StudentDashboard";
@@ -47,6 +48,9 @@ export function AppRoutes() {
 
       {/* Public Login */}
       <Route path="/login" element={<LoginPage />} />
+
+      {/* Public Student Career Profile */}
+      <Route path="/u/:username" element={<PublicStudentProfilePage />} />
 
       {/* Student Portal Routes */}
       <Route element={<ProtectedRoute allowedRoles={["student"]} />}>

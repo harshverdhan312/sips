@@ -81,11 +81,29 @@ router.get('/profile', auth, tenant, studentController.getProfile);
 // PUT /api/student/profile
 router.put('/profile', auth, tenant, studentController.updateProfile);
 
+// GET /api/student/public-profile
+router.get('/public-profile', auth, tenant, studentController.getPublicProfileConfig);
+
+// PUT /api/student/public-profile
+router.put('/public-profile', auth, tenant, studentController.updatePublicProfileConfig);
+
+// GET /api/student/github/repos
+router.get('/github/repos', auth, tenant, studentController.getGithubRepos);
+
+// GET /api/student/projects
+router.get('/projects', auth, tenant, studentController.getProjects);
+
+// PUT /api/student/projects
+router.put('/projects', auth, tenant, studentController.updateProjects);
+
 // POST /api/student/profile/image
 router.post('/profile/image', auth, tenant, imageUpload.single('image'), studentController.uploadProfileImage);
 
 // DELETE /api/student/profile/image
 router.delete('/profile/image', auth, tenant, studentController.deleteProfileImage);
+
+// GET /api/student/resume
+router.get('/resume', auth, tenant, studentController.getResume);
 
 // POST /api/student/resume
 router.post('/resume', auth, tenant, upload.single('resume'), studentController.uploadResume);

@@ -23,6 +23,19 @@ class MemoryDatabase {
     return mongoose.connection.readyState === 1 || process.env.NODE_ENV === 'test';
   }
 
+  clearAll() {
+    this.colleges = [];
+    this.students = [];
+    this.jobs = [];
+    this.alerts = [];
+    this.auditLogs = [];
+    this.matches = [];
+    this.applications = [];
+    this.notifications = [];
+    this.placementPredictions = [];
+    this._idCounter = 1000;
+  }
+
   nextId(prefix = 'id_') {
     this._idCounter += 1;
     return `${prefix}${Date.now()}_${this._idCounter}`;
@@ -172,6 +185,27 @@ class MemoryDatabase {
       tags: studentData.tags || [],
       notes: studentData.notes || '',
       github: studentData.github || '',
+      linkedin: studentData.linkedin || '',
+      projects: Array.isArray(studentData.projects) ? studentData.projects : [],
+      publicProfile: studentData.publicProfile ? {
+        enabled: Boolean(studentData.publicProfile.enabled),
+        username: (studentData.publicProfile.username || '').toLowerCase().trim(),
+        bio: String(studentData.publicProfile.bio || '').slice(0, 500).trim(),
+        showResume: studentData.publicProfile.showResume !== undefined ? Boolean(studentData.publicProfile.showResume) : false,
+        showGithub: studentData.publicProfile.showGithub !== undefined ? Boolean(studentData.publicProfile.showGithub) : true,
+        showLinkedIn: studentData.publicProfile.showLinkedIn !== undefined ? Boolean(studentData.publicProfile.showLinkedIn) : true,
+        showSkills: studentData.publicProfile.showSkills !== undefined ? Boolean(studentData.publicProfile.showSkills) : true,
+        showProjects: studentData.publicProfile.showProjects !== undefined ? Boolean(studentData.publicProfile.showProjects) : true
+      } : {
+        enabled: false,
+        username: '',
+        bio: '',
+        showResume: false,
+        showGithub: true,
+        showLinkedIn: true,
+        showSkills: true,
+        showProjects: true
+      },
       resumeUrl: studentData.resumeUrl || '',
       profileImageUrl: studentData.profileImageUrl || null,
       age: studentData.age !== undefined ? studentData.age : null,
@@ -188,8 +222,41 @@ class MemoryDatabase {
   updateStudent(id, updates) {
     const student = this.findStudentById(id);
     if (!student) return null;
+    
+    // Deep merge for publicProfile if provided
+    if (updates.publicProfile && typeof updates.publicProfile === 'object') {
+      const existingPP = student.publicProfile || {};
+      updates.publicProfile = {
+        ...existingPP,
+        ...updates.publicProfile
+      };
+    }
+    
     Object.assign(student, updates, { updatedAt: new Date() });
     return student;
+  }
+
+  findStudentByPublicUsername(username) {
+    if (!username || typeof username !== 'string') return null;
+    const clean = username.toLowerCase().trim();
+    return this.students.find(s => 
+      s.publicProfile && 
+      s.publicProfile.enabled === true && 
+      s.publicProfile.username && 
+      s.publicProfile.username.toLowerCase() === clean
+    ) || null;
+  }
+
+  isPublicUsernameTaken(username, excludeStudentId = null) {
+    if (!username || typeof username !== 'string') return false;
+    const clean = username.toLowerCase().trim();
+    if (!clean) return false;
+    return this.students.some(s => 
+      String(s._id) !== String(excludeStudentId) &&
+      s.publicProfile && 
+      s.publicProfile.username && 
+      s.publicProfile.username.toLowerCase() === clean
+    );
   }
 
   updateStudentProfileImage(id, profileImageUrl) {

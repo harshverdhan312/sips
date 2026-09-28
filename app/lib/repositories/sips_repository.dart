@@ -41,5 +41,10 @@ abstract class SipsRepository {
   Future<String> uploadResume(List<int> bytes, String filename);
   Future<String> uploadProfileImage(List<int> bytes, String filename);
   Future<void> deleteProfileImage();
+  Future<List<StudentProject>> getFeaturedProjects();
+  Future<List<StudentProject>> updateFeaturedProjects(List<int> repoIds);
+  Future<List<Map<String, dynamic>>> getGithubRepositories();
+  Future<StudentPublicProfile> getPublicProfileConfig();
+  Future<StudentPublicProfile> updatePublicProfileConfig(StudentPublicProfile config, {String? linkedin});
 }
 

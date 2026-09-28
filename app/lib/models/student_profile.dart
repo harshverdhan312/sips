@@ -1,3 +1,165 @@
+class StudentProject {
+  final int repoId;
+  final String name;
+  final String fullName;
+  final String owner;
+  final String htmlUrl;
+  final String description;
+  final String primaryLanguage;
+  final List<String> languages;
+  final List<String> topics;
+  final int stars;
+  final int forks;
+  final bool isFork;
+  final int order;
+  final DateTime? updatedAt;
+  final DateTime? selectedAt;
+
+  const StudentProject({
+    required this.repoId,
+    required this.name,
+    this.fullName = '',
+    this.owner = '',
+    this.htmlUrl = '',
+    this.description = '',
+    this.primaryLanguage = '',
+    this.languages = const [],
+    this.topics = const [],
+    this.stars = 0,
+    this.forks = 0,
+    this.isFork = false,
+    this.order = 1,
+    this.updatedAt,
+    this.selectedAt,
+  });
+
+  factory StudentProject.fromBackendJson(Map<String, dynamic> json) {
+    final rawLangs = json['languages'];
+    final langsList = rawLangs is List ? rawLangs.map((e) => e.toString()).toList() : <String>[];
+    final rawTopics = json['topics'];
+    final topicsList = rawTopics is List ? rawTopics.map((e) => e.toString()).toList() : <String>[];
+
+    DateTime? parsedUpdated;
+    if (json['updatedAt'] != null) {
+      parsedUpdated = DateTime.tryParse(json['updatedAt'].toString());
+    }
+
+    DateTime? parsedSelected;
+    if (json['selectedAt'] != null) {
+      parsedSelected = DateTime.tryParse(json['selectedAt'].toString());
+    }
+
+    return StudentProject(
+      repoId: (json['repoId'] as num?)?.toInt() ?? 0,
+      name: json['name'] as String? ?? '',
+      fullName: json['fullName'] as String? ?? '',
+      owner: json['owner'] as String? ?? '',
+      htmlUrl: json['htmlUrl'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      primaryLanguage: json['primaryLanguage'] as String? ?? '',
+      languages: langsList,
+      topics: topicsList,
+      stars: (json['stars'] as num?)?.toInt() ?? 0,
+      forks: (json['forks'] as num?)?.toInt() ?? 0,
+      isFork: json['isFork'] as bool? ?? false,
+      order: (json['order'] as num?)?.toInt() ?? 1,
+      updatedAt: parsedUpdated,
+      selectedAt: parsedSelected,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'repoId': repoId,
+      'name': name,
+      'fullName': fullName,
+      'owner': owner,
+      'htmlUrl': htmlUrl,
+      'description': description,
+      'primaryLanguage': primaryLanguage,
+      'languages': languages,
+      'topics': topics,
+      'stars': stars,
+      'forks': forks,
+      'isFork': isFork,
+      'order': order,
+      'updatedAt': updatedAt?.toIso8601String(),
+      'selectedAt': selectedAt?.toIso8601String(),
+    };
+  }
+}
+
+class StudentPublicProfile {
+  final bool enabled;
+  final String username;
+  final String bio;
+  final bool showResume;
+  final bool showGithub;
+  final bool showLinkedIn;
+  final bool showSkills;
+  final bool showProjects;
+
+  const StudentPublicProfile({
+    this.enabled = false,
+    this.username = '',
+    this.bio = '',
+    this.showResume = false,
+    this.showGithub = true,
+    this.showLinkedIn = true,
+    this.showSkills = true,
+    this.showProjects = true,
+  });
+
+  factory StudentPublicProfile.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return const StudentPublicProfile();
+    return StudentPublicProfile(
+      enabled: json['enabled'] as bool? ?? false,
+      username: json['username'] as String? ?? '',
+      bio: json['bio'] as String? ?? '',
+      showResume: json['showResume'] as bool? ?? false,
+      showGithub: json['showGithub'] as bool? ?? true,
+      showLinkedIn: json['showLinkedIn'] as bool? ?? true,
+      showSkills: json['showSkills'] as bool? ?? true,
+      showProjects: json['showProjects'] as bool? ?? true,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'enabled': enabled,
+      'username': username,
+      'bio': bio,
+      'showResume': showResume,
+      'showGithub': showGithub,
+      'showLinkedIn': showLinkedIn,
+      'showSkills': showSkills,
+      'showProjects': showProjects,
+    };
+  }
+
+  StudentPublicProfile copyWith({
+    bool? enabled,
+    String? username,
+    String? bio,
+    bool? showResume,
+    bool? showGithub,
+    bool? showLinkedIn,
+    bool? showSkills,
+    bool? showProjects,
+  }) {
+    return StudentPublicProfile(
+      enabled: enabled ?? this.enabled,
+      username: username ?? this.username,
+      bio: bio ?? this.bio,
+      showResume: showResume ?? this.showResume,
+      showGithub: showGithub ?? this.showGithub,
+      showLinkedIn: showLinkedIn ?? this.showLinkedIn,
+      showSkills: showSkills ?? this.showSkills,
+      showProjects: showProjects ?? this.showProjects,
+    );
+  }
+}
+
 class StudentProfile {
   final String id;
   final String name;
@@ -10,6 +172,7 @@ class StudentProfile {
   final String tier;
   final String profileImageUrl;
   final String githubHandle;
+  final String linkedin;
   final String leetcodeHandle;
   final int leetcodeRating;
   final int githubCommits;
@@ -19,6 +182,8 @@ class StudentProfile {
   final List<String> preferredLocations;
   final List<String> skills;
   final List<String> extractedSkills;
+  final List<StudentProject> projects;
+  final StudentPublicProfile publicProfile;
   final String resumeUrl;
   final int readinessScore;
   final int technicalScore;
@@ -43,6 +208,7 @@ class StudentProfile {
     this.tier = 'Tier-3 • Needs Preparation',
     this.profileImageUrl = '',
     this.githubHandle = '',
+    this.linkedin = '',
     this.leetcodeHandle = '',
     this.leetcodeRating = 0,
     this.githubCommits = 0,
@@ -52,6 +218,8 @@ class StudentProfile {
     this.preferredLocations = const [],
     this.skills = const [],
     this.extractedSkills = const [],
+    this.projects = const [],
+    this.publicProfile = const StudentPublicProfile(),
     this.resumeUrl = '',
     this.readinessScore = 0,
     this.technicalScore = 0,
@@ -101,6 +269,14 @@ class StudentProfile {
         ? 'Tier-1 Contender • Placement Ready'
         : (readiness >= 60 ? 'Tier-2 Candidate • Developing' : 'Tier-3 • Needs Preparation');
 
+    final rawProjects = json['projects'];
+    final projectsList = rawProjects is List
+        ? rawProjects
+            .whereType<Map<String, dynamic>>()
+            .map((p) => StudentProject.fromBackendJson(p))
+            .toList()
+        : <StudentProject>[];
+
     return StudentProfile(
       id: json['_id'] as String? ?? json['id'] as String? ?? '',
       name: json['name'] as String? ?? '',
@@ -113,6 +289,7 @@ class StudentProfile {
       tier: tier,
       profileImageUrl: json['profileImageUrl'] as String? ?? json['avatarUrl'] as String? ?? '',
       githubHandle: json['github'] as String? ?? '',
+      linkedin: json['linkedin'] as String? ?? '',
       atsScore: resumeScoreVal > 0 ? resumeScoreVal : (resumeUrl.isNotEmpty ? 80 : 0),
       resumeScore: resumeScoreVal,
       technicalScore: technical,
@@ -121,6 +298,8 @@ class StudentProfile {
       resumeVersion: resumeUrl.isNotEmpty ? 'Uploaded Resume' : 'No Resume Uploaded',
       skills: skillsList,
       extractedSkills: extractedList,
+      projects: projectsList,
+      publicProfile: StudentPublicProfile.fromJson(json['publicProfile'] as Map<String, dynamic>?),
       resumeUrl: resumeUrl,
       readinessScore: readiness,
       isVerified: true,
@@ -143,6 +322,7 @@ class StudentProfile {
     String? tier,
     String? profileImageUrl,
     String? githubHandle,
+    String? linkedin,
     String? leetcodeHandle,
     int? leetcodeRating,
     int? githubCommits,
@@ -152,6 +332,8 @@ class StudentProfile {
     List<String>? preferredLocations,
     List<String>? skills,
     List<String>? extractedSkills,
+    List<StudentProject>? projects,
+    StudentPublicProfile? publicProfile,
     String? resumeUrl,
     int? readinessScore,
     int? technicalScore,
@@ -176,6 +358,7 @@ class StudentProfile {
       tier: tier ?? this.tier,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       githubHandle: githubHandle ?? this.githubHandle,
+      linkedin: linkedin ?? this.linkedin,
       leetcodeHandle: leetcodeHandle ?? this.leetcodeHandle,
       leetcodeRating: leetcodeRating ?? this.leetcodeRating,
       githubCommits: githubCommits ?? this.githubCommits,
@@ -185,6 +368,8 @@ class StudentProfile {
       preferredLocations: preferredLocations ?? this.preferredLocations,
       skills: skills ?? this.skills,
       extractedSkills: extractedSkills ?? this.extractedSkills,
+      projects: projects ?? this.projects,
+      publicProfile: publicProfile ?? this.publicProfile,
       resumeUrl: resumeUrl ?? this.resumeUrl,
       readinessScore: readinessScore ?? this.readinessScore,
       technicalScore: technicalScore ?? this.technicalScore,

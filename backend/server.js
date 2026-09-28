@@ -40,8 +40,83 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+const jwt = require('jsonwebtoken');
+const memoryDb = require('./utils/memoryDb');
+let StudentModel = null;
+try {
+  StudentModel = require('./models/Student');
+} catch (e) {
+  // Ignored in minimal test mocks
+}
+
+// Serve uploaded files with strict privacy protection for sensitive documents (.pdf resumes)
+const uploadsStaticDir = path.resolve(config.uploadDir || path.join(__dirname, 'uploads'));
+
+app.use('/uploads', async (req, res, next) => {
+  const reqPath = req.path || '';
+  const ext = path.extname(reqPath).toLowerCase();
+
+  // Public image assets (avatars, college logos) are served directly
+  const publicImageExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.ico'];
+  if (publicImageExtensions.includes(ext)) {
+    return next();
+  }
+
+  // Sensitive documents (PDF resumes): direct unauthenticated static access is blocked
+  if (ext === '.pdf') {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const decoded = jwt.verify(token, config.jwtSecret);
+        const filename = path.basename(reqPath);
+
+        let authorized = false;
+        if (!memoryDb.isMongoConnected()) {
+          if (decoded.role === 'STUDENT') {
+            const student = memoryDb.findStudentById(decoded.id);
+            if (student && student.resumeUrl && path.basename(student.resumeUrl) === filename) {
+              authorized = true;
+            }
+          } else if (decoded.role === 'COLLEGE_ADMIN') {
+            const students = memoryDb.getStudentsByCollege(decoded.collegeId);
+            if (students.some(s => s.resumeUrl && path.basename(s.resumeUrl) === filename)) {
+              authorized = true;
+            }
+          }
+        } else if (StudentModel) {
+          if (decoded.role === 'STUDENT') {
+            const student = await StudentModel.findOne({ _id: decoded.id, collegeId: decoded.collegeId });
+            if (student && student.resumeUrl && path.basename(student.resumeUrl) === filename) {
+              authorized = true;
+            }
+          } else if (decoded.role === 'COLLEGE_ADMIN') {
+            const student = await StudentModel.findOne({ collegeId: decoded.collegeId, resumeUrl: { $regex: filename } });
+            if (student) {
+              authorized = true;
+            }
+          }
+        }
+
+        if (authorized) {
+          const resolvedPath = path.resolve(uploadsStaticDir, filename);
+          if (resolvedPath.startsWith(uploadsStaticDir) && fs.existsSync(resolvedPath)) {
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', 'inline');
+            return res.sendFile(resolvedPath);
+          }
+        }
+      } catch (err) {
+        // Token error
+      }
+    }
+
+    // Direct unauthenticated or unauthorized access to PDF resumes is strictly blocked with 404
+    return res.status(404).json({ success: false, message: 'File not found or not accessible.' });
+  }
+
+  return next();
+}, express.static(uploadsStaticDir));
 
 // Routes - Mount both standard /api/* and root routes for compatibility
 const authRoutes = require('./routes/auth');
@@ -50,10 +125,15 @@ const studentRoutes = require('./routes/student');
 const jdRoutes = require('./routes/jd');
 const notificationRoutes = require('./routes/notification');
 const adminRoutes = require('./routes/admin');
+const publicRoutes = require('./routes/public');
 
 // Admin routes
 app.use('/api/admin', adminRoutes);
 app.use('/admin', adminRoutes);
+
+// Public routes (unauthenticated shareable profile routes)
+app.use('/api/public', publicRoutes);
+app.use('/public', publicRoutes);
 
 // Core routes with both /api/ prefix and root paths
 app.use('/api/auth', authRoutes);

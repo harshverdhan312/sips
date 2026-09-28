@@ -64,6 +64,8 @@ export const studentService = {
           status,
           readinessScore: readiness,
           github: student.github || "",
+          linkedin: student.linkedin || "",
+          publicProfile: student.publicProfile || null,
           resumeUrl: student.resumeUrl || "",
           skills: skillsList,
           age: typeof student.age === 'number' ? student.age : null,
@@ -83,7 +85,7 @@ export const studentService = {
           codingProfiles: {
             github: { handle: student.github || "Not linked", verified: Boolean(student.github) }
           },
-          projects: []
+          projects: Array.isArray(student.projects) ? student.projects : []
         };
       }
     } catch (e) {
@@ -91,6 +93,70 @@ export const studentService = {
     }
 
     return null;
+  },
+
+  /**
+   * Fetch public career profile by normalized username (unauthenticated)
+   */
+  async getPublicStudentProfile(username) {
+    if (!username || typeof username !== 'string') {
+      throw new Error('Username is required.');
+    }
+    const cleanUsername = username.trim().toLowerCase();
+    return await api.get(`/api/public/students/${encodeURIComponent(cleanUsername)}`);
+  },
+
+  /**
+   * Fetch authenticated student's public career profile configuration
+   */
+  async getPublicProfileConfig() {
+    return await api.get('/api/student/public-profile');
+  },
+
+  /**
+   * Update authenticated student's public career profile configuration
+   */
+  async updatePublicProfileConfig(configData) {
+    return await api.put('/api/student/public-profile', configData);
+  },
+
+  /**
+   * Fetch public repositories from GitHub for connected account
+   */
+  async fetchGithubRepositories() {
+    try {
+      const res = await api.get('/api/student/github/repos');
+      return res;
+    } catch (e) {
+      console.error("Failed to fetch GitHub repositories:", e);
+      throw e;
+    }
+  },
+
+  /**
+   * Get student's saved featured projects
+   */
+  async getStudentProjects() {
+    try {
+      const res = await api.get('/api/student/projects');
+      return res?.projects || [];
+    } catch (e) {
+      console.warn("Could not fetch student projects:", e.message);
+      return [];
+    }
+  },
+
+  /**
+   * Save/update selected featured projects by repository IDs
+   */
+  async saveStudentProjects(repoIds) {
+    try {
+      const res = await api.put('/api/student/projects', { repoIds });
+      return res?.projects || [];
+    } catch (e) {
+      console.error("Failed to save student projects:", e);
+      throw e;
+    }
   },
 
   /**

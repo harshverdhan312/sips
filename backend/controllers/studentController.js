@@ -12,10 +12,12 @@ const { checkJobEligibility } = require('../utils/eligibilityChecker');
 const { sendNotification } = require('../utils/notificationService');
 const { mapStudentToPlacementInput } = require('../utils/placementDataMapper');
 const mlService = require('../services/mlService');
+const githubService = require('../services/githubService');
 const memoryDb = require('../utils/memoryDb');
 const config = require('../config');
 const logger = require('../utils/logger');
 const resumeExtractor = require('../utils/resumeExtractor');
+const { validateUsername, validateLinkedInUrl } = require('../utils/usernameValidator');
 
 /**
  * Helper to verify if a file starts with PDF magic bytes (%PDF-)
@@ -125,7 +127,7 @@ exports.getProfile = async (req, res) => {
  */
 exports.updateProfile = async (req, res) => {
   try {
-    const { skills, github, newPassword, password, name, tags, notes, age, internships, hostel, historyOfBacklogs, cgpa, batch, branch } = req.body;
+    const { skills, github, linkedin, newPassword, password, name, tags, notes, age, internships, hostel, historyOfBacklogs, cgpa, batch, branch } = req.body;
     const pwd = newPassword || password;
 
     // Validate password if supplied
@@ -237,6 +239,23 @@ exports.updateProfile = async (req, res) => {
       sanitizedGithub = github.trim().slice(0, 100);
     }
 
+    // Validate LinkedIn if supplied
+    let sanitizedLinkedin = undefined;
+    if (linkedin !== undefined) {
+      if (linkedin === '' || linkedin === null) {
+        sanitizedLinkedin = '';
+      } else {
+        const { isValid, error, sanitized } = validateLinkedInUrl(linkedin);
+        if (!isValid) {
+          return res.status(400).json({
+            success: false,
+            message: error || 'Invalid LinkedIn profile URL.'
+          });
+        }
+        sanitizedLinkedin = sanitized;
+      }
+    }
+
     // Validate Name if supplied
     let sanitizedName = undefined;
     if (name !== undefined) {
@@ -329,6 +348,7 @@ exports.updateProfile = async (req, res) => {
       const updates = {};
       if (sanitizedSkills !== undefined) updates.skills = sanitizedSkills;
       if (sanitizedGithub !== undefined) updates.github = sanitizedGithub;
+      if (sanitizedLinkedin !== undefined) updates.linkedin = sanitizedLinkedin;
       if (sanitizedName !== undefined) updates.name = sanitizedName;
       if (sanitizedTags !== undefined) updates.tags = sanitizedTags;
       if (sanitizedNotes !== undefined) updates.notes = sanitizedNotes;
@@ -366,6 +386,9 @@ exports.updateProfile = async (req, res) => {
     }
     if (sanitizedGithub !== undefined) {
       student.github = sanitizedGithub;
+    }
+    if (sanitizedLinkedin !== undefined) {
+      student.linkedin = sanitizedLinkedin;
     }
     if (sanitizedName !== undefined) {
       student.name = sanitizedName;
@@ -709,6 +732,59 @@ exports.deleteResume = async (req, res) => {
   } catch (error) {
     logger.error('Delete resume error:', error);
     res.status(500).json({ success: false, message: 'Server error removing resume' });
+  }
+};
+
+/**
+ * GET /api/student/resume
+ * Student-only — download or view authenticated student's own resume
+ */
+exports.getResume = async (req, res, next) => {
+  try {
+    let student = null;
+    if (!memoryDb.isMongoConnected()) {
+      student = memoryDb.findStudentById(req.user.id);
+    } else {
+      student = await Student.findOne({
+        _id: req.user.id,
+        collegeId: req.collegeId
+      }).select('resumeUrl name');
+    }
+
+    if (!student || !student.resumeUrl) {
+      return res.status(404).json({
+        success: false,
+        message: 'No resume found for this student.'
+      });
+    }
+
+    const filename = path.basename(student.resumeUrl);
+    const uploadDirectory = path.resolve(config.uploadDir || path.join(__dirname, '../uploads'));
+    const resolvedPath = path.resolve(uploadDirectory, filename);
+
+    if (!resolvedPath.startsWith(uploadDirectory)) {
+      logger.warn(`Path traversal attempt on authenticated resume: ${student.resumeUrl}`);
+      return res.status(404).json({
+        success: false,
+        message: 'Resume file cannot be located.'
+      });
+    }
+
+    if (!fs.existsSync(resolvedPath)) {
+      return res.status(404).json({
+        success: false,
+        message: 'Resume file not found on server.'
+      });
+    }
+
+    const safeDownloadName = `${(student.name || 'student').replace(/[^a-zA-Z0-9_-]/g, '_')}-resume.pdf`;
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${safeDownloadName}"`);
+
+    return res.sendFile(resolvedPath);
+  } catch (error) {
+    logger.error('Authenticated resume access error:', error);
+    next(error);
   }
 };
 
@@ -1593,4 +1669,458 @@ exports.analyzeJobMatch = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * GET /api/student/github/repos
+ * Fetch available public repositories for student's linked GitHub account
+ */
+exports.getGithubRepos = async (req, res, next) => {
+  try {
+    let student;
+    if (!memoryDb.isMongoConnected()) {
+      student = memoryDb.findStudentById(req.user.id);
+    } else {
+      student = await Student.findOne({ _id: req.user.id, collegeId: req.collegeId });
+    }
+
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student profile not found' });
+    }
+
+    if (!student.github || !student.github.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'No GitHub handle linked to your profile. Please connect your GitHub account in profile settings.'
+      });
+    }
+
+    const repos = await githubService.fetchUserRepositories(student.github);
+    
+    // Mark currently selected repositories
+    const selectedRepoIds = new Set((student.projects || []).map(p => Number(p.repoId)));
+    const repositoriesWithSelection = repos.map(repo => ({
+      ...repo,
+      isSelected: selectedRepoIds.has(repo.repoId)
+    }));
+
+    return res.json({
+      success: true,
+      githubHandle: githubService.extractUsername(student.github),
+      total: repositoriesWithSelection.length,
+      repositories: repositoriesWithSelection
+    });
+  } catch (error) {
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({
+        success: false,
+        message: error.message
+      });
+    }
+    logger.error('Get GitHub repositories error:', error);
+    next(error);
+  }
+};
+
+/**
+ * GET /api/student/projects
+ * Get featured projects for authenticated student
+ */
+exports.getProjects = async (req, res, next) => {
+  try {
+    let student;
+    if (!memoryDb.isMongoConnected()) {
+      student = memoryDb.findStudentById(req.user.id);
+    } else {
+      student = await Student.findOne({ _id: req.user.id, collegeId: req.collegeId });
+    }
+
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student profile not found' });
+    }
+
+    const projects = (student.projects || []).sort((a, b) => (a.order || 0) - (b.order || 0));
+
+    return res.json({
+      success: true,
+      projects
+    });
+  } catch (error) {
+    logger.error('Get student projects error:', error);
+    next(error);
+  }
+};
+
+/**
+ * PUT /api/student/projects
+ * Save/update featured projects (up to 3) for authenticated student
+ */
+exports.updateProjects = async (req, res, next) => {
+  try {
+    const { repoIds } = req.body;
+
+    if (!Array.isArray(repoIds)) {
+      return res.status(400).json({
+        success: false,
+        message: 'repoIds must be an array of numeric repository IDs.'
+      });
+    }
+
+    if (repoIds.length > 3) {
+      return res.status(400).json({
+        success: false,
+        message: 'Maximum of 3 featured projects allowed.'
+      });
+    }
+
+    // Check duplicates
+    const uniqueIds = new Set(repoIds);
+    if (uniqueIds.size !== repoIds.length) {
+      return res.status(400).json({
+        success: false,
+        message: 'Duplicate repository IDs are not allowed.'
+      });
+    }
+
+    // Validate ID types
+    for (const id of repoIds) {
+      if (typeof id !== 'number' || isNaN(id) || id <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Each repoId must be a valid positive integer.'
+        });
+      }
+    }
+
+    let student;
+    if (!memoryDb.isMongoConnected()) {
+      student = memoryDb.findStudentById(req.user.id);
+    } else {
+      student = await Student.findOne({ _id: req.user.id, collegeId: req.collegeId });
+    }
+
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student profile not found' });
+    }
+
+    // If clearing all projects
+    if (repoIds.length === 0) {
+      if (!memoryDb.isMongoConnected()) {
+        memoryDb.updateStudent(req.user.id, { projects: [] });
+      } else {
+        student.projects = [];
+        await student.save();
+      }
+      return res.json({
+        success: true,
+        message: 'Featured projects cleared successfully.',
+        projects: []
+      });
+    }
+
+    // For selecting projects, student must have a GitHub handle
+    if (!student.github || !student.github.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'No GitHub handle linked to your profile. Please connect your GitHub account before selecting projects.'
+      });
+    }
+
+    // Fetch verified repos from GitHub
+    const verifiedRepos = await githubService.fetchUserRepositories(student.github);
+    const repoMap = new Map(verifiedRepos.map(r => [r.repoId, r]));
+
+    // Verify all requested repoIds belong to the authenticated student's GitHub account
+    const selectedSnapshots = [];
+    for (let i = 0; i < repoIds.length; i++) {
+      const id = repoIds[i];
+      const verifiedRepo = repoMap.get(id);
+      if (!verifiedRepo) {
+        return res.status(400).json({
+          success: false,
+          message: `Repository ID ${id} does not exist or does not belong to linked GitHub account '${student.github}'.`
+        });
+      }
+
+      // Fetch detailed language breakdown for this featured repo
+      let detailedLanguages = verifiedRepo.languages || [];
+      try {
+        const langs = await githubService.fetchRepoLanguages(verifiedRepo.owner, verifiedRepo.name);
+        if (langs && langs.length > 0) {
+          detailedLanguages = langs;
+        }
+      } catch (err) {
+        logger.warn(`Could not fetch languages for ${verifiedRepo.owner}/${verifiedRepo.name}:`, err.message);
+      }
+
+      selectedSnapshots.push({
+        repoId: verifiedRepo.repoId,
+        name: verifiedRepo.name,
+        fullName: verifiedRepo.fullName,
+        owner: verifiedRepo.owner,
+        htmlUrl: verifiedRepo.htmlUrl,
+        description: verifiedRepo.description || '',
+        primaryLanguage: verifiedRepo.primaryLanguage || '',
+        languages: detailedLanguages,
+        topics: verifiedRepo.topics || [],
+        stars: verifiedRepo.stars || 0,
+        forks: verifiedRepo.forks || 0,
+        isFork: verifiedRepo.isFork || false,
+        order: i + 1,
+        updatedAt: verifiedRepo.updatedAt,
+        selectedAt: new Date()
+      });
+    }
+
+    if (!memoryDb.isMongoConnected()) {
+      memoryDb.updateStudent(req.user.id, { projects: selectedSnapshots });
+    } else {
+      student.projects = selectedSnapshots;
+      await student.save();
+    }
+
+    return res.json({
+      success: true,
+      message: 'Featured projects updated successfully.',
+      projects: selectedSnapshots
+    });
+  } catch (error) {
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({
+        success: false,
+        message: error.message
+      });
+    }
+    logger.error('Update student projects error:', error);
+    next(error);
+  }
+};
+
+/**
+ * GET /api/student/public-profile
+ * Get authenticated student's public career profile configuration
+ */
+exports.getPublicProfileConfig = async (req, res, next) => {
+  try {
+    let student = null;
+
+    if (!memoryDb.isMongoConnected()) {
+      student = memoryDb.findStudentById(req.user.id);
+    } else {
+      student = await Student.findOne({
+        _id: req.user.id,
+        collegeId: req.collegeId
+      }).select('publicProfile linkedin github resumeUrl name');
+    }
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: 'Student profile not found.'
+      });
+    }
+
+    const pub = student.publicProfile || {};
+
+    return res.json({
+      success: true,
+      publicProfile: {
+        enabled: pub.enabled === true,
+        username: pub.username || '',
+        bio: typeof pub.bio === 'string' ? pub.bio : '',
+        showResume: pub.showResume === true,
+        showGithub: pub.showGithub !== false,
+        showLinkedIn: pub.showLinkedIn !== false,
+        showSkills: pub.showSkills !== false,
+        showProjects: pub.showProjects !== false
+      },
+      linkedin: student.linkedin || '',
+      github: student.github || '',
+      hasResume: Boolean(student.resumeUrl)
+    });
+  } catch (error) {
+    logger.error('Get public profile config error:', error);
+    next(error);
+  }
+};
+
+/**
+ * PUT /api/student/public-profile
+ * Update authenticated student's public career profile configuration
+ */
+exports.updatePublicProfileConfig = async (req, res, next) => {
+  try {
+    const {
+      enabled,
+      username,
+      bio,
+      showResume,
+      showGithub,
+      showLinkedIn,
+      showSkills,
+      showProjects,
+      linkedin
+    } = req.body;
+
+    let student = null;
+
+    if (!memoryDb.isMongoConnected()) {
+      student = memoryDb.findStudentById(req.user.id);
+    } else {
+      student = await Student.findOne({
+        _id: req.user.id,
+        collegeId: req.collegeId
+      });
+    }
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: 'Student profile not found.'
+      });
+    }
+
+    const currentPublic = student.publicProfile || {
+      enabled: false,
+      username: '',
+      bio: '',
+      showResume: false,
+      showGithub: true,
+      showLinkedIn: true,
+      showSkills: true,
+      showProjects: true
+    };
+
+    const targetEnabled = enabled !== undefined ? Boolean(enabled) : (currentPublic.enabled === true);
+
+    // Validate username if supplied or if profile is being enabled
+    let normalizedUsername = currentPublic.username || '';
+    if (username !== undefined) {
+      if (typeof username !== 'string') {
+        return res.status(400).json({
+          success: false,
+          message: 'Username must be a string.'
+        });
+      }
+
+      const trimmed = username.trim();
+      if (trimmed) {
+        const { isValid, error, normalized } = validateUsername(trimmed);
+        if (!isValid) {
+          return res.status(400).json({
+            success: false,
+            message: error || 'Invalid username format.'
+          });
+        }
+        normalizedUsername = normalized;
+      } else {
+        normalizedUsername = '';
+      }
+    }
+
+    if (targetEnabled && !normalizedUsername) {
+      return res.status(400).json({
+        success: false,
+        message: 'A valid public username is required to enable your public career profile.'
+      });
+    }
+
+    // Check username uniqueness if changed or enabling
+    if (normalizedUsername && normalizedUsername !== currentPublic.username) {
+      if (!memoryDb.isMongoConnected()) {
+        if (memoryDb.isPublicUsernameTaken(normalizedUsername, req.user.id)) {
+          return res.status(400).json({
+            success: false,
+            message: 'Username is already taken. Please choose another username.'
+          });
+        }
+      } else {
+        const existing = await Student.findOne({
+          'publicProfile.username': normalizedUsername,
+          _id: { $ne: req.user.id }
+        });
+        if (existing) {
+          return res.status(400).json({
+            success: false,
+            message: 'Username is already taken. Please choose another username.'
+          });
+        }
+      }
+    }
+
+    // Validate bio
+    let sanitizedBio = currentPublic.bio || '';
+    if (bio !== undefined) {
+      if (bio === null) {
+        sanitizedBio = '';
+      } else if (typeof bio !== 'string') {
+        return res.status(400).json({
+          success: false,
+          message: 'Bio must be a plain text string.'
+        });
+      } else {
+        sanitizedBio = bio.trim().slice(0, 500);
+      }
+    }
+
+    // Validate LinkedIn
+    let sanitizedLinkedin = student.linkedin || '';
+    if (linkedin !== undefined) {
+      if (linkedin === null || linkedin === '') {
+        sanitizedLinkedin = '';
+      } else {
+        const { isValid, error, sanitized } = validateLinkedInUrl(linkedin);
+        if (!isValid) {
+          return res.status(400).json({
+            success: false,
+            message: error || 'Invalid LinkedIn URL.'
+          });
+        }
+        sanitizedLinkedin = sanitized;
+      }
+    }
+
+    const updatedPublicProfile = {
+      enabled: targetEnabled,
+      username: normalizedUsername,
+      bio: sanitizedBio,
+      showResume: showResume !== undefined ? Boolean(showResume) : (currentPublic.showResume === true),
+      showGithub: showGithub !== undefined ? Boolean(showGithub) : (currentPublic.showGithub !== false),
+      showLinkedIn: showLinkedIn !== undefined ? Boolean(showLinkedIn) : (currentPublic.showLinkedIn !== false),
+      showSkills: showSkills !== undefined ? Boolean(showSkills) : (currentPublic.showSkills !== false),
+      showProjects: showProjects !== undefined ? Boolean(showProjects) : (currentPublic.showProjects !== false)
+    };
+
+    if (!memoryDb.isMongoConnected()) {
+      memoryDb.updateStudent(req.user.id, {
+        publicProfile: updatedPublicProfile,
+        linkedin: sanitizedLinkedin
+      });
+    } else {
+      student.publicProfile = updatedPublicProfile;
+      student.linkedin = sanitizedLinkedin;
+      try {
+        await student.save();
+      } catch (saveError) {
+        if (saveError.code === 11000 || (saveError.keyPattern && saveError.keyPattern['publicProfile.username'])) {
+          return res.status(400).json({
+            success: false,
+            message: 'Username is already taken. Please choose another username.'
+          });
+        }
+        throw saveError;
+      }
+    }
+
+    return res.json({
+      success: true,
+      message: 'Public profile settings updated successfully.',
+      publicProfile: updatedPublicProfile,
+      linkedin: sanitizedLinkedin
+    });
+  } catch (error) {
+    logger.error('Update public profile config error:', error);
+    next(error);
+  }
+};
+
 
