@@ -12,6 +12,10 @@ const config = {
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
   uploadLimitBytes: 5 * 1024 * 1024, // 5MB
   uploadDir: path.resolve(__dirname, '..', process.env.UPLOAD_DIR || 'uploads'),
+  cloudinaryUrl: process.env.CLOUDINARY_URL || '',
+  cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_NAME || '',
+  cloudinaryApiKey: process.env.CLOUDINARY_API_KEY || '',
+  cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET || '',
   mlServiceUrl: process.env.ML_SERVICE_URL || 'http://127.0.0.1:8000',
   mlServiceTimeoutMs: parseInt(process.env.ML_SERVICE_TIMEOUT_MS, 10) || 5000,
   mlServiceApiKey: process.env.ML_SERVICE_API_KEY || ''
