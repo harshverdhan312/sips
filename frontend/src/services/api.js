@@ -183,6 +183,7 @@ export const api = {
   post: (endpoint, body, options = {}) => request(endpoint, { ...options, method: 'POST', body }),
   postMultipart: (endpoint, formData, options = {}) => request(endpoint, { ...options, method: 'POST', body: formData }),
   put: (endpoint, body, options = {}) => request(endpoint, { ...options, method: 'PUT', body }),
+  patch: (endpoint, body, options = {}) => request(endpoint, { ...options, method: 'PATCH', body }),
   delete: (endpoint, options = {}) => request(endpoint, { ...options, method: 'DELETE' }),
   getBlob: async (endpoint, options = {}) => {
     const url = `${API_BASE_URL}${endpoint}`;

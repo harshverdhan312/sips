@@ -55,6 +55,21 @@ function LinkedinIcon(props) {
   );
 }
 
+function formatTimeAgo(dateInput) {
+  if (!dateInput) return null;
+  const date = new Date(dateInput);
+  if (isNaN(date.getTime())) return null;
+  const diffInSec = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+  if (diffInSec < 60) return "just now";
+  const minutes = Math.floor(diffInSec / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days}d ago`;
+  return date.toLocaleDateString();
+}
+
 export function StudentProfilePage() {
   const { showSuccess, showError, showWarning } = useNotifications();
   const { updateUser } = useAuth();
@@ -89,6 +104,8 @@ export function StudentProfilePage() {
   const [loadingRepos, setLoadingRepos] = useState(false);
   const [selectedRepoIds, setSelectedRepoIds] = useState([]);
   const [savingProjects, setSavingProjects] = useState(false);
+  const [syncingProjects, setSyncingProjects] = useState(false);
+  const [missingProjectsAlert, setMissingProjectsAlert] = useState([]);
   const [repoSearchFilter, setRepoSearchFilter] = useState("");
 
   // Public Career Profile State
@@ -292,11 +309,38 @@ export function StudentProfilePage() {
         projects: updatedProjects
       }));
       setIsProjectsModalOpen(false);
+      setMissingProjectsAlert([]);
       showSuccess("Featured projects updated successfully!");
     } catch (e) {
       showError(e.message || "Failed to update featured projects. Please try again.");
     } finally {
       setSavingProjects(false);
+    }
+  };
+
+  const handleSyncProjects = async () => {
+    if (syncingProjects) return;
+    setSyncingProjects(true);
+    setMissingProjectsAlert([]);
+    try {
+      const res = await studentService.syncStudentProjects();
+      if (res && res.projects) {
+        setStudent(prev => ({
+          ...prev,
+          projects: res.projects
+        }));
+        if (res.missingProjects && res.missingProjects.length > 0) {
+          setMissingProjectsAlert(res.missingProjects);
+          showWarning(`Synced with ${res.missingProjects.length} repository(ies) unavailable on GitHub.`);
+        } else {
+          showSuccess(`Refreshed ${res.updatedCount ?? res.projects.length} project(s) from GitHub!`);
+        }
+      }
+    } catch (e) {
+      console.error("Failed to sync projects:", e);
+      showError(e.message || "Failed to sync GitHub projects. Please try again.");
+    } finally {
+      setSyncingProjects(false);
     }
   };
 
@@ -922,156 +966,222 @@ export function StudentProfilePage() {
       </Card>
 
       {/* Featured GitHub Projects Section */}
-      <Card className="mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
-                <FolderGit2 className="w-5 h-5 text-indigo-600" /> Featured GitHub Projects
-              </h3>
-              <Badge variant={student.projects && student.projects.length > 0 ? "indigo" : "neutral"} size="sm">
-                {student.projects?.length || 0} / 3 Selected
-              </Badge>
-            </div>
-            <p className="text-xs text-slate-500 mt-1">
-              Showcase your top 3 public repositories to institutional placement cells and visiting enterprise recruiters
-            </p>
-          </div>
-          <div>
-            {student.github ? (
-              <Button
-                variant="outline"
-                size="xs"
-                icon={Edit2}
-                onClick={handleOpenProjectsModal}
-              >
-                {student.projects && student.projects.length > 0 ? "Manage Projects" : "Select Projects"}
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                size="xs"
-                icon={GitBranch}
-                onClick={() => setIsEditingGithub(true)}
-              >
-                Connect GitHub First
-              </Button>
-            )}
-          </div>
-        </div>
+      {(() => {
+        const latestSyncedAt = (student.projects || []).reduce((latest, p) => {
+          if (!p.syncedAt) return latest;
+          if (!latest) return p.syncedAt;
+          return new Date(p.syncedAt) > new Date(latest) ? p.syncedAt : latest;
+        }, null);
 
-        {/* State A: GitHub Not Linked */}
-        {!student.github ? (
-          <div className="p-8 text-center rounded-2xl bg-slate-50/70 border border-dashed border-slate-200">
-            <GitBranch className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-            <p className="text-sm font-semibold text-slate-700">GitHub Profile Not Linked</p>
-            <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto mb-4">
-              Connect your GitHub account handle above to automatically fetch and showcase your best public repositories.
-            </p>
-            <Button
-              variant="primary"
-              size="xs"
-              icon={Plus}
-              onClick={() => setIsEditingGithub(true)}
-            >
-              Add GitHub Handle
-            </Button>
-          </div>
-        ) : !student.projects || student.projects.length === 0 ? (
-          /* State B: GitHub Linked, No Projects Selected */
-          <div className="p-8 text-center rounded-2xl bg-indigo-50/30 border border-dashed border-indigo-200/70">
-            <FolderGit2 className="w-8 h-8 text-indigo-500 mx-auto mb-2" />
-            <p className="text-sm font-semibold text-slate-800">No Featured Projects Selected Yet</p>
-            <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto mb-4">
-              Select up to 3 of your best public repositories from <span className="font-semibold text-indigo-600">@{student.github}</span> to highlight on your placement portfolio.
-            </p>
-            <Button
-              variant="primary"
-              size="xs"
-              icon={Plus}
-              onClick={handleOpenProjectsModal}
-            >
-              Select Featured Projects
-            </Button>
-          </div>
-        ) : (
-          /* State C: 1–3 Featured Projects */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {student.projects.map((proj, idx) => (
-              <div
-                key={proj.repoId || idx}
-                className="relative flex flex-col justify-between p-4 rounded-xl border border-slate-200/80 bg-white hover:border-indigo-300 hover:shadow-sm transition-all group"
-              >
-                <div>
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 font-bold text-[10px]">
-                        #{idx + 1}
-                      </span>
-                      <h4 className="font-bold text-slate-900 text-sm truncate" title={proj.name}>
-                        {proj.name}
-                      </h4>
-                    </div>
-                    <a
-                      href={proj.htmlUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-1 rounded text-slate-400 hover:text-indigo-600 hover:bg-slate-50 transition-colors shrink-0"
-                      title="View on GitHub"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  </div>
-
-                  <p className="text-xs text-slate-600 line-clamp-2 mb-3 min-h-[32px]">
-                    {proj.description || "No description provided for this repository."}
-                  </p>
-
-                  {/* Tech stack / topics */}
-                  {proj.topics && proj.topics.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {proj.topics.slice(0, 3).map((topic, tIdx) => (
-                        <span
-                          key={tIdx}
-                          className="px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-medium text-slate-600"
-                        >
-                          #{topic}
-                        </span>
-                      ))}
-                      {proj.topics.length > 3 && (
-                        <span className="text-[10px] text-slate-400 self-center">
-                          +{proj.topics.length - 3}
-                        </span>
-                      )}
-                    </div>
+        return (
+          <Card className="mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
+                    <FolderGit2 className="w-5 h-5 text-indigo-600" /> Featured GitHub Projects
+                  </h3>
+                  <Badge variant={student.projects && student.projects.length > 0 ? "indigo" : "neutral"} size="sm">
+                    {student.projects?.length || 0} / 3 Selected
+                  </Badge>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-slate-500">
+                  <span>Showcase your top 3 public repositories to institutional placement cells and visiting enterprise recruiters</span>
+                  {latestSyncedAt && (
+                    <span className="inline-flex items-center gap-1 font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md text-[11px]">
+                      <RefreshCw className="w-3 h-3 text-slate-400" />
+                      Last synced: {formatTimeAgo(latestSyncedAt)}
+                    </span>
                   )}
                 </div>
-
-                <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 text-xs text-slate-500 mt-2">
-                  <div className="flex items-center gap-1.5">
-                    {proj.primaryLanguage && (
-                      <span className="flex items-center gap-1 font-medium text-slate-700 text-[11px]">
-                        <span className="w-2 h-2 rounded-full bg-indigo-500 inline-block" />
-                        {proj.primaryLanguage}
+              </div>
+              <div className="flex items-center gap-2">
+                {student.projects && student.projects.length > 0 && (
+                  <Button
+                    variant="outline"
+                    size="xs"
+                    icon={RefreshCw}
+                    onClick={handleSyncProjects}
+                    disabled={syncingProjects}
+                    className={syncingProjects ? "opacity-75 cursor-not-allowed" : ""}
+                  >
+                    {syncingProjects ? (
+                      <span className="flex items-center gap-1.5">
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin text-indigo-600" />
+                        Syncing...
                       </span>
+                    ) : (
+                      "Sync GitHub Projects"
                     )}
-                  </div>
-                  <div className="flex items-center gap-3 text-[11px]">
-                    <span className="flex items-center gap-1" title="Stars">
-                      <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                      {proj.stars || 0}
-                    </span>
-                    <span className="flex items-center gap-1" title="Forks">
-                      <GitFork className="w-3 h-3 text-slate-400" />
-                      {proj.forks || 0}
-                    </span>
+                  </Button>
+                )}
+                {student.github ? (
+                  <Button
+                    variant="outline"
+                    size="xs"
+                    icon={Edit2}
+                    onClick={handleOpenProjectsModal}
+                  >
+                    {student.projects && student.projects.length > 0 ? "Manage Projects" : "Select Projects"}
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="xs"
+                    icon={GitBranch}
+                    onClick={() => setIsEditingGithub(true)}
+                  >
+                    Connect GitHub First
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Missing projects notice banner if sync detected unavailable repositories */}
+            {missingProjectsAlert.length > 0 && (
+              <div className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2.5">
+                <span className="font-semibold text-amber-900 shrink-0">Sync Notice:</span>
+                <div className="space-y-1">
+                  <p>
+                    {missingProjectsAlert.length} repository(ies) could not be refreshed from GitHub (deleted, renamed, or made private).
+                    Their existing snapshots are preserved in your profile. You can keep them or remove them via "Manage Projects".
+                  </p>
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {missingProjectsAlert.map((mp, i) => (
+                      <span key={i} className="px-2 py-0.5 rounded bg-amber-100/80 text-amber-900 font-mono text-[10px]">
+                        {mp.name || `Repo #${mp.repoId}`} ({mp.reason || 'NOT_FOUND'})
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-      </Card>
+            )}
+
+            {/* State A: GitHub Not Linked */}
+            {!student.github ? (
+              <div className="p-8 text-center rounded-2xl bg-slate-50/70 border border-dashed border-slate-200">
+                <GitBranch className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                <p className="text-sm font-semibold text-slate-700">GitHub Profile Not Linked</p>
+                <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto mb-4">
+                  Connect your GitHub account handle above to automatically fetch and showcase your best public repositories.
+                </p>
+                <Button
+                  variant="primary"
+                  size="xs"
+                  icon={Plus}
+                  onClick={() => setIsEditingGithub(true)}
+                >
+                  Add GitHub Handle
+                </Button>
+              </div>
+            ) : !student.projects || student.projects.length === 0 ? (
+              /* State B: GitHub Linked, No Projects Selected */
+              <div className="p-8 text-center rounded-2xl bg-indigo-50/30 border border-dashed border-indigo-200/70">
+                <FolderGit2 className="w-8 h-8 text-indigo-500 mx-auto mb-2" />
+                <p className="text-sm font-semibold text-slate-800">No Featured Projects Selected Yet</p>
+                <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto mb-4">
+                  Select up to 3 of your best public repositories from <span className="font-semibold text-indigo-600">@{student.github}</span> to highlight on your placement portfolio.
+                </p>
+                <Button
+                  variant="primary"
+                  size="xs"
+                  icon={Plus}
+                  onClick={handleOpenProjectsModal}
+                >
+                  Select Featured Projects
+                </Button>
+              </div>
+            ) : (
+              /* State C: 1–3 Featured Projects */
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {student.projects.map((proj, idx) => {
+                  const isMissing = missingProjectsAlert.some(m => String(m.repoId) === String(proj.repoId));
+
+                  return (
+                    <div
+                      key={proj.repoId || idx}
+                      className={`relative flex flex-col justify-between p-4 rounded-xl border bg-white hover:border-indigo-300 hover:shadow-sm transition-all group ${
+                        isMissing ? 'border-amber-300 bg-amber-50/20' : 'border-slate-200/80'
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 font-bold text-[10px]">
+                              #{idx + 1}
+                            </span>
+                            <h4 className="font-bold text-slate-900 text-sm truncate" title={proj.name}>
+                              {proj.name}
+                            </h4>
+                            {isMissing && (
+                              <span className="shrink-0 px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 text-[9px] font-semibold">
+                                Unavailable
+                              </span>
+                            )}
+                          </div>
+                          <a
+                            href={proj.htmlUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1 rounded text-slate-400 hover:text-indigo-600 hover:bg-slate-50 transition-colors shrink-0"
+                            title="View on GitHub"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                        </div>
+
+                        <p className="text-xs text-slate-600 line-clamp-2 mb-3 min-h-[32px]">
+                          {proj.description || "No description provided for this repository."}
+                        </p>
+
+                        {/* Tech stack / topics */}
+                        {proj.topics && proj.topics.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-3">
+                            {proj.topics.slice(0, 3).map((topic, tIdx) => (
+                              <span
+                                key={tIdx}
+                                className="px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-medium text-slate-600"
+                              >
+                                #{topic}
+                              </span>
+                            ))}
+                            {proj.topics.length > 3 && (
+                              <span className="text-[10px] text-slate-400 self-center">
+                                +{proj.topics.length - 3}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 text-xs text-slate-500 mt-2">
+                        <div className="flex items-center gap-1.5">
+                          {proj.primaryLanguage && (
+                            <span className="flex items-center gap-1 font-medium text-slate-700 text-[11px]">
+                              <span className="w-2 h-2 rounded-full bg-indigo-500 inline-block" />
+                              {proj.primaryLanguage}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3 text-[11px]">
+                          <span className="flex items-center gap-1" title="Stars">
+                            <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                            {proj.stars || 0}
+                          </span>
+                          <span className="flex items-center gap-1" title="Forks">
+                            <GitFork className="w-3 h-3 text-slate-400" />
+                            {proj.forks || 0}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </Card>
+        );
+      })()}
 
       {/* Placement Profile Information */}
       <Card>

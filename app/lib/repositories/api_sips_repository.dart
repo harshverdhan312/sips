@@ -386,6 +386,35 @@ class ApiSipsRepository implements SipsRepository {
   }
 
   @override
+  Future<Map<String, dynamic>> syncFeaturedProjects() async {
+    final response = await _apiClient.post('/api/student/projects/sync');
+    if (response is Map<String, dynamic>) {
+      final rawList = response['projects'];
+      if (rawList is List) {
+        final updatedList = rawList
+            .whereType<Map<String, dynamic>>()
+            .map((p) => StudentProject.fromBackendJson(p))
+            .toList();
+        if (_cachedProfile != null) {
+          _cachedProfile = _cachedProfile!.copyWith(projects: updatedList);
+        }
+        return {
+          'projects': updatedList,
+          'updatedCount': response['updatedCount'] ?? updatedList.length,
+          'missingCount': response['missingCount'] ?? 0,
+          'missingProjects': response['missingProjects'] ?? [],
+        };
+      }
+    }
+    return {
+      'projects': <StudentProject>[],
+      'updatedCount': 0,
+      'missingCount': 0,
+      'missingProjects': [],
+    };
+  }
+
+  @override
   Future<List<Map<String, dynamic>>> getGithubRepositories() async {
     final response = await _apiClient.get('/api/student/github/repos');
     if (response is Map<String, dynamic> && response['repositories'] is List) {
