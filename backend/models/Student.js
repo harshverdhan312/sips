@@ -49,7 +49,8 @@ const studentSchema = new mongoose.Schema({
       isFork: { type: Boolean, default: false },
       order: { type: Number, default: 1 },
       updatedAt: { type: Date, default: null },
-      selectedAt: { type: Date, default: Date.now }
+      selectedAt: { type: Date, default: Date.now },
+      syncedAt: { type: Date, default: null }
     }
   ],
   resumeUrl: { type: String, default: '' },

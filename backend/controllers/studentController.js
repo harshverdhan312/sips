@@ -1895,7 +1895,8 @@ exports.updateProjects = async (req, res, next) => {
         isFork: verifiedRepo.isFork || false,
         order: i + 1,
         updatedAt: verifiedRepo.updatedAt,
-        selectedAt: new Date()
+        selectedAt: new Date(),
+        syncedAt: new Date()
       });
     }
 
@@ -1919,6 +1920,135 @@ exports.updateProjects = async (req, res, next) => {
       });
     }
     logger.error('Update student projects error:', error);
+    next(error);
+  }
+};
+
+/**
+ * POST /api/student/projects/sync
+ * Refresh stored metadata for already-selected featured projects directly from GitHub
+ */
+exports.syncProjects = async (req, res, next) => {
+  try {
+    let student;
+    if (!memoryDb.isMongoConnected()) {
+      student = memoryDb.findStudentById(req.user.id);
+    } else {
+      student = await Student.findOne({ _id: req.user.id, collegeId: req.collegeId });
+    }
+
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student profile not found' });
+    }
+
+    if (!student.github || !student.github.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'No GitHub handle linked to your profile. Please connect your GitHub account before syncing projects.'
+      });
+    }
+
+    const currentProjects = student.projects || [];
+    if (currentProjects.length === 0) {
+      const now = new Date();
+      return res.json({
+        success: true,
+        message: 'No featured projects currently selected to sync.',
+        projects: [],
+        syncedAt: now,
+        updatedCount: 0,
+        missingCount: 0,
+        missingProjects: []
+      });
+    }
+
+    // Fetch fresh repositories from GitHub (bypassCache = true to ensure fresh data)
+    const verifiedRepos = await githubService.fetchUserRepositories(student.github, true);
+    const repoMap = new Map(verifiedRepos.map(r => [r.repoId, r]));
+
+    const refreshedProjects = [];
+    const missingProjects = [];
+    const syncTimestamp = new Date();
+    let updatedCount = 0;
+
+    // Preserve project order and iterate through existing selected projects
+    const sortedCurrent = [...currentProjects].sort((a, b) => (a.order || 0) - (b.order || 0));
+
+    for (let i = 0; i < sortedCurrent.length; i++) {
+      const savedProj = sortedCurrent[i];
+      const verifiedRepo = repoMap.get(Number(savedProj.repoId));
+
+      if (verifiedRepo) {
+        // Fetch detailed languages breakdown if available
+        let detailedLanguages = verifiedRepo.languages || [];
+        try {
+          const langs = await githubService.fetchRepoLanguages(verifiedRepo.owner, verifiedRepo.name);
+          if (langs && langs.length > 0) {
+            detailedLanguages = langs;
+          }
+        } catch (err) {
+          logger.warn(`Could not fetch languages during sync for ${verifiedRepo.owner}/${verifiedRepo.name}:`, err.message);
+        }
+
+        refreshedProjects.push({
+          repoId: verifiedRepo.repoId,
+          name: verifiedRepo.name,
+          fullName: verifiedRepo.fullName,
+          owner: verifiedRepo.owner,
+          htmlUrl: verifiedRepo.htmlUrl,
+          description: verifiedRepo.description || '',
+          primaryLanguage: verifiedRepo.primaryLanguage || '',
+          languages: detailedLanguages.length > 0 ? detailedLanguages : (savedProj.languages || []),
+          topics: verifiedRepo.topics || [],
+          stars: verifiedRepo.stars || 0,
+          forks: verifiedRepo.forks || 0,
+          isFork: verifiedRepo.isFork || false,
+          order: savedProj.order || (i + 1),
+          updatedAt: verifiedRepo.updatedAt,
+          selectedAt: savedProj.selectedAt || new Date(),
+          syncedAt: syncTimestamp
+        });
+        updatedCount++;
+      } else {
+        // Repository missing on GitHub (renamed, made private, deleted, etc.)
+        // Keep existing saved snapshot so student selection is not destroyed!
+        const snapshot = savedProj.toObject ? savedProj.toObject() : { ...savedProj };
+        refreshedProjects.push({
+          ...snapshot,
+          order: savedProj.order || (i + 1)
+        });
+        missingProjects.push({
+          repoId: savedProj.repoId,
+          name: savedProj.name,
+          reason: 'NOT_FOUND'
+        });
+      }
+    }
+
+    if (!memoryDb.isMongoConnected()) {
+      memoryDb.updateStudent(req.user.id, { projects: refreshedProjects });
+    } else {
+      student.projects = refreshedProjects;
+      await student.save();
+    }
+
+    return res.json({
+      success: true,
+      message: `Successfully synchronized ${updatedCount} featured project(s).`,
+      projects: refreshedProjects,
+      syncedAt: syncTimestamp,
+      updatedCount,
+      missingCount: missingProjects.length,
+      missingProjects
+    });
+  } catch (error) {
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({
+        success: false,
+        message: error.message
+      });
+    }
+    logger.error('Sync student projects error:', error);
     next(error);
   }
 };

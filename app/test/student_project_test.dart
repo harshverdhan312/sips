@@ -116,6 +116,22 @@ void main() {
       expect(profile.projects[2].name, 'project-three');
     });
 
+    test('StudentProject parses syncedAt timestamp correctly', () {
+      final json = {
+        'repoId': 101,
+        'name': 'sips-mobile',
+        'syncedAt': '2025-06-01T12:30:00.000Z',
+      };
+
+      final project = StudentProject.fromBackendJson(json);
+
+      expect(project.repoId, 101);
+      expect(project.syncedAt, isNotNull);
+      expect(project.syncedAt!.year, 2025);
+      expect(project.syncedAt!.month, 6);
+      expect(project.syncedAt!.day, 1);
+    });
+
     test('StudentProfile copyWith updates projects properly', () {
       final profile = const StudentProfile(
         id: '123',
@@ -129,6 +145,7 @@ void main() {
             repoId: 101,
             name: 'sips',
             primaryLanguage: 'JavaScript',
+            syncedAt: null,
           )
         ],
       );

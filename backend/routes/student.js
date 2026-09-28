@@ -101,6 +101,9 @@ router.get('/projects', studentController.getProjects);
 // PUT /api/student/projects
 router.put('/projects', studentController.updateProjects);
 
+// POST /api/student/projects/sync
+router.post('/projects/sync', studentController.syncProjects);
+
 // POST /api/student/profile/image
 router.post('/profile/image', imageUpload.single('image'), studentController.uploadProfileImage);
 
