@@ -18,6 +18,11 @@ const studentSchema = new mongoose.Schema({
     enum: ['UNPLACED', 'PLACED', 'IN_PROCESS', 'OPTED_OUT'],
     default: 'UNPLACED'
   },
+  accountStatus: {
+    type: String,
+    enum: ['ACTIVE', 'PASSOUT', 'DEBARRED', 'DEACTIVATED'],
+    default: 'ACTIVE'
+  },
   companyPlaced: { type: String, trim: true, default: '' },
   packageOffered: { type: Number, default: 0 }, // in LPA
   readinessScore: { type: Number, default: 0, min: 0, max: 100 },
@@ -90,6 +95,7 @@ studentSchema.index(
 studentSchema.index({ collegeId: 1 });
 studentSchema.index({ collegeId: 1, branch: 1 });
 studentSchema.index({ collegeId: 1, placementStatus: 1 });
+studentSchema.index({ collegeId: 1, accountStatus: 1 });
 studentSchema.index({ collegeId: 1, batch: 1 });
 studentSchema.index({ collegeId: 1, readinessScore: 1 });
 

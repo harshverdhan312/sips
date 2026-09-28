@@ -12,7 +12,12 @@ import {
   RefreshCw,
   FileText,
   ExternalLink,
-  Share2
+  Share2,
+  Trash2,
+  GraduationCap,
+  UserX,
+  ShieldAlert,
+  AlertTriangle
 } from "lucide-react";
 import { placementService } from "../../services/placementService";
 import { adminService } from "../../services/adminService";
@@ -29,11 +34,33 @@ export function StudentManagementPage() {
   const [students, setStudents] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState("All");
+  const [selectedAccountStatus, setSelectedAccountStatus] = useState("All");
+
+  // Multi-select state for bulk actions
+  const [selectedStudentIds, setSelectedStudentIds] = useState([]);
+  const [bulkStatusModalOpen, setBulkStatusModalOpen] = useState(false);
+  const [bulkTargetStatus, setBulkTargetStatus] = useState("PASSOUT");
+  const [updatingBulkStatus, setUpdatingBulkStatus] = useState(false);
+  const [bulkDeleteModalOpen, setBulkDeleteModalOpen] = useState(false);
+  const [bulkDeleteConfirmText, setBulkDeleteConfirmText] = useState("");
+  const [deletingBulkStudents, setDeletingBulkStudents] = useState(false);
 
   // Selected student modal
   const [activeStudent, setActiveStudent] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [counselingComingSoon, setCounselingComingSoon] = useState(false);
+
+  // Student Account Lifecycle Modals
+  const [statusModalOpen, setStatusModalOpen] = useState(false);
+  const [statusModalStudent, setStatusModalStudent] = useState(null);
+  const [targetAccountStatus, setTargetAccountStatus] = useState("ACTIVE");
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+
+  // Hardened Delete Student Modal
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteModalStudent, setDeleteModalStudent] = useState(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deletingStudent, setDeletingStudent] = useState(false);
 
   // Add Student modal
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -173,9 +200,18 @@ export function StudentManagementPage() {
         }
       }
 
+      // Account lifecycle status filter
+      if (selectedAccountStatus && selectedAccountStatus !== "All") {
+        const selAcc = selectedAccountStatus.toLowerCase().replace(/[\s-_]/g, "");
+        const sAcc = (st.accountStatus || "ACTIVE").toLowerCase().replace(/[\s-_]/g, "");
+        if (selAcc === "active" && sAcc !== "active") return false;
+        if ((selAcc === "passout" || selAcc === "pass-out") && sAcc !== "passout") return false;
+        if ((selAcc === "debarred" || selAcc === "deactivated") && (sAcc !== "debarred" && sAcc !== "deactivated")) return false;
+      }
+
       return true;
     });
-  }, [students, selectedBranch, selectedStatus]);
+  }, [students, selectedBranch, selectedStatus, selectedAccountStatus]);
 
   // Derived academic structure helper lists
   const allBranches = Array.from(
@@ -406,7 +442,182 @@ export function StudentManagementPage() {
     }
   };
 
+  const handleOpenStatusModal = (student, newStatus) => {
+    setStatusModalStudent(student);
+    setTargetAccountStatus(newStatus);
+    setStatusModalOpen(true);
+  };
+
+  const handleConfirmStatusChange = async () => {
+    if (!statusModalStudent || !targetAccountStatus || updatingStatus) return;
+    setUpdatingStatus(true);
+    try {
+      const studentId = statusModalStudent.id || statusModalStudent._id;
+      await placementService.updateStudentAccountStatus(studentId, targetAccountStatus);
+      showSuccess(`Student account status updated to ${targetAccountStatus}.`);
+      setStatusModalOpen(false);
+      setStudents((prev) =>
+        prev.map((s) =>
+          (s.id === studentId || s._id === studentId)
+            ? { ...s, accountStatus: targetAccountStatus }
+            : s
+        )
+      );
+      if (activeStudent && (activeStudent.id === studentId || activeStudent._id === studentId)) {
+        setActiveStudent((prev) => ({ ...prev, accountStatus: targetAccountStatus }));
+      }
+    } catch (err) {
+      console.error("Failed to update status:", err);
+      showError(err.message || "Failed to update student account status.");
+    } finally {
+      setUpdatingStatus(false);
+    }
+  };
+
+  const handleOpenDeleteModal = (student) => {
+    setDeleteModalStudent(student);
+    setDeleteConfirmText("");
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteModalStudent || deletingStudent) return;
+    setDeletingStudent(true);
+    try {
+      const studentId = deleteModalStudent.id || deleteModalStudent._id;
+      await placementService.deleteStudent(studentId);
+      showSuccess(`Student ${deleteModalStudent.name} and associated records permanently deleted.`);
+      setDeleteModalOpen(false);
+      setStudents((prev) => prev.filter((s) => s.id !== studentId && s._id !== studentId));
+      if (activeStudent && (activeStudent.id === studentId || activeStudent._id === studentId)) {
+        setModalOpen(false);
+        setActiveStudent(null);
+      }
+    } catch (err) {
+      console.error("Failed to delete student:", err);
+      showError(err.message || "Failed to delete student.");
+    } finally {
+      setDeletingStudent(false);
+    }
+  };
+
+  const handleToggleSelectAll = (e) => {
+    if (e.target.checked) {
+      const allFilteredIds = filteredStudents.map((s) => s.id || s._id);
+      setSelectedStudentIds(allFilteredIds);
+    } else {
+      setSelectedStudentIds([]);
+    }
+  };
+
+  const handleToggleSelectStudent = (studentId, e) => {
+    e.stopPropagation();
+    setSelectedStudentIds((prev) =>
+      prev.includes(studentId)
+        ? prev.filter((id) => id !== studentId)
+        : [...prev, studentId]
+    );
+  };
+
+  const isAllSelected = filteredStudents.length > 0 && filteredStudents.every((s) => selectedStudentIds.includes(s.id || s._id));
+  const isSomeSelected = filteredStudents.some((s) => selectedStudentIds.includes(s.id || s._id)) && !isAllSelected;
+
+  const handleOpenBulkStatusModal = (status) => {
+    setBulkTargetStatus(status);
+    setBulkStatusModalOpen(true);
+  };
+
+  const handleConfirmBulkStatus = async () => {
+    if (selectedStudentIds.length === 0 || updatingBulkStatus) return;
+    setUpdatingBulkStatus(true);
+    try {
+      await placementService.bulkUpdateStudentAccountStatus(selectedStudentIds, bulkTargetStatus);
+      showSuccess(`Updated account status for ${selectedStudentIds.length} candidate(s) to ${bulkTargetStatus}.`);
+      setStudents((prev) =>
+        prev.map((s) => {
+          const sId = s.id || s._id;
+          if (selectedStudentIds.includes(sId)) {
+            return { ...s, accountStatus: bulkTargetStatus };
+          }
+          return s;
+        })
+      );
+      setSelectedStudentIds([]);
+      setBulkStatusModalOpen(false);
+    } catch (err) {
+      console.error("Failed bulk update:", err);
+      showError(err.message || "Failed to update bulk student status.");
+    } finally {
+      setUpdatingBulkStatus(false);
+    }
+  };
+
+  const handleOpenBulkDeleteModal = () => {
+    setBulkDeleteConfirmText("");
+    setBulkDeleteModalOpen(true);
+  };
+
+  const handleConfirmBulkDelete = async () => {
+    if (selectedStudentIds.length === 0 || deletingBulkStudents) return;
+    setDeletingBulkStudents(true);
+    try {
+      await placementService.bulkDeleteStudents(selectedStudentIds);
+      showSuccess(`Permanently deleted ${selectedStudentIds.length} candidate(s) and their associated records.`);
+      setStudents((prev) => prev.filter((s) => !selectedStudentIds.includes(s.id || s._id)));
+      setSelectedStudentIds([]);
+      setBulkDeleteModalOpen(false);
+    } catch (err) {
+      console.error("Failed bulk delete:", err);
+      showError(err.message || "Failed to delete selected students.");
+    } finally {
+      setDeletingBulkStudents(false);
+    }
+  };
+
+  const deleteExpectedMatch = useMemo(() => {
+    if (!deleteModalStudent) return [];
+    const expected = [];
+    if (deleteModalStudent.name) expected.push(deleteModalStudent.name.trim().toLowerCase());
+    if (deleteModalStudent.rollNo) expected.push(deleteModalStudent.rollNo.trim().toLowerCase());
+    if (deleteModalStudent.usn) expected.push(deleteModalStudent.usn.trim().toLowerCase());
+    return expected;
+  }, [deleteModalStudent]);
+
+  const isDeleteConfirmed = useMemo(() => {
+    const input = (deleteConfirmText || "").trim().toLowerCase();
+    return input.length > 0 && deleteExpectedMatch.includes(input);
+  }, [deleteConfirmText, deleteExpectedMatch]);
+
   const columns = [
+    {
+      title: (
+        <input
+          type="checkbox"
+          checked={isAllSelected}
+          ref={(el) => {
+            if (el) el.indeterminate = isSomeSelected;
+          }}
+          onChange={handleToggleSelectAll}
+          className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+          title="Select all filtered candidates"
+        />
+      ),
+      key: "select",
+      className: "w-10 text-center",
+      render: (row) => {
+        const sId = row.id || row._id;
+        return (
+          <input
+            type="checkbox"
+            checked={selectedStudentIds.includes(sId)}
+            onChange={(e) => handleToggleSelectStudent(sId, e)}
+            onClick={(e) => e.stopPropagation()}
+            className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+            title={`Select ${row.name}`}
+          />
+        );
+      }
+    },
     {
       title: "Student",
       key: "name",
@@ -509,38 +720,136 @@ export function StudentManagementPage() {
       )
     },
     {
+      title: "Account",
+      key: "accountStatus",
+      sortable: true,
+      render: (row) => {
+        const acc = (row.accountStatus || "ACTIVE").toUpperCase();
+        if (acc === "PASSOUT") {
+          return (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+              Pass-Out
+            </span>
+          );
+        }
+        if (acc === "DEBARRED" || acc === "DEACTIVATED") {
+          return (
+            <span
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200"
+              title="Debarred: Can login, cannot apply to placement drives"
+            >
+              <ShieldAlert className="w-3 h-3 text-rose-500" />
+              Debarred
+            </span>
+          );
+        }
+        return (
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            Active
+          </span>
+        );
+      }
+    },
+    {
       title: "Action",
       key: "actions",
       className: "text-right",
-      render: (row) => (
-        <div className="flex items-center justify-end gap-1.5">
-          <Button
-            variant="outline"
-            size="xs"
-            icon={Eye}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleViewStudent(row);
-            }}
-            title="Candidate Placement Intelligence Profile"
-          >
-            Placement Profile
-          </Button>
-          {row.publicProfile?.enabled && row.publicProfile?.username && (
-            <a
-              href={`/u/${encodeURIComponent(row.publicProfile.username)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 border border-indigo-200 transition-colors"
-              title="Open Student's Public Career Profile (New Tab)"
+      render: (row) => {
+        const acc = (row.accountStatus || "ACTIVE").toUpperCase();
+        return (
+          <div className="flex items-center justify-end gap-1.5 flex-wrap" onClick={(e) => e.stopPropagation()}>
+            <Button
+              variant="outline"
+              size="xs"
+              icon={Eye}
+              onClick={() => handleViewStudent(row)}
+              title="Candidate Placement Intelligence Profile"
             >
-              <span>Career Profile</span>
-              <ExternalLink className="w-3 h-3" />
-            </a>
-          )}
-        </div>
-      )
+              Placement Profile
+            </Button>
+            {row.publicProfile?.enabled && row.publicProfile?.username && (
+              <a
+                href={`/u/${encodeURIComponent(row.publicProfile.username)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 border border-indigo-200 transition-colors"
+                title="Open Student's Public Career Profile (New Tab)"
+              >
+                <span>Career Profile</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            )}
+            {acc === "ACTIVE" && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => handleOpenStatusModal(row, "PASSOUT")}
+                  className="px-2 py-1 rounded-lg text-xs font-medium text-amber-700 hover:bg-amber-50 border border-amber-200 transition-colors cursor-pointer"
+                  title="Mark student as pass-out (graduated)"
+                >
+                  Mark Pass-Out
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleOpenStatusModal(row, "DEBARRED")}
+                  className="px-2 py-1 rounded-lg text-xs font-medium text-rose-700 hover:bg-rose-50 border border-rose-200 transition-colors cursor-pointer"
+                  title="Debar student from applying to placement drives"
+                >
+                  Debar
+                </button>
+              </>
+            )}
+            {acc === "PASSOUT" && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => handleOpenStatusModal(row, "ACTIVE")}
+                  className="px-2 py-1 rounded-lg text-xs font-medium text-emerald-700 hover:bg-emerald-50 border border-emerald-200 transition-colors cursor-pointer"
+                  title="Restore active portal access"
+                >
+                  Restore Access
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleOpenStatusModal(row, "DEBARRED")}
+                  className="px-2 py-1 rounded-lg text-xs font-medium text-rose-700 hover:bg-rose-50 border border-rose-200 transition-colors cursor-pointer"
+                  title="Debar student from applying to placement drives"
+                >
+                  Debar
+                </button>
+              </>
+            )}
+            {(acc === "DEBARRED" || acc === "DEACTIVATED") && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => handleOpenStatusModal(row, "ACTIVE")}
+                  className="px-2 py-1 rounded-lg text-xs font-medium text-emerald-700 hover:bg-emerald-50 border border-emerald-200 transition-colors cursor-pointer"
+                  title="Restore student's ability to apply to placement drives"
+                >
+                  Restore (Allow Applications)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleOpenStatusModal(row, "PASSOUT")}
+                  className="px-2 py-1 rounded-lg text-xs font-medium text-amber-700 hover:bg-amber-50 border border-amber-200 transition-colors cursor-pointer"
+                  title="Mark student as pass-out (graduated)"
+                >
+                  Mark Pass-Out
+                </button>
+              </>
+            )}
+            <button
+              type="button"
+              onClick={() => handleOpenDeleteModal(row)}
+              className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-colors cursor-pointer"
+              title="Delete student and all records"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        );
+      }
     }
   ];
 
@@ -592,6 +901,75 @@ export function StudentManagementPage() {
         </div>
       </div>
 
+      {/* Floating Bulk Selection Actions Bar */}
+      {selectedStudentIds.length > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-slate-900 text-white rounded-2xl shadow-xl border border-slate-800 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="flex items-center gap-3">
+            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-indigo-500 text-xs font-black font-mono shadow-xs">
+              {selectedStudentIds.length}
+            </span>
+            <div>
+              <p className="text-sm font-bold text-white">
+                {selectedStudentIds.length} candidate{selectedStudentIds.length > 1 ? "s" : ""} selected
+              </p>
+              <p className="text-[11px] text-slate-400">
+                Choose a bulk operation to apply across all selected candidates
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap justify-end">
+            <button
+              type="button"
+              onClick={() => handleOpenBulkStatusModal("PASSOUT")}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-400/40 text-xs font-semibold transition-colors cursor-pointer"
+              title="Mark selected candidates as Pass-Out (graduated)"
+            >
+              <GraduationCap className="w-3.5 h-3.5 text-amber-400" />
+              <span>Mark Pass-Out</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleOpenBulkStatusModal("DEBARRED")}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-400/40 text-xs font-semibold transition-colors cursor-pointer"
+              title="Debar selected candidates from applying to placement drives"
+            >
+              <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
+              <span>Debar Candidates</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleOpenBulkStatusModal("ACTIVE")}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 text-xs font-semibold transition-colors cursor-pointer"
+              title="Restore active privileges and allow applications"
+            >
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Restore Access</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleOpenBulkDeleteModal}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600/30 hover:bg-red-600/50 text-red-200 border border-red-500/40 text-xs font-semibold transition-colors cursor-pointer"
+              title="Permanently delete selected candidates and cleanup records"
+            >
+              <Trash2 className="w-3.5 h-3.5 text-red-400" />
+              <span>Delete Selected</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setSelectedStudentIds([])}
+              className="px-2.5 py-1.5 text-xs font-medium text-slate-400 hover:text-white transition-colors cursor-pointer"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Filter Bar and DataTable */}
       <DataTable
         columns={columns}
@@ -608,7 +986,7 @@ export function StudentManagementPage() {
         }
         onRowClick={(row) => handleViewStudent(row)}
         filterComponent={
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <select
               value={selectedBranch}
               onChange={(e) => setSelectedBranch(e.target.value)}
@@ -627,7 +1005,7 @@ export function StudentManagementPage() {
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             >
-              <option value="All">All Statuses</option>
+              <option value="All">All Placement Statuses</option>
               <option value="Needs Improvement">Needs Improvement</option>
               <option value="Placement Ready">Placement Ready</option>
               <option value="At Risk">At Risk</option>
@@ -635,12 +1013,24 @@ export function StudentManagementPage() {
               <option value="Unplaced">Unplaced</option>
             </select>
 
-            {(selectedBranch !== "All" || selectedStatus !== "All") && (
+            <select
+              value={selectedAccountStatus}
+              onChange={(e) => setSelectedAccountStatus(e.target.value)}
+              className="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            >
+              <option value="All">All Account Statuses</option>
+              <option value="Active">Active</option>
+              <option value="Pass-Out">Pass-Out</option>
+              <option value="Debarred">Debarred</option>
+            </select>
+
+            {(selectedBranch !== "All" || selectedStatus !== "All" || selectedAccountStatus !== "All") && (
               <button
                 type="button"
                 onClick={() => {
                   setSelectedBranch("All");
                   setSelectedStatus("All");
+                  setSelectedAccountStatus("All");
                 }}
                 className="px-2 py-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
               >
@@ -671,7 +1061,7 @@ export function StudentManagementPage() {
                 className="w-16 h-16 rounded-2xl border-2 border-white shadow-xs shrink-0"
               />
               <div className="flex-1">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="font-bold text-slate-900 text-lg">
                     {activeStudent.name}
                   </h3>
@@ -691,8 +1081,24 @@ export function StudentManagementPage() {
                   >
                     {activeStudent.status}
                   </Badge>
+                  {((activeStudent.accountStatus || "ACTIVE").toUpperCase() === "PASSOUT") && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                      Account: Pass-Out
+                    </span>
+                  )}
+                  {((activeStudent.accountStatus || "ACTIVE").toUpperCase() === "DEBARRED" || (activeStudent.accountStatus || "ACTIVE").toUpperCase() === "DEACTIVATED") && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                      <ShieldAlert className="w-3 h-3 text-rose-500" />
+                      Account: Debarred
+                    </span>
+                  )}
+                  {((activeStudent.accountStatus || "ACTIVE").toUpperCase() === "ACTIVE") && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      Account: Active
+                    </span>
+                  )}
                 </div>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 mt-0.5">
                   {activeStudent.course ? `${activeStudent.course} • ` : ""}{activeStudent.branch}{activeStudent.section ? ` (Sec ${activeStudent.section})` : ""} • Batch {activeStudent.batch}
                 </p>
                 <p className="text-xs font-semibold text-slate-700 mt-1">
@@ -785,7 +1191,11 @@ export function StudentManagementPage() {
 
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-100">
               <div className="flex items-center gap-2 w-full sm:w-auto">
-                {activeStudent.publicProfile?.enabled && activeStudent.publicProfile?.username ? (
+                {(activeStudent.accountStatus || "ACTIVE").toUpperCase() === "DEACTIVATED" ? (
+                  <span className="text-xs text-rose-500 font-medium">
+                    Public career profile is hidden while student account is deactivated.
+                  </span>
+                ) : activeStudent.publicProfile?.enabled && activeStudent.publicProfile?.username ? (
                   <>
                     <a
                       href={`/u/${encodeURIComponent(activeStudent.publicProfile.username)}`}
@@ -1254,6 +1664,462 @@ export function StudentManagementPage() {
             </Button>
           </div>
         </form>
+      </Modal>
+
+      {/* Account Lifecycle Status Confirmation Modal */}
+      <Modal
+        isOpen={statusModalOpen}
+        onClose={() => setStatusModalOpen(false)}
+        maxWidth="max-w-md"
+        title={
+          targetAccountStatus === "PASSOUT"
+            ? "Mark Student as Pass-Out?"
+            : targetAccountStatus === "DEBARRED"
+            ? "Debar Student from Placement Drives?"
+            : targetAccountStatus === "DEACTIVATED"
+            ? "Deactivate Student Access?"
+            : "Restore Student Placement Privileges?"
+        }
+        subtitle={
+          statusModalStudent
+            ? `${statusModalStudent.name} (${statusModalStudent.usn || statusModalStudent.rollNo})`
+            : ""
+        }
+      >
+        {statusModalStudent && (
+          <div className="space-y-4 text-xs text-slate-600">
+            {targetAccountStatus === "PASSOUT" && (
+              <>
+                <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/80 text-amber-900 space-y-2">
+                  <div className="flex items-center gap-2 font-bold text-sm text-amber-950">
+                    <GraduationCap className="w-4 h-4 text-amber-600" />
+                    <span>Graduated / Pass-Out Lifecycle Transition</span>
+                  </div>
+                  <p className="text-xs text-amber-800 leading-relaxed">
+                    Student: <strong>{statusModalStudent.name}</strong> • Batch: <strong>{statusModalStudent.batch || "N/A"}</strong>
+                  </p>
+                </div>
+
+                <div className="space-y-2 py-1">
+                  <p className="font-semibold text-slate-800">This action will:</p>
+                  <ul className="space-y-1.5 pl-1">
+                    <li className="flex items-start gap-2">
+                      <span className="text-amber-600 font-bold">•</span>
+                      <span>Disable student portal login and immediate API access</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-emerald-600 font-bold">✓</span>
+                      <span>Preserve institutional placement records & match telemetry</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-emerald-600 font-bold">✓</span>
+                      <span>Preserve college records</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-emerald-600 font-bold">✓</span>
+                      <span>Keep the public Career Profile available if enabled</span>
+                    </li>
+                  </ul>
+                </div>
+              </>
+            )}
+
+            {targetAccountStatus === "DEBARRED" && (
+              <>
+                <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 space-y-2">
+                  <div className="flex items-center gap-2 font-bold text-sm text-rose-950">
+                    <ShieldAlert className="w-4 h-4 text-rose-600" />
+                    <span>Debarment from Campus Placement Drives</span>
+                  </div>
+                  <p className="text-xs text-rose-800 leading-relaxed">
+                    Student: <strong>{statusModalStudent.name}</strong> ({statusModalStudent.usn || statusModalStudent.rollNo})
+                  </p>
+                </div>
+
+                <div className="space-y-2 py-1">
+                  <p className="font-semibold text-slate-800">This action will:</p>
+                  <ul className="space-y-1.5 pl-1">
+                    <li className="flex items-start gap-2">
+                      <span className="text-rose-600 font-bold">•</span>
+                      <span>Block student from applying to any job postings (returns 403 Forbidden)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-emerald-600 font-bold">✓</span>
+                      <span>Allow student to log in, view dashboard, metrics, and manage profile</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-emerald-600 font-bold">✓</span>
+                      <span>Preserve all candidate records and public career profile</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-emerald-600 font-bold">✓</span>
+                      <span>Can be restored by Placement Cell at any time</span>
+                    </li>
+                  </ul>
+                </div>
+              </>
+            )}
+
+            {targetAccountStatus === "DEACTIVATED" && (
+              <>
+                <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 space-y-2">
+                  <div className="flex items-center gap-2 font-bold text-sm text-rose-950">
+                    <UserX className="w-4 h-4 text-rose-600" />
+                    <span>Administrative Access Revocation</span>
+                  </div>
+                  <p className="text-xs text-rose-800 leading-relaxed">
+                    Student: <strong>{statusModalStudent.name}</strong>
+                  </p>
+                </div>
+
+                <div className="space-y-2 py-1">
+                  <p className="font-semibold text-slate-800">This action will:</p>
+                  <ul className="space-y-1.5 pl-1">
+                    <li className="flex items-start gap-2">
+                      <span className="text-rose-600 font-bold">•</span>
+                      <span>Block student login</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-rose-600 font-bold">•</span>
+                      <span>Immediately revoke student API access</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-emerald-600 font-bold">✓</span>
+                      <span>Preserve college records</span>
+                    </li>
+                  </ul>
+                </div>
+              </>
+            )}
+
+            {targetAccountStatus === "ACTIVE" && (
+              <>
+                <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 space-y-2">
+                  <div className="flex items-center gap-2 font-bold text-sm text-emerald-950">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>Restore Full Student Placement Privileges</span>
+                  </div>
+                  <p className="text-xs text-emerald-800 leading-relaxed">
+                    Student: <strong>{statusModalStudent.name}</strong>
+                  </p>
+                </div>
+
+                <div className="space-y-2 py-1">
+                  <p className="font-semibold text-slate-800">This action will:</p>
+                  <ul className="space-y-1.5 pl-1">
+                    <li className="flex items-start gap-2">
+                      <span className="text-emerald-600 font-bold">✓</span>
+                      <span>Restore student portal login capability (if previously pass-out)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-emerald-600 font-bold">✓</span>
+                      <span>Restore ability to apply to campus placement drives & job postings</span>
+                    </li>
+                  </ul>
+                </div>
+              </>
+            )}
+
+            <div className="flex justify-end gap-2 pt-4 border-t border-slate-100">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setStatusModalOpen(false)}
+                disabled={updatingStatus}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant={
+                  targetAccountStatus === "DEBARRED" || targetAccountStatus === "DEACTIVATED"
+                    ? "danger"
+                    : targetAccountStatus === "PASSOUT"
+                    ? "primary"
+                    : "success"
+                }
+                size="sm"
+                loading={updatingStatus}
+                onClick={handleConfirmStatusChange}
+              >
+                {targetAccountStatus === "PASSOUT"
+                  ? "Mark as Pass-Out"
+                  : targetAccountStatus === "DEBARRED"
+                  ? "Debar Student"
+                  : targetAccountStatus === "DEACTIVATED"
+                  ? "Deactivate"
+                  : "Restore Access"}
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Bulk Lifecycle Status Confirmation Modal */}
+      <Modal
+        isOpen={bulkStatusModalOpen}
+        onClose={() => setBulkStatusModalOpen(false)}
+        maxWidth="max-w-md"
+        title={
+          bulkTargetStatus === "PASSOUT"
+            ? `Mark ${selectedStudentIds.length} Students as Pass-Out?`
+            : bulkTargetStatus === "DEBARRED"
+            ? `Debar ${selectedStudentIds.length} Students from Drives?`
+            : `Restore Full Access for ${selectedStudentIds.length} Students?`
+        }
+        subtitle={`${selectedStudentIds.length} selected candidates`}
+      >
+        <div className="space-y-4 text-xs text-slate-600">
+          {bulkTargetStatus === "PASSOUT" && (
+            <>
+              <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 space-y-2">
+                <div className="flex items-center gap-2 font-bold text-sm text-amber-950">
+                  <GraduationCap className="w-4 h-4 text-amber-600" />
+                  <span>Bulk Pass-Out / Alumni Transition</span>
+                </div>
+                <p className="text-xs text-amber-800 leading-relaxed">
+                  You are marking <strong>{selectedStudentIds.length}</strong> selected candidate(s) as Pass-Out / Graduated.
+                </p>
+              </div>
+
+              <div className="space-y-2 py-1">
+                <p className="font-semibold text-slate-800">This action will:</p>
+                <ul className="space-y-1.5 pl-1">
+                  <li className="flex items-start gap-2">
+                    <span className="text-amber-600 font-bold">•</span>
+                    <span>Disable student portal login for all selected students</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 font-bold">✓</span>
+                    <span>Preserve all institutional placement metrics and historical records</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 font-bold">✓</span>
+                    <span>Keep public Career Profiles available (if enabled by students)</span>
+                  </li>
+                </ul>
+              </div>
+            </>
+          )}
+
+          {bulkTargetStatus === "DEBARRED" && (
+            <>
+              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 space-y-2">
+                <div className="flex items-center gap-2 font-bold text-sm text-rose-950">
+                  <ShieldAlert className="w-4 h-4 text-rose-600" />
+                  <span>Bulk Debarment from Campus Placement</span>
+                </div>
+                <p className="text-xs text-rose-800 leading-relaxed">
+                  You are debarring <strong>{selectedStudentIds.length}</strong> selected candidate(s) from applying to placement drives.
+                </p>
+              </div>
+
+              <div className="space-y-2 py-1">
+                <p className="font-semibold text-slate-800">This action will:</p>
+                <ul className="space-y-1.5 pl-1">
+                  <li className="flex items-start gap-2">
+                    <span className="text-rose-600 font-bold">•</span>
+                    <span>Block job applications (attempting to apply returns 403 Forbidden)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 font-bold">✓</span>
+                    <span>Allow students to log in and view dashboard, profiles, and drive details</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 font-bold">✓</span>
+                    <span>Can be restored at any time by the Placement Cell</span>
+                  </li>
+                </ul>
+              </div>
+            </>
+          )}
+
+          {bulkTargetStatus === "ACTIVE" && (
+            <>
+              <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 space-y-2">
+                <div className="flex items-center gap-2 font-bold text-sm text-emerald-950">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Restore Active Privileges</span>
+                </div>
+                <p className="text-xs text-emerald-800 leading-relaxed">
+                  Restoring full placement portal privileges and job application eligibility for <strong>{selectedStudentIds.length}</strong> student(s).
+                </p>
+              </div>
+
+              <div className="space-y-2 py-1">
+                <p className="font-semibold text-slate-800">This action will:</p>
+                <ul className="space-y-1.5 pl-1">
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 font-bold">✓</span>
+                    <span>Restore student portal login capability</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 font-bold">✓</span>
+                    <span>Restore full ability to apply for placement drives</span>
+                  </li>
+                </ul>
+              </div>
+            </>
+          )}
+
+          <div className="flex justify-end gap-2 pt-4 border-t border-slate-100">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setBulkStatusModalOpen(false)}
+              disabled={updatingBulkStatus}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant={
+                bulkTargetStatus === "DEBARRED"
+                  ? "danger"
+                  : bulkTargetStatus === "PASSOUT"
+                  ? "primary"
+                  : "success"
+              }
+              size="sm"
+              loading={updatingBulkStatus}
+              onClick={handleConfirmBulkStatus}
+            >
+              {bulkTargetStatus === "PASSOUT"
+                ? "Confirm Bulk Pass-Out"
+                : bulkTargetStatus === "DEBARRED"
+                ? "Confirm Bulk Debarment"
+                : "Restore All Selected"}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Hardened Delete Student Confirmation Modal */}
+      <Modal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        maxWidth="max-w-md"
+        title="Delete Student"
+        subtitle={
+          deleteModalStudent
+            ? `${deleteModalStudent.name} (${deleteModalStudent.usn || deleteModalStudent.rollNo})`
+            : ""
+        }
+      >
+        {deleteModalStudent && (
+          <div className="space-y-4 text-xs text-slate-600">
+            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 space-y-2">
+              <div className="flex items-center gap-2 font-bold text-sm text-rose-950">
+                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                <span>Warning</span>
+              </div>
+              <p className="text-xs text-rose-800 leading-relaxed">
+                This permanently removes the student account and associated removable data. This action cannot be undone.
+              </p>
+            </div>
+
+            <div className="space-y-1 text-slate-700">
+              <p><strong>Student:</strong> {deleteModalStudent.name}</p>
+              <p><strong>Student ID / USN:</strong> {deleteModalStudent.usn || deleteModalStudent.rollNo}</p>
+            </div>
+
+            <div className="space-y-2 pt-1">
+              <label className="block text-slate-700 font-semibold text-xs leading-relaxed">
+                To confirm deletion, type the student's name (<span className="font-mono font-bold text-slate-900 select-all">{deleteModalStudent.name}</span>) or USN/Roll No (<span className="font-mono font-bold text-slate-900 select-all">{deleteModalStudent.usn || deleteModalStudent.rollNo}</span>) below:
+              </label>
+              <input
+                type="text"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                placeholder="Type name or USN exactly to confirm"
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-600"
+                autoFocus
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-4 border-t border-slate-100">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setDeleteModalOpen(false)}
+                disabled={deletingStudent}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="danger"
+                size="sm"
+                icon={Trash2}
+                disabled={!isDeleteConfirmed || deletingStudent}
+                loading={deletingStudent}
+                onClick={handleConfirmDelete}
+              >
+                {deletingStudent ? "Deleting..." : "Delete Student"}
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Bulk Delete Students Confirmation Modal */}
+      <Modal
+        isOpen={bulkDeleteModalOpen}
+        onClose={() => setBulkDeleteModalOpen(false)}
+        maxWidth="max-w-md"
+        title={`Bulk Delete ${selectedStudentIds.length} Students`}
+        subtitle="Destructive administrative operation"
+      >
+        <div className="space-y-4 text-xs text-slate-600">
+          <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 space-y-2">
+            <div className="flex items-center gap-2 font-bold text-sm text-rose-950">
+              <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+              <span>Permanent Cascading Deletion</span>
+            </div>
+            <p className="text-xs text-rose-800 leading-relaxed">
+              This permanently deletes all <strong>{selectedStudentIds.length}</strong> selected student accounts, their job applications, placement predictions, notifications, and uploaded files. This action cannot be undone.
+            </p>
+          </div>
+
+          <div className="space-y-2 pt-1">
+            <label className="block text-slate-700 font-semibold text-xs leading-relaxed">
+              To confirm bulk deletion, type <span className="font-mono font-bold text-rose-700 select-all">DELETE</span> below:
+            </label>
+            <input
+              type="text"
+              value={bulkDeleteConfirmText}
+              onChange={(e) => setBulkDeleteConfirmText(e.target.value)}
+              placeholder="Type DELETE to confirm"
+              className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-600"
+              autoFocus
+            />
+          </div>
+
+          <div className="flex justify-end gap-2 pt-4 border-t border-slate-100">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setBulkDeleteModalOpen(false)}
+              disabled={deletingBulkStudents}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              size="sm"
+              disabled={bulkDeleteConfirmText.trim().toUpperCase() !== "DELETE" || deletingBulkStudents}
+              loading={deletingBulkStudents}
+              onClick={handleConfirmBulkDelete}
+            >
+              Permanently Delete {selectedStudentIds.length} Students
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

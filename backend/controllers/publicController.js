@@ -66,12 +66,13 @@ exports.getPublicStudentProfile = async (req, res, next) => {
     } else {
       student = await Student.findOne({
         'publicProfile.enabled': true,
-        'publicProfile.username': username
+        'publicProfile.username': username,
+        accountStatus: { $ne: 'DEACTIVATED' }
       }).lean();
     }
 
-    // Return 404 for nonexistent, disabled, or unconfigured profiles
-    if (!student || !student.publicProfile || !student.publicProfile.enabled) {
+    // Return 404 for nonexistent, disabled, unconfigured, or deactivated profiles
+    if (!student || !student.publicProfile || !student.publicProfile.enabled || student.accountStatus === 'DEACTIVATED') {
       return res.status(404).json({
         success: false,
         message: 'Public profile not found.'
@@ -176,14 +177,16 @@ exports.getPublicStudentResume = async (req, res, next) => {
     } else {
       student = await Student.findOne({
         'publicProfile.enabled': true,
-        'publicProfile.username': username
-      }).select('publicProfile resumeUrl name');
+        'publicProfile.username': username,
+        accountStatus: { $ne: 'DEACTIVATED' }
+      }).select('publicProfile resumeUrl name accountStatus');
     }
 
     if (
       !student ||
       !student.publicProfile ||
       !student.publicProfile.enabled ||
+      student.accountStatus === 'DEACTIVATED' ||
       student.publicProfile.showResume !== true ||
       !student.resumeUrl
     ) {

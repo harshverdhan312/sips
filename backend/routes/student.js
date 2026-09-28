@@ -75,70 +75,75 @@ const imageUpload = multer({
   }
 });
 
+const studentAccountAccess = require('../middleware/studentAccountAccess');
+
+// Enforce auth, tenant, and real-time student account lifecycle checks on all student routes
+router.use(auth, tenant, studentAccountAccess);
+
 // GET /api/student/profile
-router.get('/profile', auth, tenant, studentController.getProfile);
+router.get('/profile', studentController.getProfile);
 
 // PUT /api/student/profile
-router.put('/profile', auth, tenant, studentController.updateProfile);
+router.put('/profile', studentController.updateProfile);
 
 // GET /api/student/public-profile
-router.get('/public-profile', auth, tenant, studentController.getPublicProfileConfig);
+router.get('/public-profile', studentController.getPublicProfileConfig);
 
 // PUT /api/student/public-profile
-router.put('/public-profile', auth, tenant, studentController.updatePublicProfileConfig);
+router.put('/public-profile', studentController.updatePublicProfileConfig);
 
 // GET /api/student/github/repos
-router.get('/github/repos', auth, tenant, studentController.getGithubRepos);
+router.get('/github/repos', studentController.getGithubRepos);
 
 // GET /api/student/projects
-router.get('/projects', auth, tenant, studentController.getProjects);
+router.get('/projects', studentController.getProjects);
 
 // PUT /api/student/projects
-router.put('/projects', auth, tenant, studentController.updateProjects);
+router.put('/projects', studentController.updateProjects);
 
 // POST /api/student/profile/image
-router.post('/profile/image', auth, tenant, imageUpload.single('image'), studentController.uploadProfileImage);
+router.post('/profile/image', imageUpload.single('image'), studentController.uploadProfileImage);
 
 // DELETE /api/student/profile/image
-router.delete('/profile/image', auth, tenant, studentController.deleteProfileImage);
+router.delete('/profile/image', studentController.deleteProfileImage);
 
 // GET /api/student/resume
-router.get('/resume', auth, tenant, studentController.getResume);
+router.get('/resume', studentController.getResume);
 
 // POST /api/student/resume
-router.post('/resume', auth, tenant, upload.single('resume'), studentController.uploadResume);
+router.post('/resume', upload.single('resume'), studentController.uploadResume);
 
 // DELETE /api/student/resume
-router.delete('/resume', auth, tenant, studentController.deleteResume);
+router.delete('/resume', studentController.deleteResume);
 
 // GET /api/student/jobs
-router.get('/jobs', auth, tenant, studentController.getJobs);
+router.get('/jobs', studentController.getJobs);
 
 // POST /api/student/jobs/:id/analyze-match
-router.post('/jobs/:id/analyze-match', auth, tenant, validateObjectId('id'), studentController.analyzeJobMatch);
+router.post('/jobs/:id/analyze-match', validateObjectId('id'), studentController.analyzeJobMatch);
 
 // POST /api/student/jobs/:id/apply
-router.post('/jobs/:id/apply', auth, tenant, validateObjectId('id'), studentController.applyToJob);
+router.post('/jobs/:id/apply', validateObjectId('id'), studentController.applyToJob);
 
 // GET /api/student/preferred-jobs
-router.get('/preferred-jobs', auth, tenant, studentController.getPreferredJobs);
+router.get('/preferred-jobs', studentController.getPreferredJobs);
 
 // GET /api/student/applications
-router.get('/applications', auth, tenant, studentController.getApplications);
+router.get('/applications', studentController.getApplications);
 
 // GET /api/student/applications/:id
-router.get('/applications/:id', auth, tenant, validateObjectId('id'), studentController.getApplicationById);
+router.get('/applications/:id', validateObjectId('id'), studentController.getApplicationById);
 
 // PATCH /api/student/applications/:id/withdraw
-router.patch('/applications/:id/withdraw', auth, tenant, validateObjectId('id'), studentController.withdrawApplication);
+router.patch('/applications/:id/withdraw', validateObjectId('id'), studentController.withdrawApplication);
 
 // GET /api/student/analytics/placement
-router.get('/analytics/placement', auth, tenant, studentController.getPlacementTelemetry);
+router.get('/analytics/placement', studentController.getPlacementTelemetry);
 
 // POST /api/student/analytics/placement/predict
-router.post('/analytics/placement/predict', auth, tenant, studentController.predictPlacement);
+router.post('/analytics/placement/predict', studentController.predictPlacement);
 
 // GET /api/student/analytics/placement/prediction
-router.get('/analytics/placement/prediction', auth, tenant, studentController.getLatestPlacementPrediction);
+router.get('/analytics/placement/prediction', studentController.getLatestPlacementPrediction);
 
 module.exports = router;

@@ -1,10 +1,16 @@
 const adminStudentController = require('../controllers/adminStudentController');
 const Student = require('../models/Student');
 const Match = require('../models/Match');
+const Application = require('../models/Application');
+const PlacementPrediction = require('../models/PlacementPrediction');
+const Notification = require('../models/Notification');
 const AuditLog = require('../models/AuditLog');
 
 jest.mock('../models/Student');
 jest.mock('../models/Match');
+jest.mock('../models/Application');
+jest.mock('../models/PlacementPrediction');
+jest.mock('../models/Notification');
 jest.mock('../models/AuditLog');
 
 describe('Admin Student Controller', () => {
@@ -206,6 +212,9 @@ describe('Admin Student Controller', () => {
 
       Student.findOneAndDelete.mockResolvedValue(mockStudent);
       Match.deleteMany.mockResolvedValue({ deletedCount: 3 });
+      Application.deleteMany.mockResolvedValue({ deletedCount: 1 });
+      PlacementPrediction.deleteMany.mockResolvedValue({ deletedCount: 1 });
+      Notification.deleteMany.mockResolvedValue({ deletedCount: 1 });
       AuditLog.create.mockResolvedValue({});
 
       const req = createMockReq({ params: { id: 's1' } });

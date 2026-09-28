@@ -209,6 +209,7 @@ export const placementService = {
             cgpa: cgpa > 0 ? cgpa : 0,
             status,
             placementStatus: s.placementStatus || "UNPLACED",
+            accountStatus: s.accountStatus || "ACTIVE",
             resumeUrl: s.resumeUrl || null,
             avatar: s.profileImageUrl || null,
             profileImageUrl: s.profileImageUrl || null,
@@ -641,5 +642,33 @@ export const placementService = {
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
     return filename;
+  },
+
+  /**
+   * Update student account lifecycle status (ACTIVE, PASSOUT, DEBARRED, DEACTIVATED)
+   */
+  async updateStudentAccountStatus(studentId, accountStatus) {
+    return api.patch(`/api/admin/students/${studentId}/account-status`, { accountStatus });
+  },
+
+  /**
+   * Bulk update student account lifecycle status (ACTIVE, PASSOUT, DEBARRED, DEACTIVATED)
+   */
+  async bulkUpdateStudentAccountStatus(studentIds, accountStatus) {
+    return api.patch(`/api/admin/students/bulk-account-status`, { studentIds, accountStatus });
+  },
+
+  /**
+   * Permanently delete a student and clean up dependencies
+   */
+  async deleteStudent(studentId) {
+    return api.delete(`/api/admin/students/${studentId}`);
+  },
+
+  /**
+   * Bulk permanently delete students and clean up dependencies
+   */
+  async bulkDeleteStudents(studentIds) {
+    return api.post(`/api/admin/students/bulk-delete`, { studentIds });
   }
 };

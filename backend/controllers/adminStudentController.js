@@ -1,10 +1,14 @@
 const Student = require('../models/Student');
 const Match = require('../models/Match');
+const Application = require('../models/Application');
+const PlacementPrediction = require('../models/PlacementPrediction');
+const Notification = require('../models/Notification');
 const AuditLog = require('../models/AuditLog');
 const College = require('../models/College');
 const bcrypt = require('bcryptjs');
 const { parseCSV } = require('../utils/csvParser');
 const memoryDb = require('../utils/memoryDb');
+const { safeDeleteUploadFile } = require('../utils/fileStorage');
 const collegeController = require('./collegeController');
 
 /**
@@ -19,6 +23,7 @@ exports.getStudents = async (req, res) => {
       batch,
       status,
       readiness,
+      accountStatus,
       page = 1,
       limit = 20,
       sortBy = 'name',
@@ -26,7 +31,7 @@ exports.getStudents = async (req, res) => {
     } = req.query;
 
     if (!memoryDb.isMongoConnected()) {
-      const allStudents = memoryDb.getStudents(req.collegeId, { search, branch, status, readiness });
+      const allStudents = memoryDb.getStudents(req.collegeId, { search, branch, status, readiness, accountStatus });
       return res.json({
         success: true,
         students: allStudents,
@@ -98,13 +103,18 @@ exports.getStudents = async (req, res) => {
       }
     }
 
+    // Account lifecycle status filter
+    if (accountStatus && accountStatus !== 'All') {
+      query.accountStatus = accountStatus.trim().toUpperCase();
+    }
+
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
     const limitNum = Math.min(1000, Math.max(1, parseInt(limit, 10) || 50));
     const skip = (pageNum - 1) * limitNum;
 
     // Sorting
     const sort = {};
-    const validSortFields = ['name', 'rollNo', 'usn', 'email', 'branch', 'batch', 'cgpa', 'readinessScore', 'placementStatus', 'createdAt'];
+    const validSortFields = ['name', 'rollNo', 'usn', 'email', 'branch', 'batch', 'cgpa', 'readinessScore', 'placementStatus', 'accountStatus', 'createdAt'];
     const sortField = validSortFields.includes(sortBy) ? sortBy : 'name';
     sort[sortField] = sortOrder.toLowerCase() === 'desc' ? -1 : 1;
 
@@ -305,52 +315,301 @@ exports.updateStudent = async (req, res) => {
 };
 
 /**
- * DELETE /api/admin/students/:id
- * Remove student record and corresponding matches
+ * PATCH /api/admin/students/:id/account-status
+ * Dedicated endpoint to update student account lifecycle status (ACTIVE, PASSOUT, DEACTIVATED)
  */
-exports.deleteStudent = async (req, res) => {
+exports.updateStudentAccountStatus = async (req, res) => {
   try {
-    if (!memoryDb.isMongoConnected()) {
-      const deleted = memoryDb.deleteStudent(req.params.id);
-      if (!deleted) {
-        return res.status(404).json({ message: 'Student not found' });
-      }
-      return res.json({
-        success: true,
-        message: 'Student deleted successfully'
+    const { accountStatus } = req.body;
+    const allowedStatuses = ['ACTIVE', 'PASSOUT', 'DEBARRED', 'DEACTIVATED'];
+
+    if (!accountStatus || !allowedStatuses.includes(accountStatus)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid accountStatus. Must be one of: ACTIVE, PASSOUT, DEBARRED, DEACTIVATED.'
       });
     }
 
-    const student = await Student.findOneAndDelete({
+    if (!memoryDb.isMongoConnected()) {
+      const student = memoryDb.findStudentById(req.params.id);
+      if (!student || String(student.collegeId) !== String(req.collegeId)) {
+        return res.status(404).json({ success: false, message: 'Student not found.' });
+      }
+      const previousStatus = student.accountStatus || 'ACTIVE';
+      memoryDb.updateStudent(student._id, { accountStatus });
+      return res.json({
+        success: true,
+        message: `Student account status updated to ${accountStatus}.`,
+        student: {
+          _id: student._id,
+          name: student.name,
+          accountStatus
+        }
+      });
+    }
+
+    const student = await Student.findOne({
       _id: req.params.id,
       collegeId: req.collegeId
     });
 
     if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
+      return res.status(404).json({
+        success: false,
+        message: 'Student not found.'
+      });
     }
 
-    // Clean up matches
-    await Match.deleteMany({
-      studentId: student._id,
-      collegeId: req.collegeId
-    });
+    const previousStatus = student.accountStatus || 'ACTIVE';
+    student.accountStatus = accountStatus;
+    await student.save();
 
-    // Log action
+    // Record administrative audit log
     await AuditLog.create({
       collegeId: req.collegeId,
-      action: 'DELETE_STUDENT',
+      action: 'UPDATE_STUDENT_ACCOUNT_STATUS',
       actor: req.user.email || 'Admin',
-      target: `${student.name} (${student.email})`
+      target: `${student.name} (${student.rollNo || student.email})`,
+      details: {
+        studentId: student._id,
+        previousStatus,
+        newStatus: accountStatus
+      }
     }).catch(err => console.error('AuditLog error:', err));
 
-    res.json({
+    return res.json({
       success: true,
-      message: 'Student deleted successfully'
+      message: `Student account status updated to ${accountStatus}.`,
+      student: {
+        _id: student._id,
+        name: student.name,
+        accountStatus: student.accountStatus
+      }
+    });
+  } catch (error) {
+    console.error('Admin updateStudentAccountStatus error:', error);
+    res.status(500).json({ message: 'Server error updating student account status' });
+  }
+};
+
+/**
+ * PATCH /api/admin/students/bulk-account-status
+ * Bulk update student account lifecycle status (ACTIVE, PASSOUT, DEBARRED, DEACTIVATED)
+ */
+exports.bulkUpdateStudentAccountStatus = async (req, res) => {
+  try {
+    const { studentIds, accountStatus } = req.body;
+    const allowedStatuses = ['ACTIVE', 'PASSOUT', 'DEBARRED', 'DEACTIVATED'];
+
+    if (!accountStatus || !allowedStatuses.includes(accountStatus)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid accountStatus. Must be one of: ACTIVE, PASSOUT, DEBARRED, DEACTIVATED.'
+      });
+    }
+
+    if (!Array.isArray(studentIds) || studentIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'studentIds array is required and must not be empty.'
+      });
+    }
+
+    const collegeId = req.collegeId;
+
+    if (!memoryDb.isMongoConnected()) {
+      const updatedCount = memoryDb.bulkUpdateStudentAccountStatus(collegeId, studentIds, accountStatus);
+      return res.json({
+        success: true,
+        message: `Successfully updated account status for ${updatedCount} student(s) to ${accountStatus}.`,
+        updatedCount
+      });
+    }
+
+    const result = await Student.updateMany(
+      { _id: { $in: studentIds }, collegeId },
+      { $set: { accountStatus, updatedAt: new Date() } }
+    );
+
+    // Record audit log
+    await AuditLog.create({
+      collegeId,
+      action: 'BULK_UPDATE_STUDENT_ACCOUNT_STATUS',
+      actor: req.user.email || 'Admin',
+      target: `${result.modifiedCount} students`,
+      details: {
+        studentIds,
+        newStatus: accountStatus,
+        modifiedCount: result.modifiedCount
+      }
+    }).catch(err => console.error('AuditLog error:', err));
+
+    return res.json({
+      success: true,
+      message: `Successfully updated account status for ${result.modifiedCount} student(s) to ${accountStatus}.`,
+      updatedCount: result.modifiedCount
+    });
+  } catch (error) {
+    console.error('Admin bulkUpdateStudentAccountStatus error:', error);
+    res.status(500).json({ message: 'Server error updating bulk student account status' });
+  }
+};
+
+/**
+ * DELETE /api/admin/students/:id
+ * Tenant-scoped destructive removal of student with full dependency cleanup and safe file removal
+ */
+exports.deleteStudent = async (req, res) => {
+  try {
+    const studentId = req.params.id;
+    const collegeId = req.collegeId;
+
+    if (!memoryDb.isMongoConnected()) {
+      const student = memoryDb.findStudentById(studentId);
+      if (!student || String(student.collegeId) !== String(collegeId)) {
+        return res.status(404).json({ success: false, message: 'Student not found.' });
+      }
+      safeDeleteUploadFile(student.resumeUrl);
+      safeDeleteUploadFile(student.profileImageUrl);
+      memoryDb.deleteStudent(studentId);
+      return res.json({
+        success: true,
+        message: 'Student and associated records deleted successfully.'
+      });
+    }
+
+    const student = await Student.findOneAndDelete({
+      _id: studentId,
+      collegeId: collegeId
+    });
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: 'Student not found.'
+      });
+    }
+
+    // Capture file paths and identifying details before removal
+    const resumeUrl = student.resumeUrl;
+    const profileImageUrl = student.profileImageUrl;
+    const studentName = student.name;
+    const studentRoll = student.rollNo || student.email;
+
+    // Clean up dependent records explicitly
+    await Promise.all([
+      Match.deleteMany({ studentId: student._id, collegeId: collegeId }),
+      Application.deleteMany({ studentId: student._id, collegeId: collegeId }),
+      PlacementPrediction.deleteMany({ studentId: student._id, collegeId: collegeId }),
+      Notification.deleteMany({ studentId: student._id, collegeId: collegeId })
+    ]);
+
+    // Safely delete uploaded resume and profile image files
+    safeDeleteUploadFile(resumeUrl);
+    safeDeleteUploadFile(profileImageUrl);
+
+    // Record deletion in AuditLog
+    await AuditLog.create({
+      collegeId: collegeId,
+      action: 'DELETE_STUDENT',
+      actor: req.user.email || 'Admin',
+      target: `${studentName} (${studentRoll})`,
+      details: {
+        studentId: student._id,
+        deletedAt: new Date()
+      }
+    }).catch(err => console.error('AuditLog error:', err));
+
+    return res.json({
+      success: true,
+      message: 'Student and associated records deleted successfully.'
     });
   } catch (error) {
     console.error('Admin deleteStudent error:', error);
     res.status(500).json({ message: 'Server error deleting student' });
+  }
+};
+
+/**
+ * POST /api/admin/students/bulk-delete
+ * Bulk delete students with full cascading cleanup and safe file removal
+ */
+exports.bulkDeleteStudents = async (req, res) => {
+  try {
+    const { studentIds } = req.body;
+
+    if (!Array.isArray(studentIds) || studentIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'studentIds array is required and must not be empty.'
+      });
+    }
+
+    const collegeId = req.collegeId;
+
+    if (!memoryDb.isMongoConnected()) {
+      const deletedStudents = memoryDb.bulkDeleteStudents(collegeId, studentIds);
+      for (const s of deletedStudents) {
+        safeDeleteUploadFile(s.resumeUrl);
+        safeDeleteUploadFile(s.profileImageUrl);
+      }
+      return res.json({
+        success: true,
+        message: `Successfully deleted ${deletedStudents.length} student(s) and their associated records.`,
+        deletedCount: deletedStudents.length
+      });
+    }
+
+    // Find all matching students first to collect file URLs and IDs
+    const studentsToDelete = await Student.find({
+      _id: { $in: studentIds },
+      collegeId
+    }).select('_id name rollNo email resumeUrl profileImageUrl').lean();
+
+    if (studentsToDelete.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No matching students found to delete in your institution.'
+      });
+    }
+
+    const matchedIds = studentsToDelete.map(s => s._id);
+
+    // Cascade delete in parallel
+    await Promise.all([
+      Student.deleteMany({ _id: { $in: matchedIds }, collegeId }),
+      Match.deleteMany({ studentId: { $in: matchedIds }, collegeId }),
+      Application.deleteMany({ studentId: { $in: matchedIds }, collegeId }),
+      PlacementPrediction.deleteMany({ studentId: { $in: matchedIds }, collegeId }),
+      Notification.deleteMany({ studentId: { $in: matchedIds }, collegeId })
+    ]);
+
+    // Clean up uploaded files
+    for (const s of studentsToDelete) {
+      safeDeleteUploadFile(s.resumeUrl);
+      safeDeleteUploadFile(s.profileImageUrl);
+    }
+
+    // Record audit log
+    await AuditLog.create({
+      collegeId,
+      action: 'BULK_DELETE_STUDENTS',
+      actor: req.user.email || 'Admin',
+      target: `${studentsToDelete.length} students`,
+      details: {
+        studentIds: matchedIds,
+        deletedCount: studentsToDelete.length
+      }
+    }).catch(err => console.error('AuditLog error:', err));
+
+    return res.json({
+      success: true,
+      message: `Successfully deleted ${studentsToDelete.length} student(s) and their associated records.`,
+      deletedCount: studentsToDelete.length
+    });
+  } catch (error) {
+    console.error('Admin bulkDeleteStudents error:', error);
+    res.status(500).json({ message: 'Server error deleting students' });
   }
 };
 

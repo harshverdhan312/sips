@@ -1124,6 +1124,20 @@ exports.applyToJob = async (req, res) => {
         return res.status(404).json({ success: false, message: 'Student profile not found' });
       }
 
+      const accountStatus = (student.accountStatus || 'ACTIVE').toUpperCase();
+      if (accountStatus === 'DEBARRED') {
+        return res.status(403).json({
+          success: false,
+          message: 'You have been debarred from applying to placement drives. Please contact your Placement Cell.'
+        });
+      }
+      if (accountStatus === 'PASSOUT' || accountStatus === 'DEACTIVATED') {
+        return res.status(403).json({
+          success: false,
+          message: 'You are not permitted to apply for placement drives.'
+        });
+      }
+
       const reasons = checkJobEligibility(student, job);
       if (reasons.length > 0) {
         return res.status(400).json({
@@ -1195,6 +1209,20 @@ exports.applyToJob = async (req, res) => {
 
     if (!student) {
       return res.status(404).json({ success: false, message: 'Student profile not found' });
+    }
+
+    const mongoAccountStatus = (student.accountStatus || 'ACTIVE').toUpperCase();
+    if (mongoAccountStatus === 'DEBARRED') {
+      return res.status(403).json({
+        success: false,
+        message: 'You have been debarred from applying to placement drives. Please contact your Placement Cell.'
+      });
+    }
+    if (mongoAccountStatus === 'PASSOUT' || mongoAccountStatus === 'DEACTIVATED') {
+      return res.status(403).json({
+        success: false,
+        message: 'You are not permitted to apply for placement drives.'
+      });
     }
 
     const reasons = checkJobEligibility(student, job);

@@ -66,8 +66,11 @@ router.get('/students', validatePagination, adminStudentController.getStudents);
 router.post('/students', adminStudentController.createStudent);
 router.post('/students/upload', adminStudentController.uploadStudentsCSV);
 router.get('/students/export', adminStudentController.exportStudentsCSV);
+router.patch('/students/bulk-account-status', adminStudentController.bulkUpdateStudentAccountStatus);
+router.post('/students/bulk-delete', adminStudentController.bulkDeleteStudents);
 router.get('/students/:id', validateObjectId('id'), adminStudentController.getStudentById);
 router.put('/students/:id', validateObjectId('id'), adminStudentController.updateStudent);
+router.patch('/students/:id/account-status', validateObjectId('id'), adminStudentController.updateStudentAccountStatus);
 router.delete('/students/:id', validateObjectId('id'), adminStudentController.deleteStudent);
 
 // ==========================================

@@ -36,11 +36,13 @@ const logoUpload = multer({
   }
 });
 
+const studentAccountAccess = require('../middleware/studentAccountAccess');
+
 // GET /api/college/profile — admin get college profile
 router.get('/profile', auth, tenant, adminOnly, collegeController.getCollegeProfile);
 
 // GET /api/college/academic-structure — get college courses/branches/sections
-router.get('/academic-structure', auth, tenant, collegeController.getAcademicStructure);
+router.get('/academic-structure', auth, tenant, studentAccountAccess, collegeController.getAcademicStructure);
 
 // PUT /api/college/academic-structure — admin update academic structure
 router.put('/academic-structure', auth, tenant, adminOnly, collegeController.updateAcademicStructure);

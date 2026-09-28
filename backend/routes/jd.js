@@ -6,14 +6,16 @@ const tenant = require('../middleware/tenant');
 const adminOnly = require('../middleware/adminOnly');
 const { validateObjectId } = require('../middleware/validate');
 
+const studentAccountAccess = require('../middleware/studentAccountAccess');
+
 // POST /api/jd — admin creates a JD
 router.post('/', auth, tenant, adminOnly, jdController.createJD);
 
 // GET /api/jd — list all JDs (auth required)
-router.get('/', auth, tenant, jdController.getJDs);
+router.get('/', auth, tenant, studentAccountAccess, jdController.getJDs);
 
 // GET /api/jd/:id — get single JD
-router.get('/:id', auth, tenant, validateObjectId('id'), jdController.getJD);
+router.get('/:id', auth, tenant, studentAccountAccess, validateObjectId('id'), jdController.getJD);
 
 // GET /api/jd/:id/matches — admin gets ranked matches for a JD
 router.get('/:id/matches', auth, tenant, adminOnly, validateObjectId('id'), jdController.getJDMatches);

@@ -156,6 +156,10 @@ class MemoryDatabase {
       else if (r === 'needs_improvement') list = list.filter(s => (s.readinessScore || 0) >= 50 && (s.readinessScore || 0) < 75);
       else if (r === 'at_risk') list = list.filter(s => (s.readinessScore || 0) < 50);
     }
+    if (filters.accountStatus && filters.accountStatus !== 'All') {
+      const ast = filters.accountStatus.toUpperCase();
+      list = list.filter(s => (s.accountStatus || 'ACTIVE') === ast);
+    }
 
     return list;
   }
@@ -175,6 +179,7 @@ class MemoryDatabase {
       batch: studentData.batch ? String(studentData.batch).trim() : '',
       cgpa: (studentData.cgpa !== undefined && studentData.cgpa !== null && !isNaN(Number(studentData.cgpa))) ? Number(studentData.cgpa) : 0,
       placementStatus: studentData.placementStatus || 'UNPLACED',
+      accountStatus: studentData.accountStatus || 'ACTIVE',
       companyPlaced: studentData.companyPlaced || '',
       packageOffered: studentData.packageOffered || 0,
       readinessScore: studentData.readinessScore || 0,
@@ -242,6 +247,7 @@ class MemoryDatabase {
     return this.students.find(s => 
       s.publicProfile && 
       s.publicProfile.enabled === true && 
+      (s.accountStatus || 'ACTIVE') !== 'DEACTIVATED' &&
       s.publicProfile.username && 
       s.publicProfile.username.toLowerCase() === clean
     ) || null;
@@ -267,7 +273,50 @@ class MemoryDatabase {
     const idx = this.students.findIndex(s => String(s._id) === String(id));
     if (idx === -1) return null;
     const removed = this.students.splice(idx, 1)[0];
+
+    // Cascade remove dependent in-memory records
+    this.matches = this.matches.filter(m => String(m.studentId) !== String(id));
+    this.applications = this.applications.filter(a => String(a.studentId) !== String(id));
+    this.placementPredictions = this.placementPredictions.filter(p => String(p.studentId) !== String(id));
+    this.notifications = this.notifications.filter(n => String(n.studentId) !== String(id) && String(n.userId) !== String(id));
+
     return removed;
+  }
+
+  bulkUpdateStudentAccountStatus(collegeId, studentIds, accountStatus) {
+    if (!Array.isArray(studentIds) || studentIds.length === 0) return 0;
+    const idStrs = studentIds.map(String);
+    let updatedCount = 0;
+    for (const s of this.students) {
+      if ((!collegeId || String(s.collegeId) === String(collegeId)) && idStrs.includes(String(s._id))) {
+        s.accountStatus = accountStatus;
+        s.updatedAt = new Date();
+        updatedCount++;
+      }
+    }
+    return updatedCount;
+  }
+
+  bulkDeleteStudents(collegeId, studentIds) {
+    if (!Array.isArray(studentIds) || studentIds.length === 0) return [];
+    const idStrs = studentIds.map(String);
+    const deletedStudents = [];
+    this.students = this.students.filter(s => {
+      if ((!collegeId || String(s.collegeId) === String(collegeId)) && idStrs.includes(String(s._id))) {
+        deletedStudents.push(s);
+        return false;
+      }
+      return true;
+    });
+
+    const deletedIds = deletedStudents.map(s => String(s._id));
+    if (deletedIds.length > 0) {
+      this.matches = this.matches.filter(m => !deletedIds.includes(String(m.studentId)));
+      this.applications = this.applications.filter(a => !deletedIds.includes(String(a.studentId)));
+      this.placementPredictions = this.placementPredictions.filter(p => !deletedIds.includes(String(p.studentId)));
+      this.notifications = this.notifications.filter(n => !deletedIds.includes(String(n.studentId)) && !deletedIds.includes(String(n.userId)));
+    }
+    return deletedStudents;
   }
 
   // ==========================================
