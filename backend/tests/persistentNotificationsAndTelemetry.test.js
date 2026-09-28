@@ -78,6 +78,15 @@ describe('Phase 4: Persistent Notifications & Placement Telemetry', () => {
       }[curr] || [];
       return allowed.includes(next);
     };
+
+    Student.findOne.mockResolvedValue({
+      _id: mockStudentId,
+      collegeId: mockCollegeId,
+      name: 'Rohan Verma',
+      cgpa: 8.5,
+      branch: 'Computer Science & Engineering',
+      skills: ['react', 'node']
+    });
   });
 
   // ==========================================

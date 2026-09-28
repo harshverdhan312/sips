@@ -66,6 +66,15 @@ describe('Phase 3: Application Persistence', () => {
       const allowed = Application.ALLOWED_TRANSITIONS[curr] || [];
       return allowed.includes(next);
     };
+
+    Student.findOne.mockResolvedValue({
+      _id: studentIdA,
+      collegeId: collegeIdA,
+      name: 'Priya Sharma',
+      cgpa: 8.5,
+      branch: 'Computer Science & Engineering',
+      skills: ['node.js', 'react.js']
+    });
   });
 
   // ==========================================

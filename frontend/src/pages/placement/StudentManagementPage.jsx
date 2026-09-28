@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Users,
   Download,
@@ -60,19 +60,88 @@ export function StudentManagementPage() {
   // Load students from backend
   const loadStudents = async () => {
     try {
-      const data = await placementService.getStudents({
-        branch: selectedBranch,
-        status: selectedStatus
-      });
+      const data = await placementService.getStudents();
       setStudents(data);
     } catch (e) {
       console.error("Failed to load students:", e);
+      showError("Failed to load student roster.");
     }
   };
 
   useEffect(() => {
     loadStudents();
-  }, [selectedBranch, selectedStatus]);
+  }, []);
+
+  // Compute all unique available branches dynamically from dataset
+  const availableBranches = useMemo(() => {
+    const branchSet = new Set();
+    students.forEach((s) => {
+      if (s.branch && s.branch.trim()) {
+        branchSet.add(s.branch.trim());
+      }
+    });
+    // Ensure all standard engineering branches are included
+    [
+      "Computer Science",
+      "Computer Science & Engineering",
+      "Information Science",
+      "Electronics",
+      "Electronics & Communication",
+      "Electrical",
+      "Mechanical",
+      "Civil"
+    ].forEach((b) => branchSet.add(b));
+    return Array.from(branchSet).sort();
+  }, [students]);
+
+  // Compute filtered students list combining branch and status filters
+  const filteredStudents = useMemo(() => {
+    return students.filter((st) => {
+      // Branch filter
+      if (selectedBranch && selectedBranch !== "All") {
+        const sBranch = (st.branch || "").toLowerCase().trim();
+        const selBranch = selectedBranch.toLowerCase().trim();
+        if (selBranch === "computer science" || selBranch === "computer science & engineering" || selBranch === "cse") {
+          if (!sBranch.includes("computer") && !sBranch.includes("cs")) return false;
+        } else if (selBranch === "electronics" || selBranch === "electronics & communication" || selBranch === "ece") {
+          if (!sBranch.includes("electron") && !sBranch.includes("ec")) return false;
+        } else if (selBranch === "information science" || selBranch === "ise" || selBranch === "it") {
+          if (!sBranch.includes("information") && !sBranch.includes("is") && !sBranch.includes("it")) return false;
+        } else if (selBranch === "electrical" || selBranch === "electrical engineering" || selBranch === "eee") {
+          if (!sBranch.includes("electric") && !sBranch.includes("ee")) return false;
+        } else if (selBranch === "mechanical" || selBranch === "mechanical engineering" || selBranch === "me") {
+          if (!sBranch.includes("mechanic") && !sBranch.includes("me")) return false;
+        } else if (selBranch === "civil" || selBranch === "civil engineering") {
+          if (!sBranch.includes("civil")) return false;
+        } else {
+          if (!sBranch.includes(selBranch) && !selBranch.includes(sBranch)) return false;
+        }
+      }
+
+      // Status filter
+      if (selectedStatus && selectedStatus !== "All") {
+        const sStatus = (st.status || "").toLowerCase().trim();
+        const sPlacementStatus = (st.placementStatus || "").toLowerCase().trim();
+        const selStatus = selectedStatus.toLowerCase().trim();
+
+        if (selStatus === "placement ready" || selStatus === "ready") {
+          if (sStatus !== "placement ready" && (st.metrics?.employabilityIndex || 0) < 75) return false;
+        } else if (selStatus === "needs improvement" || selStatus === "needs_improvement") {
+          if (sStatus !== "needs improvement" && ((st.metrics?.employabilityIndex || 0) < 50 || (st.metrics?.employabilityIndex || 0) >= 75)) return false;
+        } else if (selStatus === "at risk" || selStatus === "at_risk") {
+          if (sStatus !== "at risk" && (st.metrics?.employabilityIndex || 0) >= 50) return false;
+        } else if (selStatus === "placed") {
+          if (sPlacementStatus !== "placed") return false;
+        } else if (selStatus === "unplaced") {
+          if (sPlacementStatus !== "unplaced") return false;
+        } else {
+          if (sStatus !== selStatus && sPlacementStatus !== selStatus) return false;
+        }
+      }
+
+      return true;
+    });
+  }, [students, selectedBranch, selectedStatus]);
 
   const handleExportCsv = async () => {
     if (exporting) return;
@@ -413,13 +482,16 @@ export function StudentManagementPage() {
       {/* Filter Bar and DataTable */}
       <DataTable
         columns={columns}
-        data={students}
+        data={filteredStudents}
         searchPlaceholder="Search candidate by name, USN, or branch..."
         searchKey={(item, q) =>
-          item.name.toLowerCase().includes(q) ||
-          (item.usn && item.usn.toLowerCase().includes(q)) ||
-          (item.rollNo && item.rollNo.toLowerCase().includes(q)) ||
-          item.branch.toLowerCase().includes(q)
+          Boolean(
+            (item.name && item.name.toLowerCase().includes(q)) ||
+            (item.usn && item.usn.toLowerCase().includes(q)) ||
+            (item.rollNo && item.rollNo.toLowerCase().includes(q)) ||
+            (item.branch && item.branch.toLowerCase().includes(q)) ||
+            (item.email && item.email.toLowerCase().includes(q))
+          )
         }
         onRowClick={(row) => handleViewStudent(row)}
         filterComponent={
@@ -430,10 +502,11 @@ export function StudentManagementPage() {
               className="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             >
               <option value="All">All Branches</option>
-              <option value="Computer Science & Engineering">CSE</option>
-              <option value="Information Science">ISE</option>
-              <option value="Artificial Intelligence">AI/ML</option>
-              <option value="Electronics & Communication">ECE</option>
+              {availableBranches.map((b) => (
+                <option key={b} value={b}>
+                  {b}
+                </option>
+              ))}
             </select>
 
             <select
@@ -442,10 +515,25 @@ export function StudentManagementPage() {
               className="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             >
               <option value="All">All Statuses</option>
-              <option value="Placement Ready">Placement Ready</option>
               <option value="Needs Improvement">Needs Improvement</option>
+              <option value="Placement Ready">Placement Ready</option>
               <option value="At Risk">At Risk</option>
+              <option value="Placed">Placed</option>
+              <option value="Unplaced">Unplaced</option>
             </select>
+
+            {(selectedBranch !== "All" || selectedStatus !== "All") && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedBranch("All");
+                  setSelectedStatus("All");
+                }}
+                className="px-2 py-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+              >
+                Reset Filters
+              </button>
+            )}
           </div>
         }
       />

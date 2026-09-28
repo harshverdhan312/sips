@@ -2,6 +2,14 @@ import React, { useState, useMemo } from "react";
 import { Search, ChevronLeft, ChevronRight, ArrowUpDown } from "lucide-react";
 import { cn } from "../../utils/cn";
 
+function getNestedValue(obj, path) {
+  if (!obj || !path) return undefined;
+  if (typeof path === "function") return path(obj);
+  return String(path)
+    .split(".")
+    .reduce((acc, part) => (acc != null ? acc[part] : undefined), obj);
+}
+
 export function DataTable({
   columns,
   data,
@@ -21,25 +29,40 @@ export function DataTable({
   const filteredData = useMemo(() => {
     let result = [...data];
     if (searchTerm) {
-      const q = searchTerm.toLowerCase();
+      const q = searchTerm.toLowerCase().trim();
       result = result.filter((item) => {
         if (typeof searchKey === "function") {
           return searchKey(item, q);
         }
-        const val = item[searchKey];
+        const val = getNestedValue(item, searchKey);
         if (typeof val === "string") return val.toLowerCase().includes(q);
+        if (typeof val === "number") return String(val).includes(q);
         return false;
       });
     }
 
     if (sortKey) {
       result.sort((a, b) => {
-        let valA = a[sortKey];
-        let valB = b[sortKey];
-        if (typeof valA === "string") {
-          valA = valA.toLowerCase();
-          valB = valB.toLowerCase();
+        let valA = getNestedValue(a, sortKey);
+        let valB = getNestedValue(b, sortKey);
+
+        if (valA == null && valB == null) return 0;
+        if (valA == null) return 1;
+        if (valB == null) return -1;
+
+        // Check if both values are numeric (numbers or numeric strings)
+        const isNumA = typeof valA === "number" || (!isNaN(parseFloat(valA)) && isFinite(valA) && typeof valA !== "boolean");
+        const isNumB = typeof valB === "number" || (!isNaN(parseFloat(valB)) && isFinite(valB) && typeof valB !== "boolean");
+
+        if (isNumA && isNumB) {
+          const numA = typeof valA === "number" ? valA : parseFloat(valA);
+          const numB = typeof valB === "number" ? valB : parseFloat(valB);
+          return sortOrder === "asc" ? numA - numB : numB - numA;
         }
+
+        if (typeof valA === "string") valA = valA.toLowerCase();
+        if (typeof valB === "string") valB = valB.toLowerCase();
+
         if (valA < valB) return sortOrder === "asc" ? -1 : 1;
         if (valA > valB) return sortOrder === "asc" ? 1 : -1;
         return 0;

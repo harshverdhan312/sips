@@ -140,10 +140,9 @@ export const placementService = {
   async getStudents(filters = {}) {
     try {
       const queryParams = new URLSearchParams();
+      queryParams.append('limit', '500');
       if (filters.search) queryParams.append('search', filters.search);
-      if (filters.branch && filters.branch !== "All") queryParams.append('branch', filters.branch);
-      if (filters.status && filters.status !== "All") queryParams.append('status', filters.status);
-      const qs = queryParams.toString() ? `?${queryParams.toString()}` : '';
+      const qs = `?${queryParams.toString()}`;
 
       const res = await api.get(`/api/admin/students${qs}`);
       if (res && res.students && res.students.length > 0) {
@@ -203,17 +202,54 @@ export const placementService = {
         });
 
         if (filters.status && filters.status !== "All") {
-          mapped = mapped.filter(st =>
-            st.status.toLowerCase() === filters.status.toLowerCase() ||
-            st.placementStatus.toLowerCase() === filters.status.toLowerCase()
-          );
+          const targetStatus = filters.status.toLowerCase().trim();
+          mapped = mapped.filter((st) => {
+            const sStatus = (st.status || "").toLowerCase().trim();
+            const sPlacement = (st.placementStatus || "").toLowerCase().trim();
+
+            if (targetStatus === "placement ready" || targetStatus === "ready") {
+              return sStatus === "placement ready" || st.metrics?.employabilityIndex >= 75;
+            }
+            if (targetStatus === "needs improvement" || targetStatus === "needs_improvement") {
+              return sStatus === "needs improvement" || (st.metrics?.employabilityIndex >= 50 && st.metrics?.employabilityIndex < 75);
+            }
+            if (targetStatus === "at risk" || targetStatus === "at_risk") {
+              return sStatus === "at risk" || st.metrics?.employabilityIndex < 50;
+            }
+            if (targetStatus === "placed") {
+              return sPlacement === "placed";
+            }
+            if (targetStatus === "unplaced") {
+              return sPlacement === "unplaced";
+            }
+            return sStatus === targetStatus || sPlacement === targetStatus;
+          });
         }
 
         if (filters.branch && filters.branch !== "All") {
-          mapped = mapped.filter(st =>
-            st.branch.toLowerCase().includes(filters.branch.toLowerCase()) ||
-            filters.branch.toLowerCase().includes(st.branch.toLowerCase())
-          );
+          const targetBranch = filters.branch.toLowerCase().trim();
+          mapped = mapped.filter((st) => {
+            const sBranch = (st.branch || "").toLowerCase().trim();
+            if (targetBranch === "computer science" || targetBranch === "computer science & engineering" || targetBranch === "cse") {
+              return sBranch.includes("computer") || sBranch.includes("cs");
+            }
+            if (targetBranch === "electronics" || targetBranch === "electronics & communication" || targetBranch === "ece") {
+              return sBranch.includes("electron") || sBranch.includes("ec");
+            }
+            if (targetBranch === "information science" || targetBranch === "ise" || targetBranch === "it") {
+              return sBranch.includes("information") || sBranch.includes("is") || sBranch.includes("it");
+            }
+            if (targetBranch === "electrical" || targetBranch === "electrical engineering" || targetBranch === "eee") {
+              return sBranch.includes("electric") || sBranch.includes("ee");
+            }
+            if (targetBranch === "mechanical" || targetBranch === "mechanical engineering" || targetBranch === "me") {
+              return sBranch.includes("mechanic") || sBranch.includes("me");
+            }
+            if (targetBranch === "civil" || targetBranch === "civil engineering") {
+              return sBranch.includes("civil");
+            }
+            return sBranch.includes(targetBranch) || targetBranch.includes(sBranch);
+          });
         }
 
         return mapped;
@@ -231,27 +267,47 @@ export const placementService = {
     try {
       const res = await api.get('/api/admin/jobs');
       if (res && res.jobs) {
-        return res.jobs.map((j) => ({
-          id: j._id,
-          _id: j._id,
-          company: j.company,
-          logo: "https://www.google.com/favicon.ico",
-          role: j.role || j.title,
-          department: j.department || "Engineering",
-          location: j.location || "Bengaluru, India",
-          ctc: j.ctc || "12 LPA - 16 LPA",
-          type: j.type || "Full-time",
-          deadline: j.deadline ? new Date(j.deadline).toISOString().split('T')[0] : "2025-06-30",
-          postedDate: j.createdAt ? new Date(j.createdAt).toLocaleDateString() : "Active",
-          minCgpa: j.minCgpa || 7.0,
-          allowedBranches: j.allowedBranches || ["CSE", "ISE", "ECE"],
-          requiredSkills: Array.isArray(j.requiredSkills) ? j.requiredSkills : ["Java", "SQL"],
-          description: j.description || "Exciting engineering role on campus.",
-          studentMatch: 85,
-          batchEligibleCount: j.eligibleCount || 0,
-          batchMatchedCount: j.matchedCount || 0,
-          status: j.status === 'ACTIVE' ? "Active Drive" : "Closed"
-        }));
+        const now = new Date();
+        return res.jobs.map((j) => {
+          let isExpired = false;
+          if (j.deadline) {
+            const deadlineDate = new Date(j.deadline);
+            if (!isNaN(deadlineDate.getTime())) {
+              const endOfDay = new Date(deadlineDate);
+              if (typeof j.deadline === 'string' && j.deadline.length === 10) {
+                endOfDay.setHours(23, 59, 59, 999);
+              }
+              isExpired = endOfDay < now;
+            }
+          }
+          const isStatusActive = (j.status || 'ACTIVE').toUpperCase() === 'ACTIVE';
+          const isActive = isStatusActive && !isExpired;
+
+          return {
+            id: j._id,
+            _id: j._id,
+            company: j.company,
+            logo: "https://www.google.com/favicon.ico",
+            role: j.role || j.title,
+            department: j.department || "Engineering",
+            location: j.location || "Bengaluru, India",
+            ctc: j.ctc || "12 LPA - 16 LPA",
+            type: j.type || "Full-time",
+            deadline: j.deadline ? new Date(j.deadline).toISOString().split('T')[0] : "Open Drive",
+            deadlineRaw: j.deadline,
+            postedDate: j.createdAt ? new Date(j.createdAt).toLocaleDateString() : "Active",
+            minCgpa: j.minCgpa || 7.0,
+            allowedBranches: j.allowedBranches || ["CSE", "ISE", "ECE"],
+            requiredSkills: Array.isArray(j.requiredSkills) ? j.requiredSkills : ["Java", "SQL"],
+            description: j.description || "Exciting engineering role on campus.",
+            studentMatch: 85,
+            batchEligibleCount: j.eligibleCount || 0,
+            batchMatchedCount: j.matchedCount || 0,
+            isExpired,
+            isActive,
+            status: isActive ? "Active Drive" : isExpired ? "Deadline Passed" : "Closed"
+          };
+        });
       }
     } catch (e) {
       console.warn("Could not fetch jobs from backend:", e.message);
@@ -525,9 +581,9 @@ export const placementService = {
               email: a.student.email,
               branch: a.student.branch,
               batch: a.student.batch,
-              cgpa: a.student.cgpa || 7.5,
+              cgpa: typeof a.student.cgpa === 'number' ? a.student.cgpa : 0,
               placementStatus: a.student.placementStatus || "UNPLACED",
-              readinessScore: a.student.readinessScore || 65,
+              readinessScore: typeof a.student.readinessScore === 'number' ? a.student.readinessScore : 0,
               skills: a.student.skills || [],
               avatar: a.student.profileImageUrl || null,
               profileImageUrl: a.student.profileImageUrl || null

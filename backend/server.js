@@ -3,8 +3,18 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const dns = require('dns');
 const config = require('./config');
 const logger = require('./utils/logger');
+
+// Set reliable public DNS servers for resolving MongoDB Atlas shard/SRV records on local networks
+if (config.mongoUri && config.mongoUri.includes('mongodb.net')) {
+  try {
+    dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
+  } catch (err) {
+    logger.debug('DNS setServers error:', err.message);
+  }
+}
 
 const app = express();
 
@@ -145,7 +155,7 @@ app.use(require('./middleware/errorHandler'));
 if (!config.isTest) {
   mongoose.set('bufferCommands', false);
 
-  mongoose.connect(config.mongoUri, { serverSelectionTimeoutMS: 5000 })
+  mongoose.connect(config.mongoUri, { serverSelectionTimeoutMS: 15000, connectTimeoutMS: 15000 })
     .then((conn) => {
       logger.info(`✅ Connected to MongoDB: ${conn.connection.host}/${conn.connection.name}`);
     })

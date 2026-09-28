@@ -31,17 +31,11 @@ export function StudentJobsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [matchFilter, setMatchFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [selectedJob, setSelectedJob] = useState(null);
   const [analyzingMl, setAnalyzingMl] = useState(false);
   const [mlAnalysisResult, setMlAnalysisResult] = useState(null);
-  const [appliedJobIds, setAppliedJobIds] = useState(() => {
-    try {
-      const saved = localStorage.getItem("sips_applied_job_ids");
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [applyingJobId, setApplyingJobId] = useState(null);
 
   const handleSelectJob = (job) => {
     setSelectedJob(job);
@@ -81,18 +75,44 @@ export function StudentJobsPage() {
     load();
   }, [addToast]);
 
-  const handleApply = (job) => {
-    if (!appliedJobIds.includes(job.id)) {
-      const updated = [...appliedJobIds, job.id];
-      setAppliedJobIds(updated);
-      try {
-        localStorage.setItem("sips_applied_job_ids", JSON.stringify(updated));
-      } catch (e) {
-        console.error(e);
-      }
+  const handleApply = async (job) => {
+    if (!job) return;
+    const jobId = job.id || job._id;
+
+    if (job.isEligible === false) {
+      const reasonMsg = job.eligibilityReasons?.length
+        ? job.eligibilityReasons.join(". ")
+        : "You do not satisfy the eligibility requirements for this job.";
+      addToast(reasonMsg, "error");
+      return;
     }
-    addToast(`Application registered for ${job.company} (${job.role})!`, "success");
-    setSelectedJob(null);
+
+    try {
+      setApplyingJobId(jobId);
+      await studentService.applyToJob(jobId);
+      
+      // Update local state
+      setJobs((prev) =>
+        prev.map((j) =>
+          (j.id === jobId || j._id === jobId)
+            ? { ...j, hasApplied: true, applicationStatus: "APPLIED" }
+            : j
+        )
+      );
+
+      if (selectedJob && (selectedJob.id === jobId || selectedJob._id === jobId)) {
+        setSelectedJob((prev) => ({ ...prev, hasApplied: true, applicationStatus: "APPLIED" }));
+      }
+
+      addToast(`Application submitted successfully for ${job.company} (${job.role})!`, "success");
+    } catch (err) {
+      const msg = err.data?.reasons?.length
+        ? err.data.reasons.join(". ")
+        : err.data?.message || err.message || "Failed to submit application.";
+      addToast(msg, "error");
+    } finally {
+      setApplyingJobId(null);
+    }
   };
 
   const filteredJobs = useMemo(() => {
@@ -122,16 +142,25 @@ export function StudentJobsPage() {
         matchesType = job.type.toLowerCase().includes(typeFilter.toLowerCase());
       }
 
-      return matchesSearch && matchesTier && matchesType;
+      // Status filtering (running / active vs closed / expired)
+      let matchesStatus = true;
+      if (statusFilter === "active") {
+        matchesStatus = Boolean(job.isActive);
+      } else if (statusFilter === "closed") {
+        matchesStatus = !job.isActive;
+      }
+
+      return matchesSearch && matchesTier && matchesType && matchesStatus;
     });
-  }, [jobs, searchQuery, matchFilter, typeFilter]);
+  }, [jobs, searchQuery, matchFilter, typeFilter, statusFilter]);
 
   if (loading) {
     return <DashboardSkeleton />;
   }
 
+  const activeDrivesCount = jobs.filter((j) => j.isActive).length;
   const highMatchCount = jobs.filter((j) => j.matchScore >= 80).length;
-  const appliedCount = appliedJobIds.length;
+  const appliedCount = jobs.filter((j) => j.hasApplied).length;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -149,11 +178,16 @@ export function StudentJobsPage() {
 
         <div className="flex items-center gap-3">
           <Badge variant="primary" size="lg">
-            {jobs.length} Active Drives
+            {activeDrivesCount} Active Drive{activeDrivesCount === 1 ? "" : "s"}
           </Badge>
           <Badge variant="success" size="lg">
             {highMatchCount} High Matches (≥80%)
           </Badge>
+          {appliedCount > 0 && (
+            <Badge variant="neutral" size="lg">
+              {appliedCount} Applied
+            </Badge>
+          )}
         </div>
       </div>
 
@@ -174,6 +208,20 @@ export function StudentJobsPage() {
 
           {/* Filters */}
           <div className="flex flex-wrap items-center gap-3">
+            {/* Drive Status Filter */}
+            <div className="flex items-center gap-1.5 text-xs">
+              <span className="font-semibold text-slate-600">Drive Status:</span>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-medium bg-white text-slate-700 cursor-pointer"
+              >
+                <option value="all">All Drives ({jobs.length})</option>
+                <option value="active">Active / Running ({activeDrivesCount})</option>
+                <option value="closed">Closed / Expired ({jobs.length - activeDrivesCount})</option>
+              </select>
+            </div>
+
             {/* Match Tier Dropdown */}
             <div className="flex items-center gap-1.5 text-xs">
               <Filter className="w-3.5 h-3.5 text-slate-400" />
@@ -211,12 +259,15 @@ export function StudentJobsPage() {
       {filteredJobs.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filteredJobs.map((job) => {
-            const hasApplied = appliedJobIds.includes(job.id);
-            const isEligibleCgpa = student ? student.cgpa >= job.minCgpa : true;
+            const hasApplied = Boolean(job.hasApplied);
+            const isEligible = job.isEligible !== false;
+            const isApplying = applyingJobId === (job.id || job._id);
+            const isDriveActive = Boolean(job.isActive);
+            const isExpired = Boolean(job.isExpired);
 
             return (
               <Card
-                key={job.id}
+                key={job.id || job._id}
                 className="flex flex-col justify-between hover:border-slate-300 transition-all hover:shadow-xs p-5"
               >
                 <div className="space-y-4">
@@ -242,8 +293,8 @@ export function StudentJobsPage() {
                       </div>
                     </div>
 
-                    {/* Match Score Badge */}
-                    <div className="text-right shrink-0">
+                    {/* Match Score & Eligibility / Status Badge */}
+                    <div className="flex flex-col items-end gap-1 shrink-0">
                       <Badge
                         variant={
                           job.matchScore >= 80
@@ -257,7 +308,27 @@ export function StudentJobsPage() {
                       >
                         {job.matchScore}% Match
                       </Badge>
-                      <p className="text-[10px] text-slate-400 mt-0.5">Calibrated</p>
+                      {isExpired ? (
+                        <span className="text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                          Deadline Passed
+                        </span>
+                      ) : !isDriveActive ? (
+                        <span className="text-[11px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200">
+                          Drive Closed
+                        </span>
+                      ) : !isEligible ? (
+                        <span className="text-[11px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">
+                          Not Eligible
+                        </span>
+                      ) : hasApplied ? (
+                        <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                          Applied
+                        </span>
+                      ) : (
+                        <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                          Active Drive
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -268,10 +339,16 @@ export function StudentJobsPage() {
                       <span className="font-bold text-emerald-700 text-sm">{job.ctc}</span>
                     </div>
                     <div className="text-right">
-                      <span className="text-[10px] text-slate-400 uppercase font-bold block">Min CGPA</span>
-                      <span className={`font-semibold ${isEligibleCgpa ? 'text-slate-800' : 'text-rose-600'}`}>
-                        {job.minCgpa} {isEligibleCgpa ? '✓ Eligible' : '⚠️ Below cutoff'}
-                      </span>
+                      <span className="text-[10px] text-slate-400 uppercase font-bold block">Eligibility</span>
+                      {isEligible ? (
+                        <span className="font-semibold text-emerald-700">
+                          {job.minCgpa > 0 ? `Min CGPA: ${job.minCgpa}` : "Eligible"}
+                        </span>
+                      ) : (
+                        <span className="font-semibold text-rose-600">
+                          {job.eligibilityReasons?.[0] || "Requirements not met"}
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -315,7 +392,9 @@ export function StudentJobsPage() {
                 <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-1 text-xs text-slate-400">
                     <Clock className="w-3.5 h-3.5" />
-                    <span>Deadline: {job.deadline}</span>
+                    <span className={isExpired ? "text-amber-700 font-semibold" : ""}>
+                      Deadline: {job.deadline} {isExpired ? "(Passed)" : ""}
+                    </span>
                   </div>
 
                   <div className="flex items-center gap-2">
@@ -328,16 +407,29 @@ export function StudentJobsPage() {
                     </Button>
 
                     <Button
-                      variant={hasApplied ? "outline" : "primary"}
+                      variant={hasApplied ? "outline" : (isEligible && isDriveActive) ? "primary" : "outline"}
                       size="sm"
-                      disabled={hasApplied}
+                      disabled={hasApplied || !isEligible || !isDriveActive || isApplying}
+                      loading={isApplying}
                       onClick={() => handleApply(job)}
-                      className={hasApplied ? "text-emerald-700 bg-emerald-50 border-emerald-200" : ""}
+                      className={
+                        hasApplied
+                          ? "text-emerald-700 bg-emerald-50 border-emerald-200 cursor-default"
+                          : (!isEligible || !isDriveActive)
+                          ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-75"
+                          : ""
+                      }
                     >
                       {hasApplied ? (
                         <>
                           <Check className="w-3.5 h-3.5 mr-1" /> Applied
                         </>
+                      ) : isExpired ? (
+                        "Deadline Passed"
+                      ) : !isDriveActive ? (
+                        "Drive Closed"
+                      ) : !isEligible ? (
+                        "Not Eligible"
                       ) : (
                         "Apply"
                       )}
@@ -421,6 +513,23 @@ export function StudentJobsPage() {
               </div>
             </div>
 
+            {/* Eligibility Ineligibility Banner if not eligible */}
+            {selectedJob.isEligible === false && (
+              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 space-y-1">
+                <div className="flex items-center gap-2 font-bold text-xs">
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span>You are not eligible to apply for this campus drive</span>
+                </div>
+                {selectedJob.eligibilityReasons?.length > 0 && (
+                  <ul className="list-disc list-inside text-xs pl-6 text-rose-700 space-y-0.5">
+                    {selectedJob.eligibilityReasons.map((r, idx) => (
+                      <li key={idx}>{r}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+
             {/* AI Hybrid ML Breakdown & Trigger */}
             <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3">
               <div className="flex items-center justify-between">
@@ -435,7 +544,7 @@ export function StudentJobsPage() {
                   size="xs"
                   loading={analyzingMl}
                   disabled={analyzingMl}
-                  onClick={() => handleAnalyzeMatch(selectedJob.id)}
+                  onClick={() => handleAnalyzeMatch(selectedJob.id || selectedJob._id)}
                   icon={RefreshCw}
                 >
                   {mlAnalysisResult ? "Re-analyze with AI" : "Run ML Hybrid Match"}
@@ -551,7 +660,7 @@ export function StudentJobsPage() {
                 <div>
                   <span className="text-slate-500 font-medium block">Eligible Branches</span>
                   <span className="font-semibold text-slate-800">
-                    {selectedJob.allowedBranches.join(", ")}
+                    {selectedJob.allowedBranches.length > 0 ? selectedJob.allowedBranches.join(", ") : "All Branches"}
                   </span>
                 </div>
                 <div>
@@ -560,7 +669,9 @@ export function StudentJobsPage() {
                 </div>
                 <div>
                   <span className="text-slate-500 font-medium block">Application Deadline</span>
-                  <span className="font-semibold text-slate-800">{selectedJob.deadline}</span>
+                  <span className={`font-semibold ${selectedJob.isExpired ? "text-rose-600" : "text-slate-800"}`}>
+                    {selectedJob.deadline} {selectedJob.isExpired ? "(Passed)" : ""}
+                  </span>
                 </div>
               </div>
             </div>
@@ -571,13 +682,33 @@ export function StudentJobsPage() {
                 Close
               </Button>
               <Button
-                variant={appliedJobIds.includes(selectedJob.id) ? "outline" : "primary"}
+                variant={selectedJob.hasApplied ? "outline" : (selectedJob.isEligible !== false && selectedJob.isActive) ? "primary" : "outline"}
                 size="md"
-                disabled={appliedJobIds.includes(selectedJob.id)}
+                disabled={
+                  selectedJob.hasApplied ||
+                  selectedJob.isEligible === false ||
+                  !selectedJob.isActive ||
+                  applyingJobId === (selectedJob.id || selectedJob._id)
+                }
+                loading={applyingJobId === (selectedJob.id || selectedJob._id)}
                 onClick={() => handleApply(selectedJob)}
-                className={appliedJobIds.includes(selectedJob.id) ? "text-emerald-700 bg-emerald-50 border-emerald-200" : ""}
+                className={
+                  selectedJob.hasApplied
+                    ? "text-emerald-700 bg-emerald-50 border-emerald-200 cursor-default"
+                    : (selectedJob.isEligible === false || !selectedJob.isActive)
+                    ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-75"
+                    : ""
+                }
               >
-                {appliedJobIds.includes(selectedJob.id) ? "Application Submitted" : "Submit Application"}
+                {selectedJob.hasApplied
+                  ? "Application Submitted"
+                  : selectedJob.isExpired
+                  ? "Deadline Passed"
+                  : !selectedJob.isActive
+                  ? "Drive Closed"
+                  : selectedJob.isEligible === false
+                  ? "Not Eligible"
+                  : "Submit Application"}
               </Button>
             </div>
           </div>
