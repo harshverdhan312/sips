@@ -44,6 +44,7 @@ export function PublicStudentProfilePage() {
   const [error, setError] = useState(null);
   const [profileData, setProfileData] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -51,6 +52,7 @@ export function PublicStudentProfilePage() {
     async function loadProfile() {
       setLoading(true);
       setError(null);
+      setImageError(false);
       try {
         const response = await studentService.getPublicStudentProfile(username);
         if (isMounted) {
@@ -183,14 +185,12 @@ export function PublicStudentProfilePage() {
           <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8 text-center md:text-left">
             {/* Avatar */}
             <div className="relative shrink-0">
-              {avatarUrl ? (
+              {avatarUrl && !imageError ? (
                 <img
                   src={avatarUrl}
                   alt={profile.name}
                   className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl object-cover border-2 border-slate-100 shadow-md"
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                  }}
+                  onError={() => setImageError(true)}
                 />
               ) : (
                 <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-indigo-400 flex items-center justify-center font-bold text-3xl sm:text-4xl text-white shadow-md shadow-indigo-600/20 border-2 border-indigo-100">
