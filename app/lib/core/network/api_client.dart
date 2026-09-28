@@ -72,10 +72,16 @@ class ApiClient {
   }
 
   Uri _buildUri(String path, [Map<String, String>? queryParams]) {
-    final cleanPath = path.startsWith('/') ? path : '/$path';
-    final normalizedBaseUrl = _baseUrl.endsWith('/')
+    var cleanPath = path.startsWith('/') ? path : '/$path';
+    var normalizedBaseUrl = _baseUrl.endsWith('/')
         ? _baseUrl.substring(0, _baseUrl.length - 1)
         : _baseUrl;
+
+    // Handle case where baseUrl already contains /api and path starts with /api/
+    if (normalizedBaseUrl.endsWith('/api') && cleanPath.startsWith('/api/')) {
+      cleanPath = cleanPath.substring(4);
+    }
+
     final fullUrl = '$normalizedBaseUrl$cleanPath';
     final uri = Uri.parse(fullUrl);
     if (queryParams != null && queryParams.isNotEmpty) {
