@@ -17,6 +17,7 @@ const memoryDb = require('../utils/memoryDb');
 const config = require('../config');
 const logger = require('../utils/logger');
 const resumeExtractor = require('../utils/resumeExtractor');
+const cloudinaryService = require('../services/cloudinaryService');
 const { validateUsername, validateLinkedInUrl } = require('../utils/usernameValidator');
 
 /**
@@ -810,7 +811,23 @@ exports.uploadProfileImage = async (req, res) => {
       });
     }
 
-    const newImageUrl = `/uploads/${req.file.filename}`;
+    let newImageUrl = `/uploads/${req.file.filename}`;
+
+    // If Cloudinary is configured, upload to Cloudinary and clean up temporary local file
+    if (cloudinaryService.isCloudinaryConfigured()) {
+      try {
+        const cloudResult = await cloudinaryService.uploadImage(uploadedFilePath, {
+          folder: 'sips/avatars',
+          public_id: `profile-${req.user.id}-${Date.now()}`
+        });
+        newImageUrl = cloudResult.secure_url;
+        // Clean up temporary local upload file
+        safeDeleteUploadFile(req.file.filename);
+      } catch (cloudErr) {
+        logger.warn('Cloudinary upload failed, falling back to local storage:', cloudErr.message);
+        newImageUrl = `/uploads/${req.file.filename}`;
+      }
+    }
 
     // ----------------------------------------------------
     // Resilient In-Memory Mode
@@ -827,7 +844,11 @@ exports.uploadProfileImage = async (req, res) => {
 
       // Clean up previous image file if different
       if (oldImage && oldImage !== newImageUrl) {
-        safeDeleteUploadFile(oldImage);
+        if (oldImage.includes('cloudinary.com')) {
+          cloudinaryService.deleteImage(oldImage);
+        } else {
+          safeDeleteUploadFile(oldImage);
+        }
       }
 
       return res.status(200).json({
@@ -862,7 +883,11 @@ exports.uploadProfileImage = async (req, res) => {
 
     // Clean up previous image file if successfully replaced
     if (oldImage && oldImage !== newImageUrl) {
-      safeDeleteUploadFile(oldImage);
+      if (oldImage.includes('cloudinary.com')) {
+        cloudinaryService.deleteImage(oldImage);
+      } else {
+        safeDeleteUploadFile(oldImage);
+      }
     }
 
     res.status(200).json({
@@ -894,7 +919,11 @@ exports.deleteProfileImage = async (req, res) => {
       const oldImage = student.profileImageUrl;
       student.profileImageUrl = null;
       if (oldImage) {
-        safeDeleteUploadFile(oldImage);
+        if (oldImage.includes('cloudinary.com')) {
+          cloudinaryService.deleteImage(oldImage);
+        } else {
+          safeDeleteUploadFile(oldImage);
+        }
       }
 
       return res.status(200).json({
@@ -918,7 +947,11 @@ exports.deleteProfileImage = async (req, res) => {
     await student.save();
 
     if (oldImage) {
-      safeDeleteUploadFile(oldImage);
+      if (oldImage.includes('cloudinary.com')) {
+        cloudinaryService.deleteImage(oldImage);
+      } else {
+        safeDeleteUploadFile(oldImage);
+      }
     }
 
     res.status(200).json({

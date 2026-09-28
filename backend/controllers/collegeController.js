@@ -8,6 +8,7 @@ const { parseCSV } = require('../utils/csvParser');
 const memoryDb = require('../utils/memoryDb');
 const config = require('../config');
 const logger = require('../utils/logger');
+const cloudinaryService = require('../services/cloudinaryService');
 
 /**
  * Helper to verify if a file has valid image magic bytes (JPEG, PNG, GIF, WEBP)
@@ -861,7 +862,22 @@ exports.uploadLogo = async (req, res) => {
       });
     }
 
-    const newLogoUrl = `/uploads/${req.file.filename}`;
+    let newLogoUrl = `/uploads/${req.file.filename}`;
+
+    // If Cloudinary is configured, upload to Cloudinary and clean up temporary local file
+    if (cloudinaryService.isCloudinaryConfigured()) {
+      try {
+        const cloudResult = await cloudinaryService.uploadImage(uploadedFilePath, {
+          folder: 'sips/colleges',
+          public_id: `logo-${req.collegeId || 'college'}-${Date.now()}`
+        });
+        newLogoUrl = cloudResult.secure_url;
+        safeDeleteUploadFile(req.file.filename);
+      } catch (cloudErr) {
+        logger.warn('Cloudinary logo upload failed, falling back to local storage:', cloudErr.message);
+        newLogoUrl = `/uploads/${req.file.filename}`;
+      }
+    }
 
     // ----------------------------------------------------
     // Resilient In-Memory Mode
@@ -878,7 +894,11 @@ exports.uploadLogo = async (req, res) => {
 
       // Clean up previous logo file if different
       if (oldLogo && oldLogo !== newLogoUrl) {
-        safeDeleteUploadFile(oldLogo);
+        if (oldLogo.includes('cloudinary.com')) {
+          cloudinaryService.deleteImage(oldLogo);
+        } else {
+          safeDeleteUploadFile(oldLogo);
+        }
       }
 
       return res.status(200).json({
@@ -909,7 +929,11 @@ exports.uploadLogo = async (req, res) => {
 
     // Clean up previous logo file if successfully replaced
     if (oldLogo && oldLogo !== newLogoUrl) {
-      safeDeleteUploadFile(oldLogo);
+      if (oldLogo.includes('cloudinary.com')) {
+        cloudinaryService.deleteImage(oldLogo);
+      } else {
+        safeDeleteUploadFile(oldLogo);
+      }
     }
 
     res.status(200).json({
@@ -941,7 +965,11 @@ exports.deleteLogo = async (req, res) => {
       const oldLogo = college.logoUrl;
       college.logoUrl = null;
       if (oldLogo) {
-        safeDeleteUploadFile(oldLogo);
+        if (oldLogo.includes('cloudinary.com')) {
+          cloudinaryService.deleteImage(oldLogo);
+        } else {
+          safeDeleteUploadFile(oldLogo);
+        }
       }
 
       return res.status(200).json({
@@ -961,7 +989,11 @@ exports.deleteLogo = async (req, res) => {
     await college.save();
 
     if (oldLogo) {
-      safeDeleteUploadFile(oldLogo);
+      if (oldLogo.includes('cloudinary.com')) {
+        cloudinaryService.deleteImage(oldLogo);
+      } else {
+        safeDeleteUploadFile(oldLogo);
+      }
     }
 
     res.status(200).json({
