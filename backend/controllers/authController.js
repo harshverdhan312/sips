@@ -10,6 +10,25 @@ const generateToken = (payload) => {
   return jwt.sign(payload, config.jwtSecret, { expiresIn: config.jwtExpiresIn });
 };
 
+const checkStudentAccountStatus = (student) => {
+  const status = student.accountStatus || 'ACTIVE';
+  if (status === 'PASSOUT') {
+    return {
+      allowed: false,
+      status: 403,
+      message: 'Your student portal access has concluded as a graduated student. Your public career profile may remain available.'
+    };
+  }
+  if (status === 'DEACTIVATED') {
+    return {
+      allowed: false,
+      status: 403,
+      message: 'Your student account has been deactivated. Please contact your Placement Cell.'
+    };
+  }
+  return { allowed: true };
+};
+
 /**
  * POST /api/auth/login
  * Domain-based authentication for both admin and student
@@ -87,6 +106,11 @@ exports.login = async (req, res) => {
           return res.status(401).json({ message: 'Invalid credentials' });
         }
 
+        const statusCheck = checkStudentAccountStatus(student);
+        if (!statusCheck.allowed) {
+          return res.status(statusCheck.status).json({ message: statusCheck.message });
+        }
+
         const token = generateToken({
           id: student._id,
           role: 'STUDENT',
@@ -117,6 +141,11 @@ exports.login = async (req, res) => {
       const isMatch = await bcrypt.compare(password, student.passwordHash);
       if (!isMatch) {
         return res.status(401).json({ message: 'Invalid credentials' });
+      }
+
+      const statusCheck = checkStudentAccountStatus(student);
+      if (!statusCheck.allowed) {
+        return res.status(statusCheck.status).json({ message: statusCheck.message });
       }
 
       const studentCollege = memoryDb.findCollegeById(student.collegeId) || college;
@@ -199,6 +228,11 @@ exports.login = async (req, res) => {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
+      const statusCheck = checkStudentAccountStatus(student);
+      if (!statusCheck.allowed) {
+        return res.status(statusCheck.status).json({ message: statusCheck.message });
+      }
+
       const token = generateToken({
         id: student._id,
         role: 'STUDENT',
@@ -239,6 +273,11 @@ exports.login = async (req, res) => {
     const isMatch = await student.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    const statusCheck = checkStudentAccountStatus(student);
+    if (!statusCheck.allowed) {
+      return res.status(statusCheck.status).json({ message: statusCheck.message });
     }
 
     const college = await College.findById(student.collegeId);
