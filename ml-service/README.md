@@ -21,17 +21,29 @@ Python 3.11
 - Recommendation engine
 - FastAPI integration
 
-## Placement Model Reproduction
+## Placement Model
 
-The trained placement model artifact is intentionally excluded from Git.
+The trained placement model artifact (`models/placement_model.joblib`) is version-controlled in the repository for direct production inference without requiring retraining during deployment.
 
-From the repository root, regenerate it with:
+To re-train or reproduce the model from raw dataset:
 
-.\ml-service\.venv\Scripts\python.exe .\ml-service\scripts\train_placement_model.py
+```bash
+python scripts/train_placement_model.py
+```
 
-This creates: ml-service/models/placement_model.joblib
+This updates: `models/placement_model.joblib` and evaluates metadata against `data/raw/collegePlace.csv`.
 
-The placement API loads this artifact for inference.
+## Production Deployment & Installation
+
+### Production (No Cache)
+```bash
+pip install --no-cache-dir -r requirements.txt
+```
+
+### Development & Testing
+```bash
+pip install -r requirements-dev.txt
+```
 
 ## Resume Intelligence API
 
@@ -82,7 +94,7 @@ Example response:
 
 `POST /resume/semantic-match`
 
-This endpoint uses pretrained `all-MiniLM-L6-v2` Sentence-BERT embeddings with cosine similarity. It does not use a fine-tuned model.
+This endpoint uses an ONNX Runtime CPU implementation of the pretrained `all-MiniLM-L6-v2` Sentence-BERT embedding model with attention-mask weighted mean pooling and $L_2$ unit normalization. It delivers identical 384-dimensional cosine similarity without requiring the heavy PyTorch runtime.
 
 Example request:
 
