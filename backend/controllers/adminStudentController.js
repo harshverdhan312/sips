@@ -55,7 +55,16 @@ exports.getStudents = async (req, res) => {
 
     // Branch filter
     if (branch && branch !== 'All') {
-      query.branch = new RegExp(`^${branch.trim()}$`, 'i');
+      const b = branch.trim();
+      if (b.toLowerCase() === 'computer science' || b.toLowerCase() === 'computer science & engineering' || b.toLowerCase() === 'cse') {
+        query.branch = /computer|cs/i;
+      } else if (b.toLowerCase() === 'electronics' || b.toLowerCase() === 'electronics & communication' || b.toLowerCase() === 'ece') {
+        query.branch = /electron|ec/i;
+      } else if (b.toLowerCase() === 'information science' || b.toLowerCase() === 'ise' || b.toLowerCase() === 'it') {
+        query.branch = /information|is|it/i;
+      } else {
+        query.branch = new RegExp(b, 'i');
+      }
     }
 
     // Batch filter
@@ -90,7 +99,7 @@ exports.getStudents = async (req, res) => {
     }
 
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
-    const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
+    const limitNum = Math.min(1000, Math.max(1, parseInt(limit, 10) || 50));
     const skip = (pageNum - 1) * limitNum;
 
     // Sorting
@@ -430,7 +439,16 @@ exports.uploadStudentsCSV = async (req, res) => {
       });
     }
 
-    const college = await College.findById(req.collegeId);
+    let college = null;
+    try {
+      if (require('mongoose').connection.readyState === 1 && College && typeof College.findById === 'function') {
+        college = await College.findById(req.collegeId);
+      } else {
+        college = memoryDb.findCollegeById(req.collegeId);
+      }
+    } catch (e) {
+      college = memoryDb.findCollegeById(req.collegeId);
+    }
     for (const s of parsedStudents) {
       try {
         const existing = await Student.findOne({

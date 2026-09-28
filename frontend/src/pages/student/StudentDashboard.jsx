@@ -42,7 +42,8 @@ export function StudentDashboard() {
         ]);
         setStudent(studentData);
         setRadarData(radar);
-        setJobs(jobList.slice(0, 4));
+        const activeRunningJobs = (jobList || []).filter((j) => j.isActive);
+        setJobs(activeRunningJobs.slice(0, 4));
       } catch (err) {
         console.error(err);
       } finally {

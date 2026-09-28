@@ -55,7 +55,15 @@ exports.getOverview = async (req, res) => {
       Student.countDocuments({ collegeId, placementStatus: 'PLACED' }),
       Student.countDocuments({ collegeId, placementStatus: 'IN_PROCESS' }),
       Student.countDocuments({ collegeId, placementStatus: 'OPTED_OUT' }),
-      JobDescription.countDocuments({ collegeId, status: 'ACTIVE' }),
+      JobDescription.countDocuments({
+        collegeId,
+        status: 'ACTIVE',
+        $or: [
+          { deadline: null },
+          { deadline: { $exists: false } },
+          { deadline: { $gte: new Date() } }
+        ]
+      }),
       Alert.countDocuments({ collegeId, active: true }),
       Application.countDocuments({ collegeId }),
       AuditLog.find({ collegeId }).sort({ timestamp: -1 }).limit(5).lean()

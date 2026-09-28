@@ -573,21 +573,24 @@ exports.getJobApplicants = async (req, res) => {
       }
 
       const apps = memoryDb.getJobApplications(req.collegeId, jobId);
-      const applicants = apps.map(app => {
-        const student = memoryDb.findStudentById(app.studentId);
-        const { passwordHash, ...cleanStudent } = student || {};
-        const calc = student ? calculateMatch(student.skills || [], job.requiredSkills || []) : { score: 0, matchedSkills: [], missingSkills: [] };
-        return {
-          applicationId: app._id,
-          student: cleanStudent,
-          status: app.status,
-          matchScore: calc.score,
-          matchedSkills: calc.matchedSkills,
-          missingSkills: calc.missingSkills,
-          appliedAt: app.appliedAt,
-          updatedAt: app.updatedAt
-        };
-      });
+      const applicants = apps
+        .map(app => {
+          const student = memoryDb.findStudentById(app.studentId);
+          if (!student) return null;
+          const { passwordHash, ...cleanStudent } = student;
+          const calc = calculateMatch(student.skills || [], job.requiredSkills || []);
+          return {
+            applicationId: app._id,
+            student: cleanStudent,
+            status: app.status,
+            matchScore: calc.score,
+            matchedSkills: calc.matchedSkills,
+            missingSkills: calc.missingSkills,
+            appliedAt: app.appliedAt,
+            updatedAt: app.updatedAt
+          };
+        })
+        .filter(Boolean);
 
       return res.json({
         success: true,
@@ -611,7 +614,7 @@ exports.getJobApplicants = async (req, res) => {
       collegeId: req.collegeId
     })
       .sort({ appliedAt: -1 })
-      .populate('studentId', 'name rollNo usn email branch batch cgpa placementStatus readinessScore skills resumeUrl');
+      .populate('studentId', 'name rollNo usn email branch batch cgpa placementStatus readinessScore skills resumeUrl profileImageUrl');
 
     const validApps = applications.filter(app => app.studentId);
     const studentIds = validApps.map(app => app.studentId._id);

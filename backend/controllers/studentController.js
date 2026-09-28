@@ -8,6 +8,7 @@ const Application = require('../models/Application');
 const Notification = require('../models/Notification');
 const PlacementPrediction = require('../models/PlacementPrediction');
 const { calculateMatch, extractSkillsFromText } = require('../utils/matchingEngine');
+const { checkJobEligibility } = require('../utils/eligibilityChecker');
 const { sendNotification } = require('../utils/notificationService');
 const { mapStudentToPlacementInput } = require('../utils/placementDataMapper');
 const mlService = require('../services/mlService');
@@ -871,13 +872,16 @@ exports.getJobs = async (req, res) => {
       const jobsWithScores = jds.map(jd => {
         const match = student ? calculateMatch(student.skills || [], jd.requiredSkills || []) : { score: 0, matchedSkills: [], missingSkills: [] };
         const app = appMap[String(jd._id)];
+        const eligibilityReasons = student ? checkJobEligibility(student, jd) : [];
         return {
           ...jd,
           matchScore: match.score,
           matchedSkills: match.matchedSkills,
           missingSkills: match.missingSkills,
           hasApplied: !!app,
-          applicationStatus: app ? app.status : null
+          applicationStatus: app ? app.status : null,
+          isEligible: eligibilityReasons.length === 0,
+          eligibilityReasons
         };
       });
       return res.json(jobsWithScores);
@@ -910,13 +914,16 @@ exports.getJobs = async (req, res) => {
     const jobsWithScores = jds.map(jd => {
       const match = matchMap[jd._id.toString()];
       const app = appMap[jd._id.toString()];
+      const eligibilityReasons = student ? checkJobEligibility(student, jd) : [];
       return {
         ...jd.toObject(),
         matchScore: match ? match.score : 0,
         matchedSkills: match ? match.matchedSkills : [],
         missingSkills: match ? match.missingSkills : [],
         hasApplied: !!app,
-        applicationStatus: app ? app.status : null
+        applicationStatus: app ? app.status : null,
+        isEligible: eligibilityReasons.length === 0,
+        eligibilityReasons
       };
     });
 
@@ -943,13 +950,16 @@ exports.getPreferredJobs = async (req, res) => {
       const preferred = jds.map(jd => {
         const match = student ? calculateMatch(student.skills || [], jd.requiredSkills || []) : { score: 0, matchedSkills: [], missingSkills: [] };
         const app = appMap[String(jd._id)];
+        const eligibilityReasons = student ? checkJobEligibility(student, jd) : [];
         return {
           ...jd,
           matchScore: match.score,
           matchedSkills: match.matchedSkills,
           missingSkills: match.missingSkills,
           hasApplied: !!app,
-          applicationStatus: app ? app.status : null
+          applicationStatus: app ? app.status : null,
+          isEligible: eligibilityReasons.length === 0,
+          eligibilityReasons
         };
       }).filter(j => j.matchScore > 0).sort((a, b) => b.matchScore - a.matchScore);
       return res.json(preferred);
@@ -984,13 +994,16 @@ exports.getPreferredJobs = async (req, res) => {
       .map(m => {
         const jdObj = m.jdId.toObject ? m.jdId.toObject() : m.jdId;
         const app = appMap[jdObj._id.toString()];
+        const eligibilityReasons = student ? checkJobEligibility(student, jdObj) : [];
         return {
           ...jdObj,
           matchScore: m.score,
           matchedSkills: m.matchedSkills,
           missingSkills: m.missingSkills,
           hasApplied: !!app,
-          applicationStatus: app ? app.status : null
+          applicationStatus: app ? app.status : null,
+          isEligible: eligibilityReasons.length === 0,
+          eligibilityReasons
         };
       });
 
@@ -1018,12 +1031,30 @@ exports.applyToJob = async (req, res) => {
         return res.status(404).json({ success: false, message: 'Job not found' });
       }
 
-      if (job.status && job.status === 'CLOSED') {
+      if (job.status && job.status.toUpperCase() === 'CLOSED') {
         return res.status(400).json({ success: false, message: 'This job posting is closed' });
+      }
+
+      if (job.status && job.status.toUpperCase() !== 'ACTIVE') {
+        return res.status(400).json({ success: false, message: `This job posting is not active (status: ${job.status})` });
       }
 
       if (job.deadline && new Date(job.deadline) < new Date()) {
         return res.status(400).json({ success: false, message: 'The application deadline for this job has passed' });
+      }
+
+      const student = memoryDb.findStudentById(req.user.id);
+      if (!student || String(student.collegeId) !== String(req.collegeId)) {
+        return res.status(404).json({ success: false, message: 'Student profile not found' });
+      }
+
+      const reasons = checkJobEligibility(student, job);
+      if (reasons.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'You are not eligible for this job.',
+          reasons
+        });
       }
 
       const existing = memoryDb.findApplication(req.collegeId, req.user.id, jobId);
@@ -1068,12 +1099,35 @@ exports.applyToJob = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Job not found' });
     }
 
-    if (job.status && job.status === 'CLOSED') {
+    if (job.status && job.status.toUpperCase() === 'CLOSED') {
       return res.status(400).json({ success: false, message: 'This job posting is closed' });
+    }
+
+    if (job.status && job.status.toUpperCase() !== 'ACTIVE') {
+      return res.status(400).json({ success: false, message: `This job posting is not active (status: ${job.status})` });
     }
 
     if (job.deadline && new Date(job.deadline) < new Date()) {
       return res.status(400).json({ success: false, message: 'The application deadline for this job has passed' });
+    }
+
+    // Check student profile & eligibility
+    const student = await Student.findOne({
+      _id: req.user.id,
+      collegeId: req.collegeId
+    });
+
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student profile not found' });
+    }
+
+    const reasons = checkJobEligibility(student, job);
+    if (reasons.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'You are not eligible for this job.',
+        reasons
+      });
     }
 
     // Check duplicate application

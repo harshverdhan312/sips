@@ -46,6 +46,7 @@ export function JobDescriptionsPage() {
   // Candidate detail modal state
   const [activeStudent, setActiveStudent] = useState(null);
   const [studentModalOpen, setStudentModalOpen] = useState(false);
+  const [driveStatusFilter, setDriveStatusFilter] = useState("all"); // "all" | "active" | "closed"
 
   // New JD Modal State
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -81,6 +82,15 @@ export function JobDescriptionsPage() {
     }
     load();
   }, []);
+
+  const activeJobsCount = jobs.filter((j) => j.isActive).length;
+  const closedJobsCount = jobs.length - activeJobsCount;
+
+  const displayedJobs = jobs.filter((job) => {
+    if (driveStatusFilter === "active") return Boolean(job.isActive);
+    if (driveStatusFilter === "closed") return !job.isActive;
+    return true;
+  });
 
   // Fetch dynamic candidate matches and applications whenever selectedJob changes
   useEffect(() => {
@@ -284,22 +294,68 @@ export function JobDescriptionsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left column: Drives list (5 cols) */}
         <div className="lg:col-span-5 space-y-3">
-          <div className="flex items-center justify-between px-1">
-            <h3 className="font-bold text-slate-900 text-sm">
-              Active Recruitment Drives ({jobs.length})
-            </h3>
-            <span className="text-xs text-slate-400">Click to view match analytics</span>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+            <div>
+              <h3 className="font-bold text-slate-900 text-sm">
+                Recruitment Drives ({jobs.length})
+              </h3>
+              <span className="text-[11px] text-slate-500">
+                <span className="text-emerald-700 font-bold">{activeJobsCount} Active / Running</span> • {closedJobsCount} Closed/Expired
+              </span>
+            </div>
+
+            {/* Status Filter Buttons */}
+            <div className="inline-flex p-0.5 bg-slate-100 rounded-lg border border-slate-200 text-xs">
+              <button
+                type="button"
+                onClick={() => setDriveStatusFilter("all")}
+                className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all ${
+                  driveStatusFilter === "all"
+                    ? "bg-white text-indigo-700 shadow-xs"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                All ({jobs.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setDriveStatusFilter("active")}
+                className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all ${
+                  driveStatusFilter === "active"
+                    ? "bg-white text-emerald-700 shadow-xs"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                Active ({activeJobsCount})
+              </button>
+              <button
+                type="button"
+                onClick={() => setDriveStatusFilter("closed")}
+                className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all ${
+                  driveStatusFilter === "closed"
+                    ? "bg-white text-amber-700 shadow-xs"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                Closed ({closedJobsCount})
+              </button>
+            </div>
           </div>
 
           <div className="space-y-3">
-            {jobs.length === 0 && !loading && (
+            {displayedJobs.length === 0 && !loading && (
               <div className="p-8 text-center bg-white rounded-2xl border border-slate-200 text-slate-400 text-xs">
-                No recruitment drives published yet. Click "Add New Job Description" to create one.
+                {jobs.length === 0
+                  ? 'No recruitment drives published yet. Click "Add New Job Description" to create one.'
+                  : `No ${driveStatusFilter === "active" ? "active / running" : "closed / expired"} recruitment drives found.`}
               </div>
             )}
 
-            {jobs.map((job) => {
+            {displayedJobs.map((job) => {
               const isSelected = (selectedJob?._id || selectedJob?.id) === (job._id || job.id);
+              const isDriveActive = Boolean(job.isActive);
+              const isExpired = Boolean(job.isExpired);
+
               return (
                 <div
                   key={job._id || job.id}
@@ -316,9 +372,24 @@ export function JobDescriptionsPage() {
                         {job.company ? job.company.charAt(0) : "J"}
                       </div>
                       <div>
-                        <h4 className="font-bold text-slate-900 text-sm">
-                          {job.company}
-                        </h4>
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="font-bold text-slate-900 text-sm">
+                            {job.company}
+                          </h4>
+                          {isExpired ? (
+                            <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                              Expired
+                            </span>
+                          ) : !isDriveActive ? (
+                            <span className="text-[10px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+                              Closed
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                              Active
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-slate-500 font-medium">
                           {job.role}
                         </p>
@@ -331,7 +402,9 @@ export function JobDescriptionsPage() {
 
                   <div className="mt-3 flex items-center justify-between text-xs text-slate-500 border-t border-slate-100 pt-2.5">
                     <span>Eligible: <strong className="text-slate-800">{job.batchEligibleCount || 0}</strong> candidates</span>
-                    <span>Deadline: <strong className="text-slate-800">{job.deadline}</strong></span>
+                    <span className={isExpired ? "text-amber-700 font-semibold" : ""}>
+                      Deadline: <strong className={isExpired ? "text-amber-700" : "text-slate-800"}>{job.deadline}</strong>
+                    </span>
                   </div>
                 </div>
               );
@@ -350,8 +423,15 @@ export function JobDescriptionsPage() {
                     <h3 className="font-extrabold text-slate-900 text-xl">
                       {selectedJob.company}
                     </h3>
-                    <Badge variant="success" size="sm">
-                      {selectedJob.status || "Active Drive"}
+                    <Badge
+                      variant={selectedJob.isActive ? "success" : selectedJob.isExpired ? "warning" : "neutral"}
+                      size="sm"
+                    >
+                      {selectedJob.isActive
+                        ? "Active Drive"
+                        : selectedJob.isExpired
+                        ? "Deadline Passed"
+                        : (selectedJob.status || "Closed")}
                     </Badge>
                   </div>
                   <p className="text-sm font-semibold text-indigo-700 mt-0.5">

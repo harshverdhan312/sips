@@ -171,30 +171,61 @@ export const studentService = {
     try {
       const res = await api.get('/api/student/jobs');
       if (Array.isArray(res)) {
-        return res.map((j) => ({
-          id: j._id || j.id,
-          _id: j._id,
-          company: j.company,
-          role: j.role || j.title || "Software Engineer",
-          department: j.department || "Engineering",
-          location: j.location || "Bengaluru, India",
-          ctc: j.ctc || "Competitive",
-          type: j.type || "Full-time",
-          deadline: j.deadline ? new Date(j.deadline).toISOString().split('T')[0] : "Active Drive",
-          minCgpa: j.minCgpa ?? 0,
-          allowedBranches: Array.isArray(j.allowedBranches) ? j.allowedBranches : [],
-          requiredSkills: Array.isArray(j.requiredSkills) ? j.requiredSkills : [],
-          description: j.description || "",
-          matchScore: typeof j.matchScore === 'number' ? j.matchScore : 0,
-          matchedSkills: Array.isArray(j.matchedSkills) ? j.matchedSkills : [],
-          missingSkills: Array.isArray(j.missingSkills) ? j.missingSkills : [],
-          status: j.status || 'ACTIVE'
-        }));
+        const now = new Date();
+        return res.map((j) => {
+          let isExpired = false;
+          if (j.deadline) {
+            const deadlineDate = new Date(j.deadline);
+            if (!isNaN(deadlineDate.getTime())) {
+              const endOfDay = new Date(deadlineDate);
+              if (typeof j.deadline === 'string' && j.deadline.length === 10) {
+                endOfDay.setHours(23, 59, 59, 999);
+              }
+              isExpired = endOfDay < now;
+            }
+          }
+          const isStatusActive = !j.status || j.status.toUpperCase() === 'ACTIVE';
+          const isActive = isStatusActive && !isExpired;
+
+          return {
+            id: j._id || j.id,
+            _id: j._id,
+            company: j.company,
+            role: j.role || j.title || "Software Engineer",
+            department: j.department || "Engineering",
+            location: j.location || "Bengaluru, India",
+            ctc: j.ctc || "Competitive",
+            type: j.type || "Full-time",
+            deadline: j.deadline ? new Date(j.deadline).toISOString().split('T')[0] : "Open Drive",
+            deadlineRaw: j.deadline,
+            isExpired,
+            isActive,
+            minCgpa: j.minCgpa ?? 0,
+            allowedBranches: Array.isArray(j.allowedBranches) ? j.allowedBranches : [],
+            requiredSkills: Array.isArray(j.requiredSkills) ? j.requiredSkills : [],
+            description: j.description || "",
+            matchScore: typeof j.matchScore === 'number' ? j.matchScore : 0,
+            matchedSkills: Array.isArray(j.matchedSkills) ? j.matchedSkills : [],
+            missingSkills: Array.isArray(j.missingSkills) ? j.missingSkills : [],
+            hasApplied: Boolean(j.hasApplied),
+            applicationStatus: j.applicationStatus || null,
+            isEligible: j.isEligible !== undefined ? Boolean(j.isEligible) : true,
+            eligibilityReasons: Array.isArray(j.eligibilityReasons) ? j.eligibilityReasons : [],
+            status: j.status || 'ACTIVE'
+          };
+        });
       }
     } catch (e) {
       console.warn("Could not fetch student jobs:", e.message);
     }
     return [];
+  },
+
+  /**
+   * Submit job application to backend
+   */
+  async applyToJob(jobId) {
+    return await api.post(`/api/student/jobs/${jobId}/apply`);
   },
 
   /**
