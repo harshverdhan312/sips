@@ -9,6 +9,12 @@ jest.mock('../models/Student');
 jest.mock('../models/Match');
 jest.mock('../models/JobDescription');
 jest.mock('../models/Application');
+jest.mock('../services/cloudinaryService', () => ({
+  isCloudinaryConfigured: jest.fn().mockReturnValue(false),
+  uploadImage: jest.fn(),
+  uploadResume: jest.fn(),
+  deleteImage: jest.fn().mockResolvedValue(true)
+}));
 
 describe('Resume Academic Extraction & Profile Management', () => {
   describe('resumeExtractor Unit Tests', () => {

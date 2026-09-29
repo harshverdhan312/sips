@@ -504,11 +504,14 @@ exports.uploadResume = async (req, res) => {
         // Clean up temporary local upload file
         safeDeleteUploadFile(req.file.filename);
       } catch (cloudErr) {
-        logger.error('Cloudinary resume upload failed, falling back to local storage:', {
-          message: cloudErr.message,
-          error: cloudErr
+        safeDeleteUploadFile(req.file.filename);
+        logger.error('Cloudinary resume upload failed:', {
+          message: cloudErr.message
         });
-        newResumeUrl = `/uploads/${req.file.filename}`;
+        return res.status(502).json({
+          success: false,
+          message: 'File storage service is temporarily unavailable. Please try again.'
+        });
       }
     }
 
@@ -960,11 +963,14 @@ exports.uploadProfileImage = async (req, res) => {
         // Clean up temporary local upload file
         safeDeleteUploadFile(req.file.filename);
       } catch (cloudErr) {
-        logger.error('Cloudinary upload failed, falling back to local storage:', {
-          message: cloudErr.message,
-          error: cloudErr
+        safeDeleteUploadFile(req.file.filename);
+        logger.error('Cloudinary upload failed:', {
+          message: cloudErr.message
         });
-        newImageUrl = `/uploads/${req.file.filename}`;
+        return res.status(502).json({
+          success: false,
+          message: 'File storage service is temporarily unavailable. Please try again.'
+        });
       }
     }
 

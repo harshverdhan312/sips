@@ -9,6 +9,12 @@ const config = require('../config');
 
 jest.mock('../models/Student');
 jest.mock('../models/College');
+jest.mock('../services/cloudinaryService', () => ({
+  isCloudinaryConfigured: jest.fn().mockReturnValue(false),
+  uploadImage: jest.fn(),
+  uploadResume: jest.fn(),
+  deleteImage: jest.fn().mockResolvedValue(true)
+}));
 
 describe('Unified Profile Image System Tests', () => {
   const mockCollegeId = '507f1f77bcf86cd799439011';

@@ -38,6 +38,8 @@ describe('SIPS Student Lifecycle & Deletion Architecture Tests', () => {
 
   let student1Token;
   let student2Token;
+  let adminPasswordHash;
+  let studentPasswordHash;
 
   const resume1Filename = 'test-lifecycle-std1-resume.pdf';
   const avatar1Filename = 'test-lifecycle-std1-avatar.png';
@@ -46,6 +48,8 @@ describe('SIPS Student Lifecycle & Deletion Architecture Tests', () => {
 
   beforeAll(async () => {
     jest.spyOn(memoryDb, 'isMongoConnected').mockReturnValue(false);
+    adminPasswordHash = await bcrypt.hash('adminPass123', 8);
+    studentPasswordHash = await bcrypt.hash('studentPass123', 8);
 
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
@@ -61,7 +65,7 @@ describe('SIPS Student Lifecycle & Deletion Architecture Tests', () => {
       name: 'College of Engineering A',
       slug: 'college-a',
       adminEmail: 'admin@collegea.edu',
-      masterPasswordHash: await bcrypt.hash('adminPass123', 10),
+      masterPasswordHash: adminPasswordHash,
       acceptedDomains: ['collegea.edu']
     });
 
@@ -70,7 +74,7 @@ describe('SIPS Student Lifecycle & Deletion Architecture Tests', () => {
       name: 'College of Technology B',
       slug: 'college-b',
       adminEmail: 'admin@collegeb.edu',
-      masterPasswordHash: await bcrypt.hash('adminPass123', 10),
+      masterPasswordHash: adminPasswordHash,
       acceptedDomains: ['collegeb.edu']
     });
 
@@ -86,7 +90,7 @@ describe('SIPS Student Lifecycle & Deletion Architecture Tests', () => {
       rollNo: '230161530076',
       usn: '230161530076',
       email: 'rahul.sharma@collegea.edu',
-      passwordHash: await bcrypt.hash('studentPass123', 10),
+      passwordHash: studentPasswordHash,
       branch: 'Computer Science & Engineering',
       batch: '2025',
       cgpa: 8.5,

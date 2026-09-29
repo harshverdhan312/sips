@@ -28,14 +28,11 @@ function sanitizeCloudinaryUrl(urlStr) {
 function isCloudinaryConfigured() {
   const rawUrl = sanitizeCloudinaryUrl(typeof config.cloudinaryUrl === 'string' ? config.cloudinaryUrl : (process.env.CLOUDINARY_URL || ''));
   if (rawUrl.length > 0) {
-    const match = rawUrl.match(/^cloudinary:\/\/([^:]+):([^@]+)@(.+)$/i);
-    if (match) {
-      cloudinary.config({
-        cloud_name: cleanEnvStr(match[3]),
-        api_key: cleanEnvStr(match[1]),
-        api_secret: cleanEnvStr(match[2]),
-        secure: true
-      });
+    process.env.CLOUDINARY_URL = rawUrl;
+    cloudinary.config(true);
+    cloudinary.config({ secure: true });
+    const cfg = cloudinary.config();
+    if (cfg.cloud_name && cfg.api_key && cfg.api_secret) {
       return true;
     }
   }
