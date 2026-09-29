@@ -478,7 +478,24 @@ exports.uploadResume = async (req, res) => {
       });
     }
 
-    const newResumeUrl = `/uploads/${req.file.filename}`;
+    let newResumeUrl = `/uploads/${req.file.filename}`;
+
+    // If Cloudinary is configured, upload to Cloudinary and clean up temporary local file
+    if (cloudinaryService.isCloudinaryConfigured()) {
+      try {
+        const cloudResult = await cloudinaryService.uploadResume(uploadedFilePath, {
+          folder: 'sips/resumes',
+          public_id: `resume-${req.user.id}-${Date.now()}`
+        });
+        newResumeUrl = cloudResult.secure_url;
+        // Clean up temporary local upload file
+        safeDeleteUploadFile(req.file.filename);
+      } catch (cloudErr) {
+        logger.warn('Cloudinary resume upload failed, falling back to local storage:', cloudErr.message);
+        newResumeUrl = `/uploads/${req.file.filename}`;
+      }
+    }
+
     const pdfBuffer = await fs.promises.readFile(uploadedFilePath);
 
     // Extract academic details (CGPA and Graduation Year) and raw text from PDF resume
@@ -632,7 +649,11 @@ exports.uploadResume = async (req, res) => {
 
     // Clean up previous resume file if successfully replaced
     if (oldResume && oldResume !== newResumeUrl) {
-      safeDeleteUploadFile(oldResume);
+      if (oldResume.includes('cloudinary.com')) {
+        cloudinaryService.deleteImage(oldResume);
+      } else {
+        safeDeleteUploadFile(oldResume);
+      }
     }
 
     res.json({
@@ -672,7 +693,11 @@ exports.deleteResume = async (req, res) => {
       }
 
       if (student.resumeUrl) {
-        safeDeleteUploadFile(student.resumeUrl);
+        if (student.resumeUrl.includes('cloudinary.com')) {
+          cloudinaryService.deleteImage(student.resumeUrl);
+        } else {
+          safeDeleteUploadFile(student.resumeUrl);
+        }
       }
 
       student.resumeUrl = '';
@@ -706,7 +731,11 @@ exports.deleteResume = async (req, res) => {
     }
 
     if (student.resumeUrl) {
-      safeDeleteUploadFile(student.resumeUrl);
+      if (student.resumeUrl.includes('cloudinary.com')) {
+        cloudinaryService.deleteImage(student.resumeUrl);
+      } else {
+        safeDeleteUploadFile(student.resumeUrl);
+      }
     }
 
     student.resumeUrl = '';
@@ -757,6 +786,11 @@ exports.getResume = async (req, res, next) => {
         success: false,
         message: 'No resume found for this student.'
       });
+    }
+
+    // If stored on Cloudinary / remote CDN, redirect directly
+    if (student.resumeUrl.startsWith('http://') || student.resumeUrl.startsWith('https://')) {
+      return res.redirect(student.resumeUrl);
     }
 
     const filename = path.basename(student.resumeUrl);

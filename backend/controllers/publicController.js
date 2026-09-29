@@ -196,6 +196,11 @@ exports.getPublicStudentResume = async (req, res, next) => {
       });
     }
 
+    // If resume is stored on Cloudinary / remote CDN, redirect directly
+    if (student.resumeUrl.startsWith('http://') || student.resumeUrl.startsWith('https://')) {
+      return res.redirect(student.resumeUrl);
+    }
+
     // Safely resolve the file in uploadDir to prevent directory traversal
     const filename = path.basename(student.resumeUrl);
     const uploadDirectory = path.resolve(config.uploadDir || path.join(__dirname, '../uploads'));

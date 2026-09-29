@@ -65,6 +65,31 @@ async function uploadImage(localFilePath, options = {}) {
 }
 
 /**
+ * Upload a PDF resume file to Cloudinary with persistent raw/image storage
+ * @param {string} localFilePath - Path to local file on disk
+ * @param {Object} [options] - Additional upload options
+ * @returns {Promise<{ secure_url: string, public_id: string }>}
+ */
+async function uploadResume(localFilePath, options = {}) {
+  if (!isCloudinaryConfigured()) {
+    throw new Error('Cloudinary is not configured on the server.');
+  }
+
+  const uploadOptions = {
+    folder: options.folder || 'sips/resumes',
+    resource_type: 'auto',
+    ...options
+  };
+
+  const result = await cloudinary.uploader.upload(localFilePath, uploadOptions);
+
+  return {
+    secure_url: result.secure_url,
+    public_id: result.public_id
+  };
+}
+
+/**
  * Delete an image from Cloudinary by public ID or URL
  * @param {string} urlOrPublicId
  * @returns {Promise<boolean>}
@@ -106,5 +131,6 @@ async function deleteImage(urlOrPublicId) {
 module.exports = {
   isCloudinaryConfigured,
   uploadImage,
+  uploadResume,
   deleteImage
 };
