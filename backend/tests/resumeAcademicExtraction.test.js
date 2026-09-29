@@ -168,15 +168,16 @@ startxref
       }
     });
 
-    test('should extract CGPA and batch from PDF and update student profile', async () => {
+    test('should NOT overwrite student CGPA, batch, or branch upon resume upload', async () => {
       const mockStudent = {
         _id: studentId,
         collegeId,
         name: 'Aarav Sharma',
         resumeUrl: '',
-        branch: 'Computer Science',
-        batch: '',
-        cgpa: 0,
+        branch: 'CSE',
+        batch: '2027',
+        cgpa: 6.9,
+        skills: ['Python', 'SQL'],
         save: jest.fn().mockResolvedValue(true)
       };
 
@@ -193,8 +194,12 @@ startxref
       };
 
       let responseBody = null;
+      let statusCode = 200;
       const res = {
-        status(code) { return this; },
+        status(code) {
+          statusCode = code;
+          return this;
+        },
         json(data) {
           responseBody = data;
           return this;
@@ -204,11 +209,111 @@ startxref
       await studentController.uploadResume(req, res);
 
       expect(responseBody).toBeDefined();
-      expect(responseBody.extractedCgpa).toBe(9.15);
-      expect(responseBody.extractedBatch).toBe('2026');
-      expect(mockStudent.cgpa).toBe(9.15);
-      expect(mockStudent.batch).toBe('2026');
+      expect(responseBody.success).toBe(true);
+      expect(responseBody.reviewRequired).toBe(true);
+      expect(Array.isArray(responseBody.detectedSkills)).toBe(true);
+      // Critical regression rule: Academic data MUST NOT be modified
+      expect(mockStudent.cgpa).toBe(6.9);
+      expect(mockStudent.batch).toBe('2027');
+      expect(mockStudent.branch).toBe('CSE');
+      // Skills should not be immediately overwritten
+      expect(mockStudent.skills).toEqual(['Python', 'SQL']);
+      expect(mockStudent.resumeSkillReview).toBeDefined();
+      expect(mockStudent.resumeSkillReview.status).toBe('PENDING_REVIEW');
       expect(mockStudent.save).toHaveBeenCalled();
+    });
+  });
+
+  describe('studentController confirmResumeSkills', () => {
+    const studentId = '507f1f77bcf86cd799439011';
+    const collegeId = '507f1f77bcf86cd799439022';
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    test('should merge confirmed resume skills with existing skills without duplicates', async () => {
+      const mockStudent = {
+        _id: studentId,
+        collegeId,
+        name: 'Aarav Sharma',
+        branch: 'CSE',
+        batch: '2027',
+        cgpa: 6.9,
+        skills: ['Python', 'SQL', 'Git'],
+        resumeSkillReview: {
+          detectedSkills: ['Python', 'React', 'Docker'],
+          status: 'PENDING_REVIEW'
+        },
+        save: jest.fn().mockResolvedValue(true)
+      };
+
+      Student.findOne.mockResolvedValue(mockStudent);
+
+      const req = {
+        collegeId,
+        user: { id: studentId, email: 'aarav@college.edu' },
+        body: {
+          skills: ['Python', 'React', 'Docker']
+        }
+      };
+
+      let responseBody = null;
+      let statusCode = 200;
+      const res = {
+        status(code) {
+          statusCode = code;
+          return this;
+        },
+        json(data) {
+          responseBody = data;
+          return this;
+        }
+      };
+
+      await studentController.confirmResumeSkills(req, res);
+
+      expect(statusCode).toBe(200);
+      expect(responseBody.success).toBe(true);
+      expect(mockStudent.skills).toContain('Python');
+      expect(mockStudent.skills).toContain('SQL');
+      expect(mockStudent.skills).toContain('Git');
+      expect(mockStudent.skills).toContain('React');
+      expect(mockStudent.skills).toContain('Docker');
+      // Deduplicated
+      const pythonCount = mockStudent.skills.filter(s => s === 'Python').length;
+      expect(pythonCount).toBe(1);
+      expect(mockStudent.resumeSkillReview.status).toBe('CONFIRMED');
+      expect(mockStudent.save).toHaveBeenCalled();
+    });
+
+    test('should reject non-array skills payload', async () => {
+      const req = {
+        collegeId,
+        user: { id: studentId, email: 'aarav@college.edu' },
+        body: {
+          skills: 'React'
+        }
+      };
+
+      let responseBody = null;
+      let statusCode = 200;
+      const res = {
+        status(code) {
+          statusCode = code;
+          return this;
+        },
+        json(data) {
+          responseBody = data;
+          return this;
+        }
+      };
+
+      await studentController.confirmResumeSkills(req, res);
+
+      expect(statusCode).toBe(400);
+      expect(responseBody.success).toBe(false);
+      expect(responseBody.message).toMatch(/must be an array/i);
     });
   });
 });

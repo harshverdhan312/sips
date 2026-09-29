@@ -237,6 +237,13 @@ export const studentService = {
   },
 
   /**
+   * Confirm reviewed resume skills
+   */
+  async confirmResumeSkills(confirmedSkills) {
+    return await api.post('/api/student/resume/confirm-skills', { confirmedSkills });
+  },
+
+  /**
    * Delete uploaded resume from backend
    */
   async deleteResume() {

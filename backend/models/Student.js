@@ -54,6 +54,16 @@ const studentSchema = new mongoose.Schema({
     }
   ],
   resumeUrl: { type: String, default: '' },
+  resumeSkillReview: {
+    detectedSkills: [{ type: String, trim: true }],
+    status: {
+      type: String,
+      enum: ['NONE', 'PENDING_REVIEW', 'CONFIRMED', 'SKIPPED'],
+      default: 'NONE'
+    },
+    extractedAt: { type: Date, default: null },
+    confirmedAt: { type: Date, default: null }
+  },
   profileImageUrl: { type: String, default: null },
   linkedin: { type: String, trim: true, default: '' },
   publicProfile: {

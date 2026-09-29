@@ -249,6 +249,13 @@ if (!config.isTest) {
       logger.warn(`⚠️  MongoDB connection failed (${err.message}). Running in resilient in-memory mode.`);
     });
 
+  const cloudinaryService = require('./services/cloudinaryService');
+  if (cloudinaryService.isCloudinaryConfigured()) {
+    logger.info('☁️  Cloudinary storage is CONFIGURED and ACTIVE for persistent image & resume uploads.');
+  } else {
+    logger.warn('⚠️  Cloudinary is NOT configured. Uploaded images/resumes will be stored on local ephemeral disk (/uploads). For persistent storage across Render redeployments, set CLOUDINARY_URL (or CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET) in Render environment variables.');
+  }
+
   app.listen(config.port, () => {
     logger.info(`🚀 Server running on port ${config.port}`);
   });

@@ -250,7 +250,7 @@ class ApiSipsRepository implements SipsRepository {
   // 6. Resume Upload (LIVE)
   // ==========================================
   @override
-  Future<String> uploadResume(List<int> bytes, String filename) async {
+  Future<ResumeUploadResponse> uploadResume(List<int> bytes, String filename) async {
     final response = await _apiClient.uploadMultipart(
       '/api/student/resume',
       fieldName: 'resume',
@@ -261,20 +261,42 @@ class ApiSipsRepository implements SipsRepository {
 
     if (response is Map<String, dynamic> && response['resumeUrl'] != null) {
       final resumeUrl = response['resumeUrl'] as String;
-      final mlAnalysis = response['mlAnalysis'] as Map<String, dynamic>?;
-      final rawExtracted = mlAnalysis?['extracted_skills'];
-      final extractedList = rawExtracted is List ? rawExtracted.map((s) => s.toString()).toList() : <String>[];
+      final rawDetected = response['detectedSkills'];
+      final detectedList = rawDetected is List
+          ? rawDetected.map((s) => s.toString()).toList()
+          : <String>[];
+      final reviewRequired = response['reviewRequired'] as bool? ?? true;
 
       if (_cachedProfile != null) {
         _cachedProfile = _cachedProfile!.copyWith(
           resumeUrl: resumeUrl,
           resumeVersion: 'Uploaded Resume ($filename)',
-          extractedSkills: extractedList,
+          extractedSkills: detectedList,
         );
       }
-      return resumeUrl;
+      return ResumeUploadResponse(
+        resumeUrl: resumeUrl,
+        detectedSkills: detectedList,
+        reviewRequired: reviewRequired,
+      );
     }
     throw Exception('Resume upload did not return a valid URL');
+  }
+
+  @override
+  Future<StudentProfile> confirmResumeSkills(List<String> confirmedSkills) async {
+    final response = await _apiClient.post(
+      '/api/student/resume/confirm-skills',
+      body: {'skills': confirmedSkills},
+    );
+
+    if (response is Map<String, dynamic> && response['student'] != null) {
+      final studentData = response['student'] as Map<String, dynamic>;
+      final updated = StudentProfile.fromBackendJson(studentData);
+      _cachedProfile = updated;
+      return updated;
+    }
+    return getStudentProfile();
   }
 
   // ==========================================

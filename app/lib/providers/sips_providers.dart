@@ -230,10 +230,16 @@ class ProfileNotifier extends StateNotifier<AsyncValue<StudentProfile>> {
     }
   }
 
-  Future<String> uploadResume(List<int> bytes, String filename) async {
-    final url = await _repository.uploadResume(bytes, filename);
+  Future<ResumeUploadResponse> uploadResume(List<int> bytes, String filename) async {
+    final response = await _repository.uploadResume(bytes, filename);
     await loadProfile();
-    return url;
+    return response;
+  }
+
+  Future<void> confirmResumeSkills(List<String> confirmedSkills) async {
+    final updated = await _repository.confirmResumeSkills(confirmedSkills);
+    state = AsyncValue.data(updated);
+    _ref?.read(readinessProvider.notifier).loadReadiness();
   }
 
   Future<String> uploadProfileImage(List<int> bytes, String filename) async {

@@ -212,6 +212,12 @@ class MemoryDatabase {
         showProjects: true
       },
       resumeUrl: studentData.resumeUrl || '',
+      resumeSkillReview: studentData.resumeSkillReview || {
+        detectedSkills: [],
+        status: 'NONE',
+        extractedAt: null,
+        confirmedAt: null
+      },
       profileImageUrl: studentData.profileImageUrl || null,
       age: studentData.age !== undefined ? studentData.age : null,
       internships: studentData.internships !== undefined ? studentData.internships : null,

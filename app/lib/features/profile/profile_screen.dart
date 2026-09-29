@@ -163,7 +163,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
       setState(() => _isUploadingResume = true);
 
-      await ref.read(studentProfileProvider.notifier).uploadResume(bytes, file.name);
+      final uploadRes = await ref.read(studentProfileProvider.notifier).uploadResume(bytes, file.name);
 
       if (!mounted) return;
       messenger.showSnackBar(
@@ -172,6 +172,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           backgroundColor: const Color(0xFF047857),
         ),
       );
+
+      if (uploadRes.reviewRequired && uploadRes.detectedSkills.isNotEmpty) {
+        _showResumeSkillsReviewDialog(context, uploadRes.detectedSkills);
+      }
     } catch (e) {
       if (!mounted) return;
       messenger.showSnackBar(
@@ -185,6 +189,238 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         setState(() => _isUploadingResume = false);
       }
     }
+  }
+
+  Future<void> _showResumeSkillsReviewDialog(BuildContext context, List<String> initialDetectedSkills) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final detectedSkills = List<String>.from(initialDetectedSkills);
+    final addSkillController = TextEditingController();
+    bool isConfirming = false;
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogCtx) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: AppColors.surface,
+              shape: RoundedRectangleBorder(borderRadius: AppRadius.xlRadius),
+              title: Row(
+                children: [
+                  const Icon(Icons.auto_awesome_rounded, color: AppColors.primary, size: 22),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Skills Found in Your Resume',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.onSurface,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'We found these skills in your resume. Please review them before adding them to your SIPS profile.',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13,
+                          color: AppColors.onSurfaceVariant,
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Detected Skills (${detectedSkills.length})',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceContainerLowest,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.4)),
+                        ),
+                        child: detectedSkills.isEmpty
+                            ? Text(
+                                'No skills selected. Add missing skills below or confirm.',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 12,
+                                  fontStyle: FontStyle.italic,
+                                  color: AppColors.onSurfaceVariant,
+                                ),
+                              )
+                            : Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: detectedSkills.map((skill) {
+                                  return Chip(
+                                    label: Text(
+                                      skill,
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                    backgroundColor: AppColors.primary.withValues(alpha: 0.08),
+                                    deleteIcon: const Icon(Icons.close_rounded, size: 16),
+                                    deleteIconColor: AppColors.primary,
+                                    onDeleted: () {
+                                      setDialogState(() {
+                                        detectedSkills.remove(skill);
+                                      });
+                                    },
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                      side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
+                                    ),
+                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    visualDensity: VisualDensity.compact,
+                                  );
+                                }).toList(),
+                              ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: addSkillController,
+                              style: GoogleFonts.plusJakartaSans(fontSize: 13),
+                              decoration: InputDecoration(
+                                hintText: 'Add missing skill (e.g. Docker)...',
+                                hintStyle: GoogleFonts.plusJakartaSans(
+                                  fontSize: 12,
+                                  color: AppColors.onSurfaceVariant.withValues(alpha: 0.6),
+                                ),
+                                isDense: true,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(color: AppColors.outlineVariant),
+                                ),
+                              ),
+                              onSubmitted: (val) {
+                                final text = val.trim();
+                                if (text.isNotEmpty) {
+                                  final exists = detectedSkills.any((s) => s.toLowerCase() == text.toLowerCase());
+                                  if (!exists) {
+                                    setDialogState(() {
+                                      detectedSkills.add(text);
+                                      addSkillController.clear();
+                                    });
+                                  }
+                                }
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              final text = addSkillController.text.trim();
+                              if (text.isNotEmpty) {
+                                final exists = detectedSkills.any((s) => s.toLowerCase() == text.toLowerCase());
+                                if (!exists) {
+                                  setDialogState(() {
+                                    detectedSkills.add(text);
+                                    addSkillController.clear();
+                                  });
+                                }
+                              }
+                            },
+                            icon: const Icon(Icons.add, size: 16),
+                            label: const Text('Add'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryContainer,
+                              foregroundColor: AppColors.onPrimaryContainer,
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              textStyle: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w600),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actionsPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              actions: [
+                TextButton(
+                  onPressed: isConfirming ? null : () => Navigator.pop(dialogCtx),
+                  child: Text(
+                    'Cancel',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: AppColors.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: isConfirming
+                      ? null
+                      : () async {
+                          setDialogState(() => isConfirming = true);
+                          try {
+                            await ref.read(studentProfileProvider.notifier).confirmResumeSkills(detectedSkills);
+                            if (dialogCtx.mounted) {
+                              Navigator.pop(dialogCtx);
+                            }
+                            messenger.showSnackBar(
+                              const SnackBar(
+                                content: Text('Resume skills confirmed and added to your profile!'),
+                                backgroundColor: Color(0xFF047857),
+                              ),
+                            );
+                          } catch (e) {
+                            setDialogState(() => isConfirming = false);
+                            messenger.showSnackBar(
+                              SnackBar(
+                                content: Text('Failed to confirm skills: ${e.toString()}'),
+                                backgroundColor: AppColors.error,
+                              ),
+                            );
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.onPrimary,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: isConfirming
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : Text(
+                          'Confirm Skills',
+                          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700),
+                        ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   Future<void> _handleImageUpload(StudentProfile profile) async {

@@ -136,6 +136,12 @@ export function StudentProfilePage() {
   const [copiedPublicUrl, setCopiedPublicUrl] = useState(false);
   const [publicProfileError, setPublicProfileError] = useState("");
 
+  // Resume Skill Review State
+  const [isResumeSkillReviewModalOpen, setIsResumeSkillReviewModalOpen] = useState(false);
+  const [detectedSkillsList, setDetectedSkillsList] = useState([]);
+  const [reviewNewSkill, setReviewNewSkill] = useState("");
+  const [confirmingSkills, setConfirmingSkills] = useState(false);
+
   useEffect(() => {
     async function load() {
       const data = await studentService.getCurrentStudent();
@@ -493,27 +499,57 @@ export function StudentProfilePage() {
       const res = await studentService.uploadResume(file);
       const updated = await studentService.getCurrentStudent();
       setStudent(updated);
-      setAcademicForm({
-        name: updated.name || "",
-        branch: updated.branch || "",
-        batch: updated.batch || "",
-        cgpa: updated.cgpa > 0 ? String(updated.cgpa) : ""
-      });
 
-      let feedback = "Resume uploaded successfully.";
-      if (res?.extractedCgpa || res?.extractedBatch) {
-        const parts = [];
-        if (res.extractedCgpa) parts.push(`CGPA: ${res.extractedCgpa.toFixed(2)}`);
-        if (res.extractedBatch) parts.push(`Graduation Year: ${res.extractedBatch}`);
-        feedback += ` Extracted ${parts.join(" and ")} from resume.`;
+      const detected = res.detectedSkills || [];
+      if (detected.length > 0) {
+        setDetectedSkillsList(detected);
+        setIsResumeSkillReviewModalOpen(true);
+        showSuccess("Resume uploaded. Please review the detected skills below.");
+      } else {
+        showSuccess("Resume uploaded successfully.");
       }
-      showSuccess(feedback);
     } catch (err) {
       console.error(err);
       showError(err.message || "Failed to process the uploaded file.");
     } finally {
       setUploadingResume(false);
+      // Reset input value so same file can be re-selected if needed
+      e.target.value = "";
     }
+  };
+
+  const handleConfirmReviewSkills = async () => {
+    setConfirmingSkills(true);
+    try {
+      await studentService.confirmResumeSkills(detectedSkillsList);
+      const updated = await studentService.getCurrentStudent();
+      setStudent(updated);
+      setSkillsList(updated.skills || []);
+      setIsResumeSkillReviewModalOpen(false);
+      showSuccess(`Confirmed ${detectedSkillsList.length} skills! Your profile has been updated.`);
+    } catch (err) {
+      console.error(err);
+      showError(err.message || "Failed to confirm resume skills.");
+    } finally {
+      setConfirmingSkills(false);
+    }
+  };
+
+  const handleAddReviewSkill = (e) => {
+    e?.preventDefault();
+    const trimmed = reviewNewSkill.trim();
+    if (!trimmed) return;
+    const lower = trimmed.toLowerCase();
+    if (detectedSkillsList.some(s => s.toLowerCase() === lower)) {
+      showWarning(`Skill "${trimmed}" is already in the list.`);
+      return;
+    }
+    setDetectedSkillsList([...detectedSkillsList, trimmed]);
+    setReviewNewSkill("");
+  };
+
+  const handleRemoveReviewSkill = (skillToRemove) => {
+    setDetectedSkillsList(detectedSkillsList.filter(s => s !== skillToRemove));
   };
 
   const handleResumeDelete = async () => {
@@ -1978,6 +2014,97 @@ export function StudentProfilePage() {
             </Button>
           </div>
         </form>
+      </Modal>
+
+      {/* Resume Skill Review Modal */}
+      <Modal
+        isOpen={isResumeSkillReviewModalOpen}
+        onClose={() => setIsResumeSkillReviewModalOpen(false)}
+        title="Skills Found in Your Resume"
+        size="md"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-slate-600">
+            We found these skills in your resume. Please review them before adding them to your SIPS profile.
+          </p>
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Detected Skills ({detectedSkillsList.length})
+            </label>
+            <div className="flex flex-wrap gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200 min-h-[60px] items-center">
+              {detectedSkillsList.length === 0 ? (
+                <span className="text-xs text-slate-400 italic">No skills selected. You can add skills below or confirm to proceed.</span>
+              ) : (
+                detectedSkillsList.map((skill, index) => (
+                  <span
+                    key={`${skill}-${index}`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-full text-xs font-medium"
+                  >
+                    {skill}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveReviewSkill(skill)}
+                      className="text-indigo-400 hover:text-indigo-700 rounded-full focus:outline-none"
+                      title="Remove skill"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </span>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Add Skill row */}
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={reviewNewSkill}
+              onChange={(e) => setReviewNewSkill(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddReviewSkill();
+                }
+              }}
+              placeholder="Add missing skill (e.g. Docker, Python)..."
+              className="flex-1 text-xs px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleAddReviewSkill}
+              className="shrink-0 text-xs"
+            >
+              <Plus className="w-3.5 h-3.5 mr-1" />
+              Add Skill
+            </Button>
+          </div>
+
+          {/* Modal Actions */}
+          <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={confirmingSkills}
+              onClick={() => setIsResumeSkillReviewModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="primary"
+              size="sm"
+              loading={confirmingSkills}
+              onClick={handleConfirmReviewSkills}
+            >
+              Confirm Skills
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

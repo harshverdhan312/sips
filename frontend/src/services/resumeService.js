@@ -14,6 +14,15 @@ export const resumeService = {
   },
 
   /**
+   * Confirm reviewed skills detected from resume
+   * Calls POST /api/student/resume/confirm-skills
+   */
+  async confirmResumeSkills(confirmedSkills) {
+    const res = await api.post('/api/student/resume/confirm-skills', { confirmedSkills });
+    return res;
+  },
+
+  /**
    * Delete active resume from backend
    * Calls DELETE /api/student/resume
    */

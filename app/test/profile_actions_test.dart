@@ -155,6 +155,8 @@ void main() {
             jsonEncode({
               'message': 'Resume uploaded',
               'resumeUrl': '/uploads/resume_101.pdf',
+              'detectedSkills': ['Flutter', 'Dart'],
+              'reviewRequired': true,
             }),
             200,
             headers: {'content-type': 'application/json'},
@@ -167,10 +169,49 @@ void main() {
       final repo = ApiSipsRepository(apiClient);
 
       final dummyPdfBytes = utf8.encode('%PDF-1.4 dummy content');
-      final resumeUrl = await repo.uploadResume(dummyPdfBytes, 'resume_aarav.pdf');
+      final response = await repo.uploadResume(dummyPdfBytes, 'resume_aarav.pdf');
 
       expect(capturedRequest.method, 'POST');
-      expect(resumeUrl, '/uploads/resume_101.pdf');
+      expect(response.resumeUrl, '/uploads/resume_101.pdf');
+      expect(response.detectedSkills, contains('Flutter'));
+      expect(response.reviewRequired, true);
+    });
+
+    test('confirmResumeSkills posts confirmed skills to backend and updates profile skills', () async {
+      late http.BaseRequest capturedRequest;
+      final mockClient = MockClient((request) async {
+        if (request.method == 'POST' && request.url.path == '/api/student/resume/confirm-skills') {
+          capturedRequest = request;
+          final body = jsonDecode(request.body) as Map<String, dynamic>;
+          return http.Response(
+            jsonEncode({
+              'success': true,
+              'message': 'Skills confirmed',
+              'skills': body['skills'],
+              'student': {
+                '_id': 'st_101',
+                'name': 'Aarav Sharma',
+                'email': 'aarav@eng.edu',
+                'skills': body['skills'],
+                'readinessScore': 90,
+              }
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        return http.Response('Not Found', 404);
+      });
+
+      final apiClient = ApiClient(client: mockClient, baseUrl: 'http://localhost:5000');
+      final repo = ApiSipsRepository(apiClient);
+
+      final updated = await repo.confirmResumeSkills(['Flutter', 'Dart', 'React']);
+
+      expect(capturedRequest.method, 'POST');
+      final sentBody = jsonDecode((capturedRequest as http.Request).body) as Map<String, dynamic>;
+      expect(sentBody['skills'], ['Flutter', 'Dart', 'React']);
+      expect(updated.skills, contains('React'));
     });
   });
 }

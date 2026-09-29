@@ -7,7 +7,7 @@ const JobDescription = require('../models/JobDescription');
 const Application = require('../models/Application');
 const Notification = require('../models/Notification');
 const PlacementPrediction = require('../models/PlacementPrediction');
-const { calculateMatch, extractSkillsFromText } = require('../utils/matchingEngine');
+const { calculateMatch, extractSkillsFromText, extractResumeSkills, normalizeSkill, formatCanonicalSkill } = require('../utils/matchingEngine');
 const { checkJobEligibility } = require('../utils/eligibilityChecker');
 const { sendNotification } = require('../utils/notificationService');
 const { mapStudentToPlacementInput } = require('../utils/placementDataMapper');
@@ -478,6 +478,19 @@ exports.uploadResume = async (req, res) => {
       });
     }
 
+    const pdfBuffer = await fs.promises.readFile(uploadedFilePath);
+
+    // Extract raw text from PDF resume using Node.js PDF stream extractor
+    let rawPdfText = '';
+    try {
+      rawPdfText = resumeExtractor.extractTextFromPdfBuffer(pdfBuffer);
+    } catch (parseErr) {
+      logger.warn('Resume text extraction error:', parseErr.message);
+    }
+
+    // Extract candidate skills from resume text using SIPS known skill vocabulary
+    const detectedSkills = extractResumeSkills(rawPdfText);
+
     let newResumeUrl = `/uploads/${req.file.filename}`;
 
     // If Cloudinary is configured, upload to Cloudinary and clean up temporary local file
@@ -496,52 +509,12 @@ exports.uploadResume = async (req, res) => {
       }
     }
 
-    const pdfBuffer = await fs.promises.readFile(uploadedFilePath);
-
-    // Extract academic details (CGPA and Graduation Year) and raw text from PDF resume
-    let extractedCgpa = null;
-    let extractedBatch = null;
-    let rawPdfText = '';
-    try {
-      rawPdfText = resumeExtractor.extractTextFromPdfBuffer(pdfBuffer);
-      const extracted = resumeExtractor.extractFromPdfBuffer(pdfBuffer);
-      if (extracted.extractedCgpa !== null) extractedCgpa = extracted.extractedCgpa;
-      if (extracted.extractedBatch !== null) extractedBatch = extracted.extractedBatch;
-    } catch (parseErr) {
-      logger.warn('Resume academic extraction error:', parseErr.message);
-    }
-
-    // Extract local skills using matchingEngine dictionary
-    const localExtractedSkills = extractSkillsFromText(rawPdfText);
-
-    // Trigger FastAPI ML resume skill extraction safely
-    let mlAnalysis = {
-      status: 'unavailable',
-      extracted_skills: []
+    const pendingReview = {
+      detectedSkills,
+      status: 'PENDING_REVIEW',
+      extractedAt: new Date(),
+      confirmedAt: null
     };
-
-    try {
-      const extractionResult = await mlService.extractResumeSkills(pdfBuffer, req.file.originalname || req.file.filename);
-      if (extractionResult && Array.isArray(extractionResult.extracted_skills)) {
-        mlAnalysis = {
-          status: 'completed',
-          extracted_skills: extractionResult.extracted_skills
-        };
-      }
-    } catch (mlErr) {
-      logger.warn('ML resume skill extraction skipped/unavailable:', { error: mlErr.message });
-      mlAnalysis = {
-        status: 'unavailable',
-        extracted_skills: [],
-        message: 'ML skill extraction service is currently offline. Resume was saved successfully.'
-      };
-    }
-
-    // Combine all extracted skills (local dictionary + ML extracted)
-    const combinedExtractedSkills = Array.from(new Set([
-      ...localExtractedSkills,
-      ...mlAnalysis.extracted_skills
-    ].map(s => String(s).trim()).filter(Boolean)));
 
     // ----------------------------------------------------
     // Resilient In-Memory Mode
@@ -555,49 +528,45 @@ exports.uploadResume = async (req, res) => {
 
       const oldResume = student.resumeUrl;
       student.resumeUrl = newResumeUrl;
-      if (extractedCgpa !== null) {
-        student.cgpa = extractedCgpa;
-      }
-      if (extractedBatch !== null) {
-        student.batch = extractedBatch;
-      }
+      student.resumeSkillReview = pendingReview;
 
-      // Merge skills from resume
-      if (combinedExtractedSkills.length > 0) {
-        const existing = student.skills || [];
-        student.skills = Array.from(new Set([...existing, ...combinedExtractedSkills]));
+      // Note: student.cgpa, student.batch, student.branch, and student.skills remain untouched!
+      if (!student.resumeScore || student.resumeScore <= 0) {
+        student.resumeScore = 80;
       }
-
-      // Calculate verified readiness scores upon resume upload
-      const totalSkillCount = (student.skills || []).length;
-      student.resumeScore = Math.min(95, Math.max(70, 65 + totalSkillCount * 2));
-      student.technicalScore = Math.min(95, Math.max(55, 50 + totalSkillCount * 3));
-      student.softSkillScore = 70;
       student.readinessScore = Math.round(
-        student.technicalScore * 0.4 +
-        student.resumeScore * 0.3 +
-        student.softSkillScore * 0.3
+        (student.technicalScore || 0) * 0.4 +
+        (student.resumeScore || 80) * 0.3 +
+        (student.softSkillScore || 70) * 0.3
       );
 
       // Clean up previous resume file if different
       if (oldResume && oldResume !== newResumeUrl) {
-        safeDeleteUploadFile(oldResume);
+        if (oldResume.includes('cloudinary.com')) {
+          cloudinaryService.deleteImage(oldResume);
+        } else {
+          safeDeleteUploadFile(oldResume);
+        }
       }
 
       return res.json({
         success: true,
-        message: 'Resume uploaded and analyzed successfully',
+        message: 'Resume uploaded successfully. Please review detected skills before confirming.',
         resumeUrl: student.resumeUrl,
-        extractedCgpa,
-        extractedBatch,
-        cgpa: student.cgpa,
-        batch: student.batch,
-        skills: student.skills,
-        readinessScore: student.readinessScore,
-        technicalScore: student.technicalScore,
-        softSkillScore: student.softSkillScore,
-        resumeScore: student.resumeScore,
-        mlAnalysis
+        detectedSkills,
+        reviewRequired: true,
+        student: {
+          resumeUrl: student.resumeUrl,
+          skills: student.skills || [],
+          cgpa: student.cgpa,
+          batch: student.batch,
+          branch: student.branch,
+          readinessScore: student.readinessScore,
+          technicalScore: student.technicalScore,
+          softSkillScore: student.softSkillScore,
+          resumeScore: student.resumeScore,
+          resumeSkillReview: student.resumeSkillReview
+        }
       });
     }
 
@@ -616,28 +585,16 @@ exports.uploadResume = async (req, res) => {
 
     const oldResume = student.resumeUrl;
     student.resumeUrl = newResumeUrl;
-    if (extractedCgpa !== null) {
-      student.cgpa = extractedCgpa;
-    }
-    if (extractedBatch !== null) {
-      student.batch = extractedBatch;
-    }
+    student.resumeSkillReview = pendingReview;
 
-    // Merge skills from resume
-    if (combinedExtractedSkills.length > 0) {
-      const existing = student.skills || [];
-      student.skills = Array.from(new Set([...existing, ...combinedExtractedSkills]));
+    // Note: student.cgpa, student.batch, student.branch, and student.skills remain untouched!
+    if (!student.resumeScore || student.resumeScore <= 0) {
+      student.resumeScore = 80;
     }
-
-    // Calculate verified readiness scores upon resume upload
-    const totalSkillCount = (student.skills || []).length;
-    student.resumeScore = Math.min(95, Math.max(70, 65 + totalSkillCount * 2));
-    student.technicalScore = Math.min(95, Math.max(55, 50 + totalSkillCount * 3));
-    student.softSkillScore = 70;
     student.readinessScore = Math.round(
-      student.technicalScore * 0.4 +
-      student.resumeScore * 0.3 +
-      student.softSkillScore * 0.3
+      (student.technicalScore || 0) * 0.4 +
+      (student.resumeScore || 80) * 0.3 +
+      (student.softSkillScore || 70) * 0.3
     );
 
     try {
@@ -658,18 +615,22 @@ exports.uploadResume = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Resume uploaded and analyzed successfully',
+      message: 'Resume uploaded successfully. Please review detected skills before confirming.',
       resumeUrl: student.resumeUrl,
-      extractedCgpa,
-      extractedBatch,
-      cgpa: student.cgpa,
-      batch: student.batch,
-      skills: student.skills,
-      readinessScore: student.readinessScore,
-      technicalScore: student.technicalScore,
-      softSkillScore: student.softSkillScore,
-      resumeScore: student.resumeScore,
-      mlAnalysis
+      detectedSkills,
+      reviewRequired: true,
+      student: {
+        resumeUrl: student.resumeUrl,
+        skills: student.skills || [],
+        cgpa: student.cgpa,
+        batch: student.batch,
+        branch: student.branch,
+        readinessScore: student.readinessScore,
+        technicalScore: student.technicalScore,
+        softSkillScore: student.softSkillScore,
+        resumeScore: student.resumeScore,
+        resumeSkillReview: student.resumeSkillReview
+      }
     });
   } catch (error) {
     if (uploadedFilePath) {
@@ -677,6 +638,144 @@ exports.uploadResume = async (req, res) => {
     }
     logger.error('Upload resume error:', error);
     res.status(500).json({ message: 'Server error uploading resume' });
+  }
+};
+
+/**
+ * POST /api/student/resume/confirm-skills
+ * Student-only — confirm reviewed resume skills to merge into authoritative Student.skills.
+ * 
+ * Merge semantics:
+ * FINAL_SKILLS = EXISTING_CONFIRMED_SKILLS + STUDENT_APPROVED_RESUME_SKILLS + ANY_MANUALLY_ADDED_SKILLS
+ * (normalized, deduplicated, preserving existing and GitHub-derived skills)
+ */
+exports.confirmResumeSkills = async (req, res) => {
+  try {
+    const { confirmedSkills, skills } = req.body;
+    const inputSkills = confirmedSkills !== undefined ? confirmedSkills : skills;
+
+    if (inputSkills !== undefined && !Array.isArray(inputSkills)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid skills payload: confirmedSkills must be an array of strings.'
+      });
+    }
+
+    const rawList = Array.isArray(inputSkills) ? inputSkills : [];
+
+    const mergeSkillsWithPreservation = (existingList) => {
+      const skillMap = new Map();
+      (existingList || []).forEach(s => {
+        if (typeof s === 'string' && s.trim().length > 0) {
+          const norm = normalizeSkill(s.trim());
+          if (!skillMap.has(norm)) {
+            skillMap.set(norm, formatCanonicalSkill(s.trim()));
+          }
+        }
+      });
+      rawList.forEach(s => {
+        if (typeof s === 'string' && s.trim().length > 0) {
+          const norm = normalizeSkill(s.trim());
+          if (!skillMap.has(norm)) {
+            skillMap.set(norm, formatCanonicalSkill(s.trim()));
+          }
+        }
+      });
+      return Array.from(skillMap.values());
+    };
+
+    // ----------------------------------------------------
+    // Resilient In-Memory Mode
+    // ----------------------------------------------------
+    if (!memoryDb.isMongoConnected()) {
+      const student = memoryDb.findStudentById(req.user.id);
+      if (!student) {
+        return res.status(404).json({ success: false, message: 'Profile not found' });
+      }
+
+      student.skills = mergeSkillsWithPreservation(student.skills);
+      student.resumeSkillReview = {
+        detectedSkills: [],
+        status: 'CONFIRMED',
+        extractedAt: student.resumeSkillReview?.extractedAt || null,
+        confirmedAt: new Date()
+      };
+
+      // Recalculate readiness scores based on updated confirmed skills
+      const totalSkillCount = student.skills.length;
+      student.technicalScore = Math.min(95, Math.max(50, 50 + totalSkillCount * 3));
+      student.softSkillScore = student.softSkillScore || 70;
+      student.resumeScore = student.resumeScore || 80;
+      student.readinessScore = Math.round(
+        student.technicalScore * 0.4 +
+        student.resumeScore * 0.3 +
+        student.softSkillScore * 0.3
+      );
+
+      return res.json({
+        success: true,
+        message: 'Skills confirmed and added to profile successfully.',
+        skills: student.skills,
+        readinessScore: student.readinessScore,
+        technicalScore: student.technicalScore,
+        student: {
+          skills: student.skills,
+          readinessScore: student.readinessScore,
+          technicalScore: student.technicalScore,
+          resumeSkillReview: student.resumeSkillReview
+        }
+      });
+    }
+
+    // ----------------------------------------------------
+    // MongoDB Mode
+    // ----------------------------------------------------
+    const student = await Student.findOne({
+      _id: req.user.id,
+      collegeId: req.collegeId
+    });
+
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Profile not found' });
+    }
+
+    student.skills = mergeSkillsWithPreservation(student.skills);
+    student.resumeSkillReview = {
+      detectedSkills: [],
+      status: 'CONFIRMED',
+      extractedAt: student.resumeSkillReview?.extractedAt || null,
+      confirmedAt: new Date()
+    };
+
+    // Recalculate readiness scores based on updated confirmed skills
+    const totalSkillCount = student.skills.length;
+    student.technicalScore = Math.min(95, Math.max(50, 50 + totalSkillCount * 3));
+    student.softSkillScore = student.softSkillScore || 70;
+    student.resumeScore = student.resumeScore || 80;
+    student.readinessScore = Math.round(
+      student.technicalScore * 0.4 +
+      student.resumeScore * 0.3 +
+      student.softSkillScore * 0.3
+    );
+
+    await student.save();
+
+    res.json({
+      success: true,
+      message: 'Skills confirmed and added to profile successfully.',
+      skills: student.skills,
+      readinessScore: student.readinessScore,
+      technicalScore: student.technicalScore,
+      student: {
+        skills: student.skills,
+        readinessScore: student.readinessScore,
+        technicalScore: student.technicalScore,
+        resumeSkillReview: student.resumeSkillReview
+      }
+    });
+  } catch (error) {
+    logger.error('Confirm resume skills error:', error);
+    res.status(500).json({ success: false, message: 'Server error confirming resume skills' });
   }
 };
 

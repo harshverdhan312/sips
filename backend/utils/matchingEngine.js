@@ -151,14 +151,13 @@ const KNOWN_SKILLS = [
  * Extract skills from JD text using keyword matching
  */
 const extractSkillsFromText = (text) => {
-  if (!text) return [];
+  if (!text || typeof text !== 'string') return [];
   const lowerText = text.toLowerCase();
   const found = new Set();
 
   KNOWN_SKILLS.forEach(skill => {
-    // Use word boundary matching for single-word skills
     const escaped = skill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`\\b${escaped}\\b`, 'i');
+    const regex = new RegExp(`(?:^|[^a-zA-Z0-9_+#-])${escaped}(?:$|[^a-zA-Z0-9_+#-])`, 'i');
     if (regex.test(lowerText)) {
       found.add(normalizeSkill(skill));
     }
@@ -167,4 +166,61 @@ const extractSkillsFromText = (text) => {
   return Array.from(found);
 };
 
-module.exports = { calculateMatch, extractSkillsFromText, normalizeSkill };
+const canonicalMap = {
+  'javascript': 'JavaScript',
+  'typescript': 'TypeScript',
+  'react.js': 'React',
+  'react': 'React',
+  'node.js': 'Node.js',
+  'node': 'Node.js',
+  'express.js': 'Express',
+  'express': 'Express',
+  'mongodb': 'MongoDB',
+  'postgresql': 'PostgreSQL',
+  'python': 'Python',
+  'java': 'Java',
+  'c++': 'C++',
+  'c#': 'C#',
+  'flutter': 'Flutter',
+  'dart': 'Dart',
+  'docker': 'Docker',
+  'kubernetes': 'Kubernetes',
+  'aws': 'AWS',
+  'git': 'Git',
+  'github': 'GitHub',
+  'tensorflow': 'TensorFlow',
+  'pytorch': 'PyTorch',
+  'sql': 'SQL',
+  'mysql': 'MySQL',
+  'rest api': 'REST API',
+  'graphql': 'GraphQL',
+  'html': 'HTML',
+  'css': 'CSS',
+  'golang': 'Go',
+  'redis': 'Redis',
+  'django': 'Django',
+  'flask': 'Flask',
+  'spring': 'Spring',
+  'spring boot': 'Spring Boot',
+  'linux': 'Linux',
+  'figma': 'Figma'
+};
+
+const formatCanonicalSkill = (skill) => {
+  if (!skill || typeof skill !== 'string') return '';
+  const norm = normalizeSkill(skill);
+  if (canonicalMap[norm]) return canonicalMap[norm];
+  return skill.trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+};
+
+/**
+ * Extract candidate skills from resume or text with canonical display names
+ */
+const extractResumeSkills = (text) => {
+  const extracted = extractSkillsFromText(text);
+  const canonicalSet = new Set(extracted.map(formatCanonicalSkill));
+  return Array.from(canonicalSet);
+};
+
+module.exports = { calculateMatch, extractSkillsFromText, extractResumeSkills, normalizeSkill, formatCanonicalSkill };
+
