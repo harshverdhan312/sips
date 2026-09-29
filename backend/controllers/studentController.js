@@ -504,7 +504,10 @@ exports.uploadResume = async (req, res) => {
         // Clean up temporary local upload file
         safeDeleteUploadFile(req.file.filename);
       } catch (cloudErr) {
-        logger.warn('Cloudinary resume upload failed, falling back to local storage:', cloudErr.message);
+        logger.error('Cloudinary resume upload failed, falling back to local storage:', {
+          message: cloudErr.message,
+          error: cloudErr
+        });
         newResumeUrl = `/uploads/${req.file.filename}`;
       }
     }
@@ -957,7 +960,10 @@ exports.uploadProfileImage = async (req, res) => {
         // Clean up temporary local upload file
         safeDeleteUploadFile(req.file.filename);
       } catch (cloudErr) {
-        logger.warn('Cloudinary upload failed, falling back to local storage:', cloudErr.message);
+        logger.error('Cloudinary upload failed, falling back to local storage:', {
+          message: cloudErr.message,
+          error: cloudErr
+        });
         newImageUrl = `/uploads/${req.file.filename}`;
       }
     }

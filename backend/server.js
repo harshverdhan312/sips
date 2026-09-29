@@ -200,6 +200,17 @@ app.get(['/health', '/api/health'], (req, res) => {
   });
 });
 
+// Cloudinary connection diagnostics
+app.get(['/health/cloudinary', '/api/health/cloudinary', '/api/cloudinary-status'], async (req, res) => {
+  const cloudinaryService = require('./services/cloudinaryService');
+  const status = await cloudinaryService.getCloudinaryStatus();
+  res.json({
+    status: status.isConfigured ? (status.pingStatus === 'ok' ? 'ok' : 'degraded') : 'unconfigured',
+    ...status,
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Fallback for non-API client routes to serve landing page / SPA or redirect to frontend
 app.get('*', (req, res, next) => {
   if (

@@ -3,28 +3,46 @@ const fs = require('fs');
 const config = require('../config');
 const logger = require('../utils/logger');
 
+function cleanEnvStr(val) {
+  if (!val || typeof val !== 'string') return '';
+  let s = val.trim();
+  if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
+    s = s.slice(1, -1).trim();
+  }
+  return s;
+}
+
+function sanitizeCloudinaryUrl(urlStr) {
+  let s = cleanEnvStr(urlStr);
+  if (s.startsWith('CLOUDINARY_URL=')) {
+    s = s.replace(/^CLOUDINARY_URL=/, '').trim();
+    s = cleanEnvStr(s);
+  }
+  return s;
+}
+
 /**
  * Configure and verify Cloudinary client
  * @returns {boolean}
  */
 function isCloudinaryConfigured() {
-  const rawUrl = (typeof config.cloudinaryUrl === 'string' ? config.cloudinaryUrl : (process.env.CLOUDINARY_URL || '')).trim();
+  const rawUrl = sanitizeCloudinaryUrl(typeof config.cloudinaryUrl === 'string' ? config.cloudinaryUrl : (process.env.CLOUDINARY_URL || ''));
   if (rawUrl.length > 0) {
     const match = rawUrl.match(/^cloudinary:\/\/([^:]+):([^@]+)@(.+)$/i);
     if (match) {
       cloudinary.config({
-        cloud_name: match[3],
-        api_key: match[1],
-        api_secret: match[2],
+        cloud_name: cleanEnvStr(match[3]),
+        api_key: cleanEnvStr(match[1]),
+        api_secret: cleanEnvStr(match[2]),
         secure: true
       });
       return true;
     }
   }
 
-  const cloudName = (typeof config.cloudinaryCloudName === 'string' ? config.cloudinaryCloudName : (process.env.CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_NAME || '')).trim();
-  const apiKey = (typeof config.cloudinaryApiKey === 'string' ? config.cloudinaryApiKey : (process.env.CLOUDINARY_API_KEY || '')).trim();
-  const apiSecret = (typeof config.cloudinaryApiSecret === 'string' ? config.cloudinaryApiSecret : (process.env.CLOUDINARY_API_SECRET || '')).trim();
+  const cloudName = cleanEnvStr(typeof config.cloudinaryCloudName === 'string' ? config.cloudinaryCloudName : (process.env.CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_NAME || ''));
+  const apiKey = cleanEnvStr(typeof config.cloudinaryApiKey === 'string' ? config.cloudinaryApiKey : (process.env.CLOUDINARY_API_KEY || ''));
+  const apiSecret = cleanEnvStr(typeof config.cloudinaryApiSecret === 'string' ? config.cloudinaryApiSecret : (process.env.CLOUDINARY_API_SECRET || ''));
 
   if (cloudName.length > 0 && apiKey.length > 0 && apiSecret.length > 0) {
     cloudinary.config({
@@ -37,6 +55,35 @@ function isCloudinaryConfigured() {
   }
 
   return false;
+}
+
+/**
+ * Get Cloudinary configuration status and ping result for diagnostics
+ */
+async function getCloudinaryStatus() {
+  const isConfigured = isCloudinaryConfigured();
+  const cfg = cloudinary.config();
+  let pingStatus = null;
+  let pingError = null;
+
+  if (isConfigured) {
+    try {
+      const ping = await cloudinary.api.ping();
+      pingStatus = ping.status || 'ok';
+    } catch (err) {
+      pingError = err.message;
+      logger.warn('Cloudinary ping check failed:', err.message);
+    }
+  }
+
+  return {
+    isConfigured,
+    cloudName: cfg.cloud_name || null,
+    hasApiKey: Boolean(cfg.api_key),
+    hasApiSecret: Boolean(cfg.api_secret),
+    pingStatus,
+    pingError
+  };
 }
 
 /**
@@ -134,6 +181,7 @@ async function deleteImage(urlOrPublicId) {
 
 module.exports = {
   isCloudinaryConfigured,
+  getCloudinaryStatus,
   uploadImage,
   uploadResume,
   deleteImage
