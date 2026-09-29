@@ -180,12 +180,23 @@ class MockSipsRepository implements SipsRepository {
   }
 
   @override
-  Future<String> uploadResume(List<int> bytes, String filename) async {
+  Future<ResumeUploadResponse> uploadResume(List<int> bytes, String filename) async {
     _profile = _profile.copyWith(
       resumeUrl: '/uploads/$filename',
       resumeVersion: 'v3.5 (Uploaded $filename)',
     );
-    return _profile.resumeUrl;
+    return ResumeUploadResponse(
+      resumeUrl: _profile.resumeUrl,
+      detectedSkills: const ['Flutter', 'Dart', 'React', 'Node.js', 'PostgreSQL'],
+      reviewRequired: true,
+    );
+  }
+
+  @override
+  Future<StudentProfile> confirmResumeSkills(List<String> confirmedSkills) async {
+    final merged = <String>{..._profile.skills, ...confirmedSkills}.toList();
+    _profile = _profile.copyWith(skills: merged);
+    return _profile;
   }
 
   @override

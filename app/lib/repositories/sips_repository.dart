@@ -38,7 +38,8 @@ abstract class SipsRepository {
 
   Future<List<PlacementAlert>> getPlacementAlerts();
   Future<void> markAlertAsRead(String alertId);
-  Future<String> uploadResume(List<int> bytes, String filename);
+  Future<ResumeUploadResponse> uploadResume(List<int> bytes, String filename);
+  Future<StudentProfile> confirmResumeSkills(List<String> confirmedSkills);
   Future<String> uploadProfileImage(List<int> bytes, String filename);
   Future<void> deleteProfileImage();
   Future<List<StudentProject>> getFeaturedProjects();
@@ -47,5 +48,17 @@ abstract class SipsRepository {
   Future<List<Map<String, dynamic>>> getGithubRepositories();
   Future<StudentPublicProfile> getPublicProfileConfig();
   Future<StudentPublicProfile> updatePublicProfileConfig(StudentPublicProfile config, {String? linkedin});
+}
+
+class ResumeUploadResponse {
+  final String resumeUrl;
+  final List<String> detectedSkills;
+  final bool reviewRequired;
+
+  const ResumeUploadResponse({
+    required this.resumeUrl,
+    this.detectedSkills = const [],
+    this.reviewRequired = false,
+  });
 }
 

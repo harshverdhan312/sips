@@ -116,6 +116,10 @@ router.get('/resume', studentController.getResume);
 // POST /api/student/resume
 router.post('/resume', upload.single('resume'), studentController.uploadResume);
 
+// POST /api/student/resume/confirm-skills
+router.post('/resume/confirm-skills', studentController.confirmResumeSkills);
+router.post('/skills/confirm-resume', studentController.confirmResumeSkills);
+
 // DELETE /api/student/resume
 router.delete('/resume', studentController.deleteResume);
 
