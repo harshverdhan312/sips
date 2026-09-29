@@ -25,7 +25,6 @@ class ApiSipsRepository implements SipsRepository {
 
   // Session state tracking across API re-fetches
   final Set<String> _readAlertIds = {};
-  final Set<String> _appliedJobIds = {};
   final Set<String> _bookmarkedJobIds = {};
 
   ApiSipsRepository(this._apiClient);
@@ -156,7 +155,6 @@ class ApiSipsRepository implements SipsRepository {
           .map((item) {
             final job = JobOpportunity.fromBackendJson(item);
             return job.copyWith(
-              hasApplied: _appliedJobIds.contains(job.id),
               isBookmarked: _bookmarkedJobIds.contains(job.id),
             );
           })
@@ -195,10 +193,13 @@ class ApiSipsRepository implements SipsRepository {
 
   @override
   Future<void> applyForJob(String jobId) async {
-    _appliedJobIds.add(jobId);
+    await _apiClient.post('/api/student/jobs/$jobId/apply');
     _cachedJobs = _cachedJobs.map((j) {
       if (j.id == jobId) {
-        return j.copyWith(hasApplied: true);
+        return j.copyWith(
+          hasApplied: true,
+          applicationStatus: 'APPLIED',
+        );
       }
       return j;
     }).toList();
