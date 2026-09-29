@@ -8,25 +8,29 @@ const logger = require('../utils/logger');
  * @returns {boolean}
  */
 function isCloudinaryConfigured() {
-  if (config.cloudinaryUrl && config.cloudinaryUrl.trim().length > 0) {
-    cloudinary.config({
-      cloudinary_url: config.cloudinaryUrl.trim()
-    });
-    return true;
+  const rawUrl = (typeof config.cloudinaryUrl === 'string' ? config.cloudinaryUrl : (process.env.CLOUDINARY_URL || '')).trim();
+  if (rawUrl.length > 0) {
+    const match = rawUrl.match(/^cloudinary:\/\/([^:]+):([^@]+)@(.+)$/i);
+    if (match) {
+      cloudinary.config({
+        cloud_name: match[3],
+        api_key: match[1],
+        api_secret: match[2],
+        secure: true
+      });
+      return true;
+    }
   }
 
-  if (
-    config.cloudinaryCloudName &&
-    config.cloudinaryApiKey &&
-    config.cloudinaryApiSecret &&
-    config.cloudinaryCloudName.trim().length > 0 &&
-    config.cloudinaryApiKey.trim().length > 0 &&
-    config.cloudinaryApiSecret.trim().length > 0
-  ) {
+  const cloudName = (typeof config.cloudinaryCloudName === 'string' ? config.cloudinaryCloudName : (process.env.CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_NAME || '')).trim();
+  const apiKey = (typeof config.cloudinaryApiKey === 'string' ? config.cloudinaryApiKey : (process.env.CLOUDINARY_API_KEY || '')).trim();
+  const apiSecret = (typeof config.cloudinaryApiSecret === 'string' ? config.cloudinaryApiSecret : (process.env.CLOUDINARY_API_SECRET || '')).trim();
+
+  if (cloudName.length > 0 && apiKey.length > 0 && apiSecret.length > 0) {
     cloudinary.config({
-      cloud_name: config.cloudinaryCloudName.trim(),
-      api_key: config.cloudinaryApiKey.trim(),
-      api_secret: config.cloudinaryApiSecret.trim(),
+      cloud_name: cloudName,
+      api_key: apiKey,
+      api_secret: apiSecret,
       secure: true
     });
     return true;
