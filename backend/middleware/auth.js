@@ -2,12 +2,17 @@ const jwt = require('jsonwebtoken');
 const config = require('../config');
 
 module.exports = (req, res, next) => {
+  let token = null;
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Authentication required' });
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+  } else if (req.query && req.query.token) {
+    token = req.query.token;
   }
 
-  const token = authHeader.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ message: 'Authentication required' });
+  }
   try {
     const decoded = jwt.verify(token, config.jwtSecret);
     // decoded: { id, role, collegeId, collegeSlug }

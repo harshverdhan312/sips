@@ -13,25 +13,37 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || '';
  * - Resolves relative /uploads/... or similar root-relative asset paths against API_BASE_URL
  * - Avoids duplicate slashes
  */
-export function resolveAssetUrl(url) {
+export function resolveAssetUrl(url, options = {}) {
   if (!url || typeof url !== 'string') return url;
   const trimmed = url.trim();
   if (!trimmed) return trimmed;
 
+  let resolved = trimmed;
+
   // Preserve absolute URLs and data/blob URIs
-  if (/^(?:https?:|\/\/|data:|blob:)/i.test(trimmed)) {
-    return trimmed;
+  if (!/^(?:https?:|\/\/|data:|blob:)/i.test(trimmed)) {
+    if (!API_BASE_URL) {
+      resolved = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+    } else {
+      const base = API_BASE_URL.replace(/\/+$/, '');
+      const path = trimmed.replace(/^\/+/, '');
+      resolved = `${base}/${path}`;
+    }
   }
 
-  // If no API_BASE_URL is configured (e.g. local Vite dev with proxy), return relative path as-is
-  if (!API_BASE_URL) {
-    return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+  // Attach auth token for sensitive PDF documents opened in browser tabs
+  const isPdf = /\.pdf(?:[?#]|$)/i.test(resolved);
+  const shouldAttachAuth = options.auth === true || (options.auth !== false && isPdf);
+
+  if (shouldAttachAuth) {
+    const token = getAuthToken();
+    if (token && !resolved.includes('token=')) {
+      const separator = resolved.includes('?') ? '&' : '?';
+      resolved = `${resolved}${separator}token=${encodeURIComponent(token)}`;
+    }
   }
 
-  // Strip trailing slash from API_BASE_URL and leading slash from relative path
-  const base = API_BASE_URL.replace(/\/+$/, '');
-  const path = trimmed.replace(/^\/+/, '');
-  return `${base}/${path}`;
+  return resolved;
 }
 
 const getAuthToken = () => {

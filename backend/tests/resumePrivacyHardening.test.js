@@ -173,6 +173,15 @@ describe('Resume Privacy Hardening & Access Control Tests', () => {
       expect(res.headers['content-type']).toMatch(/application\/pdf/i);
       expect((res.body && Buffer.isBuffer(res.body) ? res.body.toString() : res.text || '')).toContain('Student A Resume Content');
     });
+
+    test('Student A can access own resume file via URL query token (?token=...) in browser new tab', async () => {
+      const res = await request(app)
+        .get(`/uploads/${resumeAFilename}?token=${studentAToken}`);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.headers['content-type']).toMatch(/application\/pdf/i);
+      expect((res.body && Buffer.isBuffer(res.body) ? res.body.toString() : res.text || '')).toContain('Student A Resume Content');
+    });
   });
 
   describe('G. profile image / static asset behavior remains intact', () => {

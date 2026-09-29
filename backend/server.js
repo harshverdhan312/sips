@@ -65,8 +65,14 @@ app.use('/uploads', async (req, res, next) => {
   // Sensitive documents (PDF resumes): direct unauthenticated static access is blocked
   if (ext === '.pdf') {
     const authHeader = req.headers.authorization;
+    let token = null;
     if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.split(' ')[1];
+      token = authHeader.split(' ')[1];
+    } else if (req.query && req.query.token) {
+      token = req.query.token;
+    }
+
+    if (token) {
       try {
         const decoded = jwt.verify(token, config.jwtSecret);
         const filename = path.basename(reqPath);
