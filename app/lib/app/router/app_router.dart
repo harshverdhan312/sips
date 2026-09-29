@@ -91,6 +91,14 @@ class AppRouter {
         },
       ),
       GoRoute(
+        path: '/opportunities/:id',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? 'job_1';
+          return JobDetailScreen(jobId: id);
+        },
+      ),
+      GoRoute(
         path: '/roadmap',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const RoadmapScreen(),

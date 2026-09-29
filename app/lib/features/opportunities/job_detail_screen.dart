@@ -4,24 +4,83 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_radius.dart';
+import '../../core/network/api_exception.dart';
 import '../../core/widgets/readiness_gauge.dart';
 import '../../core/widgets/section_header.dart';
 import '../../core/widgets/sips_badge.dart';
 import '../../core/widgets/sips_button.dart';
 import '../../core/widgets/sips_card.dart';
 import '../../core/widgets/skill_chip.dart';
+import '../../models/job_opportunity.dart';
 import '../../providers/sips_providers.dart';
 
-class JobDetailScreen extends ConsumerWidget {
+class JobDetailScreen extends ConsumerStatefulWidget {
   final String jobId;
 
   const JobDetailScreen({super.key, required this.jobId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final jobsAsync = ref.watch(opportunitiesProvider);
+  ConsumerState<JobDetailScreen> createState() => _JobDetailScreenState();
+}
 
-    final mlMatchAsync = ref.watch(jobMatchAnalysisProvider(jobId));
+class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
+  bool _isApplying = false;
+
+  Future<void> _handleApply(JobOpportunity job) async {
+    if (job.hasApplied || !job.isEligible || !job.isActive) {
+      if (!job.isEligible && job.eligibilityReasons.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(job.eligibilityReasons.join('. ')),
+            backgroundColor: const Color(0xFFE11D48),
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() => _isApplying = true);
+    try {
+      await ref.read(opportunitiesProvider.notifier).apply(job.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Application submitted successfully for ${job.company} (${job.role})!'),
+            backgroundColor: AppColors.emerald,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        String msg = 'Failed to submit application.';
+        if (e is ApiException) {
+          if (e.details is Map && (e.details as Map)['reasons'] is List) {
+            final reasons = (e.details as Map)['reasons'] as List;
+            msg = reasons.join('. ');
+          } else {
+            msg = e.message;
+          }
+        } else {
+          msg = e.toString();
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(msg),
+            backgroundColor: const Color(0xFFE11D48),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isApplying = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final jobsAsync = ref.watch(opportunitiesProvider);
+    final mlMatchAsync = ref.watch(jobMatchAnalysisProvider(widget.jobId));
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -35,11 +94,7 @@ class JobDetailScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
             tooltip: 'Re-analyze Match',
-            onPressed: () => ref.refresh(jobMatchAnalysisProvider(jobId)),
-          ),
-          IconButton(
-            icon: const Icon(Icons.share_outlined),
-            onPressed: () {},
+            onPressed: () => ref.refresh(jobMatchAnalysisProvider(widget.jobId)),
           ),
         ],
       ),
@@ -48,7 +103,7 @@ class JobDetailScreen extends ConsumerWidget {
         error: (err, _) => Center(child: Text('Error: $err')),
         data: (jobs) {
           final job = jobs.firstWhere(
-            (j) => j.id == jobId,
+            (j) => j.id == widget.jobId,
             orElse: () => jobs.first,
           );
 
@@ -62,6 +117,11 @@ class JobDetailScreen extends ConsumerWidget {
           final effectiveMissingSkills = mlMatch != null
               ? mlMatch.missingSkills
               : job.missingSkills;
+
+          final hasApplied = job.hasApplied;
+          final isEligible = job.isEligible;
+          final isDriveActive = job.isActive;
+          final isExpired = job.isExpired;
 
           return Column(
             children: [
@@ -86,12 +146,22 @@ class JobDetailScreen extends ConsumerWidget {
                                   isSmall: true,
                                 ),
                                 SipsBadge(
-                                  label: mlMatch?.mlStatus == 'completed'
-                                      ? 'AI HYBRID MATCH'
-                                      : job.deadlineText,
-                                  variant: mlMatch?.mlStatus == 'completed'
-                                      ? SipsBadgeVariant.emerald
-                                      : SipsBadgeVariant.neutral,
+                                  label: isExpired
+                                      ? 'DEADLINE PASSED'
+                                      : !isDriveActive
+                                          ? 'DRIVE CLOSED'
+                                          : !isEligible
+                                              ? 'NOT ELIGIBLE'
+                                              : hasApplied
+                                                  ? 'APPLIED'
+                                                  : mlMatch?.mlStatus == 'completed'
+                                                      ? 'AI HYBRID MATCH'
+                                                      : job.deadlineText,
+                                  variant: (!isEligible || isExpired)
+                                      ? SipsBadgeVariant.amber
+                                      : (hasApplied || mlMatch?.mlStatus == 'completed')
+                                          ? SipsBadgeVariant.emerald
+                                          : SipsBadgeVariant.neutral,
                                   isSmall: true,
                                 ),
                               ],
@@ -196,7 +266,63 @@ class JobDetailScreen extends ConsumerWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
+
+                      // Ineligibility Alert Banner if Not Eligible
+                      if (!isEligible)
+                        Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFF1F2),
+                            borderRadius: AppRadius.lgRadius,
+                            border: Border.all(color: const Color(0xFFFECDD3), width: 1),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.error_outline_rounded, color: Color(0xFFE11D48), size: 18),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'You are not eligible for this campus drive',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700,
+                                      color: const Color(0xFF9F1239),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (job.eligibilityReasons.isNotEmpty) ...[
+                                const SizedBox(height: 8),
+                                ...job.eligibilityReasons.map(
+                                  (r) => Padding(
+                                    padding: const EdgeInsets.only(left: 26, bottom: 4),
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text('• ', style: TextStyle(color: Color(0xFFE11D48), fontWeight: FontWeight.bold)),
+                                        Expanded(
+                                          child: Text(
+                                            r,
+                                            style: GoogleFonts.plusJakartaSans(
+                                              fontSize: 12,
+                                              color: const Color(0xFFBE123C),
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+
+                      if (!isEligible) const SizedBox(height: 20),
 
                       // Matched Skills Section
                       SectionHeader(
@@ -241,38 +367,23 @@ class JobDetailScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: effectiveMissingSkills
-                                  .map((s) => SkillChip(label: s, status: SkillStatus.gap))
-                                  .toList(),
-                            ),
-                            const SizedBox(height: 14),
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFFFBEB),
-                                borderRadius: AppRadius.mdRadius,
-                                border: Border.all(color: const Color(0xFFFDE68A), width: 0.8),
+                            if (effectiveMissingSkills.isNotEmpty)
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: effectiveMissingSkills
+                                    .map((s) => SkillChip(label: s, status: SkillStatus.gap))
+                                    .toList(),
+                              )
+                            else
+                              Text(
+                                'All required skills matched for this opportunity!',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 12,
+                                  color: const Color(0xFF047857),
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.flash_on_rounded, color: Color(0xFFD97706), size: 18),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      'Addressing these 2 gaps will boost your match score to 96% and unlock direct interview scheduling.',
-                                      style: GoogleFonts.plusJakartaSans(
-                                        fontSize: 11,
-                                        color: const Color(0xFF92400E),
-                                        height: 1.35,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
                           ],
                         ),
                       ),
@@ -285,7 +396,7 @@ class JobDetailScreen extends ConsumerWidget {
                       SipsCard(
                         padding: const EdgeInsets.all(16),
                         child: Text(
-                          job.description,
+                          job.description.isNotEmpty ? job.description : 'No description provided.',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 13,
                             color: AppColors.onSurfaceVariant,
@@ -296,34 +407,32 @@ class JobDetailScreen extends ConsumerWidget {
 
                       const SizedBox(height: 20),
 
-                      // Eligibility Checklist
-                      SectionHeader(title: 'Placement Cell Eligibility'),
+                      // Placement Cell Eligibility Checklist
+                      SectionHeader(title: 'Placement Cell Eligibility Criteria'),
                       const SizedBox(height: 8),
                       SipsCard(
                         padding: const EdgeInsets.all(16),
                         child: Column(
-                          children: job.eligibilityCriteria.map((item) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Icon(Icons.check_circle_rounded, color: AppColors.emerald, size: 16),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Text(
-                                      item,
-                                      style: GoogleFonts.plusJakartaSans(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.onSurface,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                          children: [
+                            if (job.minCgpa > 0)
+                              _buildEligibilityRow(
+                                title: 'Minimum CGPA Required: ${job.minCgpa}',
+                                isMet: isEligible || !job.eligibilityReasons.any((r) => r.toLowerCase().contains('cgpa')),
                               ),
-                            );
-                          }).toList(),
+                            if (job.allowedBranches.isNotEmpty)
+                              _buildEligibilityRow(
+                                title: 'Allowed Branches: ${job.allowedBranches.join(', ')}',
+                                isMet: isEligible || !job.eligibilityReasons.any((r) => r.toLowerCase().contains('branch')),
+                              ),
+                            _buildEligibilityRow(
+                              title: 'Application Deadline: ${job.deadline}',
+                              isMet: !isExpired,
+                            ),
+                            _buildEligibilityRow(
+                              title: 'Drive Status: ${job.status}',
+                              isMet: isDriveActive,
+                            ),
+                          ],
                         ),
                       ),
 
@@ -353,18 +462,25 @@ class JobDetailScreen extends ConsumerWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: SipsButton(
-                        label: job.hasApplied ? 'Applied' : 'Apply via Campus',
-                        variant: job.hasApplied ? SipsButtonVariant.emerald : SipsButtonVariant.primary,
+                        label: hasApplied
+                            ? 'Applied'
+                            : isExpired
+                                ? 'Deadline Passed'
+                                : !isDriveActive
+                                    ? 'Drive Closed'
+                                    : !isEligible
+                                        ? 'Not Eligible'
+                                        : 'Apply via Campus',
+                        variant: hasApplied
+                            ? SipsButtonVariant.emerald
+                            : (!isEligible || !isDriveActive || isExpired)
+                                ? SipsButtonVariant.secondary
+                                : SipsButtonVariant.primary,
                         size: SipsButtonSize.large,
-                        onPressed: () {
-                          ref.read(opportunitiesProvider.notifier).apply(job.id);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Applied for ${job.role} at ${job.company}!'),
-                              backgroundColor: AppColors.emerald,
-                            ),
-                          );
-                        },
+                        isLoading: _isApplying,
+                        onPressed: (hasApplied || !isEligible || !isDriveActive || isExpired || _isApplying)
+                            ? null
+                            : () => _handleApply(job),
                       ),
                     ),
                   ],
@@ -373,6 +489,33 @@ class JobDetailScreen extends ConsumerWidget {
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildEligibilityRow({required String title, required bool isMet}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            isMet ? Icons.check_circle_rounded : Icons.cancel_rounded,
+            color: isMet ? AppColors.emerald : const Color(0xFFE11D48),
+            size: 16,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              title,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: isMet ? AppColors.onSurface : const Color(0xFFBE123C),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
