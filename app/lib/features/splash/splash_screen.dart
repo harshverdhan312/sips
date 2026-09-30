@@ -24,9 +24,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   Future<void> _bootstrap() async {
     if (_hasNavigated) return;
 
-    // Concurrently run authentication check and minimum visual splash branding transition
+    // Concurrently run authentication check, onboarding check, and minimum visual splash transition
     final results = await Future.wait([
       ref.read(authProvider.notifier).checkInitialAuth(),
+      ref.read(apiClientProvider).hasSeenOnboarding(),
       Future.delayed(const Duration(milliseconds: 1000)),
     ]);
 
@@ -34,8 +35,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     _hasNavigated = true;
 
     final isAuthenticated = results[0] as bool;
+    final hasSeenOnboarding = results[1] as bool;
+
     if (isAuthenticated) {
       context.go('/home');
+    } else if (hasSeenOnboarding) {
+      context.go('/auth');
     } else {
       context.go('/welcome');
     }

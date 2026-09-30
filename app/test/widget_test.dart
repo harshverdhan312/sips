@@ -27,8 +27,15 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    // Verify SIPS branding image and header renders on WelcomeScreen
+    // Verify SIPS branding image and header renders on WelcomeScreen (Screen 1)
     expect(find.byType(Image), findsWidgets);
+    expect(find.text('Get Started'), findsOneWidget);
+
+    // Tap Get Started to advance to Screen 2
+    await tester.tap(find.text('Get Started'));
+    await tester.pumpAndSettle();
+
+    // Verify Screen 2
     expect(find.text('Sign In to Student Portal'), findsOneWidget);
     expect(find.byType(ElevatedButton), findsNothing); // custom SipsButton used
   });
