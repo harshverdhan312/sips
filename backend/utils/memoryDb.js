@@ -192,6 +192,7 @@ class MemoryDatabase {
       github: studentData.github || '',
       linkedin: studentData.linkedin || '',
       projects: Array.isArray(studentData.projects) ? studentData.projects : [],
+      codingProfiles: Array.isArray(studentData.codingProfiles) ? studentData.codingProfiles : [],
       publicProfile: studentData.publicProfile ? {
         enabled: Boolean(studentData.publicProfile.enabled),
         username: (studentData.publicProfile.username || '').toLowerCase().trim(),
@@ -200,7 +201,8 @@ class MemoryDatabase {
         showGithub: studentData.publicProfile.showGithub !== undefined ? Boolean(studentData.publicProfile.showGithub) : true,
         showLinkedIn: studentData.publicProfile.showLinkedIn !== undefined ? Boolean(studentData.publicProfile.showLinkedIn) : true,
         showSkills: studentData.publicProfile.showSkills !== undefined ? Boolean(studentData.publicProfile.showSkills) : true,
-        showProjects: studentData.publicProfile.showProjects !== undefined ? Boolean(studentData.publicProfile.showProjects) : true
+        showProjects: studentData.publicProfile.showProjects !== undefined ? Boolean(studentData.publicProfile.showProjects) : true,
+        showCodingProfiles: studentData.publicProfile.showCodingProfiles !== undefined ? Boolean(studentData.publicProfile.showCodingProfiles) : true
       } : {
         enabled: false,
         username: '',
@@ -209,7 +211,8 @@ class MemoryDatabase {
         showGithub: true,
         showLinkedIn: true,
         showSkills: true,
-        showProjects: true
+        showProjects: true,
+        showCodingProfiles: true
       },
       resumeUrl: studentData.resumeUrl || '',
       resumeSkillReview: studentData.resumeSkillReview || {

@@ -53,6 +53,65 @@ const studentSchema = new mongoose.Schema({
       syncedAt: { type: Date, default: null }
     }
   ],
+  codingProfiles: [
+    {
+      platform: {
+        type: String,
+        required: true,
+        enum: ['LEETCODE', 'CODEFORCES', 'HACKERRANK', 'GEEKSFORGEEKS', 'CODECHEF', 'ATCODER']
+      },
+      username: { type: String, required: true, trim: true },
+      profileUrl: { type: String, required: true, trim: true },
+      accessMode: {
+        type: String,
+        enum: ['OFFICIAL_API', 'PUBLIC_ENDPOINT', 'UNOFFICIAL_ENDPOINT'],
+        default: 'PUBLIC_ENDPOINT'
+      },
+      connectionStatus: {
+        type: String,
+        enum: ['CONNECTED', 'DISCONNECTED', 'ERROR'],
+        default: 'CONNECTED'
+      },
+      verificationStatus: {
+        type: String,
+        enum: ['UNVERIFIED', 'PENDING', 'VERIFIED'],
+        default: 'UNVERIFIED'
+      },
+      showOnPublicProfile: { type: Boolean, default: true },
+      stats: {
+        problemsSolved: { type: Number, default: null },
+        difficultyBreakdown: {
+          easy: { type: Number, default: null },
+          medium: { type: Number, default: null },
+          hard: { type: Number, default: null }
+        },
+        currentRating: { type: Number, default: null },
+        maxRating: { type: Number, default: null },
+        rank: { type: String, default: null },
+        maxRank: { type: String, default: null },
+        globalRank: { type: Number, default: null },
+        rankingTier: { type: String, default: null },
+        contestParticipationCount: { type: Number, default: null },
+        reputationOrPoints: { type: Number, default: null },
+        contribution: { type: Number, default: null },
+        friendOfCount: { type: Number, default: null },
+        badges: [
+          {
+            name: { type: String, trim: true },
+            iconUrl: { type: String, trim: true, default: '' }
+          }
+        ],
+        topLanguages: [{ type: String, trim: true }]
+      },
+      lastSyncedAt: { type: Date, default: Date.now },
+      syncStatus: {
+        type: String,
+        enum: ['SUCCESS', 'PARTIAL', 'FAILED', 'RATE_LIMITED', 'USER_NOT_FOUND'],
+        default: 'SUCCESS'
+      },
+      syncError: { type: String, default: '' }
+    }
+  ],
   resumeUrl: { type: String, default: '' },
   resumeSkillReview: {
     detectedSkills: [{ type: String, trim: true }],
@@ -79,7 +138,8 @@ const studentSchema = new mongoose.Schema({
     showGithub: { type: Boolean, default: true },
     showLinkedIn: { type: Boolean, default: true },
     showSkills: { type: Boolean, default: true },
-    showProjects: { type: Boolean, default: true }
+    showProjects: { type: Boolean, default: true },
+    showCodingProfiles: { type: Boolean, default: true }
   },
   age: { type: Number, default: null },
   internships: { type: Number, default: null, min: 0 },

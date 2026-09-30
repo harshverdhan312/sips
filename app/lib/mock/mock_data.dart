@@ -35,6 +35,39 @@ class MockData {
       'Full Stack Developer',
     ],
     preferredLocations: ['Bengaluru', 'Hyderabad', 'Hybrid'],
+    codingProfiles: [
+      CodingPlatformProfile(
+        platform: 'LEETCODE',
+        username: 'aarav_nit',
+        profileUrl: 'https://leetcode.com/u/aarav_nit',
+        connectionStatus: 'CONNECTED',
+        verificationStatus: 'UNVERIFIED',
+        showOnPublicProfile: true,
+        stats: CodingPlatformStats(
+          problemsSolved: 450,
+          difficultyBreakdown: DifficultyBreakdown(easy: 150, medium: 240, hard: 60),
+          currentRating: 1842,
+          contestParticipationCount: 24,
+          badges: ['Guardian', '100 Days Badge 2025'],
+          topLanguages: ['C++', 'Python', 'Go'],
+        ),
+      ),
+      CodingPlatformProfile(
+        platform: 'CODEFORCES',
+        username: 'aarav_cf',
+        profileUrl: 'https://codeforces.com/profile/aarav_cf',
+        connectionStatus: 'CONNECTED',
+        verificationStatus: 'UNVERIFIED',
+        showOnPublicProfile: true,
+        stats: CodingPlatformStats(
+          currentRating: 1560,
+          maxRating: 1612,
+          rank: 'Specialist',
+          maxRank: 'Expert',
+          contestParticipationCount: 18,
+        ),
+      ),
+    ],
     isVerified: true,
   );
 

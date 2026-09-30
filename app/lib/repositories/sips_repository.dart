@@ -48,6 +48,11 @@ abstract class SipsRepository {
   Future<List<Map<String, dynamic>>> getGithubRepositories();
   Future<StudentPublicProfile> getPublicProfileConfig();
   Future<StudentPublicProfile> updatePublicProfileConfig(StudentPublicProfile config, {String? linkedin});
+  Future<List<CodingPlatformProfile>> getCodingProfiles();
+  Future<CodingPlatformProfile> connectCodingProfile({required String platform, required String username, bool showOnPublicProfile = true});
+  Future<CodingPlatformProfile> syncCodingProfile(String platform);
+  Future<CodingPlatformProfile> updateCodingProfileVisibility(String platform, bool showOnPublicProfile);
+  Future<void> disconnectCodingProfile(String platform);
 }
 
 class ResumeUploadResponse {

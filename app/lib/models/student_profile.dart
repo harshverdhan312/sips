@@ -169,6 +169,188 @@ class StudentPublicProfile {
   }
 }
 
+class DifficultyBreakdown {
+  final int? easy;
+  final int? medium;
+  final int? hard;
+
+  const DifficultyBreakdown({
+    this.easy,
+    this.medium,
+    this.hard,
+  });
+
+  factory DifficultyBreakdown.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return const DifficultyBreakdown();
+    return DifficultyBreakdown(
+      easy: (json['easy'] as num?)?.toInt(),
+      medium: (json['medium'] as num?)?.toInt(),
+      hard: (json['hard'] as num?)?.toInt(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (easy != null) 'easy': easy,
+      if (medium != null) 'medium': medium,
+      if (hard != null) 'hard': hard,
+    };
+  }
+}
+
+class CodingPlatformStats {
+  final int? problemsSolved;
+  final DifficultyBreakdown? difficultyBreakdown;
+  final int? currentRating;
+  final int? maxRating;
+  final String? rank;
+  final String? maxRank;
+  final int? contestParticipationCount;
+  final List<String> badges;
+  final List<String> topLanguages;
+
+  const CodingPlatformStats({
+    this.problemsSolved,
+    this.difficultyBreakdown,
+    this.currentRating,
+    this.maxRating,
+    this.rank,
+    this.maxRank,
+    this.contestParticipationCount,
+    this.badges = const [],
+    this.topLanguages = const [],
+  });
+
+  factory CodingPlatformStats.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return const CodingPlatformStats();
+    final rawBadges = json['badges'];
+    final badgesList = rawBadges is List ? rawBadges.map((e) => e.toString()).toList() : <String>[];
+    final rawLangs = json['topLanguages'];
+    final langsList = rawLangs is List ? rawLangs.map((e) => e.toString()).toList() : <String>[];
+
+    final rawBreakdown = json['difficultyBreakdown'];
+    final breakdownMap = rawBreakdown is Map ? rawBreakdown.cast<String, dynamic>() : null;
+
+    return CodingPlatformStats(
+      problemsSolved: (json['problemsSolved'] as num?)?.toInt(),
+      difficultyBreakdown: breakdownMap != null
+          ? DifficultyBreakdown.fromJson(breakdownMap)
+          : null,
+      currentRating: (json['currentRating'] as num?)?.toInt(),
+      maxRating: (json['maxRating'] as num?)?.toInt(),
+      rank: json['rank'] as String?,
+      maxRank: json['maxRank'] as String?,
+      contestParticipationCount: (json['contestParticipationCount'] as num?)?.toInt(),
+      badges: badgesList,
+      topLanguages: langsList,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (problemsSolved != null) 'problemsSolved': problemsSolved,
+      if (difficultyBreakdown != null) 'difficultyBreakdown': difficultyBreakdown!.toJson(),
+      if (currentRating != null) 'currentRating': currentRating,
+      if (maxRating != null) 'maxRating': maxRating,
+      if (rank != null) 'rank': rank,
+      if (maxRank != null) 'maxRank': maxRank,
+      if (contestParticipationCount != null) 'contestParticipationCount': contestParticipationCount,
+      if (badges.isNotEmpty) 'badges': badges,
+      if (topLanguages.isNotEmpty) 'topLanguages': topLanguages,
+    };
+  }
+}
+
+class CodingPlatformProfile {
+  final String platform; // 'LEETCODE' | 'CODEFORCES'
+  final String username;
+  final String profileUrl;
+  final String connectionStatus; // 'CONNECTED' | 'DISCONNECTED' | 'ERROR'
+  final String verificationStatus; // 'UNVERIFIED'
+  final bool showOnPublicProfile;
+  final CodingPlatformStats stats;
+  final DateTime? lastSyncedAt;
+  final String? syncStatus;
+  final String? syncError;
+
+  const CodingPlatformProfile({
+    required this.platform,
+    required this.username,
+    this.profileUrl = '',
+    this.connectionStatus = 'CONNECTED',
+    this.verificationStatus = 'UNVERIFIED',
+    this.showOnPublicProfile = true,
+    this.stats = const CodingPlatformStats(),
+    this.lastSyncedAt,
+    this.syncStatus,
+    this.syncError,
+  });
+
+  factory CodingPlatformProfile.fromBackendJson(Map<String, dynamic> json) {
+    DateTime? parsedSynced;
+    if (json['lastSyncedAt'] != null) {
+      parsedSynced = DateTime.tryParse(json['lastSyncedAt'].toString());
+    }
+
+    final rawStats = json['stats'];
+    final statsMap = rawStats is Map ? rawStats.cast<String, dynamic>() : null;
+
+    return CodingPlatformProfile(
+      platform: json['platform'] as String? ?? '',
+      username: json['username'] as String? ?? '',
+      profileUrl: json['profileUrl'] as String? ?? '',
+      connectionStatus: json['connectionStatus'] as String? ?? 'CONNECTED',
+      verificationStatus: json['verificationStatus'] as String? ?? 'UNVERIFIED',
+      showOnPublicProfile: json['showOnPublicProfile'] as bool? ?? true,
+      stats: CodingPlatformStats.fromJson(statsMap),
+      lastSyncedAt: parsedSynced,
+      syncStatus: json['syncStatus'] as String?,
+      syncError: json['syncError'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'platform': platform,
+      'username': username,
+      'profileUrl': profileUrl,
+      'connectionStatus': connectionStatus,
+      'verificationStatus': verificationStatus,
+      'showOnPublicProfile': showOnPublicProfile,
+      'stats': stats.toJson(),
+      'lastSyncedAt': lastSyncedAt?.toIso8601String(),
+      'syncStatus': syncStatus,
+      'syncError': syncError,
+    };
+  }
+
+  CodingPlatformProfile copyWith({
+    String? platform,
+    String? username,
+    String? profileUrl,
+    String? connectionStatus,
+    String? verificationStatus,
+    bool? showOnPublicProfile,
+    CodingPlatformStats? stats,
+    DateTime? lastSyncedAt,
+    String? syncStatus,
+    String? syncError,
+  }) {
+    return CodingPlatformProfile(
+      platform: platform ?? this.platform,
+      username: username ?? this.username,
+      profileUrl: profileUrl ?? this.profileUrl,
+      connectionStatus: connectionStatus ?? this.connectionStatus,
+      verificationStatus: verificationStatus ?? this.verificationStatus,
+      showOnPublicProfile: showOnPublicProfile ?? this.showOnPublicProfile,
+      stats: stats ?? this.stats,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      syncStatus: syncStatus ?? this.syncStatus,
+      syncError: syncError ?? this.syncError,
+    );
+  }
+}
+
 class StudentProfile {
   final String id;
   final String name;
@@ -192,6 +374,7 @@ class StudentProfile {
   final List<String> skills;
   final List<String> extractedSkills;
   final List<StudentProject> projects;
+  final List<CodingPlatformProfile> codingProfiles;
   final StudentPublicProfile publicProfile;
   final String resumeUrl;
   final int readinessScore;
@@ -228,6 +411,7 @@ class StudentProfile {
     this.skills = const [],
     this.extractedSkills = const [],
     this.projects = const [],
+    this.codingProfiles = const [],
     this.publicProfile = const StudentPublicProfile(),
     this.resumeUrl = '',
     this.readinessScore = 0,
@@ -286,6 +470,19 @@ class StudentProfile {
             .toList()
         : <StudentProject>[];
 
+    final rawCodingProfiles = json['codingProfiles'];
+    final codingProfilesList = rawCodingProfiles is List
+        ? rawCodingProfiles
+            .whereType<Map<String, dynamic>>()
+            .map((p) => CodingPlatformProfile.fromBackendJson(p))
+            .toList()
+        : <CodingPlatformProfile>[];
+
+    // Derive leetcode legacy stats if present
+    final lcProfile = codingProfilesList.where((p) => p.platform == 'LEETCODE' && p.connectionStatus == 'CONNECTED').firstOrNull;
+    final derivedLcHandle = lcProfile?.username ?? (json['leetcode'] as String? ?? '');
+    final derivedLcRating = lcProfile?.stats.currentRating ?? (json['leetcodeRating'] as num?)?.toInt() ?? 0;
+
     return StudentProfile(
       id: json['_id'] as String? ?? json['id'] as String? ?? '',
       name: json['name'] as String? ?? '',
@@ -299,6 +496,8 @@ class StudentProfile {
       profileImageUrl: json['profileImageUrl'] as String? ?? json['avatarUrl'] as String? ?? '',
       githubHandle: json['github'] as String? ?? '',
       linkedin: json['linkedin'] as String? ?? '',
+      leetcodeHandle: derivedLcHandle,
+      leetcodeRating: derivedLcRating,
       atsScore: resumeScoreVal > 0 ? resumeScoreVal : (resumeUrl.isNotEmpty ? 80 : 0),
       resumeScore: resumeScoreVal,
       technicalScore: technical,
@@ -308,6 +507,7 @@ class StudentProfile {
       skills: skillsList,
       extractedSkills: extractedList,
       projects: projectsList,
+      codingProfiles: codingProfilesList,
       publicProfile: StudentPublicProfile.fromJson(json['publicProfile'] as Map<String, dynamic>?),
       resumeUrl: resumeUrl,
       readinessScore: readiness,
@@ -342,6 +542,7 @@ class StudentProfile {
     List<String>? skills,
     List<String>? extractedSkills,
     List<StudentProject>? projects,
+    List<CodingPlatformProfile>? codingProfiles,
     StudentPublicProfile? publicProfile,
     String? resumeUrl,
     int? readinessScore,
@@ -378,6 +579,7 @@ class StudentProfile {
       skills: skills ?? this.skills,
       extractedSkills: extractedSkills ?? this.extractedSkills,
       projects: projects ?? this.projects,
+      codingProfiles: codingProfiles ?? this.codingProfiles,
       publicProfile: publicProfile ?? this.publicProfile,
       resumeUrl: resumeUrl ?? this.resumeUrl,
       readinessScore: readinessScore ?? this.readinessScore,

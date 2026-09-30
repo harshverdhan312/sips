@@ -32,7 +32,9 @@ import {
   Globe,
   Copy,
   Lock,
-  ShieldCheck
+  ShieldCheck,
+  BookOpen,
+  Code
 } from "lucide-react";
 import Avatar from "../../components/common/Avatar";
 import { studentService } from "../../services/studentService";
@@ -142,6 +144,18 @@ export function StudentProfilePage() {
   const [reviewNewSkill, setReviewNewSkill] = useState("");
   const [confirmingSkills, setConfirmingSkills] = useState(false);
 
+  // Coding Profiles State
+  const [codingProfiles, setCodingProfiles] = useState([]);
+  const [isCodingProfileModalOpen, setIsCodingProfileModalOpen] = useState(false);
+  const [codingProfileForm, setCodingProfileForm] = useState({
+    platform: "LEETCODE",
+    username: "",
+    showOnPublicProfile: true
+  });
+  const [savingCodingProfile, setSavingCodingProfile] = useState(false);
+  const [syncingPlatform, setSyncingPlatform] = useState("");
+  const [codingProfileError, setCodingProfileError] = useState("");
+
   useEffect(() => {
     async function load() {
       const data = await studentService.getCurrentStudent();
@@ -175,6 +189,14 @@ export function StudentProfilePage() {
         }
       } catch (err) {
         console.warn("Could not fetch public profile config:", err.message);
+      }
+
+      // Load Coding Profiles
+      try {
+        const profiles = await studentService.getCodingProfiles();
+        setCodingProfiles(profiles || []);
+      } catch (err) {
+        console.warn("Could not fetch coding profiles:", err.message);
       }
     }
     load();
@@ -403,6 +425,98 @@ export function StudentProfilePage() {
       setTimeout(() => setCopiedPublicUrl(false), 2500);
     } catch (e) {
       showError("Could not copy link to clipboard.");
+    }
+  };
+
+  const handleOpenConnectCodingModal = (platform = "LEETCODE") => {
+    const existing = codingProfiles.find(p => p.platform === platform);
+    setCodingProfileForm({
+      platform,
+      username: existing ? existing.username : "",
+      showOnPublicProfile: existing ? existing.showOnPublicProfile !== false : true
+    });
+    setCodingProfileError("");
+    setIsCodingProfileModalOpen(true);
+  };
+
+  const handleSaveCodingProfile = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!codingProfileForm.username.trim()) {
+      setCodingProfileError("Username or profile URL is required.");
+      return;
+    }
+
+    setCodingProfileError("");
+    setSavingCodingProfile(true);
+
+    try {
+      const res = await studentService.connectCodingProfile({
+        platform: codingProfileForm.platform,
+        username: codingProfileForm.username.trim(),
+        showOnPublicProfile: codingProfileForm.showOnPublicProfile
+      });
+
+      if (res && res.success) {
+        setCodingProfiles(res.codingProfiles || []);
+        setIsCodingProfileModalOpen(false);
+        showSuccess(res.message || `Connected ${codingProfileForm.platform} profile successfully!`);
+      } else {
+        setCodingProfileError(res?.message || `Failed to connect ${codingProfileForm.platform} profile.`);
+      }
+    } catch (err) {
+      setCodingProfileError(err.message || `Failed to connect ${codingProfileForm.platform} profile.`);
+    } finally {
+      setSavingCodingProfile(false);
+    }
+  };
+
+  const handleSyncCodingProfile = async (platform) => {
+    setSyncingPlatform(platform);
+    try {
+      const res = await studentService.syncCodingProfile(platform);
+      if (res && res.codingProfiles) {
+        setCodingProfiles(res.codingProfiles);
+      }
+      if (res && res.success) {
+        showSuccess(res.message || `Synchronized ${platform} statistics successfully!`);
+      } else {
+        showWarning(res?.message || `Sync completed with notice: ${res?.codingProfile?.syncError || 'Check profile'}`);
+      }
+    } catch (err) {
+      showError(err.message || `Failed to sync ${platform} profile.`);
+    } finally {
+      setSyncingPlatform("");
+    }
+  };
+
+  const handleToggleCodingProfileVisibility = async (platform, currentVisibility) => {
+    const nextVisibility = !currentVisibility;
+    try {
+      const res = await studentService.updateCodingProfileVisibility(platform, nextVisibility);
+      if (res && res.codingProfiles) {
+        setCodingProfiles(res.codingProfiles);
+      }
+      showSuccess(`${platform} visibility ${nextVisibility ? 'enabled' : 'hidden'} on public profile.`);
+    } catch (err) {
+      showError(err.message || `Failed to update ${platform} visibility.`);
+    }
+  };
+
+  const handleDisconnectCodingProfile = async (platform) => {
+    if (!window.confirm(`Are you sure you want to disconnect your ${platform} profile from SIPS?`)) {
+      return;
+    }
+
+    try {
+      const res = await studentService.disconnectCodingProfile(platform);
+      if (res && res.codingProfiles) {
+        setCodingProfiles(res.codingProfiles);
+      } else {
+        setCodingProfiles(prev => prev.filter(p => p.platform !== platform));
+      }
+      showSuccess(`Disconnected ${platform} profile.`);
+    } catch (err) {
+      showError(err.message || `Failed to disconnect ${platform} profile.`);
     }
   };
 
@@ -1218,6 +1332,192 @@ export function StudentProfilePage() {
           </Card>
         );
       })()}
+
+      {/* Coding & Competitive Programming Profiles Section */}
+      <Card className="mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-indigo-600" /> Coding & Competitive Programming Profiles
+              </h3>
+              <Badge variant={codingProfiles.length > 0 ? "indigo" : "neutral"} size="sm">
+                {codingProfiles.length} Connected
+              </Badge>
+            </div>
+            <p className="text-xs text-slate-500 mt-1">
+              Connect your LeetCode and Codeforces profiles to showcase verified problem-solving metrics and contest ratings
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {['LEETCODE', 'CODEFORCES'].map((platformKey) => {
+            const isLeetCode = platformKey === 'LEETCODE';
+            const connected = codingProfiles.find(p => p.platform === platformKey);
+            const isSyncing = syncingPlatform === platformKey;
+            const stats = connected?.stats || {};
+
+            return (
+              <div
+                key={platformKey}
+                className="p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-300 transition-all flex flex-col justify-between shadow-xs"
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2.5 rounded-xl border ${
+                        isLeetCode 
+                          ? 'bg-amber-50 text-amber-600 border-amber-200' 
+                          : 'bg-blue-50 text-blue-600 border-blue-200'
+                      }`}>
+                        <Code className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-bold text-slate-900 text-sm">
+                            {isLeetCode ? 'LeetCode' : 'Codeforces'}
+                          </h4>
+                          <Badge variant={connected ? "emerald" : "neutral"} size="xs">
+                            {connected ? "Connected" : "Not Linked"}
+                          </Badge>
+                        </div>
+                        {connected ? (
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-xs font-mono text-indigo-600 font-semibold">@{connected.username}</span>
+                            {connected.profileUrl && (
+                              <a
+                                href={connected.profileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-slate-400 hover:text-indigo-600 transition-colors"
+                                title="Open Profile"
+                              >
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-slate-400">Public statistics & ratings</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {connected && (
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="xs"
+                          icon={RefreshCw}
+                          onClick={() => handleSyncCodingProfile(platformKey)}
+                          disabled={isSyncing}
+                          title="Sync Now"
+                          className={isSyncing ? "animate-spin text-indigo-600" : "text-slate-500 hover:text-indigo-600"}
+                        />
+                        <Button
+                          variant="ghost"
+                          size="xs"
+                          icon={Trash2}
+                          onClick={() => handleDisconnectCodingProfile(platformKey)}
+                          title="Disconnect"
+                          className="text-slate-400 hover:text-rose-600"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {connected ? (
+                    <div className="space-y-3 mt-4">
+                      {/* Stats Pills */}
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        {typeof stats.problemsSolved === 'number' && (
+                          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                            <span className="text-[10px] text-slate-500 font-medium block">Problems Solved</span>
+                            <span className="font-extrabold text-slate-900 text-base">{stats.problemsSolved}</span>
+                          </div>
+                        )}
+                        {typeof stats.currentRating === 'number' && (
+                          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                            <span className="text-[10px] text-slate-500 font-medium block">Contest Rating</span>
+                            <span className="font-extrabold text-indigo-600 text-base">{stats.currentRating}</span>
+                          </div>
+                        )}
+                        {typeof stats.maxRating === 'number' && (
+                          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                            <span className="text-[10px] text-slate-500 font-medium block">Max Rating</span>
+                            <span className="font-bold text-slate-700 text-sm">{stats.maxRating}</span>
+                          </div>
+                        )}
+                        {stats.rank && (
+                          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                            <span className="text-[10px] text-slate-500 font-medium block">Current Rank</span>
+                            <span className="font-bold text-blue-700 text-sm capitalize">{stats.rank}</span>
+                          </div>
+                        )}
+                        {stats.rankingTier && (
+                          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                            <span className="text-[10px] text-slate-500 font-medium block">Badge Tier</span>
+                            <span className="font-bold text-amber-700 text-sm">{stats.rankingTier}</span>
+                          </div>
+                        )}
+                        {typeof stats.contestParticipationCount === 'number' && stats.contestParticipationCount > 0 && (
+                          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                            <span className="text-[10px] text-slate-500 font-medium block">Contests</span>
+                            <span className="font-bold text-slate-700 text-sm">{stats.contestParticipationCount}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Difficulty Breakdown for LeetCode */}
+                      {stats.difficultyBreakdown && (
+                        <div className="flex items-center gap-1.5 pt-1 text-[11px]">
+                          <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-medium">
+                            E: {stats.difficultyBreakdown.easy}
+                          </span>
+                          <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-700 font-medium">
+                            M: {stats.difficultyBreakdown.medium}
+                          </span>
+                          <span className="px-2 py-0.5 rounded bg-rose-50 text-rose-700 font-medium">
+                            H: {stats.difficultyBreakdown.hard}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Sync notice / Last synced */}
+                      <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-[11px] text-slate-500">
+                        <span>
+                          {connected.lastSyncedAt ? `Synced ${formatTimeAgo(connected.lastSyncedAt)}` : 'Recently connected'}
+                        </span>
+                        <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={connected.showOnPublicProfile !== false}
+                            onChange={() => handleToggleCodingProfileVisibility(platformKey, connected.showOnPublicProfile !== false)}
+                            className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-3.5 w-3.5"
+                          />
+                          <span className="text-slate-600 font-medium">Show on Public Profile</span>
+                        </label>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+                      <span className="text-xs text-slate-500">Not connected to your profile</span>
+                      <Button
+                        variant="outline"
+                        size="xs"
+                        icon={Plus}
+                        onClick={() => handleOpenConnectCodingModal(platformKey)}
+                      >
+                        Connect {isLeetCode ? 'LeetCode' : 'Codeforces'}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
 
       {/* Placement Profile Information */}
       <Card>
@@ -2105,6 +2405,67 @@ export function StudentProfilePage() {
             </Button>
           </div>
         </div>
+      </Modal>
+
+      {/* Coding Profile Connection Modal */}
+      <Modal
+        isOpen={isCodingProfileModalOpen}
+        onClose={() => !savingCodingProfile && setIsCodingProfileModalOpen(false)}
+        title={`${codingModalPlatform === 'LEETCODE' ? 'LeetCode' : 'Codeforces'} Profile`}
+      >
+        <form onSubmit={handleSaveCodingProfile} className="space-y-4 pt-2">
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+              Handle or Profile URL
+            </label>
+            <input
+              type="text"
+              value={codingModalUsername}
+              onChange={(e) => setCodingModalUsername(e.target.value)}
+              placeholder={codingModalPlatform === 'LEETCODE' ? 'e.g., username or https://leetcode.com/u/username' : 'e.g., handle or https://codeforces.com/profile/handle'}
+              disabled={savingCodingProfile}
+              className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              required
+            />
+            <p className="text-xs text-slate-500 mt-1">
+              Enter your public username or profile link. We will verify and fetch your public stats.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 pt-1">
+            <input
+              type="checkbox"
+              id="codingModalShowPublic"
+              checked={codingModalShowOnPublic}
+              onChange={(e) => setCodingModalShowOnPublic(e.target.checked)}
+              disabled={savingCodingProfile}
+              className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer"
+            />
+            <label htmlFor="codingModalShowPublic" className="text-xs font-medium text-slate-700 cursor-pointer select-none">
+              Display on public career profile
+            </label>
+          </div>
+
+          <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={savingCodingProfile}
+              onClick={() => setIsCodingProfileModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              loading={savingCodingProfile}
+            >
+              Save & Sync
+            </Button>
+          </div>
+        </form>
       </Modal>
     </div>
   );

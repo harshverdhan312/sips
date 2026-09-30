@@ -13,6 +13,7 @@ const { sendNotification } = require('../utils/notificationService');
 const { mapStudentToPlacementInput } = require('../utils/placementDataMapper');
 const mlService = require('../services/mlService');
 const githubService = require('../services/githubService');
+const codingPlatformService = require('../services/codingPlatforms/codingPlatformService');
 const memoryDb = require('../utils/memoryDb');
 const config = require('../config');
 const logger = require('../utils/logger');
@@ -2267,7 +2268,8 @@ exports.getPublicProfileConfig = async (req, res, next) => {
         showGithub: pub.showGithub !== false,
         showLinkedIn: pub.showLinkedIn !== false,
         showSkills: pub.showSkills !== false,
-        showProjects: pub.showProjects !== false
+        showProjects: pub.showProjects !== false,
+        showCodingProfiles: pub.showCodingProfiles !== false
       },
       linkedin: student.linkedin || '',
       github: student.github || '',
@@ -2294,6 +2296,7 @@ exports.updatePublicProfileConfig = async (req, res, next) => {
       showLinkedIn,
       showSkills,
       showProjects,
+      showCodingProfiles,
       linkedin
     } = req.body;
 
@@ -2323,7 +2326,8 @@ exports.updatePublicProfileConfig = async (req, res, next) => {
       showGithub: true,
       showLinkedIn: true,
       showSkills: true,
-      showProjects: true
+      showProjects: true,
+      showCodingProfiles: true
     };
 
     const targetEnabled = enabled !== undefined ? Boolean(enabled) : (currentPublic.enabled === true);
@@ -2423,7 +2427,8 @@ exports.updatePublicProfileConfig = async (req, res, next) => {
       showGithub: showGithub !== undefined ? Boolean(showGithub) : (currentPublic.showGithub !== false),
       showLinkedIn: showLinkedIn !== undefined ? Boolean(showLinkedIn) : (currentPublic.showLinkedIn !== false),
       showSkills: showSkills !== undefined ? Boolean(showSkills) : (currentPublic.showSkills !== false),
-      showProjects: showProjects !== undefined ? Boolean(showProjects) : (currentPublic.showProjects !== false)
+      showProjects: showProjects !== undefined ? Boolean(showProjects) : (currentPublic.showProjects !== false),
+      showCodingProfiles: showCodingProfiles !== undefined ? Boolean(showCodingProfiles) : (currentPublic.showCodingProfiles !== false)
     };
 
     if (!memoryDb.isMongoConnected()) {
@@ -2458,5 +2463,338 @@ exports.updatePublicProfileConfig = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * GET /api/student/coding-profiles
+ * Get authenticated student's connected coding profiles
+ */
+exports.getCodingProfiles = async (req, res, next) => {
+  try {
+    let student = null;
+    if (!memoryDb.isMongoConnected()) {
+      student = memoryDb.findStudentById(req.user.id);
+    } else {
+      student = await Student.findOne({ _id: req.user.id, collegeId: req.collegeId }).select('codingProfiles');
+    }
+
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student profile not found' });
+    }
+
+    return res.json({
+      success: true,
+      codingProfiles: student.codingProfiles || []
+    });
+  } catch (error) {
+    logger.error('Get coding profiles error:', error);
+    next(error);
+  }
+};
+
+/**
+ * POST /api/student/coding-profiles
+ * Connect or update a coding platform profile
+ */
+exports.connectCodingProfile = async (req, res, next) => {
+  try {
+    const { platform, username, showOnPublicProfile } = req.body;
+
+    if (!platform || typeof platform !== 'string') {
+      return res.status(400).json({ success: false, message: 'Platform name is required.' });
+    }
+    if (!username || typeof username !== 'string') {
+      return res.status(400).json({ success: false, message: 'Username or profile URL is required.' });
+    }
+
+    const targetPlatform = platform.trim().toUpperCase();
+
+    // Fetch and verify profile from platform
+    const fetchedData = await codingPlatformService.fetchPlatformProfile(targetPlatform, username, true);
+
+    let student = null;
+    if (!memoryDb.isMongoConnected()) {
+      student = memoryDb.findStudentById(req.user.id);
+    } else {
+      student = await Student.findOne({ _id: req.user.id, collegeId: req.collegeId });
+    }
+
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student profile not found' });
+    }
+
+    const currentProfiles = student.codingProfiles || [];
+    const existingIndex = currentProfiles.findIndex(p => p.platform === targetPlatform);
+
+    const newProfile = {
+      platform: targetPlatform,
+      username: fetchedData.username,
+      profileUrl: fetchedData.profileUrl,
+      accessMode: fetchedData.accessMode,
+      connectionStatus: 'CONNECTED',
+      verificationStatus: 'UNVERIFIED',
+      showOnPublicProfile: showOnPublicProfile !== undefined ? Boolean(showOnPublicProfile) : true,
+      stats: fetchedData.stats,
+      lastSyncedAt: new Date(),
+      syncStatus: 'SUCCESS',
+      syncError: ''
+    };
+
+    if (existingIndex >= 0) {
+      currentProfiles[existingIndex] = newProfile;
+    } else {
+      currentProfiles.push(newProfile);
+    }
+
+    if (!memoryDb.isMongoConnected()) {
+      memoryDb.updateStudent(req.user.id, { codingProfiles: currentProfiles });
+    } else {
+      student.codingProfiles = currentProfiles;
+      await student.save();
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Successfully connected ${targetPlatform} profile for ${fetchedData.username}.`,
+      codingProfile: newProfile,
+      codingProfiles: currentProfiles
+    });
+  } catch (error) {
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({
+        success: false,
+        message: error.message
+      });
+    }
+    logger.error('Connect coding profile error:', error);
+    next(error);
+  }
+};
+
+/**
+ * POST /api/student/coding-profiles/:platform/sync
+ * Manually synchronize a connected coding platform profile
+ */
+exports.syncCodingProfile = async (req, res, next) => {
+  try {
+    const rawPlatform = req.params.platform;
+    if (!rawPlatform) {
+      return res.status(400).json({ success: false, message: 'Platform parameter is required.' });
+    }
+    const targetPlatform = rawPlatform.trim().toUpperCase();
+
+    let student = null;
+    if (!memoryDb.isMongoConnected()) {
+      student = memoryDb.findStudentById(req.user.id);
+    } else {
+      student = await Student.findOne({ _id: req.user.id, collegeId: req.collegeId });
+    }
+
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student profile not found' });
+    }
+
+    const currentProfiles = student.codingProfiles || [];
+    const profileIndex = currentProfiles.findIndex(p => p.platform === targetPlatform);
+
+    if (profileIndex < 0) {
+      return res.status(404).json({
+        success: false,
+        message: `No connected ${targetPlatform} profile found for your account.`
+      });
+    }
+
+    const existing = currentProfiles[profileIndex];
+    let syncError = '';
+    let syncStatus = 'SUCCESS';
+    let fetchedData = null;
+
+    try {
+      fetchedData = await codingPlatformService.fetchPlatformProfile(targetPlatform, existing.username, true);
+    } catch (err) {
+      syncError = err.message || 'Failed to sync platform profile.';
+      if (err.statusCode === 429 || err.isRateLimit) {
+        syncStatus = 'RATE_LIMITED';
+      } else if (err.statusCode === 404 || err.isUserNotFound) {
+        syncStatus = 'USER_NOT_FOUND';
+      } else {
+        syncStatus = 'FAILED';
+      }
+    }
+
+    const now = new Date();
+    if (fetchedData) {
+      currentProfiles[profileIndex] = {
+        platform: targetPlatform,
+        username: fetchedData.username,
+        profileUrl: fetchedData.profileUrl,
+        accessMode: fetchedData.accessMode || existing.accessMode,
+        connectionStatus: 'CONNECTED',
+        verificationStatus: existing.verificationStatus || 'UNVERIFIED',
+        showOnPublicProfile: existing.showOnPublicProfile !== false,
+        stats: fetchedData.stats,
+        lastSyncedAt: now,
+        syncStatus: 'SUCCESS',
+        syncError: ''
+      };
+    } else {
+      // Retain existing statistics without destroying data
+      currentProfiles[profileIndex] = {
+        ...((existing.toObject ? existing.toObject() : existing)),
+        lastSyncedAt: now,
+        syncStatus,
+        syncError
+      };
+    }
+
+    if (!memoryDb.isMongoConnected()) {
+      memoryDb.updateStudent(req.user.id, { codingProfiles: currentProfiles });
+    } else {
+      student.codingProfiles = currentProfiles;
+      await student.save();
+    }
+
+    if (syncStatus !== 'SUCCESS') {
+      return res.status(200).json({
+        success: false,
+        message: `Sync partially failed: ${syncError}`,
+        codingProfile: currentProfiles[profileIndex],
+        codingProfiles: currentProfiles
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: `Successfully synchronized ${targetPlatform} profile.`,
+      codingProfile: currentProfiles[profileIndex],
+      codingProfiles: currentProfiles
+    });
+  } catch (error) {
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({
+        success: false,
+        message: error.message
+      });
+    }
+    logger.error('Sync coding profile error:', error);
+    next(error);
+  }
+};
+
+/**
+ * PATCH /api/student/coding-profiles/:platform/visibility
+ * Update visibility toggle for a coding platform profile
+ */
+exports.updateCodingProfileVisibility = async (req, res, next) => {
+  try {
+    const rawPlatform = req.params.platform;
+    const { showOnPublicProfile } = req.body;
+
+    if (!rawPlatform) {
+      return res.status(400).json({ success: false, message: 'Platform parameter is required.' });
+    }
+    if (showOnPublicProfile === undefined) {
+      return res.status(400).json({ success: false, message: 'showOnPublicProfile boolean is required.' });
+    }
+
+    const targetPlatform = rawPlatform.trim().toUpperCase();
+
+    let student = null;
+    if (!memoryDb.isMongoConnected()) {
+      student = memoryDb.findStudentById(req.user.id);
+    } else {
+      student = await Student.findOne({ _id: req.user.id, collegeId: req.collegeId });
+    }
+
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student profile not found' });
+    }
+
+    const currentProfiles = student.codingProfiles || [];
+    const profileIndex = currentProfiles.findIndex(p => p.platform === targetPlatform);
+
+    if (profileIndex < 0) {
+      return res.status(404).json({
+        success: false,
+        message: `No connected ${targetPlatform} profile found to update.`
+      });
+    }
+
+    const existing = currentProfiles[profileIndex];
+    currentProfiles[profileIndex] = {
+      ...((existing.toObject ? existing.toObject() : existing)),
+      showOnPublicProfile: Boolean(showOnPublicProfile)
+    };
+
+    if (!memoryDb.isMongoConnected()) {
+      memoryDb.updateStudent(req.user.id, { codingProfiles: currentProfiles });
+    } else {
+      student.codingProfiles = currentProfiles;
+      await student.save();
+    }
+
+    return res.json({
+      success: true,
+      message: `Visibility for ${targetPlatform} profile updated.`,
+      codingProfile: currentProfiles[profileIndex],
+      codingProfiles: currentProfiles
+    });
+  } catch (error) {
+    logger.error('Update coding profile visibility error:', error);
+    next(error);
+  }
+};
+
+/**
+ * DELETE /api/student/coding-profiles/:platform
+ * Disconnect a coding platform profile
+ */
+exports.disconnectCodingProfile = async (req, res, next) => {
+  try {
+    const rawPlatform = req.params.platform;
+    if (!rawPlatform) {
+      return res.status(400).json({ success: false, message: 'Platform parameter is required.' });
+    }
+    const targetPlatform = rawPlatform.trim().toUpperCase();
+
+    let student = null;
+    if (!memoryDb.isMongoConnected()) {
+      student = memoryDb.findStudentById(req.user.id);
+    } else {
+      student = await Student.findOne({ _id: req.user.id, collegeId: req.collegeId });
+    }
+
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student profile not found' });
+    }
+
+    const currentProfiles = student.codingProfiles || [];
+    const initialLen = currentProfiles.length;
+    const filteredProfiles = currentProfiles.filter(p => p.platform !== targetPlatform);
+
+    if (filteredProfiles.length === initialLen) {
+      return res.status(404).json({
+        success: false,
+        message: `No connected ${targetPlatform} profile found to disconnect.`
+      });
+    }
+
+    if (!memoryDb.isMongoConnected()) {
+      memoryDb.updateStudent(req.user.id, { codingProfiles: filteredProfiles });
+    } else {
+      student.codingProfiles = filteredProfiles;
+      await student.save();
+    }
+
+    return res.json({
+      success: true,
+      message: `Successfully disconnected ${targetPlatform} profile.`,
+      codingProfiles: filteredProfiles
+    });
+  } catch (error) {
+    logger.error('Disconnect coding profile error:', error);
+    next(error);
+  }
+};
+
 
 

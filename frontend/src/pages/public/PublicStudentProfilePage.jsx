@@ -130,7 +130,7 @@ export function PublicStudentProfilePage() {
     );
   }
 
-  const { profile, links, skills, projects, resume } = profileData;
+  const { profile, links, skills, projects, codingProfiles, resume } = profileData;
   const college = profile?.college;
   const resumeUrl = resume?.available && resume?.url ? resolveAssetUrl(resume.url) : null;
   const avatarUrl = profile?.profileImageUrl ? resolveAssetUrl(profile.profileImageUrl) : null;
@@ -299,6 +299,149 @@ export function PublicStudentProfilePage() {
                   </span>
                 ))}
               </div>
+            </div>
+          </section>
+        )}
+
+        {/* Coding & Problem Solving Section */}
+        {codingProfiles && codingProfiles.length > 0 && (
+          <section className="space-y-4">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 shadow-xs">
+                <BookOpen className="w-4 h-4" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-slate-900 tracking-tight">Coding & Problem Solving</h2>
+                <p className="text-xs text-slate-500">Verified competitive programming & algorithmic practice</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {codingProfiles.map((cp, idx) => {
+                const isLeetCode = cp.platform === 'LEETCODE';
+                const isCodeforces = cp.platform === 'CODEFORCES';
+                const stats = cp.stats || {};
+
+                return (
+                  <div
+                    key={idx}
+                    className="flex flex-col justify-between p-5 rounded-2xl bg-white border border-slate-200/80 hover:border-indigo-300 hover:shadow-md transition-all shadow-sm group"
+                  >
+                    <div className="space-y-4">
+                      {/* Platform Header */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <div className={`p-2 rounded-xl border ${
+                            isLeetCode
+                              ? 'bg-amber-50 text-amber-600 border-amber-200'
+                              : 'bg-blue-50 text-blue-600 border-blue-200'
+                          }`}>
+                            <Code className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-bold text-slate-900 text-base">
+                                {isLeetCode ? 'LeetCode' : isCodeforces ? 'Codeforces' : cp.platform}
+                              </h3>
+                              {stats.rankingTier && (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                  {stats.rankingTier}
+                                </span>
+                              )}
+                              {stats.rank && (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 capitalize">
+                                  {stats.rank}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-slate-500 font-mono">@{cp.username}</p>
+                          </div>
+                        </div>
+
+                        {cp.profileUrl && (
+                          <a
+                            href={cp.profileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-slate-50 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 text-xs font-semibold text-slate-700 hover:text-indigo-600 transition-colors"
+                          >
+                            <span>View Profile</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        )}
+                      </div>
+
+                      {/* Stats Grid */}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
+                        {typeof stats.problemsSolved === 'number' && (
+                          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                            <span className="text-[11px] font-medium text-slate-500 block">Problems Solved</span>
+                            <span className="text-lg font-extrabold text-slate-900">{stats.problemsSolved}</span>
+                          </div>
+                        )}
+
+                        {typeof stats.currentRating === 'number' && (
+                          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                            <span className="text-[11px] font-medium text-slate-500 block">Contest Rating</span>
+                            <span className="text-lg font-extrabold text-indigo-600">{stats.currentRating}</span>
+                          </div>
+                        )}
+
+                        {typeof stats.maxRating === 'number' && (
+                          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                            <span className="text-[11px] font-medium text-slate-500 block">Max Rating</span>
+                            <span className="text-lg font-extrabold text-slate-700">{stats.maxRating}</span>
+                          </div>
+                        )}
+
+                        {typeof stats.contestParticipationCount === 'number' && stats.contestParticipationCount > 0 && (
+                          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                            <span className="text-[11px] font-medium text-slate-500 block">Contests</span>
+                            <span className="text-lg font-extrabold text-slate-900">{stats.contestParticipationCount}</span>
+                          </div>
+                        )}
+
+                        {typeof stats.globalRank === 'number' && stats.globalRank > 0 && (
+                          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                            <span className="text-[11px] font-medium text-slate-500 block">Global Rank</span>
+                            <span className="text-lg font-extrabold text-slate-900">#{stats.globalRank.toLocaleString()}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* LeetCode Difficulty Breakdown Pills */}
+                      {stats.difficultyBreakdown && (
+                        <div className="flex items-center gap-2 pt-1">
+                          <span className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+                            Easy: {stats.difficultyBreakdown.easy}
+                          </span>
+                          <span className="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 text-xs font-semibold">
+                            Medium: {stats.difficultyBreakdown.medium}
+                          </span>
+                          <span className="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 text-xs font-semibold">
+                            Hard: {stats.difficultyBreakdown.hard}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Badges */}
+                      {Array.isArray(stats.badges) && stats.badges.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                          {stats.badges.map((b, bIdx) => (
+                            <span
+                              key={bIdx}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-semibold"
+                            >
+                              <Award className="w-3 h-3 text-amber-600" />
+                              {b.name || b}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </section>
         )}
