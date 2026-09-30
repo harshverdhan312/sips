@@ -82,13 +82,17 @@ class SipsBadge extends StatelessWidget {
             Icon(icon, size: isSmall ? 12 : 14, color: fg),
             const SizedBox(width: 4),
           ],
-          Text(
-            label,
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: isSmall ? 10 : 11,
-              fontWeight: FontWeight.w700,
-              color: fg,
-              letterSpacing: 0.2,
+          Flexible(
+            child: Text(
+              label,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: isSmall ? 10 : 11,
+                fontWeight: FontWeight.w700,
+                color: fg,
+                letterSpacing: 0.2,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

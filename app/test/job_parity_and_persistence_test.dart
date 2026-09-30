@@ -289,8 +289,8 @@ void main() {
       // 8. Ineligible job shows Not Eligible
       expect(find.text('Not Eligible'), findsWidgets);
 
-      // 9. Minimum CGPA restriction displayed
-      expect(find.text('Minimum CGPA required: 8. Your CGPA: 6.9'), findsOneWidget);
+      // 9. Minimum CGPA restriction displayed concisely
+      expect(find.text('Min CGPA: 8.0'), findsOneWidget);
 
       // 10 & 11. Already-applied job displays Applied
       expect(find.text('Applied'), findsWidgets);

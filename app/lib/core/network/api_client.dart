@@ -8,6 +8,7 @@ import 'api_exception.dart';
 
 class ApiConfig {
   static const String tokenKey = 'sips_auth_token';
+  static const String onboardingKey = 'sips_has_seen_onboarding';
 
   static const String _envBaseUrl = String.fromEnvironment('API_BASE_URL');
 
@@ -56,6 +57,16 @@ class ApiClient {
   Future<void> clearToken() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(ApiConfig.tokenKey);
+  }
+
+  Future<bool> hasSeenOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(ApiConfig.onboardingKey) ?? false;
+  }
+
+  Future<void> setHasSeenOnboarding(bool seen) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(ApiConfig.onboardingKey, seen);
   }
 
   Future<Map<String, String>> _getHeaders({bool isJson = true}) async {

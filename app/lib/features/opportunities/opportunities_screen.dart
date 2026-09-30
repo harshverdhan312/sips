@@ -547,15 +547,39 @@ class _OpportunitiesScreenState extends ConsumerState<OpportunitiesScreen> {
         ? const Color(0xFF047857) // Emerald
         : (job.matchScore >= 60 ? AppColors.primary : const Color(0xFFD97706)); // Amber
 
+    // Format concise eligibility summary to prevent text collision
+    String eligibilitySummary;
+    if (isEligible) {
+      eligibilitySummary = job.minCgpa > 0 ? 'Min CGPA: ${job.minCgpa}' : 'Eligible';
+    } else {
+      if (job.eligibilityReasons.length > 1) {
+        eligibilitySummary = '${job.eligibilityReasons.length} requirements not met';
+      } else if (job.eligibilityReasons.isNotEmpty) {
+        final reason = job.eligibilityReasons.first;
+        if (reason.toLowerCase().contains('cgpa')) {
+          eligibilitySummary = 'Min CGPA: ${job.minCgpa > 0 ? job.minCgpa : 7.0}';
+        } else if (reason.toLowerCase().contains('branch')) {
+          eligibilitySummary = 'Branch not eligible';
+        } else if (reason.toLowerCase().contains('backlog')) {
+          eligibilitySummary = 'Backlog criteria not met';
+        } else {
+          eligibilitySummary = reason;
+        }
+      } else {
+        eligibilitySummary = 'Requirements not met';
+      }
+    }
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: SipsCard(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(16),
         onTap: () => context.push('/job-detail/${job.id}'),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Row: Company Avatar + Name & Status/Match Badges
+            // 1. Header Row: Avatar + Title & Company Details
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -584,55 +608,74 @@ class _OpportunitiesScreenState extends ConsumerState<OpportunitiesScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        job.company,
+                        job.role,
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
                           color: AppColors.onSurface,
+                          height: 1.25,
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        job.role,
+                        job.company,
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
                           color: AppColors.primary,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 4),
                       Row(
                         children: [
-                          const Icon(Icons.location_on_outlined, size: 13, color: AppColors.outline),
+                          const Icon(Icons.location_on_outlined, size: 12, color: AppColors.outline),
                           const SizedBox(width: 3),
-                          Text(
-                            job.location,
-                            style: GoogleFonts.plusJakartaSans(fontSize: 11, color: AppColors.onSurfaceVariant),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text('•', style: TextStyle(color: AppColors.outline, fontSize: 11)),
-                          const SizedBox(width: 8),
-                          Text(
-                            job.type,
-                            style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.onSurfaceVariant),
+                          Expanded(
+                            child: Text(
+                              '${job.location} • ${job.type}',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.onSurfaceVariant,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ],
                       ),
                     ],
                   ),
                 ),
-                // Match Score & Eligibility / Status Badge
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: matchColor.withValues(alpha: 0.12),
-                        borderRadius: AppRadius.fullRadius,
-                        border: Border.all(color: matchColor.withValues(alpha: 0.3), width: 1),
-                      ),
-                      child: Text(
+              ],
+            ),
+
+            const SizedBox(height: 10),
+
+            // 2. Status / Match Row
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                // Match Score Badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: matchColor.withValues(alpha: 0.12),
+                    borderRadius: AppRadius.fullRadius,
+                    border: Border.all(color: matchColor.withValues(alpha: 0.3), width: 1),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.bolt_rounded, size: 13, color: matchColor),
+                      const SizedBox(width: 3),
+                      Text(
                         '${job.matchScore}% Match',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 11,
@@ -640,156 +683,100 @@ class _OpportunitiesScreenState extends ConsumerState<OpportunitiesScreen> {
                           color: matchColor,
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    if (isExpired)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFEF3C7),
-                          borderRadius: AppRadius.mdRadius,
-                          border: Border.all(color: const Color(0xFFFDE68A), width: 0.8),
-                        ),
-                        child: Text(
-                          'Deadline Passed',
-                          style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.w700, color: const Color(0xFFB45309)),
-                        ),
-                      )
-                    else if (!isDriveActive)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceContainerLow,
-                          borderRadius: AppRadius.mdRadius,
-                          border: Border.all(color: AppColors.outlineVariant, width: 0.8),
-                        ),
-                        child: Text(
-                          'Drive Closed',
-                          style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.outline),
-                        ),
-                      )
-                    else if (!isEligible)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFF1F2),
-                          borderRadius: AppRadius.mdRadius,
-                          border: Border.all(color: const Color(0xFFFECDD3), width: 0.8),
-                        ),
-                        child: Text(
-                          'Not Eligible',
-                          style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.w700, color: const Color(0xFFE11D48)),
-                        ),
-                      )
-                    else if (hasApplied)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFECFDF5),
-                          borderRadius: AppRadius.mdRadius,
-                          border: Border.all(color: const Color(0xFFA7F3D0), width: 0.8),
-                        ),
-                        child: Text(
-                          'Applied',
-                          style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.w700, color: const Color(0xFF047857)),
-                        ),
-                      )
-                    else
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFECFDF5),
-                          borderRadius: AppRadius.mdRadius,
-                          border: Border.all(color: const Color(0xFFA7F3D0), width: 0.8),
-                        ),
-                        child: Text(
-                          'Active Drive',
-                          style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.w700, color: const Color(0xFF047857)),
-                        ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
+                // Application / Eligibility Status Badge
+                if (isExpired)
+                  _buildStatusPill(
+                    label: 'Deadline Passed',
+                    bgColor: const Color(0xFFFEF3C7),
+                    fgColor: const Color(0xFFB45309),
+                    borderColor: const Color(0xFFFDE68A),
+                  )
+                else if (!isDriveActive)
+                  _buildStatusPill(
+                    label: 'Drive Closed',
+                    bgColor: AppColors.surfaceContainerLow,
+                    fgColor: AppColors.outline,
+                    borderColor: AppColors.outlineVariant,
+                  )
+                else if (hasApplied)
+                  _buildStatusPill(
+                    label: 'Applied',
+                    bgColor: const Color(0xFFECFDF5),
+                    fgColor: const Color(0xFF047857),
+                    borderColor: const Color(0xFFA7F3D0),
+                  )
+                else if (!isEligible)
+                  _buildStatusPill(
+                    label: 'Not Eligible',
+                    bgColor: const Color(0xFFFFF1F2),
+                    fgColor: const Color(0xFFE11D48),
+                    borderColor: const Color(0xFFFECDD3),
+                  )
+                else
+                  _buildStatusPill(
+                    label: 'Active Drive',
+                    bgColor: const Color(0xFFECFDF5),
+                    fgColor: const Color(0xFF047857),
+                    borderColor: const Color(0xFFA7F3D0),
+                  ),
               ],
             ),
 
             const SizedBox(height: 12),
 
-            // Compensation & Eligibility Banner
+            // 3. Compensation & Eligibility Banner (Responsive Stack/Row)
             Container(
+              width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
                 color: AppColors.surfaceContainerLow,
                 borderRadius: AppRadius.mdRadius,
-                border: Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.5), width: 0.8),
+                border: Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.6), width: 0.8),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isCompact = constraints.maxWidth < 280;
+                  if (isCompact) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildPackageSection(job.ctc),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 6),
+                          child: Divider(height: 1, thickness: 0.6, color: AppColors.outlineVariant),
+                        ),
+                        _buildEligibilitySection(isEligible, eligibilitySummary),
+                      ],
+                    );
+                  }
+                  return Row(
                     children: [
-                      Text(
-                        'PACKAGE',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.outline,
-                          letterSpacing: 0.5,
-                        ),
+                      Expanded(
+                        flex: 5,
+                        child: _buildPackageSection(job.ctc),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        job.ctc,
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                          color: const Color(0xFF047857),
-                        ),
+                      Container(
+                        width: 1,
+                        height: 28,
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                        color: AppColors.outlineVariant.withValues(alpha: 0.8),
+                      ),
+                      Expanded(
+                        flex: 6,
+                        child: _buildEligibilitySection(isEligible, eligibilitySummary),
                       ),
                     ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        'ELIGIBILITY',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.outline,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      if (isEligible)
-                        Text(
-                          job.minCgpa > 0 ? 'Min CGPA: ${job.minCgpa}' : 'Eligible',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF047857),
-                          ),
-                        )
-                      else
-                        Text(
-                          job.eligibilityReasons.isNotEmpty
-                              ? job.eligibilityReasons.first
-                              : 'Requirements not met',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFFE11D48),
-                          ),
-                        ),
-                    ],
-                  ),
-                ],
+                  );
+                },
               ),
             ),
 
             const SizedBox(height: 12),
 
-            // Matched & Gap Skills Breakdown
+            // 4. Skills Section
             if (job.matchedSkills.isNotEmpty || job.missingSkills.isNotEmpty) ...[
               Wrap(
                 spacing: 6,
@@ -806,72 +793,172 @@ class _OpportunitiesScreenState extends ConsumerState<OpportunitiesScreen> {
               const SizedBox(height: 12),
             ],
 
-            // Card Footer: Deadline + Action Buttons
+            // 5. Bottom Action Row
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    const Icon(Icons.schedule_rounded, size: 14, color: AppColors.outline),
-                    const SizedBox(width: 4),
-                    Text(
-                      job.deadlineText,
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 11,
-                        fontWeight: isExpired ? FontWeight.w700 : FontWeight.w500,
+                // Deadline in Expanded to avoid overflow
+                Expanded(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.schedule_rounded,
+                        size: 13,
                         color: isExpired ? const Color(0xFFB45309) : AppColors.outline,
                       ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        job.isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-                        color: job.isBookmarked ? AppColors.primary : AppColors.outline,
-                        size: 20,
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          job.deadlineText,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            fontWeight: isExpired ? FontWeight.w700 : FontWeight.w500,
+                            color: isExpired ? const Color(0xFFB45309) : AppColors.outline,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                      onPressed: () => ref.read(opportunitiesProvider.notifier).toggleBookmark(job.id),
-                      tooltip: 'Bookmark Drive',
-                    ),
-                    const SizedBox(width: 4),
-                    SipsButton(
-                      label: 'View Details',
-                      variant: SipsButtonVariant.outline,
-                      size: SipsButtonSize.small,
-                      onPressed: () => context.push('/job-detail/${job.id}'),
-                    ),
-                    const SizedBox(width: 8),
-                    // Action button reflecting authoritative state
-                    SipsButton(
-                      label: hasApplied
-                          ? 'Applied'
-                          : isExpired
-                              ? 'Deadline Passed'
-                              : !isDriveActive
-                                  ? 'Drive Closed'
-                                  : !isEligible
-                                      ? 'Not Eligible'
-                                      : 'Apply Now',
-                      variant: hasApplied
-                          ? SipsButtonVariant.emerald
-                          : (!isEligible || !isDriveActive || isExpired)
-                              ? SipsButtonVariant.secondary
-                              : SipsButtonVariant.primary,
-                      size: SipsButtonSize.small,
-                      isLoading: isApplying,
-                      onPressed: (hasApplied || !isEligible || !isDriveActive || isExpired || isApplying)
-                          ? null
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 4),
+                // Bookmark Icon Button
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  icon: Icon(
+                    job.isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                    color: job.isBookmarked ? AppColors.primary : AppColors.outline,
+                    size: 20,
+                  ),
+                  onPressed: () => ref.read(opportunitiesProvider.notifier).toggleBookmark(job.id),
+                  tooltip: 'Bookmark Drive',
+                ),
+                const SizedBox(width: 6),
+                // Action Button
+                SipsButton(
+                  label: hasApplied
+                      ? 'Applied'
+                      : isExpired
+                          ? 'Deadline Passed'
+                          : !isDriveActive
+                              ? 'Drive Closed'
+                              : !isEligible
+                                  ? 'View Details'
+                                  : 'Apply Now',
+                  variant: hasApplied
+                      ? SipsButtonVariant.emerald
+                      : (!isEligible || !isDriveActive || isExpired)
+                          ? SipsButtonVariant.outline
+                          : SipsButtonVariant.primary,
+                  size: SipsButtonSize.small,
+                  isLoading: isApplying,
+                  onPressed: (hasApplied || isExpired || !isDriveActive)
+                      ? () => context.push('/job-detail/${job.id}')
+                      : (!isEligible)
+                          ? () => context.push('/job-detail/${job.id}')
                           : () => _handleApply(job),
-                    ),
-                  ],
                 ),
               ],
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildStatusPill({
+    required String label,
+    required Color bgColor,
+    required Color fgColor,
+    required Color borderColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: AppRadius.mdRadius,
+        border: Border.all(color: borderColor, width: 0.8),
+      ),
+      child: Text(
+        label,
+        style: GoogleFonts.plusJakartaSans(
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          color: fgColor,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPackageSection(String ctc) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'PACKAGE',
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 9,
+            fontWeight: FontWeight.w800,
+            color: AppColors.outline,
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          ctc,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+            color: const Color(0xFF047857),
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEligibilitySection(bool isEligible, String summary) {
+    final color = isEligible ? const Color(0xFF047857) : const Color(0xFFE11D48);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'ELIGIBILITY',
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 9,
+            fontWeight: FontWeight.w800,
+            color: AppColors.outline,
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Row(
+          children: [
+            if (!isEligible) ...[
+              const Icon(Icons.warning_amber_rounded, size: 12, color: Color(0xFFE11D48)),
+              const SizedBox(width: 3),
+            ],
+            Expanded(
+              child: Text(
+                summary,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: color,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
