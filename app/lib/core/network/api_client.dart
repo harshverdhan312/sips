@@ -145,6 +145,22 @@ class ApiClient {
     }
   }
 
+  Future<dynamic> patch(String path, {dynamic body}) async {
+    try {
+      final uri = _buildUri(path);
+      final headers = await _getHeaders();
+      final response = await _client.patch(
+        uri,
+        headers: headers,
+        body: body != null ? jsonEncode(body) : null,
+      );
+      return _handleResponse(response);
+    } catch (e) {
+      if (e is ApiException) rethrow;
+      throw ApiException(message: 'Network error: ${e.toString()}');
+    }
+  }
+
   Future<dynamic> delete(String path) async {
     try {
       final uri = _buildUri(path);

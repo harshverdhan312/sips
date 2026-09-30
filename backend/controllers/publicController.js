@@ -119,6 +119,66 @@ exports.getPublicStudentProfile = async (req, res, next) => {
       ? student.skills.filter(s => typeof s === 'string' && s.trim().length > 0)
       : [];
 
+    // Filter and sanitize coding profiles (only active, visible profiles from stored snapshot)
+    let publicCodingProfiles = [];
+    if (student.publicProfile.showCodingProfiles !== false && Array.isArray(student.codingProfiles)) {
+      publicCodingProfiles = student.codingProfiles
+        .filter(cp => cp && cp.showOnPublicProfile !== false && cp.connectionStatus === 'CONNECTED')
+        .map(cp => {
+          const rawStats = cp.stats || {};
+          const cleanStats = {};
+
+          if (typeof rawStats.problemsSolved === 'number') {
+            cleanStats.problemsSolved = rawStats.problemsSolved;
+          }
+          if (rawStats.difficultyBreakdown && typeof rawStats.difficultyBreakdown === 'object') {
+            cleanStats.difficultyBreakdown = {
+              easy: typeof rawStats.difficultyBreakdown.easy === 'number' ? rawStats.difficultyBreakdown.easy : 0,
+              medium: typeof rawStats.difficultyBreakdown.medium === 'number' ? rawStats.difficultyBreakdown.medium : 0,
+              hard: typeof rawStats.difficultyBreakdown.hard === 'number' ? rawStats.difficultyBreakdown.hard : 0
+            };
+          }
+          if (typeof rawStats.currentRating === 'number') {
+            cleanStats.currentRating = rawStats.currentRating;
+          }
+          if (typeof rawStats.maxRating === 'number') {
+            cleanStats.maxRating = rawStats.maxRating;
+          }
+          if (rawStats.rank) {
+            cleanStats.rank = String(rawStats.rank);
+          }
+          if (rawStats.maxRank) {
+            cleanStats.maxRank = String(rawStats.maxRank);
+          }
+          if (typeof rawStats.globalRank === 'number') {
+            cleanStats.globalRank = rawStats.globalRank;
+          }
+          if (rawStats.rankingTier) {
+            cleanStats.rankingTier = String(rawStats.rankingTier);
+          }
+          if (typeof rawStats.contestParticipationCount === 'number') {
+            cleanStats.contestParticipationCount = rawStats.contestParticipationCount;
+          }
+          if (Array.isArray(rawStats.badges)) {
+            cleanStats.badges = rawStats.badges.map(b => ({
+              name: String(b.name || ''),
+              iconUrl: String(b.iconUrl || '')
+            })).filter(b => b.name);
+          }
+          if (Array.isArray(rawStats.topLanguages)) {
+            cleanStats.topLanguages = rawStats.topLanguages.map(l => String(l));
+          }
+
+          return {
+            platform: cp.platform,
+            username: cp.username,
+            profileUrl: cp.profileUrl,
+            accessMode: cp.accessMode || 'PUBLIC_ENDPOINT',
+            stats: cleanStats
+          };
+        });
+    }
+
     // Resume availability
     const hasResume = Boolean(student.resumeUrl && student.resumeUrl.trim());
     const isResumePublic = student.publicProfile.showResume === true && hasResume;
@@ -141,6 +201,7 @@ exports.getPublicStudentProfile = async (req, res, next) => {
       },
       skills: publicSkills,
       projects: publicProjects,
+      codingProfiles: publicCodingProfiles,
       resume: {
         available: isResumePublic,
         url: isResumePublic ? `/api/public/students/${username}/resume` : null

@@ -1352,6 +1352,543 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  final Set<String> _syncingCodingPlatforms = {};
+
+  Future<void> _handleSyncCodingPlatform(String platform) async {
+    if (_syncingCodingPlatforms.contains(platform)) return;
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _syncingCodingPlatforms.add(platform));
+    try {
+      await ref.read(sipsRepositoryProvider).syncCodingProfile(platform);
+      await ref.read(studentProfileProvider.notifier).loadProfile();
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('${platform == 'LEETCODE' ? 'LeetCode' : 'Codeforces'} profile refreshed successfully!'),
+          backgroundColor: const Color(0xFF047857),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('Sync failed: ${e.toString()}'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _syncingCodingPlatforms.remove(platform));
+      }
+    }
+  }
+
+  Future<void> _handleToggleCodingProfileVisibility(String platform, bool currentVisibility) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await ref.read(sipsRepositoryProvider).updateCodingProfileVisibility(platform, !currentVisibility);
+      await ref.read(studentProfileProvider.notifier).loadProfile();
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('Visibility updated for ${platform == 'LEETCODE' ? 'LeetCode' : 'Codeforces'}'),
+          backgroundColor: const Color(0xFF047857),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('Failed to update visibility: ${e.toString()}'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
+
+  Future<void> _handleDisconnectCodingPlatform(String platform) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.xlRadius),
+        title: Text(
+          'Disconnect ${platform == 'LEETCODE' ? 'LeetCode' : 'Codeforces'}?',
+          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 16),
+        ),
+        content: Text(
+          'This will remove the platform stats from your profile and public career page.',
+          style: GoogleFonts.plusJakartaSans(fontSize: 13, color: AppColors.onSurfaceVariant),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(false),
+            child: Text('Cancel', style: GoogleFonts.plusJakartaSans(color: AppColors.outline)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () => Navigator.of(dialogCtx).pop(true),
+            child: Text('Disconnect', style: GoogleFonts.plusJakartaSans(color: Colors.white, fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      await ref.read(sipsRepositoryProvider).disconnectCodingProfile(platform);
+      await ref.read(studentProfileProvider.notifier).loadProfile();
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('${platform == 'LEETCODE' ? 'LeetCode' : 'Codeforces'} disconnected'),
+          backgroundColor: const Color(0xFF047857),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('Failed to disconnect: ${e.toString()}'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
+
+  Future<void> _showEditCodingProfileDialog(BuildContext context, StudentProfile profile, String platform) async {
+    final existing = profile.codingProfiles.where((p) => p.platform.toUpperCase() == platform.toUpperCase() && p.connectionStatus == 'CONNECTED').firstOrNull;
+    final usernameCtrl = TextEditingController(text: existing?.username ?? '');
+    bool showOnPublic = existing?.showOnPublicProfile ?? true;
+    final messenger = ScaffoldMessenger.of(context);
+    bool isSaving = false;
+
+    await showDialog(
+      context: context,
+      builder: (dialogCtx) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: AppColors.surface,
+              shape: RoundedRectangleBorder(borderRadius: AppRadius.xlRadius),
+              title: Row(
+                children: [
+                  Icon(
+                    platform == 'LEETCODE' ? Icons.code_rounded : Icons.leaderboard_rounded,
+                    color: AppColors.primary,
+                    size: 22,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${platform == 'LEETCODE' ? 'LeetCode' : 'Codeforces'} Profile',
+                    style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.onSurface),
+                  ),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Enter your handle or profile URL. SIPS will verify and fetch your public stats snapshot.',
+                    style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AppColors.onSurfaceVariant),
+                  ),
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: usernameCtrl,
+                    autofocus: true,
+                    enabled: !isSaving,
+                    decoration: InputDecoration(
+                      hintText: platform == 'LEETCODE' ? 'username or profile URL' : 'handle or profile URL',
+                      prefixIcon: Icon(platform == 'LEETCODE' ? Icons.terminal_rounded : Icons.person_outline, size: 20),
+                      filled: true,
+                      fillColor: AppColors.surfaceContainerLow,
+                      border: OutlineInputBorder(
+                        borderRadius: AppRadius.mdRadius,
+                        borderSide: const BorderSide(color: AppColors.outlineVariant),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: AppRadius.mdRadius,
+                        borderSide: const BorderSide(color: AppColors.outlineVariant),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: AppRadius.mdRadius,
+                        borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  CheckboxListTile(
+                    value: showOnPublic,
+                    onChanged: isSaving ? null : (val) => setDialogState(() => showOnPublic = val ?? true),
+                    title: Text(
+                      'Show on Public Career Profile',
+                      style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.onSurface),
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    dense: true,
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isSaving ? null : () => Navigator.of(dialogCtx).pop(),
+                  child: Text('Cancel', style: GoogleFonts.plusJakartaSans(color: AppColors.outline)),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(borderRadius: AppRadius.mdRadius),
+                  ),
+                  onPressed: isSaving
+                      ? null
+                      : () async {
+                          final input = usernameCtrl.text.trim();
+                          if (input.isEmpty) {
+                            messenger.showSnackBar(
+                              const SnackBar(
+                                content: Text('Please enter a username or profile URL.'),
+                                backgroundColor: AppColors.error,
+                              ),
+                            );
+                            return;
+                          }
+                          setDialogState(() => isSaving = true);
+                          try {
+                            await ref.read(sipsRepositoryProvider).connectCodingProfile(
+                                  platform: platform,
+                                  username: input,
+                                  showOnPublicProfile: showOnPublic,
+                                );
+                            await ref.read(studentProfileProvider.notifier).loadProfile();
+                            if (dialogCtx.mounted) {
+                              Navigator.of(dialogCtx).pop();
+                            }
+                            if (mounted) {
+                              messenger.showSnackBar(
+                                SnackBar(
+                                  content: Text('${platform == 'LEETCODE' ? 'LeetCode' : 'Codeforces'} profile connected & synced!'),
+                                  backgroundColor: const Color(0xFF047857),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            setDialogState(() => isSaving = false);
+                            if (mounted) {
+                              messenger.showSnackBar(
+                                SnackBar(
+                                  content: Text('Failed to connect: ${e.toString()}'),
+                                  backgroundColor: AppColors.error,
+                                ),
+                              );
+                            }
+                          }
+                        },
+                  child: isSaving
+                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : Text('Save & Sync', style: GoogleFonts.plusJakartaSans(color: Colors.white, fontWeight: FontWeight.w700)),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildCodingPlatformCard(BuildContext context, StudentProfile profile, String platform, String title, IconData icon) {
+    final cp = profile.codingProfiles.where((p) => p.platform.toUpperCase() == platform.toUpperCase() && p.connectionStatus == 'CONNECTED').firstOrNull;
+    final isConnected = cp != null;
+    final isSyncing = _syncingCodingPlatforms.contains(platform);
+
+    return SipsCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: isConnected ? AppColors.primary.withValues(alpha: 0.1) : AppColors.surfaceContainerLow,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(icon, size: 20, color: isConnected ? AppColors.primary : AppColors.outline),
+                  ),
+                  const SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          color: AppColors.onSurface,
+                        ),
+                      ),
+                      if (isConnected)
+                        Text(
+                          '@${cp.username}',
+                          style: GoogleFonts.firaCode(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primary,
+                          ),
+                        )
+                      else
+                        Text(
+                          'Not connected',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            color: AppColors.outline,
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  SipsBadge(
+                    label: isConnected ? 'CONNECTED' : 'NOT LINKED',
+                    variant: isConnected ? SipsBadgeVariant.emerald : SipsBadgeVariant.neutral,
+                    isSmall: true,
+                  ),
+                  const SizedBox(width: 4),
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert_rounded, size: 18, color: AppColors.outline),
+                    onSelected: (val) {
+                      if (val == 'edit') {
+                        _showEditCodingProfileDialog(context, profile, platform);
+                      } else if (val == 'sync') {
+                        _handleSyncCodingPlatform(platform);
+                      } else if (val == 'visibility') {
+                        if (cp != null) {
+                          _handleToggleCodingProfileVisibility(platform, cp.showOnPublicProfile);
+                        }
+                      } else if (val == 'disconnect') {
+                        _handleDisconnectCodingPlatform(platform);
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 'edit',
+                        child: Text(isConnected ? 'Edit Handle' : 'Connect', style: GoogleFonts.plusJakartaSans(fontSize: 12)),
+                      ),
+                      if (isConnected) ...[
+                        PopupMenuItem(
+                          value: 'sync',
+                          child: Text('Sync Now', style: GoogleFonts.plusJakartaSans(fontSize: 12)),
+                        ),
+                        PopupMenuItem(
+                          value: 'visibility',
+                          child: Text(cp.showOnPublicProfile ? 'Hide from Public Profile' : 'Show on Public Profile', style: GoogleFonts.plusJakartaSans(fontSize: 12)),
+                        ),
+                        const PopupMenuDivider(),
+                        PopupMenuItem(
+                          value: 'disconnect',
+                          child: Text('Disconnect', style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AppColors.error)),
+                        ),
+                      ],
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          if (isConnected) ...[
+            const SizedBox(height: 14),
+            const Divider(height: 1, color: AppColors.outlineVariant),
+            const SizedBox(height: 12),
+
+            // Statistics Grid
+            if (platform == 'LEETCODE') ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  if (cp.stats.problemsSolved != null)
+                    _buildStatPill('Solved', '${cp.stats.problemsSolved}', AppColors.primary),
+                  if (cp.stats.currentRating != null)
+                    _buildStatPill('Rating', '${cp.stats.currentRating}', const Color(0xFF047857)),
+                  if (cp.stats.contestParticipationCount != null)
+                    _buildStatPill('Contests', '${cp.stats.contestParticipationCount}', AppColors.onSurface),
+                ],
+              ),
+              if (cp.stats.difficultyBreakdown != null) ...[
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  children: [
+                    if (cp.stats.difficultyBreakdown?.easy != null)
+                      _buildDifficultyPill('Easy', cp.stats.difficultyBreakdown!.easy!, const Color(0xFF059669), const Color(0xFFECFDF5)),
+                    if (cp.stats.difficultyBreakdown?.medium != null)
+                      _buildDifficultyPill('Medium', cp.stats.difficultyBreakdown!.medium!, const Color(0xFFD97706), const Color(0xFFFFFBEB)),
+                    if (cp.stats.difficultyBreakdown?.hard != null)
+                      _buildDifficultyPill('Hard', cp.stats.difficultyBreakdown!.hard!, const Color(0xFFDC2626), const Color(0xFFFEF2F2)),
+                  ],
+                ),
+              ],
+            ] else if (platform == 'CODEFORCES') ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  if (cp.stats.currentRating != null)
+                    _buildStatPill('Rating', '${cp.stats.currentRating}', const Color(0xFF047857)),
+                  if (cp.stats.maxRating != null)
+                    _buildStatPill('Max Rating', '${cp.stats.maxRating}', AppColors.primary),
+                  if (cp.stats.rank != null && cp.stats.rank!.isNotEmpty)
+                    _buildStatPill('Rank', cp.stats.rank!, AppColors.onSurface),
+                  if (cp.stats.contestParticipationCount != null)
+                    _buildStatPill('Contests', '${cp.stats.contestParticipationCount}', AppColors.onSurfaceVariant),
+                ],
+              ),
+            ],
+
+            // Badges
+            if (cp.stats.badges.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 4,
+                runSpacing: 4,
+                children: cp.stats.badges.take(4).map((badge) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFEF3C7),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.military_tech_rounded, size: 12, color: Color(0xFFB45309)),
+                        const SizedBox(width: 3),
+                        Text(
+                          badge,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF92400E),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    _buildVisibilityChip('Public', cp.showOnPublicProfile),
+                    if (cp.lastSyncedAt != null) ...[
+                      const SizedBox(width: 8),
+                      Text(
+                        'Synced ${_formatTimeAgo(cp.lastSyncedAt!)}',
+                        style: GoogleFonts.plusJakartaSans(fontSize: 10, color: AppColors.outline),
+                      ),
+                    ],
+                  ],
+                ),
+                TextButton.icon(
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  onPressed: isSyncing ? null : () => _handleSyncCodingPlatform(platform),
+                  icon: isSyncing
+                      ? const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary))
+                      : const Icon(Icons.sync_rounded, size: 14, color: AppColors.primary),
+                  label: Text(
+                    isSyncing ? 'Syncing...' : 'Sync Now',
+                    style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primary),
+                  ),
+                ),
+              ],
+            ),
+          ] else ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.outlineVariant),
+                  shape: RoundedRectangleBorder(borderRadius: AppRadius.mdRadius),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                ),
+                onPressed: () => _showEditCodingProfileDialog(context, profile, platform),
+                icon: const Icon(Icons.add_rounded, size: 16, color: AppColors.primary),
+                label: Text(
+                  'Connect $title',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatPill(String label, String value, Color color) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 15,
+            fontWeight: FontWeight.w800,
+            color: color,
+          ),
+        ),
+        const SizedBox(height: 1),
+        Text(
+          label,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: AppColors.outline,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDifficultyPill(String label, int count, Color textCol, Color bgCol) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: bgCol,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        '$label: $count',
+        style: GoogleFonts.plusJakartaSans(
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          color: textCol,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(studentProfileProvider);
@@ -2185,6 +2722,24 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ),
                     );
                   }),
+
+                const SizedBox(height: 20),
+
+                // Coding & Competitive Programming Profiles
+                SectionHeader(
+                  title: 'Coding Profiles',
+                  badge: SipsBadge(
+                    label: '${profile.codingProfiles.where((p) => p.connectionStatus == "CONNECTED").length} CONNECTED',
+                    variant: profile.codingProfiles.any((p) => p.connectionStatus == "CONNECTED")
+                        ? SipsBadgeVariant.emerald
+                        : SipsBadgeVariant.neutral,
+                    isSmall: true,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _buildCodingPlatformCard(context, profile, 'LEETCODE', 'LeetCode', Icons.code_rounded),
+                const SizedBox(height: 10),
+                _buildCodingPlatformCard(context, profile, 'CODEFORCES', 'Codeforces', Icons.leaderboard_rounded),
 
                 const SizedBox(height: 20),
 

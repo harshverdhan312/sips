@@ -249,4 +249,90 @@ class MockSipsRepository implements SipsRepository {
     );
     return _profile.publicProfile;
   }
+
+  @override
+  Future<List<CodingPlatformProfile>> getCodingProfiles() async {
+    return _profile.codingProfiles;
+  }
+
+  @override
+  Future<CodingPlatformProfile> connectCodingProfile({
+    required String platform,
+    required String username,
+    bool showOnPublicProfile = true,
+  }) async {
+    final newProfile = CodingPlatformProfile(
+      platform: platform.toUpperCase(),
+      username: username,
+      profileUrl: platform.toUpperCase() == 'LEETCODE'
+          ? 'https://leetcode.com/u/$username'
+          : 'https://codeforces.com/profile/$username',
+      showOnPublicProfile: showOnPublicProfile,
+      lastSyncedAt: DateTime.now(),
+      syncStatus: 'SUCCESS',
+      stats: platform.toUpperCase() == 'LEETCODE'
+          ? const CodingPlatformStats(
+              problemsSolved: 350,
+              difficultyBreakdown: DifficultyBreakdown(easy: 120, medium: 180, hard: 50),
+              currentRating: 1650,
+              contestParticipationCount: 12,
+            )
+          : const CodingPlatformStats(
+              currentRating: 1420,
+              maxRating: 1510,
+              rank: 'Specialist',
+              maxRank: 'Specialist',
+              contestParticipationCount: 15,
+            ),
+    );
+
+    final updated = List<CodingPlatformProfile>.from(_profile.codingProfiles);
+    final idx = updated.indexWhere((p) => p.platform.toUpperCase() == platform.toUpperCase());
+    if (idx >= 0) {
+      updated[idx] = newProfile;
+    } else {
+      updated.add(newProfile);
+    }
+    _profile = _profile.copyWith(codingProfiles: updated);
+    return newProfile;
+  }
+
+  @override
+  Future<CodingPlatformProfile> syncCodingProfile(String platform) async {
+    final idx = _profile.codingProfiles.indexWhere((p) => p.platform.toUpperCase() == platform.toUpperCase());
+    if (idx >= 0) {
+      final existing = _profile.codingProfiles[idx];
+      final updatedProfile = existing.copyWith(
+        lastSyncedAt: DateTime.now(),
+        syncStatus: 'SUCCESS',
+      );
+      final list = List<CodingPlatformProfile>.from(_profile.codingProfiles);
+      list[idx] = updatedProfile;
+      _profile = _profile.copyWith(codingProfiles: list);
+      return updatedProfile;
+    }
+    throw Exception('Coding profile not found');
+  }
+
+  @override
+  Future<CodingPlatformProfile> updateCodingProfileVisibility(String platform, bool showOnPublicProfile) async {
+    final idx = _profile.codingProfiles.indexWhere((p) => p.platform.toUpperCase() == platform.toUpperCase());
+    if (idx >= 0) {
+      final existing = _profile.codingProfiles[idx];
+      final updatedProfile = existing.copyWith(showOnPublicProfile: showOnPublicProfile);
+      final list = List<CodingPlatformProfile>.from(_profile.codingProfiles);
+      list[idx] = updatedProfile;
+      _profile = _profile.copyWith(codingProfiles: list);
+      return updatedProfile;
+    }
+    throw Exception('Coding profile not found');
+  }
+
+  @override
+  Future<void> disconnectCodingProfile(String platform) async {
+    final updated = _profile.codingProfiles
+        .where((p) => p.platform.toUpperCase() != platform.toUpperCase())
+        .toList();
+    _profile = _profile.copyWith(codingProfiles: updated);
+  }
 }

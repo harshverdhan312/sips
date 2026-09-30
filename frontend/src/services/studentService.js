@@ -173,6 +173,49 @@ export const studentService = {
   },
 
   /**
+   * Get student's connected coding platform profiles
+   */
+  async getCodingProfiles() {
+    try {
+      const res = await api.get('/api/student/coding-profiles');
+      return res?.codingProfiles || [];
+    } catch (e) {
+      console.warn("Could not fetch coding profiles:", e.message);
+      return [];
+    }
+  },
+
+  /**
+   * Connect or update a coding platform profile
+   */
+  async connectCodingProfile(data) {
+    return await api.post('/api/student/coding-profiles', data);
+  },
+
+  /**
+   * Manually sync a coding platform profile
+   */
+  async syncCodingProfile(platform) {
+    return await api.post(`/api/student/coding-profiles/${encodeURIComponent(platform)}/sync`);
+  },
+
+  /**
+   * Update visibility of a coding platform profile
+   */
+  async updateCodingProfileVisibility(platform, showOnPublicProfile) {
+    return await api.patch(`/api/student/coding-profiles/${encodeURIComponent(platform)}/visibility`, {
+      showOnPublicProfile
+    });
+  },
+
+  /**
+   * Disconnect a coding platform profile
+   */
+  async disconnectCodingProfile(platform) {
+    return await api.delete(`/api/student/coding-profiles/${encodeURIComponent(platform)}`);
+  },
+
+  /**
    * Update student profile fields in backend
    */
   async updateCurrentStudent(updatedFields) {

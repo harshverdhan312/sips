@@ -481,4 +481,104 @@ class ApiSipsRepository implements SipsRepository {
     }
     return config;
   }
+
+  // ==========================================
+  // 9. Coding Platforms (LIVE)
+  // ==========================================
+  @override
+  Future<List<CodingPlatformProfile>> getCodingProfiles() async {
+    final response = await _apiClient.get('/api/student/coding-profiles');
+    if (response is Map<String, dynamic> && response['codingProfiles'] is List) {
+      final list = (response['codingProfiles'] as List)
+          .whereType<Map<String, dynamic>>()
+          .map((p) => CodingPlatformProfile.fromBackendJson(p))
+          .toList();
+      if (_cachedProfile != null) {
+        _cachedProfile = _cachedProfile!.copyWith(codingProfiles: list);
+      }
+      return list;
+    }
+    return [];
+  }
+
+  @override
+  Future<CodingPlatformProfile> connectCodingProfile({
+    required String platform,
+    required String username,
+    bool showOnPublicProfile = true,
+  }) async {
+    final body = {
+      'platform': platform,
+      'username': username,
+      'showOnPublicProfile': showOnPublicProfile,
+    };
+    final response = await _apiClient.post('/api/student/coding-profiles', body: body);
+    if (response is Map<String, dynamic> && response['codingProfile'] is Map<String, dynamic>) {
+      final profile = CodingPlatformProfile.fromBackendJson(response['codingProfile'] as Map<String, dynamic>);
+      if (_cachedProfile != null) {
+        final existing = List<CodingPlatformProfile>.from(_cachedProfile!.codingProfiles);
+        final idx = existing.indexWhere((p) => p.platform.toUpperCase() == platform.toUpperCase());
+        if (idx >= 0) {
+          existing[idx] = profile;
+        } else {
+          existing.add(profile);
+        }
+        _cachedProfile = _cachedProfile!.copyWith(codingProfiles: existing);
+      }
+      return profile;
+    }
+    throw Exception('Failed to connect coding profile');
+  }
+
+  @override
+  Future<CodingPlatformProfile> syncCodingProfile(String platform) async {
+    final response = await _apiClient.post('/api/student/coding-profiles/${platform.toUpperCase()}/sync');
+    if (response is Map<String, dynamic> && response['codingProfile'] is Map<String, dynamic>) {
+      final profile = CodingPlatformProfile.fromBackendJson(response['codingProfile'] as Map<String, dynamic>);
+      if (_cachedProfile != null) {
+        final existing = List<CodingPlatformProfile>.from(_cachedProfile!.codingProfiles);
+        final idx = existing.indexWhere((p) => p.platform.toUpperCase() == platform.toUpperCase());
+        if (idx >= 0) {
+          existing[idx] = profile;
+        } else {
+          existing.add(profile);
+        }
+        _cachedProfile = _cachedProfile!.copyWith(codingProfiles: existing);
+      }
+      return profile;
+    }
+    throw Exception('Failed to sync coding profile');
+  }
+
+  @override
+  Future<CodingPlatformProfile> updateCodingProfileVisibility(String platform, bool showOnPublicProfile) async {
+    final body = {'showOnPublicProfile': showOnPublicProfile};
+    final response = await _apiClient.patch('/api/student/coding-profiles/${platform.toUpperCase()}/visibility', body: body);
+    if (response is Map<String, dynamic> && response['codingProfile'] is Map<String, dynamic>) {
+      final profile = CodingPlatformProfile.fromBackendJson(response['codingProfile'] as Map<String, dynamic>);
+      if (_cachedProfile != null) {
+        final existing = List<CodingPlatformProfile>.from(_cachedProfile!.codingProfiles);
+        final idx = existing.indexWhere((p) => p.platform.toUpperCase() == platform.toUpperCase());
+        if (idx >= 0) {
+          existing[idx] = profile;
+        } else {
+          existing.add(profile);
+        }
+        _cachedProfile = _cachedProfile!.copyWith(codingProfiles: existing);
+      }
+      return profile;
+    }
+    throw Exception('Failed to update coding profile visibility');
+  }
+
+  @override
+  Future<void> disconnectCodingProfile(String platform) async {
+    await _apiClient.delete('/api/student/coding-profiles/${platform.toUpperCase()}');
+    if (_cachedProfile != null) {
+      final existing = _cachedProfile!.codingProfiles
+          .where((p) => p.platform.toUpperCase() != platform.toUpperCase())
+          .toList();
+      _cachedProfile = _cachedProfile!.copyWith(codingProfiles: existing);
+    }
+  }
 }

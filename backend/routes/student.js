@@ -104,6 +104,21 @@ router.put('/projects', studentController.updateProjects);
 // POST /api/student/projects/sync
 router.post('/projects/sync', studentController.syncProjects);
 
+// GET /api/student/coding-profiles
+router.get('/coding-profiles', studentController.getCodingProfiles);
+
+// POST /api/student/coding-profiles
+router.post('/coding-profiles', studentController.connectCodingProfile);
+
+// POST /api/student/coding-profiles/:platform/sync
+router.post('/coding-profiles/:platform/sync', studentController.syncCodingProfile);
+
+// PATCH /api/student/coding-profiles/:platform/visibility
+router.patch('/coding-profiles/:platform/visibility', studentController.updateCodingProfileVisibility);
+
+// DELETE /api/student/coding-profiles/:platform
+router.delete('/coding-profiles/:platform', studentController.disconnectCodingProfile);
+
 // POST /api/student/profile/image
 router.post('/profile/image', imageUpload.single('image'), studentController.uploadProfileImage);
 
