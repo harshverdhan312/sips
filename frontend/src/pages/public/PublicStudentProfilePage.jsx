@@ -312,7 +312,7 @@ export function PublicStudentProfilePage() {
               </div>
               <div>
                 <h2 className="text-lg font-bold text-slate-900 tracking-tight">Coding & Problem Solving</h2>
-                <p className="text-xs text-slate-500">Verified competitive programming & algorithmic practice</p>
+                <p className="text-xs text-slate-500">Competitive programming & algorithmic practice</p>
               </div>
             </div>
 
@@ -343,12 +343,12 @@ export function PublicStudentProfilePage() {
                               <h3 className="font-bold text-slate-900 text-base">
                                 {isLeetCode ? 'LeetCode' : isCodeforces ? 'Codeforces' : cp.platform}
                               </h3>
-                              {stats.rankingTier && (
+                              {isLeetCode && stats.rankingTier && (
                                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
                                   {stats.rankingTier}
                                 </span>
                               )}
-                              {stats.rank && (
+                              {isCodeforces && stats.rank && stats.rank.toLowerCase() !== 'unrated' && (
                                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 capitalize">
                                   {stats.rank}
                                 </span>
@@ -371,57 +371,115 @@ export function PublicStudentProfilePage() {
                         )}
                       </div>
 
-                      {/* Stats Grid */}
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
-                        {typeof stats.problemsSolved === 'number' && (
-                          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                            <span className="text-[11px] font-medium text-slate-500 block">Problems Solved</span>
-                            <span className="text-lg font-extrabold text-slate-900">{stats.problemsSolved}</span>
-                          </div>
-                        )}
+                      {/* Platform-Specific Metrics */}
+                      {isLeetCode ? (
+                        <>
+                          {/* LeetCode Stats Grid */}
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
+                            {typeof stats.problemsSolved === 'number' && (
+                              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                <span className="text-[11px] font-medium text-slate-500 block">Problems Solved</span>
+                                <span className="text-lg font-extrabold text-slate-900">{stats.problemsSolved}</span>
+                              </div>
+                            )}
 
-                        {typeof stats.currentRating === 'number' && (
-                          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                            <span className="text-[11px] font-medium text-slate-500 block">Contest Rating</span>
-                            <span className="text-lg font-extrabold text-indigo-600">{stats.currentRating}</span>
-                          </div>
-                        )}
+                            {typeof stats.globalRank === 'number' && stats.globalRank > 0 && (
+                              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                <span className="text-[11px] font-medium text-slate-500 block">Global Rank</span>
+                                <span className="text-lg font-extrabold text-slate-900">#{stats.globalRank.toLocaleString()}</span>
+                              </div>
+                            )}
 
-                        {typeof stats.maxRating === 'number' && (
-                          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                            <span className="text-[11px] font-medium text-slate-500 block">Max Rating</span>
-                            <span className="text-lg font-extrabold text-slate-700">{stats.maxRating}</span>
-                          </div>
-                        )}
+                            {typeof stats.currentRating === 'number' && stats.currentRating > 0 && (
+                              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                <span className="text-[11px] font-medium text-slate-500 block">Contest Rating</span>
+                                <span className="text-lg font-extrabold text-indigo-600">{stats.currentRating}</span>
+                              </div>
+                            )}
 
-                        {typeof stats.contestParticipationCount === 'number' && stats.contestParticipationCount > 0 && (
-                          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                            <span className="text-[11px] font-medium text-slate-500 block">Contests</span>
-                            <span className="text-lg font-extrabold text-slate-900">{stats.contestParticipationCount}</span>
+                            {typeof stats.contestParticipationCount === 'number' && stats.contestParticipationCount > 0 && (
+                              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                <span className="text-[11px] font-medium text-slate-500 block">Contests</span>
+                                <span className="text-lg font-extrabold text-slate-900">{stats.contestParticipationCount}</span>
+                              </div>
+                            )}
                           </div>
-                        )}
 
-                        {typeof stats.globalRank === 'number' && stats.globalRank > 0 && (
-                          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                            <span className="text-[11px] font-medium text-slate-500 block">Global Rank</span>
-                            <span className="text-lg font-extrabold text-slate-900">#{stats.globalRank.toLocaleString()}</span>
-                          </div>
-                        )}
-                      </div>
+                          {/* LeetCode Difficulty Breakdown Pills (Only non-null counts rendered) */}
+                          {stats.difficultyBreakdown && (
+                            typeof stats.difficultyBreakdown.easy === 'number' ||
+                            typeof stats.difficultyBreakdown.medium === 'number' ||
+                            typeof stats.difficultyBreakdown.hard === 'number'
+                          ) && (
+                            <div className="flex items-center gap-2 pt-1">
+                              {typeof stats.difficultyBreakdown.easy === 'number' && (
+                                <span className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+                                  Easy: {stats.difficultyBreakdown.easy}
+                                </span>
+                              )}
+                              {typeof stats.difficultyBreakdown.medium === 'number' && (
+                                <span className="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 text-xs font-semibold">
+                                  Medium: {stats.difficultyBreakdown.medium}
+                                </span>
+                              )}
+                              {typeof stats.difficultyBreakdown.hard === 'number' && (
+                                <span className="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 text-xs font-semibold">
+                                  Hard: {stats.difficultyBreakdown.hard}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        /* Codeforces Stats Grid */
+                        (() => {
+                          const hasRating = typeof stats.currentRating === 'number' && stats.currentRating > 0;
+                          const hasMaxRating = typeof stats.maxRating === 'number' && stats.maxRating > 0;
+                          const hasRank = stats.rank && stats.rank.toLowerCase() !== 'unrated';
+                          const hasMaxRank = stats.maxRank && stats.maxRank.toLowerCase() !== 'unrated';
+                          const hasContests = typeof stats.contestParticipationCount === 'number' && stats.contestParticipationCount > 0;
+                          const hasActivity = hasRating || hasMaxRating || hasRank || hasMaxRank || hasContests;
 
-                      {/* LeetCode Difficulty Breakdown Pills */}
-                      {stats.difficultyBreakdown && (
-                        <div className="flex items-center gap-2 pt-1">
-                          <span className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
-                            Easy: {stats.difficultyBreakdown.easy}
-                          </span>
-                          <span className="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 text-xs font-semibold">
-                            Medium: {stats.difficultyBreakdown.medium}
-                          </span>
-                          <span className="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 text-xs font-semibold">
-                            Hard: {stats.difficultyBreakdown.hard}
-                          </span>
-                        </div>
+                          if (!hasActivity) {
+                            return (
+                              <div className="p-3.5 rounded-xl bg-slate-50 border border-dashed border-slate-200 text-center text-xs text-slate-500">
+                                No contest activity yet
+                              </div>
+                            );
+                          }
+
+                          return (
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
+                              {hasRating && (
+                                <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                  <span className="text-[11px] font-medium text-slate-500 block">Current Rating</span>
+                                  <span className="text-lg font-extrabold text-indigo-600">{stats.currentRating}</span>
+                                </div>
+                              )}
+
+                              {hasMaxRating && (
+                                <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                  <span className="text-[11px] font-medium text-slate-500 block">Max Rating</span>
+                                  <span className="text-lg font-extrabold text-slate-700">{stats.maxRating}</span>
+                                </div>
+                              )}
+
+                              {hasMaxRank && (
+                                <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                  <span className="text-[11px] font-medium text-slate-500 block">Max Rank</span>
+                                  <span className="text-lg font-extrabold text-blue-700 capitalize">{stats.maxRank}</span>
+                                </div>
+                              )}
+
+                              {hasContests && (
+                                <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                  <span className="text-[11px] font-medium text-slate-500 block">Contests</span>
+                                  <span className="text-lg font-extrabold text-slate-900">{stats.contestParticipationCount}</span>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()
                       )}
 
                       {/* Badges */}

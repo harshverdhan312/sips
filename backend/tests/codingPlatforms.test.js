@@ -536,5 +536,56 @@ describe('Coding Platform Integration Tests (V1: LeetCode & Codeforces)', () => 
       expect(res.statusCode).toBe(200);
       expect(res.body.codingProfiles).toEqual([]);
     });
+
+    test('Data Integrity: LeetCode retains available difficulty counts while Codeforces does not invent difficulty breakdown or convert missing metrics to 0', async () => {
+      mockStudentDoc.codingProfiles = [
+        {
+          platform: 'LEETCODE',
+          username: 'leet_coder',
+          profileUrl: 'https://leetcode.com/u/leet_coder/',
+          connectionStatus: 'CONNECTED',
+          showOnPublicProfile: true,
+          stats: {
+            problemsSolved: 150,
+            difficultyBreakdown: { easy: 80, medium: 70 }, // hard missing/null
+            currentRating: null
+          }
+        },
+        {
+          platform: 'CODEFORCES',
+          username: 'unrated_cf',
+          profileUrl: 'https://codeforces.com/profile/unrated_cf',
+          connectionStatus: 'CONNECTED',
+          showOnPublicProfile: true,
+          stats: {
+            currentRating: null,
+            maxRating: null,
+            rank: 'Unrated',
+            contestParticipationCount: 0
+          }
+        }
+      ];
+
+      const req = { params: { username: 'harsh-dev' } };
+      const res = createMockRes();
+      const next = jest.fn();
+
+      await publicController.getPublicStudentProfile(req, res, next);
+
+      expect(res.statusCode).toBe(200);
+      const profiles = res.body.codingProfiles;
+      expect(profiles.length).toBe(2);
+
+      const leet = profiles.find(p => p.platform === 'LEETCODE');
+      expect(leet.stats.problemsSolved).toBe(150);
+      expect(leet.stats.difficultyBreakdown).toEqual({ easy: 80, medium: 70 });
+      expect(leet.stats.difficultyBreakdown.hard).toBeUndefined(); // Must NOT convert missing hard to 0
+      expect(leet.stats.currentRating).toBeUndefined();
+
+      const cf = profiles.find(p => p.platform === 'CODEFORCES');
+      expect(cf.stats.difficultyBreakdown).toBeUndefined(); // Codeforces must NOT have difficulty breakdown
+      expect(cf.stats.currentRating).toBeUndefined(); // Must NOT convert null rating to 0
+      expect(cf.stats.rank).toBe('Unrated');
+    });
   });
 });
