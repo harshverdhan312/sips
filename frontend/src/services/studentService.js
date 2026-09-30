@@ -34,14 +34,8 @@ export const studentService = {
                   ? "Tier-1 Contender • Placement Ready"
                   : (readiness >= 50 ? "Tier-2 Candidate • Developing" : "Tier-3 • Needs Preparation")));
 
-        // Fetch latest real ML placement prediction if available
-        let placementProbability = student.placementStatus === 'PLACED' ? 100 : (hasResume ? readiness : 0);
-        try {
-          const predRes = await api.get('/api/student/analytics/placement/prediction').catch(() => null);
-          if (predRes?.prediction?.placement_probability !== undefined && predRes.prediction.placement_probability !== null) {
-            placementProbability = Math.round(predRes.prediction.placement_probability * 100);
-          }
-        } catch (_) {}
+        // Base placement probability computation
+        const placementProbability = student.placementStatus === 'PLACED' ? 100 : (hasResume ? readiness : 0);
 
         return {
           id: student._id,
