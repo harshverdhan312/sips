@@ -739,6 +739,10 @@ export function StudentProfilePage() {
     }
   };
 
+  if (!student) {
+    return <DashboardSkeleton />;
+  }
+
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Header Profile Hero Card */}
@@ -2411,18 +2415,23 @@ export function StudentProfilePage() {
       <Modal
         isOpen={isCodingProfileModalOpen}
         onClose={() => !savingCodingProfile && setIsCodingProfileModalOpen(false)}
-        title={`${codingModalPlatform === 'LEETCODE' ? 'LeetCode' : 'Codeforces'} Profile`}
+        title={`${codingProfileForm.platform === 'LEETCODE' ? 'LeetCode' : 'Codeforces'} Profile`}
       >
         <form onSubmit={handleSaveCodingProfile} className="space-y-4 pt-2">
+          {codingProfileError && (
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs">
+              {codingProfileError}
+            </div>
+          )}
           <div>
             <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
               Handle or Profile URL
             </label>
             <input
               type="text"
-              value={codingModalUsername}
-              onChange={(e) => setCodingModalUsername(e.target.value)}
-              placeholder={codingModalPlatform === 'LEETCODE' ? 'e.g., username or https://leetcode.com/u/username' : 'e.g., handle or https://codeforces.com/profile/handle'}
+              value={codingProfileForm.username}
+              onChange={(e) => setCodingProfileForm(prev => ({ ...prev, username: e.target.value }))}
+              placeholder={codingProfileForm.platform === 'LEETCODE' ? 'e.g., username or https://leetcode.com/u/username' : 'e.g., handle or https://codeforces.com/profile/handle'}
               disabled={savingCodingProfile}
               className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               required
@@ -2436,8 +2445,8 @@ export function StudentProfilePage() {
             <input
               type="checkbox"
               id="codingModalShowPublic"
-              checked={codingModalShowOnPublic}
-              onChange={(e) => setCodingModalShowOnPublic(e.target.checked)}
+              checked={codingProfileForm.showOnPublicProfile}
+              onChange={(e) => setCodingProfileForm(prev => ({ ...prev, showOnPublicProfile: e.target.checked }))}
               disabled={savingCodingProfile}
               className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer"
             />
