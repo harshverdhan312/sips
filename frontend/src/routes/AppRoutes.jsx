@@ -38,6 +38,12 @@ import { AdminAnalyticsPage } from "../pages/admin/AdminAnalyticsPage";
 import { AdminSettingsPage } from "../pages/admin/AdminSettingsPage";
 import { CollegeProfilePage } from "../pages/admin/CollegeProfilePage";
 
+// University / Institution Admin Pages
+import { InstitutionDashboard } from "../pages/institution/InstitutionDashboard";
+import { DepartmentsPage } from "../pages/institution/DepartmentsPage";
+
+import { DepartmentProfilePage } from "../pages/admin/DepartmentProfilePage";
+
 export function AppRoutes() {
   const { role, isAuthenticated } = useAuth();
 
@@ -46,11 +52,22 @@ export function AppRoutes() {
       {/* Public Marketing & Gateway Layer */}
       <Route path="/" element={<LandingPage />} />
 
-      {/* Public Login */}
+      {/* Public Login & Onboarding */}
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/onboard" element={<LoginPage initialRegisterMode={true} />} />
 
       {/* Public Student Career Profile */}
       <Route path="/u/:username" element={<PublicStudentProfilePage />} />
+
+      {/* University / Institution Admin Portal Routes */}
+      <Route element={<ProtectedRoute allowedRoles={["university_admin", "admin"]} />}>
+        <Route element={<DashboardLayout />}>
+          <Route path="/institution/dashboard" element={<InstitutionDashboard />} />
+          <Route path="/institution/profile" element={<CollegeProfilePage />} />
+          <Route path="/institution/departments" element={<DepartmentsPage />} />
+          <Route path="/university_admin/dashboard" element={<InstitutionDashboard />} />
+        </Route>
+      </Route>
 
       {/* Student Portal Routes */}
       <Route element={<ProtectedRoute allowedRoles={["student"]} />}>
@@ -84,8 +101,8 @@ export function AppRoutes() {
           <Route path="/placement/job-descriptions" element={<JobDescriptionsPage />} />
           <Route path="/placement/analytics" element={<PlacementAnalyticsPage />} />
           <Route path="/placement/reports" element={<PlacementReportsPage />} />
-          <Route path="/placement/profile" element={<CollegeProfilePage />} />
-          <Route path="/placement/college-profile" element={<CollegeProfilePage />} />
+          <Route path="/placement/profile" element={<DepartmentProfilePage />} />
+          <Route path="/placement/college-profile" element={<DepartmentProfilePage />} />
         </Route>
       </Route>
 
@@ -98,8 +115,8 @@ export function AppRoutes() {
           <Route path="/admin/placement-cell" element={<AdminUserManagementPage />} />
           <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
           <Route path="/admin/settings" element={<AdminSettingsPage />} />
-          <Route path="/admin/profile" element={<CollegeProfilePage />} />
-          <Route path="/admin/college-profile" element={<CollegeProfilePage />} />
+          <Route path="/admin/profile" element={<DepartmentProfilePage />} />
+          <Route path="/admin/college-profile" element={<DepartmentProfilePage />} />
         </Route>
       </Route>
 

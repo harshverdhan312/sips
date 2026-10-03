@@ -71,6 +71,8 @@ router.post('/students/bulk-delete', adminStudentController.bulkDeleteStudents);
 router.get('/students/:id', validateObjectId('id'), adminStudentController.getStudentById);
 router.put('/students/:id', validateObjectId('id'), adminStudentController.updateStudent);
 router.patch('/students/:id/account-status', validateObjectId('id'), adminStudentController.updateStudentAccountStatus);
+router.patch('/students/:id/debar', validateObjectId('id'), adminStudentController.debarStudent);
+router.patch('/students/:id/placement-status', validateObjectId('id'), adminStudentController.updatePlacementStatus);
 router.delete('/students/:id', validateObjectId('id'), adminStudentController.deleteStudent);
 
 // ==========================================
@@ -91,8 +93,11 @@ router.get('/jobs/:id/matches', validateObjectId('id'), adminJobController.getJo
 router.get('/jobs/:id/applicants', validateObjectId('id'), adminJobController.getJobApplicants);
 router.get('/jobs/:id/applications', validateObjectId('id'), adminJobController.getJobApplicants);
 router.get('/jobs/:id/matched/export', validateObjectId('id'), adminJobController.exportJobMatchedCSV);
+router.get('/jobs/:id/export-matches', validateObjectId('id'), adminJobController.exportJobMatchedCSV);
+router.get('/jobs/:id/export-candidates', validateObjectId('id'), adminJobController.exportJobMatchedCSV);
 router.get('/jobs/:id/applications/export', validateObjectId('id'), adminJobController.exportJobApplicationsCSV);
 router.get('/jobs/:id/applicants/export', validateObjectId('id'), adminJobController.exportJobApplicationsCSV);
+router.get('/jobs/:id/export-applicants', validateObjectId('id'), adminJobController.exportJobApplicationsCSV);
 router.post('/jobs/:id/recompute', validateObjectId('id'), adminJobController.recomputeJobMatches);
 router.patch('/applications/:id/status', validateObjectId('id'), adminJobController.updateApplicationStatus);
 

@@ -168,45 +168,32 @@ export const adminService = {
     return await api.getBlob(`/api/admin/students/export${queryString}`);
   },
 
+
   /**
-   * Fetch current college profile
+   * Debar or restore application eligibility for a student
    */
-  async getCollegeProfile() {
-    try {
-      const res = await api.get('/api/admin/college/profile');
-      return res?.college || res;
-    } catch (e) {
-      console.warn("Could not fetch college profile:", e.message);
-      return null;
-    }
+  async debarStudent(studentId, debar = true) {
+    return await api.patch(`/api/admin/students/${studentId}/debar`, { debar });
   },
 
   /**
-   * Update current college profile fields
+   * Update student placement status and company details
    */
-  async updateCollegeProfile(profileData) {
-    try {
-      const res = await api.put('/api/admin/college/profile', profileData);
-      return res?.college || res;
-    } catch (e) {
-      console.error("Failed to update college profile:", e);
-      throw e;
-    }
+  async updatePlacementStatus(studentId, data = {}) {
+    return await api.patch(`/api/admin/students/${studentId}/placement-status`, data);
   },
 
   /**
-   * Upload college logo
+   * Update student details (name, email, branch, batch, cgpa, etc.)
    */
-  async uploadCollegeLogo(file) {
-    const formData = new FormData();
-    formData.append('image', file);
-    return await api.postMultipart('/api/admin/college/profile/image', formData);
+  async updateStudent(studentId, data) {
+    return await api.put(`/api/admin/students/${studentId}`, data);
   },
 
   /**
-   * Delete college logo
+   * Delete a student by id
    */
-  async deleteCollegeLogo() {
-    return await api.delete('/api/admin/college/profile/image');
+  async deleteStudent(studentId) {
+    return await api.delete(`/api/admin/students/${studentId}`);
   }
 };

@@ -1,4 +1,9 @@
-const cloudinary = require('cloudinary').v2;
+let cloudinary = null;
+try {
+  cloudinary = require('cloudinary').v2;
+} catch (e) {
+  cloudinary = null;
+}
 const fs = require('fs');
 const config = require('../config');
 const logger = require('../utils/logger');
@@ -26,6 +31,8 @@ function sanitizeCloudinaryUrl(urlStr) {
  * @returns {boolean}
  */
 function isCloudinaryConfigured() {
+  if (!cloudinary) return false;
+
   const rawUrl = sanitizeCloudinaryUrl(typeof config.cloudinaryUrl === 'string' ? config.cloudinaryUrl : (process.env.CLOUDINARY_URL || ''));
   if (rawUrl.length > 0) {
     process.env.CLOUDINARY_URL = rawUrl;
@@ -58,6 +65,17 @@ function isCloudinaryConfigured() {
  * Get Cloudinary configuration status and ping result for diagnostics
  */
 async function getCloudinaryStatus() {
+  if (!cloudinary) {
+    return {
+      isConfigured: false,
+      cloudName: null,
+      hasApiKey: false,
+      hasApiSecret: false,
+      pingStatus: null,
+      pingError: 'Cloudinary module not installed'
+    };
+  }
+
   const isConfigured = isCloudinaryConfigured();
   const cfg = cloudinary.config();
   let pingStatus = null;

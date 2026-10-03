@@ -8,6 +8,8 @@ const bcrypt = require('bcryptjs');
 class MemoryDatabase {
   constructor() {
     this.colleges = [];
+    this.institutions = [];
+    this.departments = [];
     this.students = [];
     this.jobs = [];
     this.alerts = [];
@@ -20,11 +22,22 @@ class MemoryDatabase {
   }
 
   isMongoConnected() {
-    return mongoose.connection.readyState === 1 || process.env.NODE_ENV === 'test';
+    if (mongoose.connection.readyState === 1) return true;
+    if (process.env.NODE_ENV === 'test') {
+      try {
+        const Student = require('../models/Student');
+        if (Student && (Student._isMockFunction || Student.find?._isMockFunction || typeof Student.find?.mock === 'object')) {
+          return true;
+        }
+      } catch (e) {}
+    }
+    return false;
   }
 
   clearAll() {
     this.colleges = [];
+    this.institutions = [];
+    this.departments = [];
     this.students = [];
     this.jobs = [];
     this.alerts = [];
@@ -100,6 +113,146 @@ class MemoryDatabase {
   }
 
   // ==========================================
+  // Institution Operations
+  // ==========================================
+  findInstitutionBySlug(slug) {
+    const s = (slug || '').toLowerCase().trim();
+    return this.institutions.find(i => i.slug === s);
+  }
+
+  findInstitutionByEmail(email) {
+    const e = (email || '').toLowerCase().trim();
+    return this.institutions.find(i => (i.officialEmail || '').toLowerCase() === e);
+  }
+
+  findInstitutionByMainAdminUsername(username) {
+    const u = (username || '').toLowerCase().trim();
+    return this.institutions.find(i => i.mainAdmin && (i.mainAdmin.username || '').toLowerCase() === u);
+  }
+
+  findInstitutionById(id) {
+    return this.institutions.find(i => String(i._id) === String(id));
+  }
+
+  saveInstitution(data) {
+    const newInst = {
+      _id: data._id || this.nextId('inst_'),
+      name: (data.name || '').trim(),
+      slug: (
+        (data.slug || '').toLowerCase().trim() ||
+        (data.name || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') ||
+        `inst-${Date.now()}`
+      ),
+      code: (data.code || '').trim(),
+      officialEmail: (data.officialEmail || '').toLowerCase().trim(),
+      address: (data.address || '').trim(),
+      city: (data.city || '').trim(),
+      state: (data.state || '').trim(),
+      country: (data.country || 'India').trim(),
+      website: (data.website || '').trim(),
+      phone: (data.phone || '').trim(),
+      logoUrl: data.logoUrl || null,
+      acceptedDomains: data.acceptedDomains || [],
+      mainAdmin: {
+        name: data.mainAdmin?.name || '',
+        username: (data.mainAdmin?.username || '').toLowerCase().trim(),
+        email: (data.mainAdmin?.email || '').toLowerCase().trim(),
+        passwordHash: data.mainAdmin?.passwordHash || ''
+      },
+      status: data.status || 'ACTIVE',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.institutions.push(newInst);
+    return newInst;
+  }
+
+  updateInstitution(id, updates) {
+    const inst = this.findInstitutionById(id);
+    if (!inst) return null;
+    Object.assign(inst, updates, { updatedAt: new Date() });
+    return inst;
+  }
+
+  // ==========================================
+  // Department Operations
+  // ==========================================
+  findDepartmentByUsername(username) {
+    const u = (username || '').toLowerCase().trim();
+    return this.departments.find(d => (d.username || '').toLowerCase() === u);
+  }
+
+  findDepartmentById(id) {
+    return this.departments.find(d => String(d._id) === String(id));
+  }
+
+  findDepartmentsByInstitution(institutionId) {
+    return this.departments.filter(d => String(d.institutionId) === String(institutionId));
+  }
+
+  saveDepartment(data) {
+    const newDept = {
+      _id: data._id || this.nextId('dept_'),
+      institutionId: data.institutionId,
+      name: (data.name || '').trim(),
+      code: (data.code || '').trim(),
+      username: (data.username || '').toLowerCase().trim(),
+      passwordHash: data.passwordHash,
+      programs: data.programs || [],
+      description: (data.description || '').trim(),
+      contactEmail: (data.contactEmail || '').toLowerCase().trim(),
+      contactPhone: (data.contactPhone || '').trim(),
+      status: data.status || 'ACTIVE',
+      isMergedGroup: !!data.isMergedGroup,
+      subDepartmentIds: data.subDepartmentIds || [],
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.departments.push(newDept);
+
+    // Keep shadow college record for complete legacy compatibility
+    if (!this.findCollegeById(newDept._id)) {
+      const parentInst = this.findInstitutionById(newDept.institutionId);
+      this.colleges.push({
+        _id: newDept._id,
+        name: newDept.name,
+        slug: newDept.username,
+        adminEmail: newDept.username + '@institution.edu',
+        masterPasswordHash: newDept.passwordHash,
+        acceptedDomains: parentInst?.acceptedDomains ? [...parentInst.acceptedDomains] : [],
+        academicStructure: [],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+    }
+
+    return newDept;
+  }
+
+  updateDepartment(id, updates) {
+    const dept = this.findDepartmentById(id);
+    if (!dept) return null;
+    Object.assign(dept, updates, { updatedAt: new Date() });
+
+    // Sync shadow college record
+    const shadowCol = this.findCollegeById(id);
+    if (shadowCol) {
+      if (updates.name) shadowCol.name = updates.name;
+      if (updates.username) shadowCol.slug = updates.username;
+    }
+
+    return dept;
+  }
+
+  deleteDepartment(id) {
+    const idx = this.departments.findIndex(d => String(d._id) === String(id));
+    if (idx === -1) return false;
+    this.departments.splice(idx, 1);
+    this.colleges = this.colleges.filter(c => String(c._id) !== String(id));
+    return true;
+  }
+
+  // ==========================================
   // Student Operations
   // ==========================================
   findStudentByEmail(email, collegeId) {
@@ -156,6 +309,14 @@ class MemoryDatabase {
       else if (r === 'needs_improvement') list = list.filter(s => (s.readinessScore || 0) >= 50 && (s.readinessScore || 0) < 75);
       else if (r === 'at_risk') list = list.filter(s => (s.readinessScore || 0) < 50);
     }
+    if (filters.batch && filters.batch !== 'All') {
+      const b = String(filters.batch).trim();
+      list = list.filter(s => (s.batch && String(s.batch) === b) || (s.passingYear && String(s.passingYear) === b));
+    }
+    if (filters.passingYear && filters.passingYear !== 'All') {
+      const py = String(filters.passingYear).trim();
+      list = list.filter(s => (s.passingYear && String(s.passingYear) === py) || (s.batch && String(s.batch) === py));
+    }
     if (filters.accountStatus && filters.accountStatus !== 'All') {
       const ast = filters.accountStatus.toUpperCase();
       list = list.filter(s => (s.accountStatus || 'ACTIVE') === ast);
@@ -168,6 +329,8 @@ class MemoryDatabase {
     const newStudent = {
       _id: studentData._id || this.nextId('std_'),
       collegeId: studentData.collegeId,
+      institutionId: studentData.institutionId || null,
+      departmentId: studentData.departmentId || null,
       name: studentData.name,
       rollNo: studentData.rollNo,
       usn: studentData.usn || studentData.rollNo,
@@ -176,9 +339,11 @@ class MemoryDatabase {
       course: (studentData.course || '').trim(),
       branch: studentData.branch || 'Computer Science & Engineering',
       section: (studentData.section || '').trim(),
-      batch: studentData.batch ? String(studentData.batch).trim() : '',
+      batch: studentData.batch ? String(studentData.batch).trim() : (studentData.passingYear ? String(studentData.passingYear).trim() : ''),
+      passingYear: studentData.passingYear ? String(studentData.passingYear).trim() : (studentData.batch ? String(studentData.batch).trim() : ''),
       cgpa: (studentData.cgpa !== undefined && studentData.cgpa !== null && !isNaN(Number(studentData.cgpa))) ? Number(studentData.cgpa) : 0,
       placementStatus: studentData.placementStatus || 'UNPLACED',
+      applicationEligibilityStatus: studentData.applicationEligibilityStatus || 'ELIGIBLE',
       accountStatus: studentData.accountStatus || 'ACTIVE',
       companyPlaced: studentData.companyPlaced || '',
       packageOffered: studentData.packageOffered || 0,
@@ -336,6 +501,14 @@ class MemoryDatabase {
     if (filters.status && filters.status !== 'All') {
       list = list.filter(j => j.status === filters.status.toUpperCase());
     }
+    if (filters.batch && filters.batch !== 'All') {
+      const b = String(filters.batch).trim();
+      list = list.filter(j => (j.batch && String(j.batch) === b) || (j.targetBatch && String(j.targetBatch) === b));
+    }
+    if (filters.targetBatch && filters.targetBatch !== 'All') {
+      const tb = String(filters.targetBatch).trim();
+      list = list.filter(j => (j.targetBatch && String(j.targetBatch) === tb) || (j.batch && String(j.batch) === tb));
+    }
     if (filters.search) {
       const q = filters.search.toLowerCase();
       list = list.filter(j => 
@@ -355,10 +528,14 @@ class MemoryDatabase {
     const newJob = {
       _id: jobData._id || this.nextId('job_'),
       collegeId: jobData.collegeId,
+      institutionId: jobData.institutionId || null,
+      departmentId: jobData.departmentId || null,
       title: jobData.title,
       role: jobData.role || jobData.title,
       company: jobData.company,
       department: jobData.department || 'Engineering',
+      batch: jobData.batch ? String(jobData.batch).trim() : (jobData.targetBatch ? String(jobData.targetBatch).trim() : ''),
+      targetBatch: jobData.targetBatch ? String(jobData.targetBatch).trim() : (jobData.batch ? String(jobData.batch).trim() : ''),
       location: jobData.location || 'Campus / Bengaluru',
       ctc: jobData.ctc || '12 LPA - 16 LPA',
       ctcValue: jobData.ctcValue || (jobData.ctc ? parseFloat(jobData.ctc) || 0 : 0),
@@ -381,14 +558,65 @@ class MemoryDatabase {
   updateJob(id, updates) {
     const job = this.findJobById(id);
     if (!job) return null;
+    if (updates.targetBatch && !updates.batch) {
+      updates.batch = updates.targetBatch;
+    } else if (updates.batch && !updates.targetBatch) {
+      updates.targetBatch = updates.batch;
+    }
     Object.assign(job, updates, { updatedAt: new Date() });
     return job;
   }
 
-  deleteJob(id) {
-    const idx = this.jobs.findIndex(j => String(j._id) === String(id));
+  deleteJob(id, collegeId) {
+    const idx = this.jobs.findIndex(j => 
+      String(j._id) === String(id) &&
+      (!collegeId || String(j.collegeId) === String(collegeId))
+    );
     if (idx === -1) return null;
-    return this.jobs.splice(idx, 1)[0];
+    const removed = this.jobs.splice(idx, 1)[0];
+    const jId = String(removed._id);
+    this.matches = this.matches.filter(m => String(m.jdId) !== jId && String(m.jobId) !== jId);
+    this.applications = this.applications.filter(a => String(a.jobId) !== jId);
+    return removed;
+  }
+
+  // ==========================================
+  // Match Operations
+  // ==========================================
+  findMatch(collegeId, studentId, jdId) {
+    return this.matches.find(m => 
+      (!collegeId || String(m.collegeId) === String(collegeId)) &&
+      String(m.studentId) === String(studentId) &&
+      (String(m.jdId) === String(jdId) || String(m.jobId) === String(jdId))
+    );
+  }
+
+  getJobMatches(collegeId, jdId) {
+    return this.matches.filter(m => 
+      (!collegeId || String(m.collegeId) === String(collegeId)) &&
+      (String(m.jdId) === String(jdId) || String(m.jobId) === String(jdId))
+    );
+  }
+
+  saveMatch(matchData) {
+    const existing = this.findMatch(matchData.collegeId, matchData.studentId, matchData.jdId || matchData.jobId);
+    if (existing) {
+      Object.assign(existing, matchData, { updatedAt: new Date() });
+      return existing;
+    }
+    const newMatch = {
+      _id: matchData._id || this.nextId('match_'),
+      studentId: matchData.studentId,
+      jdId: matchData.jdId || matchData.jobId,
+      jobId: matchData.jdId || matchData.jobId,
+      score: matchData.score,
+      matchedSkills: matchData.matchedSkills || [],
+      missingSkills: matchData.missingSkills || [],
+      collegeId: matchData.collegeId,
+      createdAt: new Date()
+    };
+    this.matches.push(newMatch);
+    return newMatch;
   }
 
   // ==========================================

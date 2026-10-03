@@ -132,10 +132,15 @@ const jdRoutes = require('./routes/jd');
 const notificationRoutes = require('./routes/notification');
 const adminRoutes = require('./routes/admin');
 const publicRoutes = require('./routes/public');
+const institutionRoutes = require('./routes/institution');
 
 // Admin routes
 app.use('/api/admin', adminRoutes);
 app.use('/admin', adminRoutes);
+
+// Institution routes
+app.use('/api/institution', institutionRoutes);
+app.use('/institution', institutionRoutes);
 
 // Public routes (unauthenticated shareable profile routes)
 app.use('/api/public', publicRoutes);

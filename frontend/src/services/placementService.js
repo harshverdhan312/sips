@@ -290,9 +290,16 @@ export const placementService = {
   /**
    * Fetch active job recruitment drives from backend
    */
-  async getJobs() {
+  async getJobs(filters = {}) {
     try {
-      const res = await api.get('/api/admin/jobs');
+      const params = new URLSearchParams();
+      if (filters.status && filters.status !== 'All') params.append('status', filters.status);
+      if (filters.search) params.append('search', filters.search);
+      if (filters.batch && filters.batch !== 'All') params.append('batch', filters.batch);
+      if (filters.targetBatch && filters.targetBatch !== 'All') params.append('targetBatch', filters.targetBatch);
+      const queryStr = params.toString() ? `?${params.toString()}` : '';
+
+      const res = await api.get(`/api/admin/jobs${queryStr}`);
       if (res && res.jobs) {
         const now = new Date();
         return res.jobs.map((j) => {
@@ -320,6 +327,8 @@ export const placementService = {
             location: j.location || "Bengaluru, India",
             ctc: j.ctc || "12 LPA - 16 LPA",
             type: j.type || "Full-time",
+            targetBatch: j.targetBatch || j.batch || "",
+            batch: j.targetBatch || j.batch || "",
             deadline: j.deadline ? new Date(j.deadline).toISOString().split('T')[0] : "Open Drive",
             deadlineRaw: j.deadline,
             postedDate: j.createdAt ? new Date(j.createdAt).toLocaleDateString() : "Active",
@@ -350,9 +359,23 @@ export const placementService = {
       ? newJobData.requiredSkills.split(',').map((s) => s.trim()).filter(Boolean)
       : newJobData.requiredSkills || [];
 
-    const branchesArr = typeof newJobData.allowedBranches === 'string'
-      ? newJobData.allowedBranches.split(',').map((b) => b.trim()).filter(Boolean)
-      : newJobData.allowedBranches || ['Computer Science', 'Information Science'];
+    const branchesArr = Array.isArray(newJobData.targetBranch)
+      ? newJobData.targetBranch
+      : typeof newJobData.targetBranch === 'string' && newJobData.targetBranch
+        ? newJobData.targetBranch.split(',').map((b) => b.trim()).filter(Boolean)
+        : Array.isArray(newJobData.allowedBranches)
+          ? newJobData.allowedBranches
+          : typeof newJobData.allowedBranches === 'string'
+            ? newJobData.allowedBranches.split(',').map((b) => b.trim()).filter(Boolean)
+            : newJobData.allowedBranches || ['Computer Science', 'Information Science'];
+
+    const coursesArr = Array.isArray(newJobData.targetCourse)
+      ? newJobData.targetCourse
+      : typeof newJobData.targetCourse === 'string' && newJobData.targetCourse
+        ? newJobData.targetCourse.split(',').map((c) => c.trim()).filter(Boolean)
+        : [];
+
+    const targetBatchStr = String(newJobData.targetBatch || newJobData.batch || '').trim();
 
     const payload = {
       title: newJobData.role || newJobData.title || "Software Engineer",
@@ -361,9 +384,12 @@ export const placementService = {
       department: newJobData.department || "Engineering",
       location: newJobData.location || "Bengaluru, India",
       ctc: newJobData.ctc || "12 LPA - 16 LPA",
-      type: newJobData.type || "Full-time",
+      type: newJobData.jobType || newJobData.type || "Full-time",
       minCgpa: parseFloat(newJobData.minCgpa) || 7.0,
+      targetBatch: targetBatchStr,
+      batch: targetBatchStr,
       allowedBranches: branchesArr,
+      allowedCourses: coursesArr,
       requiredSkills: requiredSkillsArr,
       description: newJobData.description || "",
       deadline: newJobData.deadline ? new Date(newJobData.deadline).toISOString() : new Date(Date.now() + 30 * 86400000).toISOString()
@@ -381,11 +407,20 @@ export const placementService = {
       location: created.location,
       ctc: created.ctc,
       minCgpa: created.minCgpa,
+      targetBatch: created.targetBatch || created.batch || "",
+      batch: created.targetBatch || created.batch || "",
       requiredSkills: created.requiredSkills,
       allowedBranches: created.allowedBranches,
       description: created.description,
       status: "Active Drive"
     };
+  },
+
+  /**
+   * Delete a job description / recruitment drive
+   */
+  async deleteJob(jobId) {
+    return await api.delete(`/api/admin/jobs/${jobId}`);
   },
 
   /**

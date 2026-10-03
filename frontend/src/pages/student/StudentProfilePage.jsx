@@ -89,6 +89,9 @@ export function StudentProfilePage() {
     cgpa: ""
   });
   const [savingAcademic, setSavingAcademic] = useState(false);
+  const [changePasswordModalOpen, setChangePasswordModalOpen] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({ newPassword: "", confirmPassword: "" });
+  const [changingPassword, setChangingPassword] = useState(false);
   const [skillsList, setSkillsList] = useState([]);
   const [newSkill, setNewSkill] = useState("");
   const [githubHandle, setGithubHandle] = useState("");
@@ -271,6 +274,33 @@ export function StudentProfilePage() {
       showError(err.message || "Failed to update academic profile.");
     } finally {
       setSavingAcademic(false);
+    }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (passwordForm.newPassword.length < 4) {
+      showError("Password must be at least 4 characters long.");
+      return;
+    }
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      showError("Passwords do not match.");
+      return;
+    }
+    
+    setChangingPassword(true);
+    try {
+      await studentService.updateCurrentStudent({
+        password: passwordForm.newPassword
+      });
+      setChangePasswordModalOpen(false);
+      setPasswordForm({ newPassword: "", confirmPassword: "" });
+      showSuccess("Password changed successfully.");
+    } catch (err) {
+      console.error(err);
+      showError(err.message || "Failed to change password.");
+    } finally {
+      setChangingPassword(false);
     }
   };
 
@@ -609,18 +639,40 @@ export function StudentProfilePage() {
   };
 
   const handleCalculatePrediction = async () => {
+    if (!student) {
+      showError("Profile data is still loading. Please try again in a moment.");
+      return;
+    }
+
+    // Client-side validation: verify required placement attributes are present
+    const missing = [];
+    if (student.age === null || student.age === undefined) missing.push("Age");
+    if (student.internships === null || student.internships === undefined) missing.push("Internships");
+    if (student.hostel === null || student.hostel === undefined) missing.push("Hostel Status");
+    if (student.historyOfBacklogs === null || student.historyOfBacklogs === undefined) missing.push("Backlog History");
+    const cgpaVal = student.cgpa ?? student.academic?.cgpa;
+    if (cgpaVal === null || cgpaVal === undefined || cgpaVal <= 0) missing.push("CGPA");
+
+    if (missing.length > 0) {
+      showError(`Please complete your Placement Profile Information first. Missing: ${missing.join(", ")}`);
+      setIsEditingPlacement(true);
+      return;
+    }
+
     setCalculatingPrediction(true);
     try {
       const res = await studentService.requestPlacementPrediction();
-      if (res && res.prediction) {
-        setPrediction(res.prediction);
+      const pred = res?.prediction || res;
+      if (pred && (pred.placementProbability !== undefined || pred.predictedClass !== undefined || pred._id)) {
+        setPrediction(pred);
         showSuccess("Placement likelihood prediction computed successfully!");
       } else {
         showError("Could not retrieve prediction result.");
       }
     } catch (err) {
-      console.error(err);
-      showError(err.message || "Failed to calculate placement prediction.");
+      console.error("Placement prediction error:", err);
+      const errMsg = err?.data?.message || err?.message || "Failed to calculate placement prediction.";
+      showError(errMsg);
     } finally {
       setCalculatingPrediction(false);
     }
@@ -844,23 +896,34 @@ export function StudentProfilePage() {
               </div>
             </div>
 
-            <Button
-              variant="outline"
-              size="xs"
-              icon={Edit2}
-              onClick={() => {
-                setAcademicForm({
-                  name: student.name || "",
-                  branch: student.branch || "",
-                  batch: student.batch || "",
-                  cgpa: student.cgpa > 0 ? String(student.cgpa) : ""
-                });
-                setEditAcademicModalOpen(true);
-              }}
-              className="bg-white hover:bg-slate-50 border-slate-200 shadow-xs"
-            >
-              Edit Academic Profile
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="xs"
+                icon={Edit2}
+                onClick={() => {
+                  setAcademicForm({
+                    name: student.name || "",
+                    branch: student.branch || "",
+                    batch: student.batch || "",
+                    cgpa: student.cgpa > 0 ? String(student.cgpa) : ""
+                  });
+                  setEditAcademicModalOpen(true);
+                }}
+                className="bg-white hover:bg-slate-50 border-slate-200 shadow-xs"
+              >
+                Edit Academic Profile
+              </Button>
+              <Button
+                variant="outline"
+                size="xs"
+                icon={Lock}
+                onClick={() => setChangePasswordModalOpen(true)}
+                className="bg-white hover:bg-slate-50 border-slate-200 shadow-xs"
+              >
+                Change Password
+              </Button>
+            </div>
           </div>
 
           {/* Quick Contact & Verification Badges */}
@@ -1993,10 +2056,9 @@ export function StudentProfilePage() {
             </label>
             <input
               type="text"
-              disabled={savingAcademic}
+              disabled={true}
               value={academicForm.branch}
-              onChange={(e) => setAcademicForm({ ...academicForm, branch: e.target.value })}
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm bg-slate-50 cursor-not-allowed focus:outline-none"
               placeholder="e.g. Computer Science & Engineering"
             />
           </div>
@@ -2008,10 +2070,9 @@ export function StudentProfilePage() {
               </label>
               <input
                 type="text"
-                disabled={savingAcademic}
+                disabled={true}
                 value={academicForm.batch}
-                onChange={(e) => setAcademicForm({ ...academicForm, batch: e.target.value })}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm bg-slate-50 cursor-not-allowed focus:outline-none"
                 placeholder="e.g. 2026 or 2022-2026"
               />
             </div>
@@ -2608,6 +2669,62 @@ export function StudentProfilePage() {
           </div>
         </form>
       </Modal>
+      {/* Change Password Modal */}
+      <Modal
+        isOpen={changePasswordModalOpen}
+        onClose={() => setChangePasswordModalOpen(false)}
+        title="Change Password"
+        size="sm"
+      >
+        <form onSubmit={handleChangePassword} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              New Password
+            </label>
+            <input
+              type="password"
+              disabled={changingPassword}
+              value={passwordForm.newPassword}
+              onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              placeholder="Enter new password"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Confirm New Password
+            </label>
+            <input
+              type="password"
+              disabled={changingPassword}
+              value={passwordForm.confirmPassword}
+              onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              placeholder="Confirm new password"
+            />
+          </div>
+          <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={changingPassword}
+              onClick={() => setChangePasswordModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              loading={changingPassword}
+            >
+              Change Password
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
     </div>
   );
 }
