@@ -17,7 +17,7 @@ const config = {
   cloudinaryApiKey: process.env.CLOUDINARY_API_KEY || '',
   cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET || '',
   mlServiceUrl: process.env.ML_SERVICE_URL || 'http://127.0.0.1:8000',
-  mlServiceTimeoutMs: parseInt(process.env.ML_SERVICE_TIMEOUT_MS, 10) || 5000,
+  mlServiceTimeoutMs: parseInt(process.env.ML_SERVICE_TIMEOUT_MS, 10) || 30000,
   mlServiceApiKey: process.env.ML_SERVICE_API_KEY || ''
 };
 

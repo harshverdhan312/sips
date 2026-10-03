@@ -130,6 +130,6 @@ describe('Real Node ↔ FastAPI ML Integration Tests', () => {
       expect([0, 1]).toContain(res.predicted_class);
       expect(typeof res.predicted_label).toBe('string');
       expect(typeof res.model_version).toBe('string');
-    });
+    }, 30000);
   });
 });
