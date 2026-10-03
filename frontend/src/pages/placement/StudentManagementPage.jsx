@@ -257,8 +257,8 @@ export function StudentManagementPage() {
     setNewStudent((prev) => ({
       ...prev,
       course: courseName,
-      branch: firstBranch?.branchName || "",
-      section: firstSection
+      branch: firstBranch ? firstBranch.branchName : prev.branch,
+      section: firstSection || prev.section
     }));
   };
 
@@ -268,7 +268,7 @@ export function StudentManagementPage() {
     setNewStudent((prev) => ({
       ...prev,
       branch: branchName,
-      section: firstSection
+      section: firstSection || prev.section
     }));
   };
 
@@ -325,6 +325,14 @@ export function StudentManagementPage() {
 
     if (!newStudent.rollNo.trim()) {
       newErrors.rollNo = "Roll No / USN is required.";
+    }
+
+    if (!newStudent.course.trim()) {
+      newErrors.course = "Course / Program is required.";
+    }
+
+    if (!newStudent.branch.trim()) {
+      newErrors.branch = "Branch / Department is required.";
     }
 
     const cgpaVal = parseFloat(newStudent.cgpa);
@@ -1552,36 +1560,64 @@ export function StudentManagementPage() {
                   <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Degree Program / Course *
                   </label>
-                  <select
+                  <input
+                    list="course-options"
                     disabled={savingStudent}
                     value={newStudent.course}
-                    onChange={(e) => handleCourseChange(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                  >
+                    onChange={(e) => {
+                      handleCourseChange(e.target.value);
+                      if (addStudentErrors.course) setAddStudentErrors(prev => ({ ...prev, course: "" }));
+                    }}
+                    className={`w-full px-3 py-2 rounded-xl border text-xs font-medium bg-white focus:outline-none focus:ring-2 ${
+                      addStudentErrors.course
+                        ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                        : "border-slate-200 focus:ring-indigo-500/20"
+                    }`}
+                    placeholder="e.g. B.Tech"
+                  />
+                  {addStudentErrors.course && (
+                    <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3 shrink-0" />
+                      {addStudentErrors.course}
+                    </p>
+                  )}
+                  <datalist id="course-options">
                     {academicStructure.map((c) => (
-                      <option key={c.courseName} value={c.courseName}>
-                        {c.courseName}
-                      </option>
+                      <option key={c.courseName} value={c.courseName} />
                     ))}
-                  </select>
+                  </datalist>
                 </div>
 
                 <div>
                   <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Branch / Department *
                   </label>
-                  <select
+                  <input
+                    list="branch-options"
                     disabled={savingStudent}
                     value={newStudent.branch}
-                    onChange={(e) => handleBranchChange(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                  >
+                    onChange={(e) => {
+                      handleBranchChange(e.target.value);
+                      if (addStudentErrors.branch) setAddStudentErrors(prev => ({ ...prev, branch: "" }));
+                    }}
+                    className={`w-full px-3 py-2 rounded-xl border text-xs font-medium bg-white focus:outline-none focus:ring-2 ${
+                      addStudentErrors.branch
+                        ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                        : "border-slate-200 focus:ring-indigo-500/20"
+                    }`}
+                    placeholder="e.g. Computer Science"
+                  />
+                  {addStudentErrors.branch && (
+                    <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3 shrink-0" />
+                      {addStudentErrors.branch}
+                    </p>
+                  )}
+                  <datalist id="branch-options">
                     {availableBranches.map((b) => (
-                      <option key={b.branchName} value={b.branchName}>
-                        {b.branchName}
-                      </option>
+                      <option key={b.branchName} value={b.branchName} />
                     ))}
-                  </select>
+                  </datalist>
                 </div>
               </div>
 
@@ -1590,18 +1626,19 @@ export function StudentManagementPage() {
                   <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Section
                   </label>
-                  <select
+                  <input
+                    list="section-options"
                     disabled={savingStudent}
                     value={newStudent.section}
                     onChange={(e) => handleSectionChange(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                  >
+                    placeholder="e.g. A"
+                  />
+                  <datalist id="section-options">
                     {availableSections.map((s) => (
-                      <option key={s} value={s}>
-                        Section {s}
-                      </option>
+                      <option key={s} value={s} />
                     ))}
-                  </select>
+                  </datalist>
                 </div>
 
                 <div>
@@ -1623,29 +1660,56 @@ export function StudentManagementPage() {
             <div className="space-y-3 p-3 bg-slate-50/80 border border-slate-200/80 rounded-xl">
               <div>
                 <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                  Degree Program / Course
+                  Degree Program / Course *
                 </label>
                 <input
                   type="text"
                   disabled={savingStudent}
                   placeholder="e.g. B.Tech, M.Tech, BCA"
                   value={newStudent.course}
-                  onChange={(e) => setNewStudent({ ...newStudent, course: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  onChange={(e) => {
+                    setNewStudent({ ...newStudent, course: e.target.value });
+                    if (addStudentErrors.course) setAddStudentErrors(prev => ({ ...prev, course: "" }));
+                  }}
+                  className={`w-full px-3 py-2 rounded-xl border text-xs font-medium focus:outline-none focus:ring-2 ${
+                    addStudentErrors.course
+                      ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                      : "border-slate-200 focus:ring-indigo-500/20"
+                  }`}
                 />
+                {addStudentErrors.course && (
+                  <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    {addStudentErrors.course}
+                  </p>
+                )}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                    Department / Branch
+                    Department / Branch *
                   </label>
                   <input
                     type="text"
                     disabled={savingStudent}
                     placeholder="e.g. Computer Science & Engineering"
                     value={newStudent.branch}
-                    onChange={(e) => setNewStudent({ ...newStudent, branch: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    onChange={(e) => {
+                      setNewStudent({ ...newStudent, branch: e.target.value });
+                      if (addStudentErrors.branch) setAddStudentErrors(prev => ({ ...prev, branch: "" }));
+                    }}
+                    className={`w-full px-3 py-2 rounded-xl border text-xs font-medium focus:outline-none focus:ring-2 ${
+                      addStudentErrors.branch
+                        ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                        : "border-slate-200 focus:ring-indigo-500/20"
+                    }`}
+                  />
+                  {addStudentErrors.branch && (
+                    <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3 shrink-0" />
+                      {addStudentErrors.branch}
+                    </p>
+                  )}                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                   />
                 </div>
                 <div>
