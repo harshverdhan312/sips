@@ -40,10 +40,6 @@ const BRANCH_TO_STREAM_MAP = {
   'eee': 'Electrical'
 };
 
-/**
- * Deterministically map a student's branch string to the canonical Stream enum expected by ML model.
- * Returns null if the branch cannot be safely and accurately mapped (no fabrication).
- */
 function mapBranchToStream(branch) {
   if (!branch || typeof branch !== 'string') return null;
   const normalized = branch.trim().toLowerCase();
@@ -51,6 +47,27 @@ function mapBranchToStream(branch) {
   if (mapped && VALID_STREAMS.has(mapped)) {
     return mapped;
   }
+  
+  // Fallback heuristic mapping
+  if (normalized.includes('computer') || normalized.includes('software') || normalized.includes('ai') || normalized.includes('artificial') || normalized.includes('data') || normalized.includes('machine')) {
+    return 'Computer Science';
+  }
+  if (normalized.includes('information') || normalized.includes('it') || normalized.includes('cyber')) {
+    return 'Information Technology';
+  }
+  if (normalized.includes('electronic') || normalized.includes('communication') || normalized.includes('ece') || normalized.includes('entc')) {
+    return 'Electronics And Communication';
+  }
+  if (normalized.includes('electrical') || normalized.includes('eee')) {
+    return 'Electrical';
+  }
+  if (normalized.includes('mech') || normalized.includes('auto') || normalized.includes('manufacturing')) {
+    return 'Mechanical';
+  }
+  if (normalized.includes('civil') || normalized.includes('construction')) {
+    return 'Civil';
+  }
+  
   return null;
 }
 

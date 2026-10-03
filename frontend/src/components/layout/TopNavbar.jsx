@@ -69,7 +69,7 @@ export function TopNavbar({ onMenuClick }) {
       {/* Right items: Role Switcher, Notifications, Profile */}
       <div className="flex items-center gap-2 sm:gap-3">
         {/* Institutional Campus Badge */}
-        {(user?.institutionName || user?.collegeName) && (
+        {role !== 'student' && (user?.institutionName || (user?.collegeName && user.collegeName !== 'College')) && (
           <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-slate-100 rounded-xl text-xs font-semibold text-slate-700 border border-slate-200/60">
             <Building2 className="w-3.5 h-3.5 text-indigo-600" />
             <span className="truncate max-w-[160px]">{user.institutionName || user.collegeName}</span>

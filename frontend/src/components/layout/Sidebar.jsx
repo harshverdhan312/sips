@@ -52,7 +52,7 @@ export function Sidebar({ isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen
     { to: "/placement/jobs", label: "Job Descriptions", icon: Briefcase, badge: "Match" },
     { to: "/placement/analytics", label: "Placement Analytics", icon: BarChart3 },
     { to: "/placement/reports", label: "Institutional Reports", icon: FileSpreadsheet },
-    { to: "/placement/profile", label: "College Profile", icon: Building2 }
+    { to: "/placement/profile", label: "Department Profile", icon: Building2 }
   ];
 
   const adminLinks = [
@@ -60,13 +60,13 @@ export function Sidebar({ isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen
     { to: "/admin/users", label: "User Management", icon: Users },
     { to: "/admin/students", label: "Student Records", icon: GraduationCap },
     { to: "/admin/analytics", label: "Platform Analytics", icon: BarChart3 },
-    { to: "/admin/profile", label: "College Profile", icon: Building2 },
+    { to: "/admin/profile", label: "Department Profile", icon: Building2 },
     { to: "/admin/settings", label: "System Settings", icon: Settings }
   ];
 
   const universityAdminLinks = [
     { to: "/institution/dashboard", label: "Overview", icon: LayoutDashboard },
-    { to: "/institution/profile", label: "University Profile", icon: Building2 },
+    { to: "/institution/profile", label: "College Profile", icon: Building2 },
     { to: "/institution/departments", label: "Departments", icon: Layers, badge: "Units" }
   ];
 

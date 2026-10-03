@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const MEMORY_ID_PREFIXES = ['std_', 'col_', 'job_', 'alt_', 'id_'];
+const MEMORY_ID_PREFIXES = ['std_', 'col_', 'job_', 'alt_', 'id_', 'dept_', 'inst_'];
 
 /**
  * Check if a string is a valid ID (either MongoDB 24-hex ObjectId or memoryDb ID)

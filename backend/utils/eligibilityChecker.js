@@ -1,4 +1,3 @@
-const { mapBranchToStream } = require('./placementDataMapper');
 
 /**
  * Check whether a student satisfies all explicit job eligibility restrictions.
@@ -28,7 +27,6 @@ function checkJobEligibility(student, job) {
   // 2. Allowed Branches check
   if (Array.isArray(job.allowedBranches) && job.allowedBranches.length > 0) {
     const studentBranch = (student.branch || '').trim();
-    const studentStream = mapBranchToStream(studentBranch);
     const studentBranchLower = studentBranch.toLowerCase();
 
     const isBranchAllowed = job.allowedBranches.some((b) => {
@@ -36,17 +34,11 @@ function checkJobEligibility(student, job) {
       const bTrimmed = b.trim();
       const bLower = bTrimmed.toLowerCase();
 
-      // Exact branch match (case-insensitive)
+      // Strict exact branch match (case-insensitive)
       if (bLower === studentBranchLower) return true;
 
-      // Stream-normalized match (e.g. "CSE" <-> "Computer Science & Engineering")
-      const bStream = mapBranchToStream(bTrimmed);
-      if (studentStream && bStream && studentStream === bStream) return true;
-
-      // Substring inclusion (e.g. "Computer Science" in "Computer Science & Engineering")
-      if (studentBranchLower && (studentBranchLower.includes(bLower) || bLower.includes(studentBranchLower))) {
-        return true;
-      }
+      // Handle "__NONE__" special edge case for deselecting all branches
+      if (bTrimmed === '__NONE__') return false;
 
       return false;
     });
@@ -56,6 +48,29 @@ function checkJobEligibility(student, job) {
         reasons.push(`Allowed branch: ${job.allowedBranches[0]}`);
       } else {
         reasons.push(`Allowed branches: ${job.allowedBranches.join(', ')}`);
+      }
+    }
+  }
+
+  // 2.5 Allowed Courses check
+  if (Array.isArray(job.allowedCourses) && job.allowedCourses.length > 0) {
+    const studentCourse = (student.course || '').trim().toLowerCase();
+    
+    const isCourseAllowed = job.allowedCourses.some((c) => {
+      if (!c || typeof c !== 'string') return false;
+      const cLower = c.trim().toLowerCase();
+      
+      // Strict exact course match (case-insensitive)
+      if (cLower === studentCourse) return true;
+      
+      return false;
+    });
+
+    if (!isCourseAllowed) {
+      if (job.allowedCourses.length === 1) {
+        reasons.push(`Allowed course: ${job.allowedCourses[0]}`);
+      } else {
+        reasons.push(`Allowed courses: ${job.allowedCourses.join(', ')}`);
       }
     }
   }
@@ -80,6 +95,22 @@ function checkJobEligibility(student, job) {
     reasons.push('This job posting is closed');
   } else if (job.status && job.status.toUpperCase() !== 'ACTIVE') {
     reasons.push(`This job posting is not active (status: ${job.status})`);
+  }
+
+  // 5. Debarment check
+  if (
+    student.applicationEligibilityStatus === 'DEBARRED' ||
+    student.isDebarred === true ||
+    (student.accountStatus && String(student.accountStatus).toUpperCase() === 'DEBARRED')
+  ) {
+    reasons.push('You are debarred from applying to placement drives');
+  }
+
+  // 6. Target batch / Passing year check
+  const jobBatch = (job.targetBatch || job.batch || '').toString().trim();
+  const studentBatch = (student.batch || student.passingYear || '').toString().trim();
+  if (jobBatch && studentBatch && jobBatch !== studentBatch) {
+    reasons.push(`This placement drive is available only to the ${jobBatch} batch.`);
   }
 
   return reasons;

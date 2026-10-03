@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { authService } from "../services/authService";
+import { institutionService } from "../services/institutionService";
 
 const AuthContext = createContext(null);
 
@@ -30,11 +31,9 @@ export function AuthProvider({ children }) {
   }, [user]);
 
   /**
-   * Real authenticated login via backend API
+   * Universal helper to process authenticated login response and set state
    */
-  const login = async (identifier, password) => {
-    const data = await authService.login(identifier, password);
-
+  const applyLoginResponse = (data, identifier = '') => {
     if (!data || !data.token) {
       throw new Error(data?.message || "Authentication failed");
     }
@@ -44,14 +43,31 @@ export function AuthProvider({ children }) {
     let mappedRole = "student";
     let userData = {};
 
-    if (data.role === "COLLEGE_ADMIN") {
+    if (data.role === "MAIN_UNIVERSITY_ADMIN") {
+      mappedRole = "university_admin";
+      userData = {
+        id: data.userId,
+        name: data.institutionName || data.name || "University Administration",
+        email: identifier.includes("@") ? identifier : (data.email || "admin@university.edu"),
+        username: data.username || identifier,
+        role: "university_admin",
+        backendRole: data.role,
+        institutionId: data.institutionId,
+        institutionName: data.institutionName,
+        status: "Active"
+      };
+    } else if (data.role === "DEPARTMENT_ADMIN" || data.role === "COLLEGE_ADMIN") {
       mappedRole = "placement";
       userData = {
         id: data.userId,
-        name: data.collegeName ? `${data.collegeName} Placement Cell` : "Placement Administration",
+        name: data.departmentName ? `${data.departmentName} Dept` : (data.collegeName ? `${data.collegeName} Placement Cell` : "Placement Administration"),
         email: identifier.includes("@") ? identifier : `${data.collegeSlug || "admin"}@college.edu`,
+        username: data.username || identifier,
         role: "placement",
         backendRole: data.role,
+        institutionId: data.institutionId,
+        departmentId: data.departmentId,
+        departmentName: data.departmentName,
         collegeSlug: data.collegeSlug,
         collegeName: data.collegeName,
         avatar: data.logoUrl || null,
@@ -64,11 +80,12 @@ export function AuthProvider({ children }) {
         id: data.userId,
         name: data.studentName || "Student Candidate",
         email: identifier.includes("@") ? identifier : "",
-        rollNo: !identifier.includes("@") ? identifier : "",
+        rollNo: !identifier.includes("@") ? identifier : (data.rollNo || ""),
         role: "student",
         backendRole: data.role,
         collegeSlug: data.collegeSlug,
         collegeName: data.collegeName,
+        batch: data.batch || data.passingYear || "",
         avatar: data.profileImageUrl || null,
         profileImageUrl: data.profileImageUrl || null,
         status: "Active"
@@ -80,6 +97,38 @@ export function AuthProvider({ children }) {
     setRole(mappedRole);
 
     return { user: userData, role: mappedRole };
+  };
+
+  /**
+   * Real authenticated login via backend API
+   */
+  const login = async (identifier, password) => {
+    const data = await authService.login(identifier, password);
+    return applyLoginResponse(data, identifier);
+  };
+
+  /**
+   * Dedicated Student login
+   */
+  const studentLogin = async (identifier, password) => {
+    const data = await authService.studentLogin(identifier, password);
+    return applyLoginResponse(data, identifier);
+  };
+
+  /**
+   * Dedicated University / Department login
+   */
+  const institutionLogin = async (identifier, password) => {
+    const data = await authService.institutionLogin(identifier, password);
+    return applyLoginResponse(data, identifier);
+  };
+
+  /**
+   * Onboard a new University Root
+   */
+  const onboardUniversity = async (institutionData) => {
+    const data = await institutionService.onboard(institutionData);
+    return applyLoginResponse(data, institutionData.adminUsername || institutionData.officialEmail);
   };
 
   /**
@@ -141,6 +190,9 @@ export function AuthProvider({ children }) {
         role,
         isAuthenticated: !!user && !!localStorage.getItem("sips_token"),
         login,
+        studentLogin,
+        institutionLogin,
+        onboardUniversity,
         registerCollege,
         updateUser,
         logout

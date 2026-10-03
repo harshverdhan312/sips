@@ -8,6 +8,7 @@ const { calculateMatch, extractSkillsFromText } = require('../utils/matchingEngi
 const { sendNotification } = require('../utils/notificationService');
 const memoryDb = require('../utils/memoryDb');
 const logger = require('../utils/logger');
+const { checkJobEligibility } = require('../utils/eligibilityChecker');
 
 /**
  * Helper to compute eligible and matched count for a JD
@@ -20,6 +21,17 @@ const computeJobStats = async (collegeId, jd) => {
   if (jd.allowedBranches && jd.allowedBranches.length > 0) {
     const branchRegexes = jd.allowedBranches.map(b => new RegExp(b.trim(), 'i'));
     query.branch = { $in: branchRegexes };
+  }
+  if (jd.allowedCourses && jd.allowedCourses.length > 0) {
+    const courseRegexes = jd.allowedCourses.map(c => new RegExp(c.trim(), 'i'));
+    query.course = { $in: courseRegexes };
+  }
+  const jobBatch = (jd.targetBatch || jd.batch || '').toString().trim();
+  if (jobBatch) {
+    query.$or = [
+      { batch: jobBatch },
+      { passingYear: jobBatch }
+    ];
   }
 
   const eligibleCount = await Student.countDocuments(query);
@@ -38,10 +50,11 @@ const computeJobStats = async (collegeId, jd) => {
  */
 exports.getJobs = async (req, res) => {
   try {
-    const { status, search } = req.query;
+    const { status, search, batch, targetBatch } = req.query;
+    const batchFilter = (targetBatch || batch || '').trim();
 
     if (!memoryDb.isMongoConnected()) {
-      const jobs = memoryDb.getJobs(req.collegeId, { status, search });
+      const jobs = memoryDb.getJobs(req.collegeId, { status, search, batch: batchFilter });
       return res.json({
         success: true,
         count: jobs.length,
@@ -55,15 +68,34 @@ exports.getJobs = async (req, res) => {
       query.status = status.toUpperCase();
     }
 
+    const andConditions = [];
+
+    if (batchFilter && batchFilter !== 'All') {
+      const batchNum = parseInt(batchFilter, 10);
+      andConditions.push({
+        $or: [
+          { targetBatch: batchFilter },
+          { batch: batchFilter },
+          ...(isNaN(batchNum) ? [] : [{ targetBatch: batchNum }, { batch: batchNum }])
+        ]
+      });
+    }
+
     if (search && search.trim()) {
       const searchRegex = new RegExp(search.trim(), 'i');
-      query.$or = [
-        { title: searchRegex },
-        { company: searchRegex },
-        { role: searchRegex },
-        { department: searchRegex },
-        { location: searchRegex }
-      ];
+      andConditions.push({
+        $or: [
+          { title: searchRegex },
+          { company: searchRegex },
+          { role: searchRegex },
+          { department: searchRegex },
+          { location: searchRegex }
+        ]
+      });
+    }
+
+    if (andConditions.length > 0) {
+      query.$and = andConditions;
     }
 
     const jobs = await JobDescription.find(query)
@@ -102,31 +134,46 @@ exports.createJob = async (req, res) => {
       minCgpa,
       allowedBranches,
       requiredSkills,
-      status
+      status,
+      targetBatch,
+      batch,
+      allowedCourses
     } = req.body;
 
-    if (!title || !company || !description) {
+    const jobTitle = (title || role || '').trim();
+    const jobCompany = (company || '').trim();
+    const jobDesc = (description || '').trim();
+
+    if (!jobTitle || !jobCompany || !jobDesc) {
       return res.status(400).json({ message: 'Title, company, and description are required' });
     }
+
+    const finalBatch = String(targetBatch || batch || '').trim();
 
     // Auto-extract skills if none provided
     let skills = requiredSkills;
     if (!skills || skills.length === 0) {
-      skills = extractSkillsFromText(description);
+      skills = extractSkillsFromText(jobDesc);
     }
 
     const parsedMinCgpa = parseFloat(minCgpa) || 0;
     const branches = Array.isArray(allowedBranches)
       ? allowedBranches.map(b => b.trim()).filter(Boolean)
       : (allowedBranches ? String(allowedBranches).split(',').map(b => b.trim()).filter(Boolean) : []);
+      
+    const courses = Array.isArray(allowedCourses)
+      ? allowedCourses.map(c => c.trim()).filter(Boolean)
+      : (allowedCourses ? String(allowedCourses).split(',').map(c => c.trim()).filter(Boolean) : []);
 
     if (!memoryDb.isMongoConnected()) {
       const job = memoryDb.saveJob({
         collegeId: req.collegeId,
-        title: title.trim(),
-        role: (role || title).trim(),
-        company: company.trim(),
-        description: description.trim(),
+        institutionId: req.user?.institutionId || req.collegeId,
+        departmentId: req.user?.departmentId || req.collegeId,
+        title: jobTitle,
+        role: (role || jobTitle).trim(),
+        company: jobCompany,
+        description: jobDesc,
         department: (department || 'Engineering').trim(),
         location: (location || 'Flexible / Campus').trim(),
         ctc: (ctc || '').trim(),
@@ -136,7 +183,10 @@ exports.createJob = async (req, res) => {
         driveDate: driveDate ? new Date(driveDate) : undefined,
         minCgpa: parsedMinCgpa,
         allowedBranches: branches,
+        allowedCourses: courses,
         requiredSkills: (skills || []).map(s => s.trim().toLowerCase()).filter(Boolean),
+        targetBatch: finalBatch,
+        batch: finalBatch,
         status: (status || 'ACTIVE').toUpperCase()
       });
 
@@ -149,11 +199,13 @@ exports.createJob = async (req, res) => {
 
     const jd = new JobDescription({
       collegeId: req.collegeId,
-      title: title.trim(),
-      role: (role || title).trim(),
-      company: company.trim(),
-      description: description.trim(),
-      rawText: description,
+      institutionId: req.user?.institutionId || req.collegeId,
+      departmentId: req.user?.departmentId || req.collegeId,
+      title: jobTitle,
+      role: (role || jobTitle).trim(),
+      company: jobCompany,
+      description: jobDesc,
+      rawText: jobDesc,
       department: (department || 'Engineering').trim(),
       location: (location || 'Flexible / Campus').trim(),
       ctc: (ctc || '').trim(),
@@ -163,7 +215,10 @@ exports.createJob = async (req, res) => {
       driveDate: driveDate ? new Date(driveDate) : undefined,
       minCgpa: parsedMinCgpa,
       allowedBranches: branches,
+      allowedCourses: courses,
       requiredSkills: (skills || []).map(s => s.trim().toLowerCase()).filter(Boolean),
+      targetBatch: finalBatch,
+      batch: finalBatch,
       status: status ? status.toUpperCase() : 'ACTIVE'
     });
 
@@ -330,6 +385,11 @@ exports.updateJob = async (req, res) => {
         : String(allowedBranches).split(',').map(b => b.trim()).filter(Boolean);
     }
     if (status !== undefined) jd.status = status.toUpperCase();
+    if (req.body.targetBatch !== undefined || req.body.batch !== undefined) {
+      const b = String(req.body.targetBatch !== undefined ? req.body.targetBatch : req.body.batch || '').trim();
+      jd.targetBatch = b;
+      jd.batch = b;
+    }
 
     if (requiredSkills !== undefined && Array.isArray(requiredSkills)) {
       const newSkills = requiredSkills.map(s => s.trim().toLowerCase()).filter(Boolean);
@@ -388,7 +448,7 @@ exports.updateJob = async (req, res) => {
 
 /**
  * DELETE /api/admin/jobs/:id
- * Delete job and clean up its matches
+ * Delete job and clean up its matches and applications
  */
 exports.deleteJob = async (req, res) => {
   try {
@@ -411,6 +471,15 @@ exports.deleteJob = async (req, res) => {
       jdId: jd._id,
       collegeId: req.collegeId
     });
+
+    if (Application && typeof Application.deleteMany === 'function') {
+      try {
+        await Application.deleteMany({
+          jobId: jd._id,
+          collegeId: req.collegeId
+        });
+      } catch (_) {}
+    }
 
     await AuditLog.create({
       collegeId: req.collegeId,
@@ -442,6 +511,7 @@ exports.getJobMatches = async (req, res) => {
       if (!job) return res.status(404).json({ message: 'Job not found' });
       const students = memoryDb.getStudents(req.collegeId);
       const ranked = students
+        .filter(s => checkJobEligibility(s, job).length === 0)
         .map(s => {
           const result = calculateMatch(s.skills || [], job.requiredSkills || []);
           return {
@@ -478,11 +548,11 @@ exports.getJobMatches = async (req, res) => {
       score: { $gte: parseInt(minScore, 10) || 0 }
     })
       .sort({ score: -1 })
-      .populate('studentId', 'name rollNo usn email branch batch cgpa placementStatus readinessScore skills')
+      .populate('studentId', 'name rollNo usn email branch course batch passingYear cgpa placementStatus readinessScore skills applicationEligibilityStatus isDebarred accountStatus')
       .lean();
 
     const ranked = matches
-      .filter(m => m.studentId)
+      .filter(m => m.studentId && checkJobEligibility(m.studentId, jd).length === 0)
       .map((m, idx) => ({
         rank: idx + 1,
         student: m.studentId,
@@ -698,6 +768,7 @@ exports.exportJobMatchedCSV = async (req, res) => {
 
       const students = memoryDb.getStudents(req.collegeId);
       const ranked = students
+        .filter(s => checkJobEligibility(s, job).length === 0)
         .map(s => {
           const result = calculateMatch(s.skills || [], job.requiredSkills || []);
           return {
@@ -745,10 +816,10 @@ exports.exportJobMatchedCSV = async (req, res) => {
       collegeId: req.collegeId
     })
       .sort({ score: -1 })
-      .populate('studentId', 'name rollNo usn email branch batch cgpa placementStatus readinessScore skills')
+      .populate('studentId', 'name rollNo usn email branch course batch passingYear cgpa placementStatus readinessScore skills applicationEligibilityStatus isDebarred accountStatus')
       .lean();
 
-    const validMatches = matches.filter(m => m.studentId);
+    const validMatches = matches.filter(m => m.studentId && checkJobEligibility(m.studentId, jd).length === 0);
 
     const headers = ['Student Name', 'Email', 'Roll Number', 'USN', 'Branch', 'Batch', 'CGPA', 'Match Score', 'Matched Skills', 'Missing Skills'];
     const rows = validMatches.map(m => {
@@ -1046,3 +1117,11 @@ exports.updateApplicationStatus = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error updating application status' });
   }
 };
+
+// Aliases for consistent candidate exports
+exports.exportMatchedCandidatesCSV = exports.exportJobMatchedCSV;
+exports.exportAppliedCandidatesCSV = exports.exportJobApplicationsCSV;
+exports.exportJobCandidatesCSV = exports.exportJobMatchedCSV;
+exports.exportJobApplicantsCSV = exports.exportJobApplicationsCSV;
+exports.exportJobMatchesCSV = exports.exportJobMatchedCSV;
+

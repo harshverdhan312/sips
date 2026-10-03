@@ -23,7 +23,7 @@ import { DashboardSkeleton } from "../../components/common/LoadingSkeleton";
 import Avatar from "../../components/common/Avatar";
 import { useNotifications } from "../../context/NotificationContext";
 import { useAuth } from "../../context/AuthContext";
-import { adminService } from "../../services/adminService";
+import { institutionService } from "../../services/institutionService";
 
 export function CollegeProfilePage() {
   const { addToast } = useNotifications();
@@ -56,22 +56,23 @@ export function CollegeProfilePage() {
     async function loadProfile() {
       setLoading(true);
       try {
-        const college = await adminService.getCollegeProfile();
+        const res = await institutionService.getProfile();
+        const college = res.institution || res;
         if (college) {
           setOriginalProfile(college);
           setFormData({
             name: college.name || "",
             slug: college.slug || "",
-            adminEmail: college.adminEmail || "",
+            adminEmail: college.officialEmail || college.adminEmail || "",
             logoUrl: college.logoUrl || null,
             code: college.code || "",
             address: college.address || "",
             city: college.city || "",
             state: college.state || "",
             website: college.website || "",
-            contactEmail: college.contactEmail || "",
-            contactPhone: college.contactPhone || "",
-            establishedYear: college.establishedYear ? String(college.establishedYear) : "",
+            contactEmail: college.officialEmail || "",
+            contactPhone: college.phone || "",
+            establishedYear: "",
             acceptedDomains: Array.isArray(college.acceptedDomains) ? college.acceptedDomains.join(", ") : ""
           });
         }
@@ -132,16 +133,16 @@ export function CollegeProfilePage() {
     setFormData({
       name: originalProfile.name || "",
       slug: originalProfile.slug || "",
-      adminEmail: originalProfile.adminEmail || "",
+      adminEmail: originalProfile.officialEmail || "",
       logoUrl: originalProfile.logoUrl || null,
       code: originalProfile.code || "",
       address: originalProfile.address || "",
       city: originalProfile.city || "",
       state: originalProfile.state || "",
       website: originalProfile.website || "",
-      contactEmail: originalProfile.contactEmail || "",
-      contactPhone: originalProfile.contactPhone || "",
-      establishedYear: originalProfile.establishedYear ? String(originalProfile.establishedYear) : "",
+      contactEmail: originalProfile.officialEmail || "",
+      contactPhone: originalProfile.phone || "",
+      establishedYear: "",
       acceptedDomains: Array.isArray(originalProfile.acceptedDomains) ? originalProfile.acceptedDomains.join(", ") : ""
     });
     setErrors({});
@@ -168,20 +169,20 @@ export function CollegeProfilePage() {
         city: formData.city.trim(),
         state: formData.state.trim(),
         website: formData.website.trim(),
-        contactEmail: formData.contactEmail.trim(),
-        contactPhone: formData.contactPhone.trim(),
-        establishedYear: formData.establishedYear ? parseInt(formData.establishedYear, 10) : null
+        officialEmail: formData.contactEmail.trim() || formData.adminEmail.trim(),
+        phone: formData.contactPhone.trim()
       };
 
       if (domainsList && domainsList.length > 0) {
         payload.acceptedDomains = domainsList;
       }
 
-      const updated = await adminService.updateCollegeProfile(payload);
+      const res = await institutionService.updateProfile(payload);
+      const updated = res.institution || res;
       setOriginalProfile(updated);
       updateUser({
-        collegeName: updated.name,
-        name: user?.backendRole === "COLLEGE_ADMIN" ? `${updated.name} Placement Cell` : user?.name,
+        institutionName: updated.name,
+        name: user?.backendRole === "MAIN_UNIVERSITY_ADMIN" ? `${updated.name} Admin` : user?.name,
         avatar: updated.logoUrl,
         logoUrl: updated.logoUrl
       });
@@ -211,8 +212,9 @@ export function CollegeProfilePage() {
 
     setUploadingLogo(true);
     try {
-      const res = await adminService.uploadCollegeLogo(file);
-      setFormData((prev) => ({ ...prev, logoUrl: res.logoUrl }));
+      const res = await institutionService.uploadLogo(file);
+      const newLogoUrl = res.logoUrl || res.data?.logoUrl;
+      setFormData((prev) => ({ ...prev, logoUrl: newLogoUrl }));
       if (originalProfile) {
         setOriginalProfile((prev) => ({ ...prev, logoUrl: res.logoUrl }));
       }
@@ -233,7 +235,7 @@ export function CollegeProfilePage() {
   const handleLogoDelete = async () => {
     setUploadingLogo(true);
     try {
-      await adminService.deleteCollegeLogo();
+      await institutionService.deleteLogo();
       setFormData((prev) => ({ ...prev, logoUrl: null }));
       if (originalProfile) {
         setOriginalProfile((prev) => ({ ...prev, logoUrl: null }));
