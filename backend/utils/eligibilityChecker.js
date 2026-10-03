@@ -34,9 +34,12 @@ function checkJobEligibility(student, job) {
       const bTrimmed = b.trim();
       const bLower = bTrimmed.toLowerCase();
 
-      const normalize = (str) => (str || '').replace(/[\.\-\s]/g, '').toLowerCase();
-      // Strict exact branch match (case-insensitive and robust)
-      if (normalize(b) === normalize(studentBranch)) return true;
+      // Normalize by removing spaces and punctuation for robust comparison
+      const bNormalized = bLower.replace(/[\.\-\s]/g, '');
+      const sNormalized = studentBranchLower.replace(/[\.\-\s]/g, '');
+
+      // Strict exact branch match (normalized)
+      if (bNormalized === sNormalized) return true;
 
       // Handle "__NONE__" special edge case for deselecting all branches
       if (bTrimmed === '__NONE__') return false;
@@ -61,9 +64,11 @@ function checkJobEligibility(student, job) {
       if (!c || typeof c !== 'string') return false;
       const cLower = c.trim().toLowerCase();
       
-      const normalize = (str) => (str || '').replace(/[\.\-\s]/g, '').toLowerCase();
-      // Strict exact course match (case-insensitive and robust)
-      if (normalize(c) === normalize(studentCourse)) return true;
+      const cNormalized = cLower.replace(/[\.\-\s]/g, '');
+      const sNormalized = studentCourse.replace(/[\.\-\s]/g, '');
+
+      // Strict exact course match (normalized)
+      if (cNormalized === sNormalized) return true;
       
       return false;
     });
