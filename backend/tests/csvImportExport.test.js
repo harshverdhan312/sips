@@ -92,8 +92,8 @@ Diya Patel, 1RV21CS002, diya@college.edu, Information Science, 2025, 9.1, "Java,
       };
       Student.mockImplementation(() => mockSavedStudent);
 
-      const csv = `Name, Roll No, Email
-Rohan Roy, CS301, rohan@college.edu`;
+      const csv = `Name, Roll No, Email, Course, Branch, Batch
+Rohan Roy, CS301, rohan@college.edu, B.Tech, CSE, 2025`;
 
       const req = createMockReq({ body: { csvText: csv } });
       const res = createMockRes();
@@ -139,12 +139,12 @@ Rohan Roy, CS301, rohan@college.edu`;
       };
       Student.mockImplementation(() => mockSavedStudent);
 
-      const csv = `Name, Roll No, Email, CGPA, Skills
-Existing Student, CS100, existing@college.edu, 8.0, "React, Node"
-Valid Student, CS101, valid@college.edu, 9.0, "Python, SQL"
-Bad Email, CS102, not-an-email, 7.5, "Go"
-Batch Duplicate, CS101, valid@college.edu, 9.0, "Python"
-Bad CGPA, CS103, badcgpa@college.edu, 15.0, "C++"`;
+      const csv = `Name, Roll No, Email, Course, Branch, Batch, CGPA, Skills
+Existing Student, CS100, existing@college.edu, B.Tech, CSE, 2025, 8.0, "React, Node"
+Valid Student, CS101, valid@college.edu, B.Tech, CSE, 2025, 9.0, "Python, SQL"
+Bad Email, CS102, not-an-email, B.Tech, CSE, 2025, 7.5, "Go"
+Batch Duplicate, CS101, valid@college.edu, B.Tech, CSE, 2025, 9.0, "Python"
+Bad CGPA, CS103, badcgpa@college.edu, B.Tech, CSE, 2025, 15.0, "C++"`;
 
       const req = createMockReq({ body: { csvData: csv } });
       const res = createMockRes();
@@ -175,8 +175,8 @@ Bad CGPA, CS103, badcgpa@college.edu, 15.0, "C++"`;
       };
       Student.mockImplementation(() => mockSavedStudent);
 
-      const csv = `Name, Roll No, Email
-Cross College Student, CS500, cross@college.edu`;
+      const csv = `Name, Roll No, Email, Course, Branch, Batch
+Cross College Student, CS500, cross@college.edu, B.Tech, CSE, 2025`;
 
       const req = createMockReq({ body: { csvData: csv } });
       const res = createMockRes();

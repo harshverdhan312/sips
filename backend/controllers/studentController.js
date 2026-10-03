@@ -359,6 +359,11 @@ exports.updateProfile = async (req, res) => {
       if (sanitizedHostel !== undefined) updates.hostel = sanitizedHostel;
       if (sanitizedHistoryOfBacklogs !== undefined) updates.historyOfBacklogs = sanitizedHistoryOfBacklogs;
       if (sanitizedCgpa !== undefined) updates.cgpa = sanitizedCgpa;
+      if (sanitizedBatch !== undefined) {
+        updates.batch = sanitizedBatch;
+        updates.passingYear = sanitizedBatch;
+      }
+      if (sanitizedBranch !== undefined) updates.branch = sanitizedBranch;
       if (pwd) {
         const salt = await bcrypt.genSalt(10);
         updates.passwordHash = await bcrypt.hash(pwd.trim(), salt);
@@ -413,6 +418,13 @@ exports.updateProfile = async (req, res) => {
     }
     if (sanitizedCgpa !== undefined) {
       student.cgpa = sanitizedCgpa;
+    }
+    if (sanitizedBatch !== undefined) {
+      student.batch = sanitizedBatch;
+      student.passingYear = sanitizedBatch;
+    }
+    if (sanitizedBranch !== undefined) {
+      student.branch = sanitizedBranch;
     }
     if (pwd) {
       const salt = await bcrypt.genSalt(10);
