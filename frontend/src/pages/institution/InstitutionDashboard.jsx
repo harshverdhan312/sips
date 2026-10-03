@@ -74,15 +74,7 @@ export function InstitutionDashboard() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={loadData}
-              icon={RefreshCw}
-              className="text-white border-white/20 hover:bg-white/10"
-            >
-              Refresh
-            </Button>
+
             <Button
               variant="primary"
               size="sm"
