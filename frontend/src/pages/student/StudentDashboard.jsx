@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   TrendingUp,
@@ -14,7 +14,8 @@ import {
   Building2,
   Briefcase,
   UploadCloud,
-  Layers
+  Layers,
+  RefreshCw
 } from "lucide-react";
 import { studentService } from "../../services/studentService";
 import { StatCard } from "../../components/common/StatCard";
@@ -24,13 +25,18 @@ import { Badge } from "../../components/common/Badge";
 import { ProbabilityGauge } from "../../components/charts/ProbabilityGauge";
 import { RadarSkillChart } from "../../components/charts/RadarSkillChart";
 import { DashboardSkeleton } from "../../components/common/LoadingSkeleton";
+import { useNotifications } from "../../context/NotificationContext";
 
 export function StudentDashboard() {
   const navigate = useNavigate();
+  const { showSuccess, showError } = useNotifications();
+  const fileInputRef = useRef(null);
+  
   const [student, setStudent] = useState(null);
   const [radarData, setRadarData] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [uploadingResume, setUploadingResume] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -52,6 +58,34 @@ export function StudentDashboard() {
     }
     loadData();
   }, []);
+
+  const handleResumeUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+      showError("Please upload a valid PDF resume.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showError("File size exceeds the allowed limit.");
+      return;
+    }
+
+    setUploadingResume(true);
+    try {
+      await studentService.uploadResume(file);
+      const updated = await studentService.getCurrentStudent();
+      setStudent(updated);
+      showSuccess("Resume uploaded successfully! Any detected skills have been added to your profile.");
+    } catch (err) {
+      console.error(err);
+      showError(err.message || "Failed to process the uploaded file.");
+    } finally {
+      setUploadingResume(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   if (loading || !student) {
     return <DashboardSkeleton />;
@@ -78,15 +112,7 @@ export function StudentDashboard() {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <Button
-              variant="outline"
-              size="md"
-              icon={FileText}
-              className="bg-white/10 text-white border-white/20 hover:bg-white/20 shadow-none"
-              onClick={() => navigate("/student/profile")}
-            >
-              {student.resumeUrl ? "View Resume" : "Upload Resume"}
-            </Button>
+
             <Button
               variant="primary"
               size="md"
@@ -101,6 +127,15 @@ export function StudentDashboard() {
 
         {/* Decorative background shape */}
         <div className="absolute right-0 top-0 -bottom-10 w-96 bg-gradient-to-l from-indigo-500/20 to-transparent pointer-events-none" />
+        
+        {/* Hidden File Input for Resume Upload */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          className="hidden"
+          accept=".pdf,application/pdf"
+          onChange={handleResumeUpload}
+        />
       </div>
 
       {/* Main Metric Cards - Enlarged and spacious layout */}
@@ -244,9 +279,13 @@ export function StudentDashboard() {
               <Button
                 variant="primary"
                 size="xs"
-                onClick={() => navigate(student.resumeUrl ? "/student/profile" : "/student/resume")}
+                onClick={() => {
+                  if (student.resumeUrl) navigate("/student/profile");
+                  else fileInputRef.current?.click();
+                }}
+                disabled={uploadingResume}
               >
-                {student.resumeUrl ? "Add Skills in Profile" : "Upload Resume"}
+                {uploadingResume ? "Uploading..." : student.resumeUrl ? "Add Skills in Profile" : "Upload Resume"}
               </Button>
             </div>
           )}

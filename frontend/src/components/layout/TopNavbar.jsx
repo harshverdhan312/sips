@@ -11,7 +11,9 @@ import {
   GraduationCap,
   Building2,
   BarChart3,
-  LogOut
+  LogOut,
+  Layers,
+  LayoutDashboard
 } from "lucide-react";
 import Avatar from "../common/Avatar";
 import { useAuth } from "../../context/AuthContext";
@@ -67,10 +69,10 @@ export function TopNavbar({ onMenuClick }) {
       {/* Right items: Role Switcher, Notifications, Profile */}
       <div className="flex items-center gap-2 sm:gap-3">
         {/* Institutional Campus Badge */}
-        {user?.collegeName && (
+        {(user?.institutionName || user?.collegeName) && (
           <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-slate-100 rounded-xl text-xs font-semibold text-slate-700 border border-slate-200/60">
             <Building2 className="w-3.5 h-3.5 text-indigo-600" />
-            <span className="truncate max-w-[160px]">{user.collegeName}</span>
+            <span className="truncate max-w-[160px]">{user.institutionName || user.collegeName}</span>
           </div>
         )}
 
@@ -180,6 +182,40 @@ export function TopNavbar({ onMenuClick }) {
               </div>
 
               <div className="py-1">
+                {role === "university_admin" && (
+                  <>
+                    <button
+                      onClick={() => {
+                        navigate("/institution/dashboard");
+                        setProfileOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 cursor-pointer font-semibold text-indigo-600"
+                    >
+                      <LayoutDashboard className="w-4 h-4 text-indigo-600" />
+                      Dashboard Overview
+                    </button>
+                    <button
+                      onClick={() => {
+                        navigate("/institution/profile");
+                        setProfileOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 cursor-pointer font-semibold text-slate-700"
+                    >
+                      <Building2 className="w-4 h-4 text-slate-500" />
+                      University Profile
+                    </button>
+                    <button
+                      onClick={() => {
+                        navigate("/institution/departments");
+                        setProfileOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 cursor-pointer font-semibold text-slate-700"
+                    >
+                      <Layers className="w-4 h-4 text-slate-500" />
+                      Departments
+                    </button>
+                  </>
+                )}
                 {role === "student" && (
                   <button
                     onClick={() => {
