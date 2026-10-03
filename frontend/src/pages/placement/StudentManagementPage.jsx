@@ -1620,32 +1620,47 @@ export function StudentManagementPage() {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-3 p-3 bg-slate-50/80 border border-slate-200/80 rounded-xl">
               <div>
                 <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                  Department / Branch
+                  Degree Program / Course
                 </label>
                 <input
                   type="text"
                   disabled={savingStudent}
-                  placeholder="e.g. Computer Science & Engineering"
-                  value={newStudent.branch}
-                  onChange={(e) => setNewStudent({ ...newStudent, branch: e.target.value })}
+                  placeholder="e.g. B.Tech, M.Tech, BCA"
+                  value={newStudent.course}
+                  onChange={(e) => setNewStudent({ ...newStudent, course: e.target.value })}
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 />
               </div>
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                  Batch Year
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. 2026"
-                  disabled={savingStudent}
-                  value={newStudent.batch}
-                  onChange={(e) => setNewStudent({ ...newStudent, batch: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Department / Branch
+                  </label>
+                  <input
+                    type="text"
+                    disabled={savingStudent}
+                    placeholder="e.g. Computer Science & Engineering"
+                    value={newStudent.branch}
+                    onChange={(e) => setNewStudent({ ...newStudent, branch: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Batch Year
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 2026"
+                    disabled={savingStudent}
+                    value={newStudent.batch}
+                    onChange={(e) => setNewStudent({ ...newStudent, batch: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
               </div>
             </div>
           )}
