@@ -671,8 +671,13 @@ export function StudentProfilePage() {
       }
     } catch (err) {
       console.error("Placement prediction error:", err);
-      const errMsg = err?.data?.message || err?.message || "Failed to calculate placement prediction.";
-      showError(errMsg);
+      if (err?.data?.missingFields && Array.isArray(err.data.missingFields) && err.data.missingFields.length > 0) {
+        showError(`Missing required fields: ${err.data.missingFields.join(", ")}. Please update your profile.`);
+        setIsEditingPlacement(true);
+      } else {
+        const errMsg = err?.data?.message || err?.message || "Failed to calculate placement prediction.";
+        showError(errMsg);
+      }
     } finally {
       setCalculatingPrediction(false);
     }

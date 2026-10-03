@@ -74,7 +74,7 @@ const sanitizeErrorMessage = (msg, status) => {
   ];
   if (sensitivePatterns.some(pattern => lower.includes(pattern))) {
     if (status >= 500) {
-      return 'Something went wrong on the server. Please try again later.';
+      return 'An internal error occurred. Please try again later.';
     }
     return 'Invalid request. Please check your information.';
   }
@@ -171,12 +171,10 @@ async function request(endpoint, options = {}) {
       safeMsg = safeMsg || 'This information already exists.';
     } else if (response.status === 422) {
       safeMsg = safeMsg || 'Please check the entered information.';
-    } else if (response.status === 429) {
-      safeMsg = 'Too many requests. Please try again later.';
     } else if (response.status >= 502 && response.status <= 504) {
-      safeMsg = 'Server is currently unavailable. Please try again later.';
+      safeMsg = safeMsg || 'Server is currently unavailable. Please try again later.';
     } else if (response.status >= 500) {
-      safeMsg = 'Something went wrong on the server. Please try again later.';
+      safeMsg = safeMsg || 'Something went wrong on the server. Please try again later.';
     } else if (!safeMsg) {
       safeMsg = 'Request failed. Please try again.';
     }
