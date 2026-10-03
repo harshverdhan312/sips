@@ -327,6 +327,14 @@ export function StudentManagementPage() {
       newErrors.rollNo = "Roll No / USN is required.";
     }
 
+    if (!newStudent.course?.trim()) {
+      newErrors.course = "Course / Program is required.";
+    }
+
+    if (!newStudent.branch?.trim()) {
+      newErrors.branch = "Branch is required.";
+    }
+
     const cgpaVal = parseFloat(newStudent.cgpa);
     if (newStudent.cgpa !== "" && (isNaN(cgpaVal) || cgpaVal < 0 || cgpaVal > 10)) {
       newErrors.cgpa = "CGPA must be between 0 and 10.";
@@ -1623,16 +1631,59 @@ export function StudentManagementPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                  Department / Branch
+                  Department / Course
                 </label>
                 <input
                   type="text"
                   disabled={savingStudent}
-                  placeholder="e.g. Computer Science & Engineering"
-                  value={newStudent.branch}
-                  onChange={(e) => setNewStudent({ ...newStudent, branch: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  placeholder="e.g. B.Tech, M.Tech, BCA"
+                  value={newStudent.course}
+                  onChange={(e) => {
+                    setNewStudent({ ...newStudent, course: e.target.value });
+                    if (addStudentErrors.course || addStudentErrors.general) {
+                      setAddStudentErrors((prev) => ({ ...prev, course: "", general: "" }));
+                    }
+                  }}
+                  className={`w-full px-3 py-2 rounded-xl border text-xs font-medium focus:outline-none focus:ring-2 ${
+                    addStudentErrors.course
+                      ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                      : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                  }`}
                 />
+                {addStudentErrors.course && (
+                  <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    {addStudentErrors.course}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                  Branch
+                </label>
+                <input
+                  type="text"
+                  disabled={savingStudent}
+                  placeholder="e.g. Computer Science"
+                  value={newStudent.branch}
+                  onChange={(e) => {
+                    setNewStudent({ ...newStudent, branch: e.target.value });
+                    if (addStudentErrors.branch || addStudentErrors.general) {
+                      setAddStudentErrors((prev) => ({ ...prev, branch: "", general: "" }));
+                    }
+                  }}
+                  className={`w-full px-3 py-2 rounded-xl border text-xs font-medium focus:outline-none focus:ring-2 ${
+                    addStudentErrors.branch
+                      ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                      : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                  }`}
+                />
+                {addStudentErrors.branch && (
+                  <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    {addStudentErrors.branch}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
