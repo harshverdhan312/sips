@@ -19,11 +19,11 @@ const computeJobStats = async (collegeId, jd) => {
     query.cgpa = { $gte: jd.minCgpa };
   }
   if (jd.allowedBranches && jd.allowedBranches.length > 0) {
-    const branchRegexes = jd.allowedBranches.map(b => new RegExp(b.trim(), 'i'));
+    const branchRegexes = jd.allowedBranches.map(b => new RegExp(`^${b.trim()}$`, 'i'));
     query.branch = { $in: branchRegexes };
   }
   if (jd.allowedCourses && jd.allowedCourses.length > 0) {
-    const courseRegexes = jd.allowedCourses.map(c => new RegExp(c.trim(), 'i'));
+    const courseRegexes = jd.allowedCourses.map(c => new RegExp(`^${c.trim()}$`, 'i'));
     query.course = { $in: courseRegexes };
   }
   const jobBatch = (jd.targetBatch || jd.batch || '').toString().trim();
