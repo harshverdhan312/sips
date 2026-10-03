@@ -4,6 +4,7 @@
  * Supported restrictions on JobDescription:
  * - minCgpa (Number)
  * - allowedBranches (Array of String)
+ * - allowedCourses (Array of String)
  * - status (Must be ACTIVE)
  * - deadline (Date must not be past)
  * - collegeId (Must match student's college)
@@ -18,71 +19,90 @@ function checkJobEligibility(student, job) {
 
   // 1. Minimum CGPA check
   if (typeof job.minCgpa === 'number' && job.minCgpa > 0) {
-    const studentCgpa = typeof student.cgpa === 'number' ? student.cgpa : 0;
-    if (studentCgpa < job.minCgpa) {
-      reasons.push(`Minimum CGPA required: ${job.minCgpa}. Your CGPA: ${studentCgpa}`);
+    if (typeof student.cgpa !== 'number') {
+      reasons.push(`Minimum CGPA required is ${job.minCgpa}, but your CGPA is missing from your profile.`);
+    } else if (student.cgpa < job.minCgpa) {
+      reasons.push(`Minimum CGPA required is ${job.minCgpa}. Your CGPA is ${student.cgpa}.`);
     }
   }
 
-  // 2. Allowed Branches check
-  if (Array.isArray(job.allowedBranches) && job.allowedBranches.length > 0) {
+  // 2. Allowed Courses check
+  const hasCourseRestriction = Array.isArray(job.allowedCourses) && job.allowedCourses.length > 0 &&
+    !job.allowedCourses.some(c => !c || c.trim().toLowerCase() === 'all' || c.trim().toLowerCase() === 'any');
+
+  if (hasCourseRestriction) {
+    const studentCourse = (student.course || '').trim();
+    if (!studentCourse) {
+      reasons.push('Course information is missing from your profile.');
+    } else {
+      const studentCourseLower = studentCourse.toLowerCase();
+      const isCourseAllowed = job.allowedCourses.some((c) => {
+        if (!c || typeof c !== 'string') return false;
+        const cLower = c.trim().toLowerCase();
+        
+        const cNormalized = cLower.replace(/[\.\-\s]/g, '');
+        const sNormalized = studentCourseLower.replace(/[\.\-\s]/g, '');
+
+        if (cNormalized === sNormalized) return true;
+        return false;
+      });
+
+      if (!isCourseAllowed) {
+        if (job.allowedCourses.length === 1) {
+          reasons.push(`Allowed course: ${job.allowedCourses[0]}`);
+        } else {
+          reasons.push(`Allowed courses: ${job.allowedCourses.join(', ')}`);
+        }
+      }
+    }
+  }
+
+  // 3. Allowed Branches check
+  const hasBranchRestriction = Array.isArray(job.allowedBranches) && job.allowedBranches.length > 0 &&
+    !job.allowedBranches.some(b => !b || b.trim().toLowerCase() === 'all' || b.trim().toLowerCase() === 'any' || b.trim() === '__NONE__');
+
+  if (hasBranchRestriction) {
     const studentBranch = (student.branch || '').trim();
-    const studentBranchLower = studentBranch.toLowerCase();
+    if (!studentBranch) {
+      reasons.push('Branch information is missing from your profile.');
+    } else {
+      const studentBranchLower = studentBranch.toLowerCase();
 
-    const isBranchAllowed = job.allowedBranches.some((b) => {
-      if (!b || typeof b !== 'string') return false;
-      const bTrimmed = b.trim();
-      const bLower = bTrimmed.toLowerCase();
+      const isBranchAllowed = job.allowedBranches.some((b) => {
+        if (!b || typeof b !== 'string') return false;
+        const bTrimmed = b.trim();
+        const bLower = bTrimmed.toLowerCase();
 
-      // Normalize by removing spaces and punctuation for robust comparison
-      const bNormalized = bLower.replace(/[\.\-\s]/g, '');
-      const sNormalized = studentBranchLower.replace(/[\.\-\s]/g, '');
+        const bNormalized = bLower.replace(/[\.\-\s]/g, '');
+        const sNormalized = studentBranchLower.replace(/[\.\-\s]/g, '');
 
-      // Strict exact branch match (normalized)
-      if (bNormalized === sNormalized) return true;
+        if (bNormalized === sNormalized) return true;
+        return false;
+      });
 
-      // Handle "__NONE__" special edge case for deselecting all branches
-      if (bTrimmed === '__NONE__') return false;
-
-      return false;
-    });
-
-    if (!isBranchAllowed) {
-      if (job.allowedBranches.length === 1) {
-        reasons.push(`Allowed branch: ${job.allowedBranches[0]}`);
-      } else {
-        reasons.push(`Allowed branches: ${job.allowedBranches.join(', ')}`);
+      if (!isBranchAllowed) {
+        if (job.allowedBranches.length === 1) {
+          reasons.push(`Allowed branch: ${job.allowedBranches[0]}`);
+        } else {
+          reasons.push(`Allowed branches: ${job.allowedBranches.join(', ')}`);
+        }
       }
     }
   }
 
-  // 2.5 Allowed Courses check
-  if (Array.isArray(job.allowedCourses) && job.allowedCourses.length > 0) {
-    const studentCourse = (student.course || '').trim().toLowerCase();
-    
-    const isCourseAllowed = job.allowedCourses.some((c) => {
-      if (!c || typeof c !== 'string') return false;
-      const cLower = c.trim().toLowerCase();
-      
-      const cNormalized = cLower.replace(/[\.\-\s]/g, '');
-      const sNormalized = studentCourse.replace(/[\.\-\s]/g, '');
-
-      // Strict exact course match (normalized)
-      if (cNormalized === sNormalized) return true;
-      
-      return false;
-    });
-
-    if (!isCourseAllowed) {
-      if (job.allowedCourses.length === 1) {
-        reasons.push(`Allowed course: ${job.allowedCourses[0]}`);
-      } else {
-        reasons.push(`Allowed courses: ${job.allowedCourses.join(', ')}`);
-      }
+  // 4. Target batch / Passing year check
+  const jobBatch = (job.targetBatch || job.batch || '').toString().trim();
+  
+  if (jobBatch && jobBatch.toLowerCase() !== 'all' && jobBatch.toLowerCase() !== 'any') {
+    const studentBatch = (student.batch || student.passingYear || '').toString().trim();
+    if (!studentBatch) {
+      reasons.push(`This placement drive is available only to the ${jobBatch} batch. Your batch information is missing.`);
+    } else if (jobBatch !== studentBatch) {
+      reasons.push(`This placement drive is available only to the ${jobBatch} batch. (Your batch: ${studentBatch})`);
     }
   }
 
-  // 3. Deadline check (the application date must not be passed)
+  // 5. Deadline check (the application date must not be passed)
   if (job.deadline) {
     const deadlineDate = new Date(job.deadline);
     if (!isNaN(deadlineDate.getTime())) {
@@ -97,27 +117,20 @@ function checkJobEligibility(student, job) {
     }
   }
 
-  // 4. Job status check (Must be ACTIVE)
+  // 6. Job status check (Must be ACTIVE)
   if (job.status && job.status.toUpperCase() === 'CLOSED') {
     reasons.push('This job posting is closed');
   } else if (job.status && job.status.toUpperCase() !== 'ACTIVE') {
     reasons.push(`This job posting is not active (status: ${job.status})`);
   }
 
-  // 5. Debarment check
+  // 7. Debarment check
   if (
     student.applicationEligibilityStatus === 'DEBARRED' ||
     student.isDebarred === true ||
     (student.accountStatus && String(student.accountStatus).toUpperCase() === 'DEBARRED')
   ) {
     reasons.push('You are debarred from applying to placement drives');
-  }
-
-  // 6. Target batch / Passing year check
-  const jobBatch = (job.targetBatch || job.batch || '').toString().trim();
-  const studentBatch = (student.batch || student.passingYear || '').toString().trim();
-  if (jobBatch && studentBatch && jobBatch !== studentBatch) {
-    reasons.push(`This placement drive is available only to the ${jobBatch} batch.`);
   }
 
   return reasons;

@@ -135,7 +135,9 @@ describe('Placement Admin Student Provisioning & Dual Login', () => {
       const req = createMockReq({
         name: 'Rohan Deshmukh',
         email: 'rohan@rvce.edu',
-        rollNo: '1RV21CS088'
+        rollNo: '1RV21CS088',
+        branch: 'Computer Science & Engineering',
+        batch: '2025'
       });
       const res = createMockRes();
 

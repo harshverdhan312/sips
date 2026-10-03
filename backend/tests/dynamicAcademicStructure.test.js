@@ -198,7 +198,8 @@ describe('Dynamic Academic Structure & Zero Initial Score Enforcement', () => {
         rollNo: '1RV21CS999',
         course: 'NonExistentDegree',
         branch: 'Computer Science',
-        section: 'A'
+        section: 'A',
+        batch: '2025'
       });
       const res = createMockRes();
 
