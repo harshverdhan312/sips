@@ -20,7 +20,8 @@ import {
   Shield,
   FileCode2,
   Award,
-  Briefcase
+  Briefcase,
+  BarChart3
 } from "lucide-react";
 import { practiceService } from "../../services/practiceService";
 import { placementService } from "../../services/placementService";
@@ -427,14 +428,27 @@ export function AssessmentListPage() {
 
                     {/* Actions */}
                     <td className="px-5 py-4 align-middle text-right">
-                      <Button
-                        variant={a.status === "DRAFT" ? "primary" : "outline"}
-                        size="sm"
-                        onClick={() => navigate(`${basePath}/assessments/${a.id}`)}
-                        className="text-xs"
-                      >
-                        {a.status === "DRAFT" ? "Open Builder" : "Inspect"}
-                      </Button>
+                      <div className="flex items-center justify-end gap-2">
+                        {a.status === "PUBLISHED" && (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => navigate(`${basePath}/assessments/${a.id}/results`)}
+                            className="text-xs flex items-center gap-1.5"
+                          >
+                            <BarChart3 className="w-3.5 h-3.5" />
+                            <span>Results</span>
+                          </Button>
+                        )}
+                        <Button
+                          variant={a.status === "DRAFT" ? "primary" : "outline"}
+                          size="sm"
+                          onClick={() => navigate(`${basePath}/assessments/${a.id}`)}
+                          className="text-xs"
+                        >
+                          {a.status === "DRAFT" ? "Open Builder" : "Inspect"}
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))}

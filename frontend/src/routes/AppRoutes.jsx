@@ -56,6 +56,7 @@ import { QuestionListPage } from "../pages/admin/QuestionListPage";
 import { QuestionDetailsPage } from "../pages/admin/QuestionDetailsPage";
 import { AssessmentListPage } from "../pages/admin/AssessmentListPage";
 import { AssessmentBuilderPage } from "../pages/admin/AssessmentBuilderPage";
+import { AssessmentResultsPage } from "../pages/admin/AssessmentResultsPage";
 
 export function AppRoutes() {
   const { role, isAuthenticated } = useAuth();
@@ -124,6 +125,7 @@ export function AppRoutes() {
           <Route path="/placement/dashboard" element={<PlacementDashboard />} />
           <Route path="/placement/assessments" element={<AssessmentListPage />} />
           <Route path="/placement/assessments/:assessmentId" element={<AssessmentBuilderPage />} />
+          <Route path="/placement/assessments/:assessmentId/results" element={<AssessmentResultsPage />} />
           <Route path="/placement/questions" element={<QuestionListPage />} />
           <Route path="/placement/questions/:questionId" element={<QuestionDetailsPage />} />
           <Route path="/placement/students" element={<StudentManagementPage />} />
@@ -142,6 +144,7 @@ export function AppRoutes() {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/assessments" element={<AssessmentListPage />} />
           <Route path="/admin/assessments/:assessmentId" element={<AssessmentBuilderPage />} />
+          <Route path="/admin/assessments/:assessmentId/results" element={<AssessmentResultsPage />} />
           <Route path="/admin/questions" element={<QuestionListPage />} />
           <Route path="/admin/questions/:questionId" element={<QuestionDetailsPage />} />
           <Route path="/admin/users" element={<AdminUserManagementPage />} />

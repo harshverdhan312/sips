@@ -30,6 +30,10 @@ router.post('/assessments/:assessmentId/associate-drive', adminAssessmentControl
 router.delete('/assessments/:assessmentId/associate-drive', adminAssessmentController.disassociateDrive);
 router.post('/assessments/:assessmentId/disassociate-drive', adminAssessmentController.disassociateDrive);
 
+// Assessment Candidate Results & Submissions
+router.get('/assessments/:assessmentId/results', adminAssessmentController.getAssessmentResults);
+router.get('/assessments/:assessmentId/results/:attemptId', adminAssessmentController.getCandidateDetail);
+
 module.exports = router;
 
 

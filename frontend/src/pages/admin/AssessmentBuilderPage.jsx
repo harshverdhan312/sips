@@ -21,7 +21,8 @@ import {
   Check,
   ChevronRight,
   Sparkles,
-  Briefcase
+  Briefcase,
+  BarChart3
 } from "lucide-react";
 import { practiceService } from "../../services/practiceService";
 import { placementService } from "../../services/placementService";
@@ -378,9 +379,20 @@ export function AssessmentBuilderPage() {
           )}
 
           {isPublished && (
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
-              <Lock className="w-3.5 h-3.5" />
-              <span>Published & Locked (Immutable)</span>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => navigate(`${basePath}/assessments/${assessment.id}/results`)}
+                className="flex items-center gap-1.5 shadow-sm"
+              >
+                <BarChart3 className="w-4 h-4" />
+                <span>Candidate Results</span>
+              </Button>
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
+                <Lock className="w-3.5 h-3.5" />
+                <span>Published & Locked</span>
+              </div>
             </div>
           )}
         </div>

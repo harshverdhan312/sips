@@ -144,6 +144,42 @@ async function disassociateDrive(req, res, next) {
   }
 }
 
+/**
+ * GET /api/admin/assessments/:assessmentId/results
+ * Aggregated candidate results and leaderboard
+ */
+async function getAssessmentResults(req, res, next) {
+  try {
+    const { assessmentId } = req.params;
+    const result = await assessmentService.getAssessmentResults(assessmentId, req.query, req.user);
+    return res.status(200).json({
+      success: true,
+      message: 'Assessment results retrieved successfully',
+      data: result
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * GET /api/admin/assessments/:assessmentId/results/:attemptId
+ * Detailed candidate attempt scorecard & answers
+ */
+async function getCandidateDetail(req, res, next) {
+  try {
+    const { assessmentId, attemptId } = req.params;
+    const result = await assessmentService.getAssessmentCandidateDetail(assessmentId, attemptId, req.user);
+    return res.status(200).json({
+      success: true,
+      message: 'Candidate attempt details retrieved successfully',
+      data: result
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   createAssessment,
   getAssessments,
@@ -154,5 +190,7 @@ module.exports = {
   removeQuestion,
   reorderQuestions,
   publishAssessment,
-  archiveAssessment
+  archiveAssessment,
+  getAssessmentResults,
+  getCandidateDetail
 };

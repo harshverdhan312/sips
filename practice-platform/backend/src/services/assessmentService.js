@@ -783,6 +783,286 @@ async function getAssessmentByDriveId(driveId, user = {}) {
   };
 }
 
+/**
+ * Get aggregated candidate results and leaderboard for an assessment (Admin/Placement)
+ */
+async function getAssessmentResults(assessmentId, query = {}, user = {}) {
+  const assessment = await prisma.assessment.findUnique({
+    where: { id: assessmentId },
+    select: { id: true, title: true, type: true, status: true, collegeId: true, durationMinutes: true, totalMarks: true }
+  });
+
+  if (!assessment) {
+    throw new AppError('Assessment not found', 404);
+  }
+
+  checkAssessmentCollegeAccess(assessment, user);
+
+  const {
+    page = 1,
+    limit = 20,
+    search = '',
+    status = 'ALL'
+  } = query;
+
+  const pageNum = Math.max(1, parseInt(page, 10) || 1);
+  const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
+  const skip = (pageNum - 1) * limitNum;
+
+  const where = {
+    assessmentId: assessment.id
+  };
+
+  const isSuper = ALLOWED_SUPER_ROLES.includes((user.role || '').toUpperCase()) && !user.collegeId;
+  if (!isSuper && user.collegeId) {
+    where.collegeId = user.collegeId;
+  }
+
+  if (status && status !== 'ALL') {
+    where.status = status;
+  }
+
+  if (search && search.trim()) {
+    where.studentId = { contains: search.trim(), mode: 'insensitive' };
+  }
+
+  // Fetch all attempts matching assessment to compute aggregate stats
+  const allAttempts = await prisma.assessmentAttempt.findMany({
+    where: {
+      assessmentId: assessment.id,
+      ...(!isSuper && user.collegeId ? { collegeId: user.collegeId } : {})
+    },
+    select: {
+      id: true,
+      status: true,
+      totalScore: true,
+      totalMarks: true
+    }
+  });
+
+  const totalAttempts = allAttempts.length;
+  const submittedAttempts = allAttempts.filter(a => a.status === 'SUBMITTED' || a.status === 'FINALIZED');
+  const submittedCount = submittedAttempts.length;
+  const inProgressCount = allAttempts.filter(a => a.status === 'IN_PROGRESS').length;
+  const timedOutCount = allAttempts.filter(a => a.status === 'TIMED_OUT').length;
+
+  let averageScore = 0;
+  let highestScore = 0;
+  let passCount = 0;
+
+  if (submittedCount > 0) {
+    const scores = submittedAttempts.map(a => Number(a.totalScore || 0));
+    highestScore = Math.max(...scores);
+    const sum = scores.reduce((acc, s) => acc + s, 0);
+    averageScore = Math.round((sum / submittedCount) * 100) / 100;
+
+    const maxMarks = Number(assessment.totalMarks || 100);
+    passCount = submittedAttempts.filter(a => Number(a.totalScore || 0) >= (maxMarks * 0.5)).length;
+  }
+
+  const passRate = submittedCount > 0 ? Math.round((passCount / submittedCount) * 100) : 0;
+
+  // Paginated query for table
+  const [items, totalFiltered] = await Promise.all([
+    prisma.assessmentAttempt.findMany({
+      where,
+      orderBy: [
+        { totalScore: 'desc' },
+        { submittedAt: 'asc' },
+        { startedAt: 'asc' }
+      ],
+      skip,
+      take: limitNum
+    }),
+    prisma.assessmentAttempt.count({ where })
+  ]);
+
+  const candidates = items.map((att, idx) => {
+    const totalScoreNum = Number(att.totalScore || 0);
+    const totalMarksNum = Number(att.totalMarks || assessment.totalMarks || 0);
+    const pct = totalMarksNum > 0 ? Math.round((totalScoreNum / totalMarksNum) * 100) : 0;
+
+    return {
+      rank: skip + idx + 1,
+      attemptId: att.id,
+      studentId: att.studentId,
+      collegeId: att.collegeId,
+      status: att.status,
+      startedAt: att.startedAt,
+      submittedAt: att.submittedAt,
+      finalizedAt: att.finalizedAt,
+      aptitudeScore: Number(att.aptitudeScore || 0),
+      technicalScore: Number(att.technicalScore || 0),
+      codingScore: Number(att.codingScore || 0),
+      totalScore: totalScoreNum,
+      totalMarks: totalMarksNum,
+      percentage: pct
+    };
+  });
+
+  return {
+    assessment: {
+      id: assessment.id,
+      title: assessment.title,
+      type: assessment.type,
+      status: assessment.status,
+      durationMinutes: assessment.durationMinutes,
+      totalMarks: Number(assessment.totalMarks)
+    },
+    metrics: {
+      totalAttempts,
+      submittedCount,
+      inProgressCount,
+      timedOutCount,
+      averageScore,
+      highestScore,
+      passCount,
+      passRate
+    },
+    candidates,
+    pagination: {
+      page: pageNum,
+      limit: limitNum,
+      total: totalFiltered,
+      totalPages: Math.ceil(totalFiltered / limitNum) || 1
+    }
+  };
+}
+
+/**
+ * Get detailed scorecard for an individual student candidate attempt
+ */
+async function getAssessmentCandidateDetail(assessmentId, attemptId, user = {}) {
+  const assessment = await prisma.assessment.findUnique({
+    where: { id: assessmentId },
+    select: { id: true, title: true, collegeId: true, totalMarks: true }
+  });
+
+  if (!assessment) {
+    throw new AppError('Assessment not found', 404);
+  }
+
+  checkAssessmentCollegeAccess(assessment, user);
+
+  const attempt = await prisma.assessmentAttempt.findUnique({
+    where: { id: attemptId },
+    include: {
+      responses: {
+        include: {
+          questionVersion: {
+            include: {
+              question: true
+            }
+          }
+        }
+      },
+      submissions: {
+        include: {
+          questionVersion: {
+            include: {
+              question: true
+            }
+          }
+        },
+        orderBy: { createdAt: 'desc' }
+      }
+    }
+  });
+
+  if (!attempt || attempt.assessmentId !== assessmentId) {
+    throw new AppError('Candidate attempt not found for this assessment', 404);
+  }
+
+  // Also fetch full assessment questions to show any unanswered ones
+  const assessmentQuestions = await prisma.assessmentQuestion.findMany({
+    where: { assessmentId },
+    include: {
+      questionVersion: {
+        include: {
+          question: true,
+          codingProblem: {
+            include: {
+              testCases: true
+            }
+          }
+        }
+      }
+    },
+    orderBy: [
+      { section: 'asc' },
+      { order: 'asc' }
+    ]
+  });
+
+  const responseMap = new Map();
+  attempt.responses.forEach(r => responseMap.set(r.questionVersionId, r));
+
+  const submissionMap = new Map();
+  attempt.submissions.forEach(s => {
+    if (!submissionMap.has(s.questionVersionId)) {
+      submissionMap.set(s.questionVersionId, s);
+    }
+  });
+
+  const questionBreakdown = assessmentQuestions.map((aq, idx) => {
+    const qv = aq.questionVersion;
+    const q = qv.question;
+    const resp = responseMap.get(qv.id);
+    const sub = submissionMap.get(qv.id);
+
+    return {
+      order: aq.order || idx + 1,
+      section: aq.section,
+      marks: Number(aq.marks),
+      negativeMarks: Number(aq.negativeMarks),
+      questionId: q.id,
+      questionVersionId: qv.id,
+      title: qv.title,
+      statement: qv.statement,
+      type: q.type,
+      category: q.category,
+      subcategory: q.subcategory,
+      difficulty: q.difficulty,
+      options: qv.options,
+      correctAnswer: qv.correctAnswer,
+      explanation: qv.explanation,
+      // Candidate's specific attempt data
+      isAnswered: Boolean(resp || sub),
+      response: resp ? {
+        chosenOptionId: resp.chosenOptionId,
+        isCorrect: resp.isCorrect,
+        marksAwarded: Number(resp.marksAwarded || 0)
+      } : null,
+      submission: sub ? {
+        status: sub.status,
+        language: sub.language,
+        code: sub.code,
+        score: Number(sub.score || 0),
+        passedTestCases: sub.passedTestCases,
+        totalTestCases: sub.totalTestCases
+      } : null
+    };
+  });
+
+  return {
+    attempt: {
+      id: attempt.id,
+      studentId: attempt.studentId,
+      collegeId: attempt.collegeId,
+      status: attempt.status,
+      startedAt: attempt.startedAt,
+      submittedAt: attempt.submittedAt,
+      finalizedAt: attempt.finalizedAt,
+      aptitudeScore: Number(attempt.aptitudeScore),
+      technicalScore: Number(attempt.technicalScore),
+      codingScore: Number(attempt.codingScore),
+      totalScore: Number(attempt.totalScore),
+      totalMarks: Number(attempt.totalMarks)
+    },
+    questionBreakdown
+  };
+}
+
 module.exports = {
   createAssessment,
   getAssessments,
@@ -794,6 +1074,8 @@ module.exports = {
   reorderAssessmentQuestions,
   publishAssessment,
   archiveAssessment,
-  getAssessmentByDriveId
+  getAssessmentByDriveId,
+  getAssessmentResults,
+  getAssessmentCandidateDetail
 };
 

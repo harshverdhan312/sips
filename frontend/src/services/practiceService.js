@@ -518,6 +518,22 @@ export const practiceService = {
   async getAssessmentResult(assessmentId, attemptId) {
     const res = await practiceApi.get(`/api/assessments/${assessmentId}/attempts/${attemptId}/result`);
     return res?.data || res;
+  },
+
+  /**
+   * (Admin/Placement) Retrieve candidate results and leaderboard for an assessment
+   */
+  async getAssessmentResults(assessmentId, params = {}) {
+    const res = await practiceApi.get(`/api/admin/assessments/${assessmentId}/results`, { params });
+    return res?.data || res;
+  },
+
+  /**
+   * (Admin/Placement) Retrieve individual candidate attempt details and scorecard
+   */
+  async getAssessmentCandidateDetail(assessmentId, attemptId) {
+    const res = await practiceApi.get(`/api/admin/assessments/${assessmentId}/results/${attemptId}`);
+    return res?.data || res;
   }
 };
 
