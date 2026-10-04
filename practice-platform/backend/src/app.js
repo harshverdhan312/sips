@@ -8,8 +8,22 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 
 // Global Middleware
+const allowedOrigins = config.corsOrigin;
+
 app.use(cors({
-  origin: config.corsOrigin,
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins === true) return callback(null, true);
+    if (Array.isArray(allowedOrigins)) {
+      if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+        return callback(null, true);
+      }
+      if (origin.endsWith('.vercel.app') || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+        return callback(null, true);
+      }
+    }
+    return callback(null, false);
+  },
   credentials: true
 }));
 app.use(express.json());

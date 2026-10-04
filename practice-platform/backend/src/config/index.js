@@ -14,9 +14,17 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 function parseCorsOrigins(raw) {
-  const defaults = ['http://localhost:5173', 'http://localhost:5174'];
+  const defaults = [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:3000',
+    'https://sips-six.vercel.app'
+  ];
   if (!raw) {
     return defaults;
+  }
+  if (raw === '*') {
+    return true;
   }
   const origins = raw.includes(',')
     ? raw.split(',').map((o) => o.trim()).filter(Boolean)
