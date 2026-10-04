@@ -71,7 +71,7 @@ async function seed() {
 
   console.log(`To insert: ${newQuestions.length} new questions (Skipping ${skippedCount} existing)`);
 
-  const BATCH_SIZE = 50;
+  const BATCH_SIZE = 25;
   for (let i = 0; i < newQuestions.length; i += BATCH_SIZE) {
     const batch = newQuestions.slice(i, i + BATCH_SIZE);
 
@@ -136,6 +136,9 @@ async function seed() {
 
         createdCount++;
       }
+    }, {
+      maxWait: 20000, // 20s max wait to acquire connection
+      timeout: 60000  // 60s interactive transaction timeout for remote DB latency
     });
 
     console.log(`  Processed ${Math.min(i + BATCH_SIZE, newQuestions.length)} / ${newQuestions.length} questions...`);
