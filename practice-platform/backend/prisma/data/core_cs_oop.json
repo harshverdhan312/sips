@@ -1,0 +1,42 @@
+[
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Polymorphism",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "oop-poly-01",
+    "title": "Compile-Time vs Runtime Polymorphism",
+    "statement": "Which mechanism demonstrates Runtime Polymorphism in object-oriented programming languages like Java or C++?",
+    "options": [
+      { "id": "opt_a", "text": "Method Overriding with Virtual Functions / Dynamic Dispatch" },
+      { "id": "opt_b", "text": "Method Overloading with different parameter counts" },
+      { "id": "opt_c", "text": "Operator Overloading" },
+      { "id": "opt_d", "text": "Template / Generics Instantiation" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "Method Overriding achieves runtime polymorphism via late binding (dynamic dispatch / vtable), resolving the method call at runtime based on the actual object type rather than the reference type."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "SOLID Principles",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "oop-solid-01",
+    "title": "Liskov Substitution Principle (LSP)",
+    "statement": "According to the Liskov Substitution Principle (LSP) in SOLID design:",
+    "options": [
+      { "id": "opt_a", "text": "Derived classes must be substitutable for their base classes without altering the correctness of the program" },
+      { "id": "opt_b", "text": "A class should have only one reason to change" },
+      { "id": "opt_c", "text": "High-level modules should depend on abstractions, not concretions" },
+      { "id": "opt_d", "text": "Clients should not be forced to depend on interfaces they do not use" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "LSP states that objects of a superclass should be replaceable with objects of its subclasses without breaking application behavior or violating preconditions/postconditions."
+  }
+]

@@ -85,9 +85,23 @@ export function NotificationProvider({ children }) {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 
-  const addToast = (message, type = "success", duration = 4000) => {
+  const addToast = (msgOrObj, fallbackType = "success", fallbackDuration = 4000) => {
+    let message = "";
+    let title = "";
+    let type = fallbackType;
+    let duration = fallbackDuration;
+
+    if (typeof msgOrObj === "object" && msgOrObj !== null) {
+      message = typeof msgOrObj.message === "string" ? msgOrObj.message : (msgOrObj.message ? String(msgOrObj.message) : "");
+      title = typeof msgOrObj.title === "string" ? msgOrObj.title : "";
+      type = msgOrObj.type || fallbackType;
+      duration = typeof msgOrObj.duration === "number" ? msgOrObj.duration : fallbackDuration;
+    } else {
+      message = String(msgOrObj || "");
+    }
+
     const id = "toast_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7);
-    setToasts((prev) => [...prev, { id, message, type }]);
+    setToasts((prev) => [...prev, { id, title, message, type }]);
     if (duration > 0) {
       setTimeout(() => {
         setToasts((prev) => prev.filter((t) => t.id !== id));

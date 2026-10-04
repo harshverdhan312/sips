@@ -17,6 +17,7 @@ import {
   Layers,
   RefreshCw
 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 import { studentService } from "../../services/studentService";
 import { StatCard } from "../../components/common/StatCard";
 import { Card, CardHeader } from "../../components/common/Card";
@@ -29,9 +30,9 @@ import { useNotifications } from "../../context/NotificationContext";
 
 export function StudentDashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { showSuccess, showError } = useNotifications();
   const fileInputRef = useRef(null);
-  
   const [student, setStudent] = useState(null);
   const [radarData, setRadarData] = useState([]);
   const [jobs, setJobs] = useState([]);
@@ -40,24 +41,73 @@ export function StudentDashboard() {
 
   useEffect(() => {
     async function loadData() {
+      setLoading(true);
       try {
         const [studentData, radar, jobList] = await Promise.all([
-          studentService.getCurrentStudent(),
-          studentService.getRadarData(),
-          studentService.getStudentJobs()
+          studentService.getCurrentStudent().catch(() => null),
+          studentService.getRadarData().catch(() => []),
+          studentService.getStudentJobs().catch(() => [])
         ]);
-        setStudent(studentData);
-        setRadarData(radar);
-        const activeRunningJobs = (jobList || []).filter((j) => j.isActive);
+        if (studentData) {
+          setStudent(studentData);
+        } else if (user) {
+          setStudent({
+            id: user.id,
+            name: user.name || "Student Candidate",
+            email: user.email || "",
+            rollNo: user.rollNo || "",
+            branch: user.branch || "Computer Science",
+            semester: "Campus Student",
+            cgpa: user.cgpa || 0.0,
+            placementStatus: "Not Placed",
+            status: "Active",
+            readinessScore: 0,
+            skills: user.skills || [],
+            resumeUrl: user.resumeUrl || "",
+            github: user.github || "",
+            metrics: {
+              placementProbability: 0,
+              technicalScore: 0,
+              softSkillScore: 0,
+              resumeScore: 0,
+              employabilityIndex: 0
+            }
+          });
+        }
+        setRadarData(Array.isArray(radar) ? radar : []);
+        const activeRunningJobs = Array.isArray(jobList) ? jobList.filter((j) => j && j.isActive) : [];
         setJobs(activeRunningJobs.slice(0, 4));
       } catch (err) {
-        console.error(err);
+        console.error("Student dashboard load error:", err);
       } finally {
         setLoading(false);
       }
     }
     loadData();
-  }, []);
+  }, [user]);
+
+  const currentStudent = student || (user ? {
+    id: user.id,
+    name: user.name || "Student Candidate",
+    email: user.email || "",
+    rollNo: user.rollNo || "",
+    branch: user.branch || "Computer Science",
+    semester: "Campus Student",
+    cgpa: 0.0,
+    placementStatus: "Not Placed",
+    status: "Active",
+    readinessScore: 0,
+    skills: [],
+    resumeUrl: "",
+    github: "",
+    metrics: {
+      placementProbability: 0,
+      technicalScore: 0,
+      softSkillScore: 0,
+      resumeScore: 0,
+      employabilityIndex: 0
+    }
+  } : null);
 
   const handleResumeUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -87,11 +137,32 @@ export function StudentDashboard() {
     }
   };
 
-  if (loading || !student) {
+  if (loading && !currentStudent) {
     return <DashboardSkeleton />;
   }
 
-  const { metrics } = student;
+  if (!currentStudent) {
+    return (
+      <div className="p-8 text-center space-y-4 max-w-md mx-auto">
+        <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto" />
+        <h2 className="text-xl font-bold text-slate-800">Student Profile Not Available</h2>
+        <p className="text-sm text-slate-500">
+          Please log in again or check your network connection to access the placement portal.
+        </p>
+        <Button onClick={() => navigate("/login")}>Go to Login</Button>
+      </div>
+    );
+  }
+
+  const metrics = currentStudent.metrics || {
+    placementProbability: 0,
+    technicalScore: 0,
+    softSkillScore: 0,
+    resumeScore: 0,
+    employabilityIndex: 0
+  };
+
+  const studentSkills = Array.isArray(currentStudent.skills) ? currentStudent.skills : [];
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -104,15 +175,14 @@ export function StudentDashboard() {
               Campus Placement Portal Active
             </div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight">
-              Welcome back, {student.name ? student.name.split(" ")[0] : "Student"} 👋
+              Welcome back, {currentStudent.name ? currentStudent.name.split(" ")[0] : "Student"} 👋
             </h1>
             <p className="text-sm sm:text-base text-indigo-200 max-w-xl">
-              {student.branch ? `${student.branch} • ${student.semester}` : "Live student placement dashboard"}
+              {currentStudent.branch ? `${currentStudent.branch} • ${currentStudent.semester || "Candidate"}` : "Live student placement dashboard"}
             </p>
           </div>
 
           <div className="flex flex-wrap gap-3">
-
             <Button
               variant="primary"
               size="md"
@@ -127,7 +197,7 @@ export function StudentDashboard() {
 
         {/* Decorative background shape */}
         <div className="absolute right-0 top-0 -bottom-10 w-96 bg-gradient-to-l from-indigo-500/20 to-transparent pointer-events-none" />
-        
+
         {/* Hidden File Input for Resume Upload */}
         <input
           type="file"
@@ -142,37 +212,37 @@ export function StudentDashboard() {
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-5">
         <StatCard
           title="Readiness Score"
-          value={student.resumeUrl ? `${student.readinessScore}/100` : "Pending Resume"}
+          value={currentStudent.resumeUrl ? `${currentStudent.readinessScore || 0}/100` : "Pending Resume"}
           icon={TrendingUp}
           iconBg="bg-indigo-50 text-indigo-600"
         />
         <StatCard
           title="Placement Probability"
-          value={student.resumeUrl ? `${metrics.placementProbability}%` : "Not Evaluated"}
+          value={currentStudent.resumeUrl ? `${metrics.placementProbability || 0}%` : "Not Evaluated"}
           icon={Target}
           iconBg="bg-emerald-50 text-emerald-600"
         />
         <StatCard
           title="Technical Score"
-          value={student.resumeUrl && metrics.technicalScore > 0 ? `${metrics.technicalScore}/100` : "Not evaluated"}
+          value={currentStudent.resumeUrl && (metrics.technicalScore || 0) > 0 ? `${metrics.technicalScore}/100` : "Not evaluated"}
           icon={Sparkles}
           iconBg="bg-blue-50 text-blue-600"
         />
         <StatCard
           title="Soft Skills Score"
-          value={student.resumeUrl && metrics.softSkillScore > 0 ? `${metrics.softSkillScore}/100` : "Not evaluated"}
+          value={currentStudent.resumeUrl && (metrics.softSkillScore || 0) > 0 ? `${metrics.softSkillScore}/100` : "Not evaluated"}
           icon={Mic}
           iconBg="bg-purple-50 text-purple-600"
         />
         <StatCard
           title="Resume Score"
-          value={student.resumeUrl ? (metrics.resumeScore > 0 ? `${metrics.resumeScore}/100` : "Uploaded") : "Pending Resume"}
+          value={currentStudent.resumeUrl ? ((metrics.resumeScore || 0) > 0 ? `${metrics.resumeScore}/100` : "Uploaded") : "Pending Resume"}
           icon={FileText}
           iconBg="bg-sky-50 text-sky-600"
         />
         <StatCard
           title="Academic CGPA"
-          value={student.cgpa > 0 ? student.cgpa.toFixed(2) : "Not Set"}
+          value={typeof currentStudent.cgpa === "number" && currentStudent.cgpa > 0 ? currentStudent.cgpa.toFixed(2) : "Not Set"}
           icon={Award}
           iconBg="bg-amber-50 text-amber-600"
         />
@@ -186,27 +256,27 @@ export function StudentDashboard() {
             title="Placement Readiness Index"
             subtitle="Computed from your verified profile metrics"
             action={
-              <Badge variant={student.readinessScore >= 80 ? "success" : (student.readinessScore >= 60 ? "primary" : "neutral")} size="sm">
-                {student.status}
+              <Badge variant={(currentStudent.readinessScore || 0) >= 80 ? "success" : ((currentStudent.readinessScore || 0) >= 60 ? "primary" : "neutral")} size="sm">
+                {currentStudent.status || "Active"}
               </Badge>
             }
           />
           <div className="py-2">
-            <ProbabilityGauge probability={metrics.placementProbability} />
+            <ProbabilityGauge probability={metrics.placementProbability || 0} />
           </div>
 
           <div className="mt-4 pt-4 border-t border-slate-100 space-y-2 text-xs">
             <div className="flex justify-between font-medium">
               <span className="text-slate-500">Placement Status:</span>
-              <span className="font-semibold text-slate-800">{student.placementStatus}</span>
+              <span className="font-semibold text-slate-800">{currentStudent.placementStatus || "Not Placed"}</span>
             </div>
             <div className="flex justify-between font-medium">
               <span className="text-slate-500">Resume Synchronization:</span>
-              <span className="font-semibold text-slate-800">{student.resumeUrl ? "Synced" : "Upload required"}</span>
+              <span className="font-semibold text-slate-800">{currentStudent.resumeUrl ? "Synced" : "Upload required"}</span>
             </div>
             <div className="flex justify-between font-medium">
               <span className="text-slate-500">Verified Technical Skills:</span>
-              <span className="font-semibold text-slate-800">{student.skills.length} skills</span>
+              <span className="font-semibold text-slate-800">{studentSkills.length} skills</span>
             </div>
           </div>
         </Card>
@@ -257,9 +327,9 @@ export function StudentDashboard() {
             </Button>
           </div>
 
-          {student.skills && student.skills.length > 0 ? (
+          {studentSkills.length > 0 ? (
             <div className="flex flex-wrap gap-2 pt-1">
-              {student.skills.map((skill, i) => (
+              {studentSkills.map((skill, i) => (
                 <span
                   key={i}
                   className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200/80 flex items-center gap-1.5"
@@ -272,7 +342,7 @@ export function StudentDashboard() {
           ) : (
             <div className="p-6 text-center rounded-2xl bg-slate-50 border border-dashed border-slate-200">
               <p className="text-xs text-slate-600 font-medium mb-3">
-                {student.resumeUrl
+                {currentStudent.resumeUrl
                   ? "No verified technical skills added yet."
                   : "No verified strengths yet. Upload your resume to analyze your skills."}
               </p>
@@ -280,12 +350,13 @@ export function StudentDashboard() {
                 variant="primary"
                 size="xs"
                 onClick={() => {
-                  if (student.resumeUrl) navigate("/student/profile");
-                  else fileInputRef.current?.click();
+                  if (currentStudent.resumeUrl) navigate("/student/profile");
+                  else if (fileInputRef.current) fileInputRef.current.click();
+                  else navigate("/student/resume");
                 }}
                 disabled={uploadingResume}
               >
-                {uploadingResume ? "Uploading..." : student.resumeUrl ? "Add Skills in Profile" : "Upload Resume"}
+                {uploadingResume ? "Uploading..." : currentStudent.resumeUrl ? "Add Skills in Profile" : "Upload Resume"}
               </Button>
             </div>
           )}
@@ -308,34 +379,34 @@ export function StudentDashboard() {
           <div className="space-y-3">
             <div className="p-3 rounded-xl bg-slate-50 flex items-center justify-between border border-slate-100 text-xs">
               <div className="flex items-center gap-2.5">
-                <div className={`w-2 h-2 rounded-full ${student.cgpa > 0 ? "bg-emerald-500" : "bg-amber-500"}`} />
+                <div className={`w-2 h-2 rounded-full ${typeof currentStudent.cgpa === "number" && currentStudent.cgpa > 0 ? "bg-emerald-500" : "bg-amber-500"}`} />
                 <span className="font-medium text-slate-700">Academic CGPA Verification</span>
               </div>
-              <span className="font-semibold text-slate-900">{student.cgpa > 0 ? `${student.cgpa.toFixed(2)} CGPA` : "Pending"}</span>
+              <span className="font-semibold text-slate-900">{typeof currentStudent.cgpa === "number" && currentStudent.cgpa > 0 ? `${currentStudent.cgpa.toFixed(2)} CGPA` : "Pending"}</span>
             </div>
 
             <div className="p-3 rounded-xl bg-slate-50 flex items-center justify-between border border-slate-100 text-xs">
               <div className="flex items-center gap-2.5">
-                <div className={`w-2 h-2 rounded-full ${student.resumeUrl ? "bg-emerald-500" : "bg-rose-500"}`} />
+                <div className={`w-2 h-2 rounded-full ${currentStudent.resumeUrl ? "bg-emerald-500" : "bg-rose-500"}`} />
                 <span className="font-medium text-slate-700">Placement PDF Resume</span>
               </div>
-              <span className="font-semibold text-slate-900">{student.resumeUrl ? "Uploaded & Synced" : "Not uploaded"}</span>
+              <span className="font-semibold text-slate-900">{currentStudent.resumeUrl ? "Uploaded & Synced" : "Not uploaded"}</span>
             </div>
 
             <div className="p-3 rounded-xl bg-slate-50 flex items-center justify-between border border-slate-100 text-xs">
               <div className="flex items-center gap-2.5">
-                <div className={`w-2 h-2 rounded-full ${student.github ? "bg-emerald-500" : "bg-slate-400"}`} />
+                <div className={`w-2 h-2 rounded-full ${currentStudent.github ? "bg-emerald-500" : "bg-slate-400"}`} />
                 <span className="font-medium text-slate-700">GitHub Profile Handle</span>
               </div>
-              <span className="font-semibold text-slate-900">{student.github || "Unlinked"}</span>
+              <span className="font-semibold text-slate-900">{currentStudent.github || "Unlinked"}</span>
             </div>
 
             <div className="p-3 rounded-xl bg-slate-50 flex items-center justify-between border border-slate-100 text-xs">
               <div className="flex items-center gap-2.5">
-                <div className={`w-2 h-2 rounded-full ${student.skills.length > 0 ? "bg-emerald-500" : "bg-amber-500"}`} />
+                <div className={`w-2 h-2 rounded-full ${studentSkills.length > 0 ? "bg-emerald-500" : "bg-amber-500"}`} />
                 <span className="font-medium text-slate-700">Technical Skills Mapping</span>
               </div>
-              <span className="font-semibold text-slate-900">{student.skills.length > 0 ? `${student.skills.length} skills verified` : "0 skills added"}</span>
+              <span className="font-semibold text-slate-900">{studentSkills.length > 0 ? `${studentSkills.length} skills verified` : "0 skills added"}</span>
             </div>
           </div>
         </Card>

@@ -1,0 +1,478 @@
+// SIPS Practice Platform — PostgreSQL Schema
+// Separate Database: sips_practice
+// Independent Microservice Database Context
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// ENUMS
+// ==========================================
+
+enum QuestionType {
+  CODING
+  APTITUDE
+  TECHNICAL
+}
+
+enum QuestionFormat {
+  SINGLE_CHOICE
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  NUMERICAL
+  CODING
+}
+
+enum QuestionDifficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum QuestionStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum SourceType {
+  COLLEGE_CREATED
+  PUBLIC_SOURCE
+  CURATED
+  ORIGINAL
+  THIRD_PARTY
+  COMPANY_PROVIDED
+  COLLEGE_PROVIDED
+}
+
+enum AssessmentType {
+  PRACTICE_SET
+  PLACEMENT_ASSESSMENT
+  MOCK_ASSESSMENT
+}
+
+enum AssessmentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum PracticeAttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+  ABANDONED
+  EXPIRED
+}
+
+enum AssessmentAttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+  TIMED_OUT
+  FINALIZED
+}
+
+enum ContestStatus {
+  DRAFT
+  PUBLISHED
+  LIVE
+  ENDED
+  EVALUATED
+  ARCHIVED
+  CANCELLED
+}
+
+enum ContestSection {
+  CODING
+  APTITUDE
+  TECHNICAL
+}
+
+enum ContestAttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+  TIMED_OUT
+  DISQUALIFIED
+}
+
+enum SubmissionMode {
+  RUN
+  SUBMIT
+}
+
+enum SubmissionStatus {
+  QUEUED
+  RUNNING
+  ACCEPTED
+  PARTIAL
+  WRONG_ANSWER
+  TIME_LIMIT_EXCEEDED
+  MEMORY_LIMIT_EXCEEDED
+  COMPILATION_ERROR
+  RUNTIME_ERROR
+  SYSTEM_ERROR
+}
+
+// ==========================================
+// QUESTION BANK DOMAIN
+// ==========================================
+
+model PracticeQuestion {
+  id              String             @id @default(cuid())
+  sourceNamespace String?            // e.g., "sips-core", "leetcode", "rvce-cs"
+  externalId      String?            // Deterministic import ID (e.g., "dsa-two-sum-01")
+  type            QuestionType
+  format          QuestionFormat
+  category        String             // e.g., QUANTITATIVE, DSA, DBMS, OS, NETWORKS
+  subcategory     String?            // e.g., ARRAYS, SQL, PERMUTATIONS
+  difficulty      QuestionDifficulty
+  status          QuestionStatus     @default(ACTIVE)
+  sourceType      SourceType         @default(CURATED)
+  sourceUrl       String?
+  attribution     String?
+  tags            String[]           @default([])
+  collegeId       String?            // External SIPS College ID (null for global questions)
+  createdBy       String?            // External SIPS Admin ID
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  versions        QuestionVersion[]
+
+  @@index([type, category, difficulty])
+  @@index([status])
+  @@index([sourceNamespace, externalId])
+  @@index([sourceType])
+  @@index([collegeId])
+}
+
+model QuestionVersion {
+  id             String            @id @default(cuid())
+  questionId     String
+  versionNumber  Int               @default(1)
+  title          String
+  statement      String            @db.Text
+  options        Json?             // Array of options [{ id, text, codeSnippet }]
+  correctAnswer  Json?             // Server-side answer key [{ id }] or numerical answer
+  explanation    String?           @db.Text
+  metadata       Json?             // Tags, starter code templates, language hints
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  question       PracticeQuestion  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  codingProblem  CodingProblem?
+  contestQuestions ContestQuestion[]
+  assessmentQuestions AssessmentQuestion[]
+  responses      QuestionResponse[]
+  assessmentResponses AssessmentResponse[]
+  submissions    CodeSubmission[]
+
+  @@unique([questionId, versionNumber])
+  @@index([questionId])
+}
+
+model CodingProblem {
+  id                String           @id @default(cuid())
+  questionVersionId String           @unique
+  inputFormat       String?          @db.Text
+  outputFormat      String?          @db.Text
+  constraints       String?          @db.Text
+  timeLimitMs       Int              @default(2000)
+  memoryLimitKb     Int              @default(128000)
+  maxMarks          Decimal          @default(100.00) @db.Decimal(10, 2)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  questionVersion   QuestionVersion  @relation(fields: [questionVersionId], references: [id], onDelete: Cascade)
+  testCases         CodingTestCase[]
+}
+
+model CodingTestCase {
+  id              String         @id @default(cuid())
+  codingProblemId String
+  input           String         @db.Text
+  expectedOutput  String         @db.Text
+  weight          Decimal        @default(1.00) @db.Decimal(10, 2)
+  isHidden        Boolean        @default(false)
+  order           Int            @default(1)
+  createdAt       DateTime       @default(now())
+
+  codingProblem   CodingProblem  @relation(fields: [codingProblemId], references: [id], onDelete: Cascade)
+  testResults     CodeSubmissionTestResult[]
+
+  @@index([codingProblemId, order])
+  @@index([codingProblemId, isHidden])
+}
+
+// ==========================================
+// PRACTICE SESSIONS
+// ==========================================
+
+model PracticeAttempt {
+  id           String                 @id @default(cuid())
+  studentId    String                 // External SIPS Student ID
+  collegeId    String                 // External SIPS College ID
+  category     String?
+  status       PracticeAttemptStatus  @default(IN_PROGRESS)
+  startedAt    DateTime               @default(now())
+  submittedAt  DateTime?
+  score        Decimal                @default(0.00) @db.Decimal(10, 2)
+  totalMarks   Decimal                @default(0.00) @db.Decimal(10, 2)
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+
+  responses    QuestionResponse[]
+  submissions  CodeSubmission[]
+
+  @@index([studentId])
+  @@index([collegeId])
+  @@index([studentId, createdAt])
+  @@index([status])
+}
+
+// ==========================================
+// CONTESTS & ASSESSMENTS
+// ==========================================
+
+model Contest {
+  id               String            @id @default(cuid())
+  sipsDriveId      String?           // External SIPS Placement Drive / JobDescription ID
+  collegeId        String            // External SIPS College ID
+  title            String
+  description      String?           @db.Text
+  instructions     String?           @db.Text
+  startAt          DateTime
+  endAt            DateTime
+  durationMinutes  Int
+  status           ContestStatus     @default(DRAFT)
+  createdBy        String?           // External SIPS Admin ID
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  questions        ContestQuestion[]
+  attempts         ContestAttempt[]
+
+  @@index([sipsDriveId])
+  @@index([collegeId, status])
+  @@index([startAt, endAt])
+}
+
+model ContestQuestion {
+  id                String           @id @default(cuid())
+  contestId         String
+  questionVersionId String
+  section           ContestSection
+  order             Int              @default(1)
+  marks             Decimal          @default(1.00) @db.Decimal(10, 2)
+  negativeMarks     Decimal          @default(0.00) @db.Decimal(10, 2)
+  createdAt         DateTime         @default(now())
+
+  contest           Contest          @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  questionVersion   QuestionVersion  @relation(fields: [questionVersionId], references: [id], onDelete: Restrict)
+
+  @@unique([contestId, questionVersionId])
+  @@index([contestId, section, order])
+}
+
+// ==========================================
+// REUSABLE ASSESSMENTS & QUESTION SETS
+// ==========================================
+
+model Assessment {
+  id               String               @id @default(cuid())
+  title            String
+  description      String?              @db.Text
+  type             AssessmentType       @default(PRACTICE_SET)
+  status           AssessmentStatus     @default(DRAFT)
+  collegeId        String?              // External SIPS College ID (null for global assessments)
+  createdBy        String?              // External SIPS Admin ID
+  durationMinutes  Int                  @default(60)
+  totalMarks       Decimal              @default(0.00) @db.Decimal(10, 2)
+  sipsDriveId      String?              // Optional external Placement Drive / JobDescription ID
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+
+  questions        AssessmentQuestion[]
+  attempts         AssessmentAttempt[]
+
+  @@index([collegeId, status])
+  @@index([type])
+  @@index([sipsDriveId])
+}
+
+model AssessmentQuestion {
+  id                String           @id @default(cuid())
+  assessmentId      String
+  questionVersionId String
+  section           ContestSection   @default(APTITUDE)
+  order             Int              @default(1)
+  marks             Decimal          @default(1.00) @db.Decimal(10, 2)
+  negativeMarks     Decimal          @default(0.00) @db.Decimal(10, 2)
+  createdAt         DateTime         @default(now())
+
+  assessment        Assessment       @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  questionVersion   QuestionVersion  @relation(fields: [questionVersionId], references: [id], onDelete: Restrict)
+  responses         AssessmentResponse[]
+
+  @@unique([assessmentId, questionVersionId])
+  @@index([assessmentId, section, order])
+}
+
+model AssessmentAttempt {
+  id                String                  @id @default(cuid())
+  assessmentId      String
+  studentId         String                  // External SIPS Student ID
+  collegeId         String                  // External SIPS College ID
+  status            AssessmentAttemptStatus @default(IN_PROGRESS)
+  startedAt         DateTime                @default(now())
+  submittedAt       DateTime?
+  finalizedAt       DateTime?
+  effectiveDeadline DateTime
+  codingScore       Decimal                 @default(0.00) @db.Decimal(10, 2)
+  aptitudeScore     Decimal                 @default(0.00) @db.Decimal(10, 2)
+  technicalScore    Decimal                 @default(0.00) @db.Decimal(10, 2)
+  totalScore        Decimal                 @default(0.00) @db.Decimal(10, 2)
+  totalMarks        Decimal                 @default(0.00) @db.Decimal(10, 2)
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+
+  assessment        Assessment              @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  responses         AssessmentResponse[]
+  submissions       CodeSubmission[]
+
+  @@unique([assessmentId, studentId])
+  @@index([assessmentId, totalScore])
+  @@index([studentId, collegeId])
+  @@index([status])
+}
+
+model AssessmentResponse {
+  id                   String             @id @default(cuid())
+  assessmentAttemptId  String
+  assessmentQuestionId String
+  questionVersionId    String
+  answerData           Json?              // Candidate answer payload (options selected / value)
+  isCorrect            Boolean?
+  marksAwarded         Decimal            @default(0.00) @db.Decimal(10, 2)
+  answeredAt           DateTime           @default(now())
+
+  assessmentAttempt    AssessmentAttempt  @relation(fields: [assessmentAttemptId], references: [id], onDelete: Cascade)
+  assessmentQuestion   AssessmentQuestion @relation(fields: [assessmentQuestionId], references: [id], onDelete: Cascade)
+  questionVersion      QuestionVersion    @relation(fields: [questionVersionId], references: [id], onDelete: Restrict)
+
+  @@unique([assessmentAttemptId, assessmentQuestionId])
+  @@index([assessmentAttemptId])
+  @@index([questionVersionId])
+}
+
+model ContestAttempt {
+  id              String                @id @default(cuid())
+  contestId       String
+  studentId       String                // External SIPS Student ID
+  collegeId       String                // External SIPS College ID
+  status          ContestAttemptStatus  @default(IN_PROGRESS)
+  startedAt       DateTime              @default(now())
+  submittedAt     DateTime?
+  codingScore     Decimal               @default(0.00) @db.Decimal(10, 2)
+  aptitudeScore   Decimal               @default(0.00) @db.Decimal(10, 2)
+  technicalScore  Decimal               @default(0.00) @db.Decimal(10, 2)
+  totalScore      Decimal               @default(0.00) @db.Decimal(10, 2)
+  totalMarks      Decimal               @default(0.00) @db.Decimal(10, 2)
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  contest         Contest               @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  responses       QuestionResponse[]
+  submissions     CodeSubmission[]
+
+  @@unique([contestId, studentId])
+  @@index([contestId, totalScore])
+  @@index([studentId, collegeId])
+}
+
+// ==========================================
+// RESPONSES & SUBMISSIONS
+// ==========================================
+
+model QuestionResponse {
+  id                 String           @id @default(cuid())
+  questionVersionId  String
+  practiceAttemptId  String?
+  contestAttemptId   String?
+  answerData         Json             // Candidate answer payload (options selected / value)
+  isCorrect          Boolean?
+  marksAwarded       Decimal          @default(0.00) @db.Decimal(10, 2)
+  answeredAt         DateTime         @default(now())
+
+  questionVersion    QuestionVersion  @relation(fields: [questionVersionId], references: [id], onDelete: Restrict)
+  practiceAttempt    PracticeAttempt? @relation(fields: [practiceAttemptId], references: [id], onDelete: Cascade)
+  contestAttempt     ContestAttempt?  @relation(fields: [contestAttemptId], references: [id], onDelete: Cascade)
+
+  @@index([practiceAttemptId])
+  @@index([contestAttemptId])
+  @@index([questionVersionId])
+}
+
+model CodeSubmission {
+  id                  String                     @id @default(cuid())
+  studentId           String                     // External SIPS Student ID
+  questionVersionId   String
+  practiceAttemptId   String?
+  contestAttemptId    String?
+  assessmentAttemptId String?
+  mode                SubmissionMode             @default(SUBMIT)
+  language            String                     // e.g., cpp, java, python, javascript
+  sourceCode          String                     @db.Text
+  status              SubmissionStatus           @default(QUEUED)
+  testsPassed         Int                        @default(0)
+  testsTotal          Int                        @default(0)
+  earnedMarks         Decimal                    @default(0.00) @db.Decimal(10, 2)
+  executionTimeMs     Int?
+  memoryUsedKb        Int?
+  compileOutput       String?                    @db.Text
+  submittedAt         DateTime                   @default(now())
+  createdAt           DateTime                   @default(now())
+  updatedAt           DateTime                   @updatedAt
+
+  questionVersion     QuestionVersion            @relation(fields: [questionVersionId], references: [id], onDelete: Restrict)
+  practiceAttempt     PracticeAttempt?           @relation(fields: [practiceAttemptId], references: [id], onDelete: Cascade)
+  contestAttempt      ContestAttempt?            @relation(fields: [contestAttemptId], references: [id], onDelete: Cascade)
+  assessmentAttempt   AssessmentAttempt?         @relation(fields: [assessmentAttemptId], references: [id], onDelete: Cascade)
+  testResults         CodeSubmissionTestResult[]
+
+  @@index([studentId, questionVersionId])
+  @@index([practiceAttemptId])
+  @@index([contestAttemptId])
+  @@index([assessmentAttemptId])
+  @@index([mode])
+  @@index([submittedAt])
+}
+
+model CodeSubmissionTestResult {
+  id                  String            @id @default(cuid())
+  submissionId        String
+  testCaseId          String?
+  judge0Token         String?           // Individual Judge0 Token/UUID
+  status              SubmissionStatus  @default(QUEUED)
+  passed              Boolean           @default(false)
+  executionTimeMs     Int?
+  memoryUsedKb        Int?
+  stdout              String?           @db.Text
+  stderr              String?           @db.Text
+  compileOutput       String?           @db.Text
+  earnedWeight        Decimal           @default(0.00) @db.Decimal(10, 2)
+  order               Int               @default(1)
+  isHidden            Boolean           @default(false)
+  createdAt           DateTime          @default(now())
+
+  submission          CodeSubmission    @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  testCase            CodingTestCase?   @relation(fields: [testCaseId], references: [id], onDelete: SetNull)
+
+  @@index([submissionId])
+  @@index([testCaseId])
+  @@index([judge0Token])
+}

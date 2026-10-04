@@ -1,0 +1,2722 @@
+[
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-001",
+    "title": "TCP Flow Control Mechanism #1",
+    "statement": "How does TCP implement flow control to prevent sender from overwhelming receiver buffer?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "ICMP Source Quench packets"
+      },
+      {
+        "id": "opt_b",
+        "text": "Random Early Detection (RED)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Sliding Window Protocol with advertised receiver window (rwnd)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Token Bucket Rate Limiter"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Receiver includes `rwnd` in TCP header acknowledging remaining free buffer space."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-002",
+    "title": "Subnet Mask Calculation #2",
+    "statement": "What is the default subnet mask for a Class B IP network with CIDR prefix /16?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "255.0.0.0"
+      },
+      {
+        "id": "opt_b",
+        "text": "255.255.0.0"
+      },
+      {
+        "id": "opt_c",
+        "text": "255.255.255.0"
+      },
+      {
+        "id": "opt_d",
+        "text": "255.255.255.128"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A /16 prefix has 16 network bits set to 1: 11111111.11111111.00000000.00000000 = 255.255.0.0."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-003",
+    "title": "HTTPS / TLS Handshake #3",
+    "statement": "In HTTPS, which protocol is responsible for encrypting transport data between client and server?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FTP on Port 21"
+      },
+      {
+        "id": "opt_b",
+        "text": "SNMP on Port 161"
+      },
+      {
+        "id": "opt_c",
+        "text": "SSH on Port 22"
+      },
+      {
+        "id": "opt_d",
+        "text": "TLS / SSL on TCP Port 443"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "TLS/SSL performs asymmetric key exchange for symmetric session encryption on port 443."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-004",
+    "title": "Distance Vector Routing Loop Prevention #4",
+    "statement": "Which technique is used in Distance Vector Routing (RIP) to prevent routing loops and the \"Count to Infinity\" problem?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Dijkstra Shortest Path Tree"
+      },
+      {
+        "id": "opt_b",
+        "text": "Spanning Tree Protocol (STP)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Split Horizon with Poison Reverse"
+      },
+      {
+        "id": "opt_d",
+        "text": "TCP Slow Start"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Split horizon prevents a router from advertising a route back onto the interface from which it was learned."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-005",
+    "title": "TCP Flow Control Mechanism #5",
+    "statement": "How does TCP implement flow control to prevent sender from overwhelming receiver buffer?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "ICMP Source Quench packets"
+      },
+      {
+        "id": "opt_b",
+        "text": "Random Early Detection (RED)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Sliding Window Protocol with advertised receiver window (rwnd)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Token Bucket Rate Limiter"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Receiver includes `rwnd` in TCP header acknowledging remaining free buffer space."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-006",
+    "title": "Subnet Mask Calculation #6",
+    "statement": "What is the default subnet mask for a Class B IP network with CIDR prefix /16?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "255.0.0.0"
+      },
+      {
+        "id": "opt_b",
+        "text": "255.255.0.0"
+      },
+      {
+        "id": "opt_c",
+        "text": "255.255.255.0"
+      },
+      {
+        "id": "opt_d",
+        "text": "255.255.255.128"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A /16 prefix has 16 network bits set to 1: 11111111.11111111.00000000.00000000 = 255.255.0.0."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-007",
+    "title": "HTTPS / TLS Handshake #7",
+    "statement": "In HTTPS, which protocol is responsible for encrypting transport data between client and server?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FTP on Port 21"
+      },
+      {
+        "id": "opt_b",
+        "text": "SNMP on Port 161"
+      },
+      {
+        "id": "opt_c",
+        "text": "SSH on Port 22"
+      },
+      {
+        "id": "opt_d",
+        "text": "TLS / SSL on TCP Port 443"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "TLS/SSL performs asymmetric key exchange for symmetric session encryption on port 443."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-008",
+    "title": "Distance Vector Routing Loop Prevention #8",
+    "statement": "Which technique is used in Distance Vector Routing (RIP) to prevent routing loops and the \"Count to Infinity\" problem?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Dijkstra Shortest Path Tree"
+      },
+      {
+        "id": "opt_b",
+        "text": "Spanning Tree Protocol (STP)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Split Horizon with Poison Reverse"
+      },
+      {
+        "id": "opt_d",
+        "text": "TCP Slow Start"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Split horizon prevents a router from advertising a route back onto the interface from which it was learned."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-009",
+    "title": "TCP Flow Control Mechanism #9",
+    "statement": "How does TCP implement flow control to prevent sender from overwhelming receiver buffer?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "ICMP Source Quench packets"
+      },
+      {
+        "id": "opt_b",
+        "text": "Random Early Detection (RED)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Sliding Window Protocol with advertised receiver window (rwnd)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Token Bucket Rate Limiter"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Receiver includes `rwnd` in TCP header acknowledging remaining free buffer space."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-010",
+    "title": "Subnet Mask Calculation #10",
+    "statement": "What is the default subnet mask for a Class B IP network with CIDR prefix /16?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "255.0.0.0"
+      },
+      {
+        "id": "opt_b",
+        "text": "255.255.0.0"
+      },
+      {
+        "id": "opt_c",
+        "text": "255.255.255.0"
+      },
+      {
+        "id": "opt_d",
+        "text": "255.255.255.128"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A /16 prefix has 16 network bits set to 1: 11111111.11111111.00000000.00000000 = 255.255.0.0."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-011",
+    "title": "HTTPS / TLS Handshake #11",
+    "statement": "In HTTPS, which protocol is responsible for encrypting transport data between client and server?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FTP on Port 21"
+      },
+      {
+        "id": "opt_b",
+        "text": "SNMP on Port 161"
+      },
+      {
+        "id": "opt_c",
+        "text": "SSH on Port 22"
+      },
+      {
+        "id": "opt_d",
+        "text": "TLS / SSL on TCP Port 443"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "TLS/SSL performs asymmetric key exchange for symmetric session encryption on port 443."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-012",
+    "title": "Distance Vector Routing Loop Prevention #12",
+    "statement": "Which technique is used in Distance Vector Routing (RIP) to prevent routing loops and the \"Count to Infinity\" problem?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Dijkstra Shortest Path Tree"
+      },
+      {
+        "id": "opt_b",
+        "text": "Spanning Tree Protocol (STP)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Split Horizon with Poison Reverse"
+      },
+      {
+        "id": "opt_d",
+        "text": "TCP Slow Start"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Split horizon prevents a router from advertising a route back onto the interface from which it was learned."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-013",
+    "title": "TCP Flow Control Mechanism #13",
+    "statement": "How does TCP implement flow control to prevent sender from overwhelming receiver buffer?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "ICMP Source Quench packets"
+      },
+      {
+        "id": "opt_b",
+        "text": "Random Early Detection (RED)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Sliding Window Protocol with advertised receiver window (rwnd)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Token Bucket Rate Limiter"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Receiver includes `rwnd` in TCP header acknowledging remaining free buffer space."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-014",
+    "title": "Subnet Mask Calculation #14",
+    "statement": "What is the default subnet mask for a Class B IP network with CIDR prefix /16?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "255.0.0.0"
+      },
+      {
+        "id": "opt_b",
+        "text": "255.255.0.0"
+      },
+      {
+        "id": "opt_c",
+        "text": "255.255.255.0"
+      },
+      {
+        "id": "opt_d",
+        "text": "255.255.255.128"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A /16 prefix has 16 network bits set to 1: 11111111.11111111.00000000.00000000 = 255.255.0.0."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-015",
+    "title": "HTTPS / TLS Handshake #15",
+    "statement": "In HTTPS, which protocol is responsible for encrypting transport data between client and server?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FTP on Port 21"
+      },
+      {
+        "id": "opt_b",
+        "text": "SNMP on Port 161"
+      },
+      {
+        "id": "opt_c",
+        "text": "SSH on Port 22"
+      },
+      {
+        "id": "opt_d",
+        "text": "TLS / SSL on TCP Port 443"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "TLS/SSL performs asymmetric key exchange for symmetric session encryption on port 443."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-016",
+    "title": "Distance Vector Routing Loop Prevention #16",
+    "statement": "Which technique is used in Distance Vector Routing (RIP) to prevent routing loops and the \"Count to Infinity\" problem?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Dijkstra Shortest Path Tree"
+      },
+      {
+        "id": "opt_b",
+        "text": "Spanning Tree Protocol (STP)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Split Horizon with Poison Reverse"
+      },
+      {
+        "id": "opt_d",
+        "text": "TCP Slow Start"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Split horizon prevents a router from advertising a route back onto the interface from which it was learned."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-017",
+    "title": "TCP Flow Control Mechanism #17",
+    "statement": "How does TCP implement flow control to prevent sender from overwhelming receiver buffer?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "ICMP Source Quench packets"
+      },
+      {
+        "id": "opt_b",
+        "text": "Random Early Detection (RED)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Sliding Window Protocol with advertised receiver window (rwnd)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Token Bucket Rate Limiter"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Receiver includes `rwnd` in TCP header acknowledging remaining free buffer space."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-018",
+    "title": "Subnet Mask Calculation #18",
+    "statement": "What is the default subnet mask for a Class B IP network with CIDR prefix /16?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "255.0.0.0"
+      },
+      {
+        "id": "opt_b",
+        "text": "255.255.0.0"
+      },
+      {
+        "id": "opt_c",
+        "text": "255.255.255.0"
+      },
+      {
+        "id": "opt_d",
+        "text": "255.255.255.128"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A /16 prefix has 16 network bits set to 1: 11111111.11111111.00000000.00000000 = 255.255.0.0."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-019",
+    "title": "HTTPS / TLS Handshake #19",
+    "statement": "In HTTPS, which protocol is responsible for encrypting transport data between client and server?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FTP on Port 21"
+      },
+      {
+        "id": "opt_b",
+        "text": "SNMP on Port 161"
+      },
+      {
+        "id": "opt_c",
+        "text": "SSH on Port 22"
+      },
+      {
+        "id": "opt_d",
+        "text": "TLS / SSL on TCP Port 443"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "TLS/SSL performs asymmetric key exchange for symmetric session encryption on port 443."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-020",
+    "title": "Distance Vector Routing Loop Prevention #20",
+    "statement": "Which technique is used in Distance Vector Routing (RIP) to prevent routing loops and the \"Count to Infinity\" problem?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Dijkstra Shortest Path Tree"
+      },
+      {
+        "id": "opt_b",
+        "text": "Spanning Tree Protocol (STP)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Split Horizon with Poison Reverse"
+      },
+      {
+        "id": "opt_d",
+        "text": "TCP Slow Start"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Split horizon prevents a router from advertising a route back onto the interface from which it was learned."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-021",
+    "title": "TCP Flow Control Mechanism #21",
+    "statement": "How does TCP implement flow control to prevent sender from overwhelming receiver buffer?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "ICMP Source Quench packets"
+      },
+      {
+        "id": "opt_b",
+        "text": "Random Early Detection (RED)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Sliding Window Protocol with advertised receiver window (rwnd)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Token Bucket Rate Limiter"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Receiver includes `rwnd` in TCP header acknowledging remaining free buffer space."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-022",
+    "title": "Subnet Mask Calculation #22",
+    "statement": "What is the default subnet mask for a Class B IP network with CIDR prefix /16?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "255.0.0.0"
+      },
+      {
+        "id": "opt_b",
+        "text": "255.255.0.0"
+      },
+      {
+        "id": "opt_c",
+        "text": "255.255.255.0"
+      },
+      {
+        "id": "opt_d",
+        "text": "255.255.255.128"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A /16 prefix has 16 network bits set to 1: 11111111.11111111.00000000.00000000 = 255.255.0.0."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-023",
+    "title": "HTTPS / TLS Handshake #23",
+    "statement": "In HTTPS, which protocol is responsible for encrypting transport data between client and server?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FTP on Port 21"
+      },
+      {
+        "id": "opt_b",
+        "text": "SNMP on Port 161"
+      },
+      {
+        "id": "opt_c",
+        "text": "SSH on Port 22"
+      },
+      {
+        "id": "opt_d",
+        "text": "TLS / SSL on TCP Port 443"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "TLS/SSL performs asymmetric key exchange for symmetric session encryption on port 443."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-024",
+    "title": "Distance Vector Routing Loop Prevention #24",
+    "statement": "Which technique is used in Distance Vector Routing (RIP) to prevent routing loops and the \"Count to Infinity\" problem?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Dijkstra Shortest Path Tree"
+      },
+      {
+        "id": "opt_b",
+        "text": "Spanning Tree Protocol (STP)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Split Horizon with Poison Reverse"
+      },
+      {
+        "id": "opt_d",
+        "text": "TCP Slow Start"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Split horizon prevents a router from advertising a route back onto the interface from which it was learned."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-025",
+    "title": "TCP Flow Control Mechanism #25",
+    "statement": "How does TCP implement flow control to prevent sender from overwhelming receiver buffer?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "ICMP Source Quench packets"
+      },
+      {
+        "id": "opt_b",
+        "text": "Random Early Detection (RED)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Sliding Window Protocol with advertised receiver window (rwnd)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Token Bucket Rate Limiter"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Receiver includes `rwnd` in TCP header acknowledging remaining free buffer space."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-026",
+    "title": "Subnet Mask Calculation #26",
+    "statement": "What is the default subnet mask for a Class B IP network with CIDR prefix /16?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "255.0.0.0"
+      },
+      {
+        "id": "opt_b",
+        "text": "255.255.0.0"
+      },
+      {
+        "id": "opt_c",
+        "text": "255.255.255.0"
+      },
+      {
+        "id": "opt_d",
+        "text": "255.255.255.128"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A /16 prefix has 16 network bits set to 1: 11111111.11111111.00000000.00000000 = 255.255.0.0."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-027",
+    "title": "HTTPS / TLS Handshake #27",
+    "statement": "In HTTPS, which protocol is responsible for encrypting transport data between client and server?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FTP on Port 21"
+      },
+      {
+        "id": "opt_b",
+        "text": "SNMP on Port 161"
+      },
+      {
+        "id": "opt_c",
+        "text": "SSH on Port 22"
+      },
+      {
+        "id": "opt_d",
+        "text": "TLS / SSL on TCP Port 443"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "TLS/SSL performs asymmetric key exchange for symmetric session encryption on port 443."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-028",
+    "title": "Distance Vector Routing Loop Prevention #28",
+    "statement": "Which technique is used in Distance Vector Routing (RIP) to prevent routing loops and the \"Count to Infinity\" problem?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Dijkstra Shortest Path Tree"
+      },
+      {
+        "id": "opt_b",
+        "text": "Spanning Tree Protocol (STP)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Split Horizon with Poison Reverse"
+      },
+      {
+        "id": "opt_d",
+        "text": "TCP Slow Start"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Split horizon prevents a router from advertising a route back onto the interface from which it was learned."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-029",
+    "title": "TCP Flow Control Mechanism #29",
+    "statement": "How does TCP implement flow control to prevent sender from overwhelming receiver buffer?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "ICMP Source Quench packets"
+      },
+      {
+        "id": "opt_b",
+        "text": "Random Early Detection (RED)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Sliding Window Protocol with advertised receiver window (rwnd)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Token Bucket Rate Limiter"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Receiver includes `rwnd` in TCP header acknowledging remaining free buffer space."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-030",
+    "title": "Subnet Mask Calculation #30",
+    "statement": "What is the default subnet mask for a Class B IP network with CIDR prefix /16?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "255.0.0.0"
+      },
+      {
+        "id": "opt_b",
+        "text": "255.255.0.0"
+      },
+      {
+        "id": "opt_c",
+        "text": "255.255.255.0"
+      },
+      {
+        "id": "opt_d",
+        "text": "255.255.255.128"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A /16 prefix has 16 network bits set to 1: 11111111.11111111.00000000.00000000 = 255.255.0.0."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-031",
+    "title": "HTTPS / TLS Handshake #31",
+    "statement": "In HTTPS, which protocol is responsible for encrypting transport data between client and server?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FTP on Port 21"
+      },
+      {
+        "id": "opt_b",
+        "text": "SNMP on Port 161"
+      },
+      {
+        "id": "opt_c",
+        "text": "SSH on Port 22"
+      },
+      {
+        "id": "opt_d",
+        "text": "TLS / SSL on TCP Port 443"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "TLS/SSL performs asymmetric key exchange for symmetric session encryption on port 443."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-032",
+    "title": "Distance Vector Routing Loop Prevention #32",
+    "statement": "Which technique is used in Distance Vector Routing (RIP) to prevent routing loops and the \"Count to Infinity\" problem?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Dijkstra Shortest Path Tree"
+      },
+      {
+        "id": "opt_b",
+        "text": "Spanning Tree Protocol (STP)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Split Horizon with Poison Reverse"
+      },
+      {
+        "id": "opt_d",
+        "text": "TCP Slow Start"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Split horizon prevents a router from advertising a route back onto the interface from which it was learned."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-033",
+    "title": "TCP Flow Control Mechanism #33",
+    "statement": "How does TCP implement flow control to prevent sender from overwhelming receiver buffer?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "ICMP Source Quench packets"
+      },
+      {
+        "id": "opt_b",
+        "text": "Random Early Detection (RED)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Sliding Window Protocol with advertised receiver window (rwnd)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Token Bucket Rate Limiter"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Receiver includes `rwnd` in TCP header acknowledging remaining free buffer space."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-034",
+    "title": "Subnet Mask Calculation #34",
+    "statement": "What is the default subnet mask for a Class B IP network with CIDR prefix /16?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "255.0.0.0"
+      },
+      {
+        "id": "opt_b",
+        "text": "255.255.0.0"
+      },
+      {
+        "id": "opt_c",
+        "text": "255.255.255.0"
+      },
+      {
+        "id": "opt_d",
+        "text": "255.255.255.128"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A /16 prefix has 16 network bits set to 1: 11111111.11111111.00000000.00000000 = 255.255.0.0."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-035",
+    "title": "HTTPS / TLS Handshake #35",
+    "statement": "In HTTPS, which protocol is responsible for encrypting transport data between client and server?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FTP on Port 21"
+      },
+      {
+        "id": "opt_b",
+        "text": "SNMP on Port 161"
+      },
+      {
+        "id": "opt_c",
+        "text": "SSH on Port 22"
+      },
+      {
+        "id": "opt_d",
+        "text": "TLS / SSL on TCP Port 443"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "TLS/SSL performs asymmetric key exchange for symmetric session encryption on port 443."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-036",
+    "title": "Distance Vector Routing Loop Prevention #36",
+    "statement": "Which technique is used in Distance Vector Routing (RIP) to prevent routing loops and the \"Count to Infinity\" problem?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Dijkstra Shortest Path Tree"
+      },
+      {
+        "id": "opt_b",
+        "text": "Spanning Tree Protocol (STP)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Split Horizon with Poison Reverse"
+      },
+      {
+        "id": "opt_d",
+        "text": "TCP Slow Start"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Split horizon prevents a router from advertising a route back onto the interface from which it was learned."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-037",
+    "title": "TCP Flow Control Mechanism #37",
+    "statement": "How does TCP implement flow control to prevent sender from overwhelming receiver buffer?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "ICMP Source Quench packets"
+      },
+      {
+        "id": "opt_b",
+        "text": "Random Early Detection (RED)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Sliding Window Protocol with advertised receiver window (rwnd)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Token Bucket Rate Limiter"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Receiver includes `rwnd` in TCP header acknowledging remaining free buffer space."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-038",
+    "title": "Subnet Mask Calculation #38",
+    "statement": "What is the default subnet mask for a Class B IP network with CIDR prefix /16?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "255.0.0.0"
+      },
+      {
+        "id": "opt_b",
+        "text": "255.255.0.0"
+      },
+      {
+        "id": "opt_c",
+        "text": "255.255.255.0"
+      },
+      {
+        "id": "opt_d",
+        "text": "255.255.255.128"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A /16 prefix has 16 network bits set to 1: 11111111.11111111.00000000.00000000 = 255.255.0.0."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-039",
+    "title": "HTTPS / TLS Handshake #39",
+    "statement": "In HTTPS, which protocol is responsible for encrypting transport data between client and server?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FTP on Port 21"
+      },
+      {
+        "id": "opt_b",
+        "text": "SNMP on Port 161"
+      },
+      {
+        "id": "opt_c",
+        "text": "SSH on Port 22"
+      },
+      {
+        "id": "opt_d",
+        "text": "TLS / SSL on TCP Port 443"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "TLS/SSL performs asymmetric key exchange for symmetric session encryption on port 443."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-040",
+    "title": "Distance Vector Routing Loop Prevention #40",
+    "statement": "Which technique is used in Distance Vector Routing (RIP) to prevent routing loops and the \"Count to Infinity\" problem?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Dijkstra Shortest Path Tree"
+      },
+      {
+        "id": "opt_b",
+        "text": "Spanning Tree Protocol (STP)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Split Horizon with Poison Reverse"
+      },
+      {
+        "id": "opt_d",
+        "text": "TCP Slow Start"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Split horizon prevents a router from advertising a route back onto the interface from which it was learned."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-041",
+    "title": "TCP Flow Control Mechanism #41",
+    "statement": "How does TCP implement flow control to prevent sender from overwhelming receiver buffer?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "ICMP Source Quench packets"
+      },
+      {
+        "id": "opt_b",
+        "text": "Random Early Detection (RED)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Sliding Window Protocol with advertised receiver window (rwnd)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Token Bucket Rate Limiter"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Receiver includes `rwnd` in TCP header acknowledging remaining free buffer space."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-042",
+    "title": "Subnet Mask Calculation #42",
+    "statement": "What is the default subnet mask for a Class B IP network with CIDR prefix /16?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "255.0.0.0"
+      },
+      {
+        "id": "opt_b",
+        "text": "255.255.0.0"
+      },
+      {
+        "id": "opt_c",
+        "text": "255.255.255.0"
+      },
+      {
+        "id": "opt_d",
+        "text": "255.255.255.128"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A /16 prefix has 16 network bits set to 1: 11111111.11111111.00000000.00000000 = 255.255.0.0."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-043",
+    "title": "HTTPS / TLS Handshake #43",
+    "statement": "In HTTPS, which protocol is responsible for encrypting transport data between client and server?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FTP on Port 21"
+      },
+      {
+        "id": "opt_b",
+        "text": "SNMP on Port 161"
+      },
+      {
+        "id": "opt_c",
+        "text": "SSH on Port 22"
+      },
+      {
+        "id": "opt_d",
+        "text": "TLS / SSL on TCP Port 443"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "TLS/SSL performs asymmetric key exchange for symmetric session encryption on port 443."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-044",
+    "title": "Distance Vector Routing Loop Prevention #44",
+    "statement": "Which technique is used in Distance Vector Routing (RIP) to prevent routing loops and the \"Count to Infinity\" problem?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Dijkstra Shortest Path Tree"
+      },
+      {
+        "id": "opt_b",
+        "text": "Spanning Tree Protocol (STP)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Split Horizon with Poison Reverse"
+      },
+      {
+        "id": "opt_d",
+        "text": "TCP Slow Start"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Split horizon prevents a router from advertising a route back onto the interface from which it was learned."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-045",
+    "title": "TCP Flow Control Mechanism #45",
+    "statement": "How does TCP implement flow control to prevent sender from overwhelming receiver buffer?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "ICMP Source Quench packets"
+      },
+      {
+        "id": "opt_b",
+        "text": "Random Early Detection (RED)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Sliding Window Protocol with advertised receiver window (rwnd)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Token Bucket Rate Limiter"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Receiver includes `rwnd` in TCP header acknowledging remaining free buffer space."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-046",
+    "title": "Subnet Mask Calculation #46",
+    "statement": "What is the default subnet mask for a Class B IP network with CIDR prefix /16?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "255.0.0.0"
+      },
+      {
+        "id": "opt_b",
+        "text": "255.255.0.0"
+      },
+      {
+        "id": "opt_c",
+        "text": "255.255.255.0"
+      },
+      {
+        "id": "opt_d",
+        "text": "255.255.255.128"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A /16 prefix has 16 network bits set to 1: 11111111.11111111.00000000.00000000 = 255.255.0.0."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-047",
+    "title": "HTTPS / TLS Handshake #47",
+    "statement": "In HTTPS, which protocol is responsible for encrypting transport data between client and server?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FTP on Port 21"
+      },
+      {
+        "id": "opt_b",
+        "text": "SNMP on Port 161"
+      },
+      {
+        "id": "opt_c",
+        "text": "SSH on Port 22"
+      },
+      {
+        "id": "opt_d",
+        "text": "TLS / SSL on TCP Port 443"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "TLS/SSL performs asymmetric key exchange for symmetric session encryption on port 443."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-048",
+    "title": "Distance Vector Routing Loop Prevention #48",
+    "statement": "Which technique is used in Distance Vector Routing (RIP) to prevent routing loops and the \"Count to Infinity\" problem?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Dijkstra Shortest Path Tree"
+      },
+      {
+        "id": "opt_b",
+        "text": "Spanning Tree Protocol (STP)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Split Horizon with Poison Reverse"
+      },
+      {
+        "id": "opt_d",
+        "text": "TCP Slow Start"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Split horizon prevents a router from advertising a route back onto the interface from which it was learned."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-049",
+    "title": "TCP Flow Control Mechanism #49",
+    "statement": "How does TCP implement flow control to prevent sender from overwhelming receiver buffer?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "ICMP Source Quench packets"
+      },
+      {
+        "id": "opt_b",
+        "text": "Random Early Detection (RED)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Sliding Window Protocol with advertised receiver window (rwnd)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Token Bucket Rate Limiter"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Receiver includes `rwnd` in TCP header acknowledging remaining free buffer space."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-050",
+    "title": "Subnet Mask Calculation #50",
+    "statement": "What is the default subnet mask for a Class B IP network with CIDR prefix /16?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "255.0.0.0"
+      },
+      {
+        "id": "opt_b",
+        "text": "255.255.0.0"
+      },
+      {
+        "id": "opt_c",
+        "text": "255.255.255.0"
+      },
+      {
+        "id": "opt_d",
+        "text": "255.255.255.128"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A /16 prefix has 16 network bits set to 1: 11111111.11111111.00000000.00000000 = 255.255.0.0."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-051",
+    "title": "HTTPS / TLS Handshake #51",
+    "statement": "In HTTPS, which protocol is responsible for encrypting transport data between client and server?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FTP on Port 21"
+      },
+      {
+        "id": "opt_b",
+        "text": "SNMP on Port 161"
+      },
+      {
+        "id": "opt_c",
+        "text": "SSH on Port 22"
+      },
+      {
+        "id": "opt_d",
+        "text": "TLS / SSL on TCP Port 443"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "TLS/SSL performs asymmetric key exchange for symmetric session encryption on port 443."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-052",
+    "title": "Distance Vector Routing Loop Prevention #52",
+    "statement": "Which technique is used in Distance Vector Routing (RIP) to prevent routing loops and the \"Count to Infinity\" problem?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Dijkstra Shortest Path Tree"
+      },
+      {
+        "id": "opt_b",
+        "text": "Spanning Tree Protocol (STP)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Split Horizon with Poison Reverse"
+      },
+      {
+        "id": "opt_d",
+        "text": "TCP Slow Start"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Split horizon prevents a router from advertising a route back onto the interface from which it was learned."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-053",
+    "title": "TCP Flow Control Mechanism #53",
+    "statement": "How does TCP implement flow control to prevent sender from overwhelming receiver buffer?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "ICMP Source Quench packets"
+      },
+      {
+        "id": "opt_b",
+        "text": "Random Early Detection (RED)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Sliding Window Protocol with advertised receiver window (rwnd)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Token Bucket Rate Limiter"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Receiver includes `rwnd` in TCP header acknowledging remaining free buffer space."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-054",
+    "title": "Subnet Mask Calculation #54",
+    "statement": "What is the default subnet mask for a Class B IP network with CIDR prefix /16?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "255.0.0.0"
+      },
+      {
+        "id": "opt_b",
+        "text": "255.255.0.0"
+      },
+      {
+        "id": "opt_c",
+        "text": "255.255.255.0"
+      },
+      {
+        "id": "opt_d",
+        "text": "255.255.255.128"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A /16 prefix has 16 network bits set to 1: 11111111.11111111.00000000.00000000 = 255.255.0.0."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-055",
+    "title": "HTTPS / TLS Handshake #55",
+    "statement": "In HTTPS, which protocol is responsible for encrypting transport data between client and server?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FTP on Port 21"
+      },
+      {
+        "id": "opt_b",
+        "text": "SNMP on Port 161"
+      },
+      {
+        "id": "opt_c",
+        "text": "SSH on Port 22"
+      },
+      {
+        "id": "opt_d",
+        "text": "TLS / SSL on TCP Port 443"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "TLS/SSL performs asymmetric key exchange for symmetric session encryption on port 443."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-056",
+    "title": "Distance Vector Routing Loop Prevention #56",
+    "statement": "Which technique is used in Distance Vector Routing (RIP) to prevent routing loops and the \"Count to Infinity\" problem?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Dijkstra Shortest Path Tree"
+      },
+      {
+        "id": "opt_b",
+        "text": "Spanning Tree Protocol (STP)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Split Horizon with Poison Reverse"
+      },
+      {
+        "id": "opt_d",
+        "text": "TCP Slow Start"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Split horizon prevents a router from advertising a route back onto the interface from which it was learned."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-057",
+    "title": "TCP Flow Control Mechanism #57",
+    "statement": "How does TCP implement flow control to prevent sender from overwhelming receiver buffer?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "ICMP Source Quench packets"
+      },
+      {
+        "id": "opt_b",
+        "text": "Random Early Detection (RED)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Sliding Window Protocol with advertised receiver window (rwnd)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Token Bucket Rate Limiter"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Receiver includes `rwnd` in TCP header acknowledging remaining free buffer space."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-058",
+    "title": "Subnet Mask Calculation #58",
+    "statement": "What is the default subnet mask for a Class B IP network with CIDR prefix /16?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "255.0.0.0"
+      },
+      {
+        "id": "opt_b",
+        "text": "255.255.0.0"
+      },
+      {
+        "id": "opt_c",
+        "text": "255.255.255.0"
+      },
+      {
+        "id": "opt_d",
+        "text": "255.255.255.128"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A /16 prefix has 16 network bits set to 1: 11111111.11111111.00000000.00000000 = 255.255.0.0."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-059",
+    "title": "HTTPS / TLS Handshake #59",
+    "statement": "In HTTPS, which protocol is responsible for encrypting transport data between client and server?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FTP on Port 21"
+      },
+      {
+        "id": "opt_b",
+        "text": "SNMP on Port 161"
+      },
+      {
+        "id": "opt_c",
+        "text": "SSH on Port 22"
+      },
+      {
+        "id": "opt_d",
+        "text": "TLS / SSL on TCP Port 443"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "TLS/SSL performs asymmetric key exchange for symmetric session encryption on port 443."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-060",
+    "title": "Distance Vector Routing Loop Prevention #60",
+    "statement": "Which technique is used in Distance Vector Routing (RIP) to prevent routing loops and the \"Count to Infinity\" problem?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Dijkstra Shortest Path Tree"
+      },
+      {
+        "id": "opt_b",
+        "text": "Spanning Tree Protocol (STP)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Split Horizon with Poison Reverse"
+      },
+      {
+        "id": "opt_d",
+        "text": "TCP Slow Start"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Split horizon prevents a router from advertising a route back onto the interface from which it was learned."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-061",
+    "title": "TCP Flow Control Mechanism #61",
+    "statement": "How does TCP implement flow control to prevent sender from overwhelming receiver buffer?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "ICMP Source Quench packets"
+      },
+      {
+        "id": "opt_b",
+        "text": "Random Early Detection (RED)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Sliding Window Protocol with advertised receiver window (rwnd)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Token Bucket Rate Limiter"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Receiver includes `rwnd` in TCP header acknowledging remaining free buffer space."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-062",
+    "title": "Subnet Mask Calculation #62",
+    "statement": "What is the default subnet mask for a Class B IP network with CIDR prefix /16?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "255.0.0.0"
+      },
+      {
+        "id": "opt_b",
+        "text": "255.255.0.0"
+      },
+      {
+        "id": "opt_c",
+        "text": "255.255.255.0"
+      },
+      {
+        "id": "opt_d",
+        "text": "255.255.255.128"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A /16 prefix has 16 network bits set to 1: 11111111.11111111.00000000.00000000 = 255.255.0.0."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-063",
+    "title": "HTTPS / TLS Handshake #63",
+    "statement": "In HTTPS, which protocol is responsible for encrypting transport data between client and server?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FTP on Port 21"
+      },
+      {
+        "id": "opt_b",
+        "text": "SNMP on Port 161"
+      },
+      {
+        "id": "opt_c",
+        "text": "SSH on Port 22"
+      },
+      {
+        "id": "opt_d",
+        "text": "TLS / SSL on TCP Port 443"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "TLS/SSL performs asymmetric key exchange for symmetric session encryption on port 443."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-064",
+    "title": "Distance Vector Routing Loop Prevention #64",
+    "statement": "Which technique is used in Distance Vector Routing (RIP) to prevent routing loops and the \"Count to Infinity\" problem?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Dijkstra Shortest Path Tree"
+      },
+      {
+        "id": "opt_b",
+        "text": "Spanning Tree Protocol (STP)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Split Horizon with Poison Reverse"
+      },
+      {
+        "id": "opt_d",
+        "text": "TCP Slow Start"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Split horizon prevents a router from advertising a route back onto the interface from which it was learned."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-065",
+    "title": "TCP Flow Control Mechanism #65",
+    "statement": "How does TCP implement flow control to prevent sender from overwhelming receiver buffer?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "ICMP Source Quench packets"
+      },
+      {
+        "id": "opt_b",
+        "text": "Random Early Detection (RED)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Sliding Window Protocol with advertised receiver window (rwnd)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Token Bucket Rate Limiter"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Receiver includes `rwnd` in TCP header acknowledging remaining free buffer space."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-066",
+    "title": "Subnet Mask Calculation #66",
+    "statement": "What is the default subnet mask for a Class B IP network with CIDR prefix /16?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "255.0.0.0"
+      },
+      {
+        "id": "opt_b",
+        "text": "255.255.0.0"
+      },
+      {
+        "id": "opt_c",
+        "text": "255.255.255.0"
+      },
+      {
+        "id": "opt_d",
+        "text": "255.255.255.128"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A /16 prefix has 16 network bits set to 1: 11111111.11111111.00000000.00000000 = 255.255.0.0."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-067",
+    "title": "HTTPS / TLS Handshake #67",
+    "statement": "In HTTPS, which protocol is responsible for encrypting transport data between client and server?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FTP on Port 21"
+      },
+      {
+        "id": "opt_b",
+        "text": "SNMP on Port 161"
+      },
+      {
+        "id": "opt_c",
+        "text": "SSH on Port 22"
+      },
+      {
+        "id": "opt_d",
+        "text": "TLS / SSL on TCP Port 443"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "TLS/SSL performs asymmetric key exchange for symmetric session encryption on port 443."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-068",
+    "title": "Distance Vector Routing Loop Prevention #68",
+    "statement": "Which technique is used in Distance Vector Routing (RIP) to prevent routing loops and the \"Count to Infinity\" problem?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Dijkstra Shortest Path Tree"
+      },
+      {
+        "id": "opt_b",
+        "text": "Spanning Tree Protocol (STP)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Split Horizon with Poison Reverse"
+      },
+      {
+        "id": "opt_d",
+        "text": "TCP Slow Start"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Split horizon prevents a router from advertising a route back onto the interface from which it was learned."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-069",
+    "title": "TCP Flow Control Mechanism #69",
+    "statement": "How does TCP implement flow control to prevent sender from overwhelming receiver buffer?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "ICMP Source Quench packets"
+      },
+      {
+        "id": "opt_b",
+        "text": "Random Early Detection (RED)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Sliding Window Protocol with advertised receiver window (rwnd)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Token Bucket Rate Limiter"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Receiver includes `rwnd` in TCP header acknowledging remaining free buffer space."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-070",
+    "title": "Subnet Mask Calculation #70",
+    "statement": "What is the default subnet mask for a Class B IP network with CIDR prefix /16?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "255.0.0.0"
+      },
+      {
+        "id": "opt_b",
+        "text": "255.255.0.0"
+      },
+      {
+        "id": "opt_c",
+        "text": "255.255.255.0"
+      },
+      {
+        "id": "opt_d",
+        "text": "255.255.255.128"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A /16 prefix has 16 network bits set to 1: 11111111.11111111.00000000.00000000 = 255.255.0.0."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-071",
+    "title": "HTTPS / TLS Handshake #71",
+    "statement": "In HTTPS, which protocol is responsible for encrypting transport data between client and server?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FTP on Port 21"
+      },
+      {
+        "id": "opt_b",
+        "text": "SNMP on Port 161"
+      },
+      {
+        "id": "opt_c",
+        "text": "SSH on Port 22"
+      },
+      {
+        "id": "opt_d",
+        "text": "TLS / SSL on TCP Port 443"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "TLS/SSL performs asymmetric key exchange for symmetric session encryption on port 443."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-072",
+    "title": "Distance Vector Routing Loop Prevention #72",
+    "statement": "Which technique is used in Distance Vector Routing (RIP) to prevent routing loops and the \"Count to Infinity\" problem?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Dijkstra Shortest Path Tree"
+      },
+      {
+        "id": "opt_b",
+        "text": "Spanning Tree Protocol (STP)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Split Horizon with Poison Reverse"
+      },
+      {
+        "id": "opt_d",
+        "text": "TCP Slow Start"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Split horizon prevents a router from advertising a route back onto the interface from which it was learned."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-073",
+    "title": "TCP Flow Control Mechanism #73",
+    "statement": "How does TCP implement flow control to prevent sender from overwhelming receiver buffer?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "ICMP Source Quench packets"
+      },
+      {
+        "id": "opt_b",
+        "text": "Random Early Detection (RED)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Sliding Window Protocol with advertised receiver window (rwnd)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Token Bucket Rate Limiter"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Receiver includes `rwnd` in TCP header acknowledging remaining free buffer space."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-074",
+    "title": "Subnet Mask Calculation #74",
+    "statement": "What is the default subnet mask for a Class B IP network with CIDR prefix /16?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "255.0.0.0"
+      },
+      {
+        "id": "opt_b",
+        "text": "255.255.0.0"
+      },
+      {
+        "id": "opt_c",
+        "text": "255.255.255.0"
+      },
+      {
+        "id": "opt_d",
+        "text": "255.255.255.128"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A /16 prefix has 16 network bits set to 1: 11111111.11111111.00000000.00000000 = 255.255.0.0."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-075",
+    "title": "HTTPS / TLS Handshake #75",
+    "statement": "In HTTPS, which protocol is responsible for encrypting transport data between client and server?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FTP on Port 21"
+      },
+      {
+        "id": "opt_b",
+        "text": "SNMP on Port 161"
+      },
+      {
+        "id": "opt_c",
+        "text": "SSH on Port 22"
+      },
+      {
+        "id": "opt_d",
+        "text": "TLS / SSL on TCP Port 443"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "TLS/SSL performs asymmetric key exchange for symmetric session encryption on port 443."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-076",
+    "title": "Distance Vector Routing Loop Prevention #76",
+    "statement": "Which technique is used in Distance Vector Routing (RIP) to prevent routing loops and the \"Count to Infinity\" problem?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Dijkstra Shortest Path Tree"
+      },
+      {
+        "id": "opt_b",
+        "text": "Spanning Tree Protocol (STP)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Split Horizon with Poison Reverse"
+      },
+      {
+        "id": "opt_d",
+        "text": "TCP Slow Start"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Split horizon prevents a router from advertising a route back onto the interface from which it was learned."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-077",
+    "title": "TCP Flow Control Mechanism #77",
+    "statement": "How does TCP implement flow control to prevent sender from overwhelming receiver buffer?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "ICMP Source Quench packets"
+      },
+      {
+        "id": "opt_b",
+        "text": "Random Early Detection (RED)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Sliding Window Protocol with advertised receiver window (rwnd)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Token Bucket Rate Limiter"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Receiver includes `rwnd` in TCP header acknowledging remaining free buffer space."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-078",
+    "title": "Subnet Mask Calculation #78",
+    "statement": "What is the default subnet mask for a Class B IP network with CIDR prefix /16?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "255.0.0.0"
+      },
+      {
+        "id": "opt_b",
+        "text": "255.255.0.0"
+      },
+      {
+        "id": "opt_c",
+        "text": "255.255.255.0"
+      },
+      {
+        "id": "opt_d",
+        "text": "255.255.255.128"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A /16 prefix has 16 network bits set to 1: 11111111.11111111.00000000.00000000 = 255.255.0.0."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-079",
+    "title": "HTTPS / TLS Handshake #79",
+    "statement": "In HTTPS, which protocol is responsible for encrypting transport data between client and server?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FTP on Port 21"
+      },
+      {
+        "id": "opt_b",
+        "text": "SNMP on Port 161"
+      },
+      {
+        "id": "opt_c",
+        "text": "SSH on Port 22"
+      },
+      {
+        "id": "opt_d",
+        "text": "TLS / SSL on TCP Port 443"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "TLS/SSL performs asymmetric key exchange for symmetric session encryption on port 443."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Computer Networks",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-net-080",
+    "title": "Distance Vector Routing Loop Prevention #80",
+    "statement": "Which technique is used in Distance Vector Routing (RIP) to prevent routing loops and the \"Count to Infinity\" problem?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Dijkstra Shortest Path Tree"
+      },
+      {
+        "id": "opt_b",
+        "text": "Spanning Tree Protocol (STP)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Split Horizon with Poison Reverse"
+      },
+      {
+        "id": "opt_d",
+        "text": "TCP Slow Start"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Split horizon prevents a router from advertising a route back onto the interface from which it was learned."
+  }
+]

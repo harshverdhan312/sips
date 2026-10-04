@@ -1,0 +1,102 @@
+[
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Complexity Analysis",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "dsa-comp-01",
+    "title": "Time Complexity of Binary Search",
+    "statement": "What is the worst-case and best-case time complexity of searching an element in a sorted array of size N using Binary Search?",
+    "options": [
+      { "id": "opt_a", "text": "Worst: O(log N), Best: O(1)" },
+      { "id": "opt_b", "text": "Worst: O(N), Best: O(1)" },
+      { "id": "opt_c", "text": "Worst: O(log N), Best: O(log N)" },
+      { "id": "opt_d", "text": "Worst: O(N log N), Best: O(1)" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "Binary search divides the search space in half at each step leading to O(log N) worst-case time complexity. If the middle element is the target on the first comparison, the best-case time complexity is O(1)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Binary Trees",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "dsa-tree-01",
+    "title": "Properties of Inorder Traversal in BST",
+    "statement": "In a Binary Search Tree (BST), which tree traversal yields the nodes in strictly non-decreasing (sorted) order?",
+    "options": [
+      { "id": "opt_a", "text": "Preorder Traversal" },
+      { "id": "opt_b", "text": "Inorder Traversal" },
+      { "id": "opt_c", "text": "Postorder Traversal" },
+      { "id": "opt_d", "text": "Level-order Traversal" }
+    ],
+    "correctAnswer": { "optionId": "opt_b" },
+    "explanation": "Inorder traversal visits Left Subtree -> Root -> Right Subtree. Since BST guarantees Left < Root < Right, inorder traversal always prints node values in strictly sorted ascending order."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Graphs",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "dsa-graph-01",
+    "title": "Shortest Path Algorithm with Non-Negative Weights",
+    "statement": "Which graph algorithm is most optimal for finding the single-source shortest path in a weighted graph with non-negative edge weights using a Min-Heap/Priority Queue?",
+    "options": [
+      { "id": "opt_a", "text": "Bellman-Ford Algorithm — O(V * E)" },
+      { "id": "opt_b", "text": "Dijkstra's Algorithm — O((V + E) log V)" },
+      { "id": "opt_c", "text": "Floyd-Warshall Algorithm — O(V^3)" },
+      { "id": "opt_d", "text": "Kruskal's Algorithm — O(E log E)" }
+    ],
+    "correctAnswer": { "optionId": "opt_b" },
+    "explanation": "Dijkstra's algorithm with a Min-Heap efficiently finds the single-source shortest path in O((V + E) log V) for graphs with non-negative edge weights."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Dynamic Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "dsa-dp-01",
+    "title": "0/1 Knapsack State Space and Complexity",
+    "statement": "What is the time and auxiliary space complexity of the standard bottom-up Dynamic Programming solution for the 0/1 Knapsack Problem with N items and capacity W?",
+    "options": [
+      { "id": "opt_a", "text": "Time: O(N * W), Space: O(W) or O(N * W)" },
+      { "id": "opt_b", "text": "Time: O(2^N), Space: O(N)" },
+      { "id": "opt_c", "text": "Time: O(N log W), Space: O(1)" },
+      { "id": "opt_d", "text": "Time: O(N^2), Space: O(W^2)" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "0/1 Knapsack DP constructs a 2D table dp[N+1][W+1] (or 1D array dp[W+1] using space optimization), leading to pseudo-polynomial time complexity of O(N * W) and space O(W)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Hashing",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "dsa-hash-01",
+    "title": "Average vs Worst Case Hash Table Search",
+    "statement": "What are the average-case and worst-case time complexities of searching an element in a Hash Table with chaining collisions?",
+    "options": [
+      { "id": "opt_a", "text": "Average: O(1), Worst: O(N)" },
+      { "id": "opt_b", "text": "Average: O(log N), Worst: O(N)" },
+      { "id": "opt_c", "text": "Average: O(1), Worst: O(1)" },
+      { "id": "opt_d", "text": "Average: O(1), Worst: O(log N)" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "Assuming a uniform hash function, average lookup is O(1). In the worst case (all keys hash to the exact same bucket), the chain degrades to a linked list with O(N) search."
+  }
+]

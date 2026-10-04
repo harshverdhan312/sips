@@ -11,6 +11,10 @@ import '../../features/interview/mock_interview_screen.dart';
 import '../../features/opportunities/job_detail_screen.dart';
 import '../../features/opportunities/opportunities_screen.dart';
 import '../../features/peers/peer_matching_screen.dart';
+import '../../features/practice/presentation/practice_history_screen.dart';
+import '../../features/practice/presentation/practice_hub_screen.dart';
+import '../../features/practice/presentation/practice_result_screen.dart';
+import '../../features/practice/presentation/practice_session_screen.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/shell/main_shell_screen.dart';
 import '../../features/skills/skills_screen.dart';
@@ -122,6 +126,32 @@ class AppRouter {
         path: '/alerts',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const AlertsScreen(),
+      ),
+      GoRoute(
+        path: '/practice',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const PracticeHubScreen(),
+      ),
+      GoRoute(
+        path: '/practice/session/:id',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return PracticeSessionScreen(attemptId: id);
+        },
+      ),
+      GoRoute(
+        path: '/practice/result/:id',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return PracticeResultScreen(attemptId: id);
+        },
+      ),
+      GoRoute(
+        path: '/practice/history',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const PracticeHistoryScreen(),
       ),
     ],
   );

@@ -1,0 +1,282 @@
+[
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-technical-canonical",
+      "url": null,
+      "attribution": "SIPS Technical Curriculum Panel"
+    },
+    "externalId": "TECH-DSA-001",
+    "status": "ACTIVE",
+    "tags": ["dsa", "arrays", "amortized-analysis", "complexity"],
+    "question": {
+      "type": "TECHNICAL",
+      "format": "SINGLE_CHOICE",
+      "domain": "DSA",
+      "topic": "ARRAYS",
+      "difficulty": "EASY",
+      "title": "Dynamic Array Amortized Append Complexity",
+      "statement": "When elements are appended sequentially to a dynamic resizable array (e.g. `std::vector` in C++ or `ArrayList` in Java) that doubles its internal capacity upon overflow, what is the amortized time complexity per append operation?",
+      "options": [
+        { "id": "A", "text": "O(1)" },
+        { "id": "B", "text": "O(log N)" },
+        { "id": "C", "text": "O(N)" },
+        { "id": "D", "text": "O(N log N)" }
+      ],
+      "correctAnswer": { "optionId": "A" },
+      "explanation": "Although copying elements during array resizing takes O(N) in the worst case, doubling the capacity occurs only geometrically at powers of two. Over N insertions, the total copying cost is 1 + 2 + 4 + ... + N = 2N, yielding an amortized time complexity of O(2N / N) = O(1) per append."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-technical-canonical",
+      "url": null,
+      "attribution": "SIPS Technical Curriculum Panel"
+    },
+    "externalId": "TECH-DSA-002",
+    "status": "ACTIVE",
+    "tags": ["dsa", "bst", "trees", "traversals"],
+    "question": {
+      "type": "TECHNICAL",
+      "format": "SINGLE_CHOICE",
+      "domain": "DSA",
+      "topic": "TREES",
+      "difficulty": "MEDIUM",
+      "title": "Binary Search Tree Inorder Traversal Monotonicity",
+      "statement": "Which tree traversal algorithm produces the keys of a strictly valid Binary Search Tree (BST) in monotonically strictly non-decreasing sorted order?",
+      "options": [
+        { "id": "A", "text": "Preorder Traversal (Root, Left, Right)" },
+        { "id": "B", "text": "Inorder Traversal (Left, Root, Right)" },
+        { "id": "C", "text": "Postorder Traversal (Left, Right, Root)" },
+        { "id": "D", "text": "Breadth-First Level Order Traversal" }
+      ],
+      "correctAnswer": { "optionId": "B" },
+      "explanation": "In a BST, all keys in the left subtree are smaller than the root, and all keys in the right subtree are greater than the root. Traversing Left subtree -> Root -> Right subtree (Inorder) systematically processes keys in ascending sorted order."
+    }
+  },
+  {
+    "source": {
+      "type": "COMPANY_PROVIDED",
+      "namespace": "industry-nqt-bank",
+      "url": null,
+      "attribution": "Industry Placement Technical Screening"
+    },
+    "externalId": "TECH-DSA-003",
+    "status": "ACTIVE",
+    "tags": ["dsa", "graphs", "shortest-path", "dijkstra"],
+    "question": {
+      "type": "TECHNICAL",
+      "format": "SINGLE_CHOICE",
+      "domain": "DSA",
+      "topic": "GRAPHS",
+      "difficulty": "HARD",
+      "title": "Dijkstra Algorithm Limitation on Negative Weights",
+      "statement": "Why can standard Dijkstra's single-source shortest path algorithm produce incorrect results on directed graphs containing negative-weight edges?",
+      "options": [
+        { "id": "A", "text": "It assumes once a node is marked visited/settled from the priority queue, its computed distance is globally minimal and final" },
+        { "id": "B", "text": "It can only be executed on directed acyclic graphs (DAGs)" },
+        { "id": "C", "text": "Negative weights cause infinite loops in Breadth-First Search" },
+        { "id": "D", "text": "Priority queue implementations cannot store signed integer types" }
+      ],
+      "correctAnswer": { "optionId": "A" },
+      "explanation": "Dijkstra's greedy invariant relies on edge weights being non-negative: the minimum distance node extracted from the priority queue can never have its shortest path reduced by exploring additional edges. Negative edges violate this greedy sub-optimality, requiring the Bellman-Ford or SPFA algorithm instead."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-technical-canonical",
+      "url": null,
+      "attribution": "SIPS Technical Curriculum Panel"
+    },
+    "externalId": "TECH-DBMS-001",
+    "status": "ACTIVE",
+    "tags": ["dbms", "transactions", "acid", "atomicity"],
+    "question": {
+      "type": "TECHNICAL",
+      "format": "SINGLE_CHOICE",
+      "domain": "DBMS",
+      "topic": "ACID",
+      "difficulty": "EASY",
+      "title": "Database Transaction Atomicity Guarantee",
+      "statement": "Which ACID property guarantees that all database operations within a transaction boundary are committed successfully together, or if any operation fails, the database is rolled back to its exact pre-transaction state?",
+      "options": [
+        { "id": "A", "text": "Atomicity" },
+        { "id": "B", "text": "Consistency" },
+        { "id": "C", "text": "Isolation" },
+        { "id": "D", "text": "Durability" }
+      ],
+      "correctAnswer": { "optionId": "A" },
+      "explanation": "Atomicity follows the 'All or Nothing' rule: either every statement in the transaction is successfully executed and committed, or in the event of an abort/failure, all partial modifications are rolled back using the Write-Ahead Log (WAL) / Undo log."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-technical-canonical",
+      "url": null,
+      "attribution": "SIPS Technical Curriculum Panel"
+    },
+    "externalId": "TECH-DBMS-002",
+    "status": "ACTIVE",
+    "tags": ["dbms", "indexing", "b-plus-tree", "range-query"],
+    "question": {
+      "type": "TECHNICAL",
+      "format": "SINGLE_CHOICE",
+      "domain": "DBMS",
+      "topic": "INDEXING",
+      "difficulty": "MEDIUM",
+      "title": "B+ Tree Leaf Node Chaining for Sequential Range Scans",
+      "statement": "What structural feature of a B+ Tree index provides superior performance over a standard B-Tree for relational SQL range queries (e.g. `WHERE age BETWEEN 20 AND 30`)?",
+      "options": [
+        { "id": "A", "text": "Internal nodes store both keys and record pointers" },
+        { "id": "B", "text": "All actual data records/pointers reside only in leaf nodes, which are linked sequentially in a doubly-linked list" },
+        { "id": "C", "text": "B+ Trees have a strict binary branching factor of 2" },
+        { "id": "D", "text": "B+ Trees store records in an unordered hash bucket layout" }
+      ],
+      "correctAnswer": { "optionId": "B" },
+      "explanation": "In B+ Trees, internal nodes only store routing keys, allowing high fan-out. All data pointers reside in leaf nodes, and leaf nodes are chained together in sequential order. A range query only needs one root-to-leaf lookup to find the lower bound, followed by linear sequential leaf traversal."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-technical-canonical",
+      "url": null,
+      "attribution": "SIPS Technical Curriculum Panel"
+    },
+    "externalId": "TECH-OS-001",
+    "status": "ACTIVE",
+    "tags": ["operating-systems", "cpu-scheduling", "round-robin", "time-quantum"],
+    "question": {
+      "type": "TECHNICAL",
+      "format": "SINGLE_CHOICE",
+      "domain": "OPERATING_SYSTEMS",
+      "topic": "CPU_SCHEDULING",
+      "difficulty": "MEDIUM",
+      "title": "Round Robin Scheduling Time Quantum Limits",
+      "statement": "In an Operating System CPU scheduler, what happens to the behavior of the preemptive Round Robin (RR) scheduling algorithm when the time quantum is configured to be arbitrarily large (approaching infinity)?",
+      "options": [
+        { "id": "A", "text": "It degenerates into First-Come, First-Served (FCFS) scheduling" },
+        { "id": "B", "text": "It degenerates into Shortest Job First (SJF) scheduling" },
+        { "id": "C", "text": "Context switching overhead increases exponentially" },
+        { "id": "D", "text": "CPU starvation is completely eliminated for all I/O-bound jobs" }
+      ],
+      "correctAnswer": { "optionId": "A" },
+      "explanation": "In Round Robin scheduling, if the time quantum is larger than the longest CPU burst of any process in the ready queue, no process will ever be preempted before finishing. Consequently, processes run to completion in the arrival order, behaving identically to First-Come, First-Served (FCFS)."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-technical-canonical",
+      "url": null,
+      "attribution": "SIPS Technical Curriculum Panel"
+    },
+    "externalId": "TECH-OS-002",
+    "status": "ACTIVE",
+    "tags": ["operating-systems", "synchronization", "mutex", "semaphore"],
+    "question": {
+      "type": "TECHNICAL",
+      "format": "SINGLE_CHOICE",
+      "domain": "OPERATING_SYSTEMS",
+      "topic": "SYNCHRONIZATION",
+      "difficulty": "MEDIUM",
+      "title": "Mutex Lock vs Counting Semaphore Ownership",
+      "statement": "What is the fundamental semantic difference regarding ownership between a Mutex (Mutual Exclusion lock) and a Counting Semaphore?",
+      "options": [
+        { "id": "A", "text": "A Mutex has strict ownership (only the thread that acquired the lock can release it), whereas a Semaphore can be signaled by any thread" },
+        { "id": "B", "text": "A Mutex supports arbitrary integer counters, while a Semaphore is strictly binary" },
+        { "id": "C", "text": "Semaphores cannot be used for thread synchronization across processes" },
+        { "id": "D", "text": "Mutexes eliminate the possibility of priority inversion" }
+      ],
+      "correctAnswer": { "optionId": "A" },
+      "explanation": "A Mutex is an ownership-based locking mechanism: the specific thread that locks the mutex must unlock it. A Semaphore is a signaling mechanism (counter of available resource units) where any thread can call signal()/post() to wake up waiting threads regardless of which thread called wait()."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-technical-canonical",
+      "url": null,
+      "attribution": "SIPS Technical Curriculum Panel"
+    },
+    "externalId": "TECH-NET-001",
+    "status": "ACTIVE",
+    "tags": ["networks", "tcp", "transport-layer", "handshake"],
+    "question": {
+      "type": "TECHNICAL",
+      "format": "SINGLE_CHOICE",
+      "domain": "NETWORKS",
+      "topic": "TCP",
+      "difficulty": "EASY",
+      "title": "TCP Connection Establishment 3-Way Handshake",
+      "statement": "What is the correct chronological sequence of TCP control flag segments exchanged between a client and server to establish a reliable connection?",
+      "options": [
+        { "id": "A", "text": "SYN -> SYN-ACK -> ACK" },
+        { "id": "B", "text": "ACK -> SYN -> SYN-ACK" },
+        { "id": "C", "text": "SYN -> ACK -> SYN-ACK" },
+        { "id": "D", "text": "FIN -> FIN-ACK -> ACK" }
+      ],
+      "correctAnswer": { "optionId": "A" },
+      "explanation": "TCP 3-Way Handshake sequence: 1. Client sends SYN (Synchronize Sequence Numbers) to server. 2. Server responds with SYN-ACK (Synchronize + Acknowledge). 3. Client replies with ACK (Acknowledge) to establish the connection."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-technical-canonical",
+      "url": null,
+      "attribution": "SIPS Technical Curriculum Panel"
+    },
+    "externalId": "TECH-OOP-001",
+    "status": "ACTIVE",
+    "tags": ["oop", "solid", "open-closed-principle", "design-patterns"],
+    "question": {
+      "type": "TECHNICAL",
+      "format": "SINGLE_CHOICE",
+      "domain": "OOP",
+      "topic": "SOLID",
+      "difficulty": "MEDIUM",
+      "title": "SOLID Open/Closed Principle Definition",
+      "statement": "According to the Open/Closed Principle (the 'O' in SOLID design principles), software entities (classes, modules, functions) should be:",
+      "options": [
+        { "id": "A", "text": "Open for extension, but closed for modification" },
+        { "id": "B", "text": "Open for modification, but closed for inheritance" },
+        { "id": "C", "text": "Open for public read access, but closed for writing" },
+        { "id": "D", "text": "Open for dynamic runtime recompilation only" }
+      ],
+      "correctAnswer": { "optionId": "A" },
+      "explanation": "The Open/Closed Principle states that a module should be open for extension (its behavior can be extended by adding new subclasses/interfaces) without modifying its existing, tested source code."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-technical-canonical",
+      "url": null,
+      "attribution": "SIPS Technical Curriculum Panel"
+    },
+    "externalId": "TECH-PROG-001",
+    "status": "ACTIVE",
+    "tags": ["java", "programming-concepts", "strings", "memory-management"],
+    "question": {
+      "type": "TECHNICAL",
+      "format": "SINGLE_CHOICE",
+      "domain": "PROGRAMMING_CONCEPTS",
+      "topic": "JAVA",
+      "difficulty": "MEDIUM",
+      "title": "Java String Immutability and String Constant Pool",
+      "statement": "In the Java Virtual Machine (JVM), why are `java.lang.String` objects designed to be immutable?",
+      "options": [
+        { "id": "A", "text": "To enable safe String Constant Pool caching, thread-safety without synchronization, and deterministic security/hash caching" },
+        { "id": "B", "text": "Because Java does not support heap memory reallocation" },
+        { "id": "C", "text": "To prevent garbage collection overhead" },
+        { "id": "D", "text": "Because primitive char arrays cannot be mutated in C++ underlying JVM implementations" }
+      ],
+      "correctAnswer": { "optionId": "A" },
+      "explanation": "String immutability in Java ensures: 1. String Pool sharing without risk of side-effects from other references. 2. Inherent thread safety. 3. Security for sensitive parameters (class loading, file paths, DB URLs). 4. Safe hashCode caching for Map/Set operations."
+    }
+  }
+]

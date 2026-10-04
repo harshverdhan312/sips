@@ -1,0 +1,2382 @@
+[
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-001",
+    "title": "Diamond Problem in Inheritance #1",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-002",
+    "title": "Open-Closed Principle (SOLID) #2",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-003",
+    "title": "Singleton Pattern & Thread Safety #3",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-004",
+    "title": "Diamond Problem in Inheritance #4",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-005",
+    "title": "Open-Closed Principle (SOLID) #5",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-006",
+    "title": "Singleton Pattern & Thread Safety #6",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-007",
+    "title": "Diamond Problem in Inheritance #7",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-008",
+    "title": "Open-Closed Principle (SOLID) #8",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-009",
+    "title": "Singleton Pattern & Thread Safety #9",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-010",
+    "title": "Diamond Problem in Inheritance #10",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-011",
+    "title": "Open-Closed Principle (SOLID) #11",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-012",
+    "title": "Singleton Pattern & Thread Safety #12",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-013",
+    "title": "Diamond Problem in Inheritance #13",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-014",
+    "title": "Open-Closed Principle (SOLID) #14",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-015",
+    "title": "Singleton Pattern & Thread Safety #15",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-016",
+    "title": "Diamond Problem in Inheritance #16",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-017",
+    "title": "Open-Closed Principle (SOLID) #17",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-018",
+    "title": "Singleton Pattern & Thread Safety #18",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-019",
+    "title": "Diamond Problem in Inheritance #19",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-020",
+    "title": "Open-Closed Principle (SOLID) #20",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-021",
+    "title": "Singleton Pattern & Thread Safety #21",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-022",
+    "title": "Diamond Problem in Inheritance #22",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-023",
+    "title": "Open-Closed Principle (SOLID) #23",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-024",
+    "title": "Singleton Pattern & Thread Safety #24",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-025",
+    "title": "Diamond Problem in Inheritance #25",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-026",
+    "title": "Open-Closed Principle (SOLID) #26",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-027",
+    "title": "Singleton Pattern & Thread Safety #27",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-028",
+    "title": "Diamond Problem in Inheritance #28",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-029",
+    "title": "Open-Closed Principle (SOLID) #29",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-030",
+    "title": "Singleton Pattern & Thread Safety #30",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-031",
+    "title": "Diamond Problem in Inheritance #31",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-032",
+    "title": "Open-Closed Principle (SOLID) #32",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-033",
+    "title": "Singleton Pattern & Thread Safety #33",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-034",
+    "title": "Diamond Problem in Inheritance #34",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-035",
+    "title": "Open-Closed Principle (SOLID) #35",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-036",
+    "title": "Singleton Pattern & Thread Safety #36",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-037",
+    "title": "Diamond Problem in Inheritance #37",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-038",
+    "title": "Open-Closed Principle (SOLID) #38",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-039",
+    "title": "Singleton Pattern & Thread Safety #39",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-040",
+    "title": "Diamond Problem in Inheritance #40",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-041",
+    "title": "Open-Closed Principle (SOLID) #41",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-042",
+    "title": "Singleton Pattern & Thread Safety #42",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-043",
+    "title": "Diamond Problem in Inheritance #43",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-044",
+    "title": "Open-Closed Principle (SOLID) #44",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-045",
+    "title": "Singleton Pattern & Thread Safety #45",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-046",
+    "title": "Diamond Problem in Inheritance #46",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-047",
+    "title": "Open-Closed Principle (SOLID) #47",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-048",
+    "title": "Singleton Pattern & Thread Safety #48",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-049",
+    "title": "Diamond Problem in Inheritance #49",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-050",
+    "title": "Open-Closed Principle (SOLID) #50",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-051",
+    "title": "Singleton Pattern & Thread Safety #51",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-052",
+    "title": "Diamond Problem in Inheritance #52",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-053",
+    "title": "Open-Closed Principle (SOLID) #53",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-054",
+    "title": "Singleton Pattern & Thread Safety #54",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-055",
+    "title": "Diamond Problem in Inheritance #55",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-056",
+    "title": "Open-Closed Principle (SOLID) #56",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-057",
+    "title": "Singleton Pattern & Thread Safety #57",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-058",
+    "title": "Diamond Problem in Inheritance #58",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-059",
+    "title": "Open-Closed Principle (SOLID) #59",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-060",
+    "title": "Singleton Pattern & Thread Safety #60",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-061",
+    "title": "Diamond Problem in Inheritance #61",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-062",
+    "title": "Open-Closed Principle (SOLID) #62",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-063",
+    "title": "Singleton Pattern & Thread Safety #63",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-064",
+    "title": "Diamond Problem in Inheritance #64",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-065",
+    "title": "Open-Closed Principle (SOLID) #65",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-066",
+    "title": "Singleton Pattern & Thread Safety #66",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-067",
+    "title": "Diamond Problem in Inheritance #67",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-068",
+    "title": "Open-Closed Principle (SOLID) #68",
+    "statement": "What is the core directive of the Open-Closed Principle (OCP) in software architecture?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Classes should expose all member variables directly"
+      },
+      {
+        "id": "opt_b",
+        "text": "Functions should do exactly one thing"
+      },
+      {
+        "id": "opt_c",
+        "text": "Interfaces must be fat and exhaustive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Software entities should be open for extension, but closed for modification"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "OCP requires that system behavior can be extended without altering existing verified source code."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-069",
+    "title": "Singleton Pattern & Thread Safety #69",
+    "statement": "What pattern is commonly used in Java/C++ to implement high-performance thread-safe lazy Singleton initialization?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Double-Checked Locking with volatile keyword"
+      },
+      {
+        "id": "opt_b",
+        "text": "Multiple inheritance"
+      },
+      {
+        "id": "opt_c",
+        "text": "Observer registration"
+      },
+      {
+        "id": "opt_d",
+        "text": "Static infinite recursion"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Double-checked locking checks the instance before and after lock acquisition to avoid synchronizing after initialization."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OOP",
+    "subcategory": "Object Oriented Programming",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-oop-070",
+    "title": "Diamond Problem in Inheritance #70",
+    "statement": "How does C++ resolve the \"Diamond Problem\" of multiple inheritance where class D inherits from B and C (both inheriting from A)?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Friend classes"
+      },
+      {
+        "id": "opt_b",
+        "text": "Interface dynamic casting"
+      },
+      {
+        "id": "opt_c",
+        "text": "Operator overloading"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Inheritance (virtual base classes)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Virtual base classes ensure that only one shared instance of base class A exists in derived class D."
+  }
+]

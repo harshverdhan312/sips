@@ -46,12 +46,21 @@ export function ToastContainer() {
             )}
           >
             <Icon className={cn("w-5 h-5 shrink-0 mt-0.5", config.iconColor)} />
-            <p className="text-xs sm:text-sm font-medium flex-1 leading-snug">
-              {toast.message}
-            </p>
+            <div className="flex-1 min-w-0">
+              {toast.title && (
+                <div className="text-xs sm:text-sm font-bold leading-tight mb-0.5">
+                  {typeof toast.title === "string" ? toast.title : String(toast.title)}
+                </div>
+              )}
+              {toast.message && (
+                <p className="text-xs sm:text-sm font-medium leading-snug">
+                  {typeof toast.message === "string" ? toast.message : JSON.stringify(toast.message)}
+                </p>
+              )}
+            </div>
             <button
               onClick={() => removeToast(toast.id)}
-              className="text-slate-400 hover:text-slate-700 cursor-pointer p-0.5"
+              className="text-slate-400 hover:text-slate-700 cursor-pointer p-0.5 shrink-0"
             >
               <X className="w-4 h-4" />
             </button>

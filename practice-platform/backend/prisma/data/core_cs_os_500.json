@@ -1,0 +1,3402 @@
+[
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-001",
+    "title": "Banker's Algorithm Purpose #1",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-002",
+    "title": "Translation Lookaside Buffer (TLB) #2",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-003",
+    "title": "Belady's Anomaly in Page Replacement #3",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-004",
+    "title": "Context Switching Overhead #4",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-005",
+    "title": "Banker's Algorithm Purpose #5",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-006",
+    "title": "Translation Lookaside Buffer (TLB) #6",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-007",
+    "title": "Belady's Anomaly in Page Replacement #7",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-008",
+    "title": "Context Switching Overhead #8",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-009",
+    "title": "Banker's Algorithm Purpose #9",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-010",
+    "title": "Translation Lookaside Buffer (TLB) #10",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-011",
+    "title": "Belady's Anomaly in Page Replacement #11",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-012",
+    "title": "Context Switching Overhead #12",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-013",
+    "title": "Banker's Algorithm Purpose #13",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-014",
+    "title": "Translation Lookaside Buffer (TLB) #14",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-015",
+    "title": "Belady's Anomaly in Page Replacement #15",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-016",
+    "title": "Context Switching Overhead #16",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-017",
+    "title": "Banker's Algorithm Purpose #17",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-018",
+    "title": "Translation Lookaside Buffer (TLB) #18",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-019",
+    "title": "Belady's Anomaly in Page Replacement #19",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-020",
+    "title": "Context Switching Overhead #20",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-021",
+    "title": "Banker's Algorithm Purpose #21",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-022",
+    "title": "Translation Lookaside Buffer (TLB) #22",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-023",
+    "title": "Belady's Anomaly in Page Replacement #23",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-024",
+    "title": "Context Switching Overhead #24",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-025",
+    "title": "Banker's Algorithm Purpose #25",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-026",
+    "title": "Translation Lookaside Buffer (TLB) #26",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-027",
+    "title": "Belady's Anomaly in Page Replacement #27",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-028",
+    "title": "Context Switching Overhead #28",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-029",
+    "title": "Banker's Algorithm Purpose #29",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-030",
+    "title": "Translation Lookaside Buffer (TLB) #30",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-031",
+    "title": "Belady's Anomaly in Page Replacement #31",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-032",
+    "title": "Context Switching Overhead #32",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-033",
+    "title": "Banker's Algorithm Purpose #33",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-034",
+    "title": "Translation Lookaside Buffer (TLB) #34",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-035",
+    "title": "Belady's Anomaly in Page Replacement #35",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-036",
+    "title": "Context Switching Overhead #36",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-037",
+    "title": "Banker's Algorithm Purpose #37",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-038",
+    "title": "Translation Lookaside Buffer (TLB) #38",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-039",
+    "title": "Belady's Anomaly in Page Replacement #39",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-040",
+    "title": "Context Switching Overhead #40",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-041",
+    "title": "Banker's Algorithm Purpose #41",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-042",
+    "title": "Translation Lookaside Buffer (TLB) #42",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-043",
+    "title": "Belady's Anomaly in Page Replacement #43",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-044",
+    "title": "Context Switching Overhead #44",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-045",
+    "title": "Banker's Algorithm Purpose #45",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-046",
+    "title": "Translation Lookaside Buffer (TLB) #46",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-047",
+    "title": "Belady's Anomaly in Page Replacement #47",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-048",
+    "title": "Context Switching Overhead #48",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-049",
+    "title": "Banker's Algorithm Purpose #49",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-050",
+    "title": "Translation Lookaside Buffer (TLB) #50",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-051",
+    "title": "Belady's Anomaly in Page Replacement #51",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-052",
+    "title": "Context Switching Overhead #52",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-053",
+    "title": "Banker's Algorithm Purpose #53",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-054",
+    "title": "Translation Lookaside Buffer (TLB) #54",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-055",
+    "title": "Belady's Anomaly in Page Replacement #55",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-056",
+    "title": "Context Switching Overhead #56",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-057",
+    "title": "Banker's Algorithm Purpose #57",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-058",
+    "title": "Translation Lookaside Buffer (TLB) #58",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-059",
+    "title": "Belady's Anomaly in Page Replacement #59",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-060",
+    "title": "Context Switching Overhead #60",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-061",
+    "title": "Banker's Algorithm Purpose #61",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-062",
+    "title": "Translation Lookaside Buffer (TLB) #62",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-063",
+    "title": "Belady's Anomaly in Page Replacement #63",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-064",
+    "title": "Context Switching Overhead #64",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-065",
+    "title": "Banker's Algorithm Purpose #65",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-066",
+    "title": "Translation Lookaside Buffer (TLB) #66",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-067",
+    "title": "Belady's Anomaly in Page Replacement #67",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-068",
+    "title": "Context Switching Overhead #68",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-069",
+    "title": "Banker's Algorithm Purpose #69",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-070",
+    "title": "Translation Lookaside Buffer (TLB) #70",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-071",
+    "title": "Belady's Anomaly in Page Replacement #71",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-072",
+    "title": "Context Switching Overhead #72",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-073",
+    "title": "Banker's Algorithm Purpose #73",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-074",
+    "title": "Translation Lookaside Buffer (TLB) #74",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-075",
+    "title": "Belady's Anomaly in Page Replacement #75",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-076",
+    "title": "Context Switching Overhead #76",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-077",
+    "title": "Banker's Algorithm Purpose #77",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-078",
+    "title": "Translation Lookaside Buffer (TLB) #78",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-079",
+    "title": "Belady's Anomaly in Page Replacement #79",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-080",
+    "title": "Context Switching Overhead #80",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-081",
+    "title": "Banker's Algorithm Purpose #81",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-082",
+    "title": "Translation Lookaside Buffer (TLB) #82",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-083",
+    "title": "Belady's Anomaly in Page Replacement #83",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-084",
+    "title": "Context Switching Overhead #84",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-085",
+    "title": "Banker's Algorithm Purpose #85",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-086",
+    "title": "Translation Lookaside Buffer (TLB) #86",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-087",
+    "title": "Belady's Anomaly in Page Replacement #87",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-088",
+    "title": "Context Switching Overhead #88",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-089",
+    "title": "Banker's Algorithm Purpose #89",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-090",
+    "title": "Translation Lookaside Buffer (TLB) #90",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-091",
+    "title": "Belady's Anomaly in Page Replacement #91",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-092",
+    "title": "Context Switching Overhead #92",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-093",
+    "title": "Banker's Algorithm Purpose #93",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-094",
+    "title": "Translation Lookaside Buffer (TLB) #94",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-095",
+    "title": "Belady's Anomaly in Page Replacement #95",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-096",
+    "title": "Context Switching Overhead #96",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-097",
+    "title": "Banker's Algorithm Purpose #97",
+    "statement": "What is the primary objective of Dijkstra's Banker's Algorithm in Operating Systems?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "CPU Time Slicing"
+      },
+      {
+        "id": "opt_b",
+        "text": "Deadlock Avoidance by ensuring system remains in a Safe State"
+      },
+      {
+        "id": "opt_c",
+        "text": "Deadlock Detection and Recovery"
+      },
+      {
+        "id": "opt_d",
+        "text": "Virtual Page Allocation"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Banker's algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of resources."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-098",
+    "title": "Translation Lookaside Buffer (TLB) #98",
+    "statement": "What happens in an operating system when a TLB miss occurs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "A disk I/O interrupt is immediately fired"
+      },
+      {
+        "id": "opt_b",
+        "text": "The CPU enters an infinite kernel halt"
+      },
+      {
+        "id": "opt_c",
+        "text": "The MMU traverses the multi-level page table in main memory to fetch the frame number and updates the TLB"
+      },
+      {
+        "id": "opt_d",
+        "text": "The process is terminated with segmentation fault"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "On a TLB miss, page table lookup is performed in RAM. If the page is present in RAM, TLB is updated; if not, a Page Fault is raised."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-099",
+    "title": "Belady's Anomaly in Page Replacement #99",
+    "statement": "Belady's Anomaly (increasing page frames increases page faults) can occur in which page replacement algorithm?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "FIFO (First-In, First-Out)"
+      },
+      {
+        "id": "opt_b",
+        "text": "LRU (Least Recently Used)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Optimal Page Replacement"
+      },
+      {
+        "id": "opt_d",
+        "text": "Stack-based Replacement Algorithms"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "FIFO is not a stack algorithm and can exhibit Belady's Anomaly where allocating more frames results in more page faults."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Operating Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-os-100",
+    "title": "Context Switching Overhead #100",
+    "statement": "What state components are saved and restored during an OS process context switch?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "BIOS firmware cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Entire contents of physical RAM"
+      },
+      {
+        "id": "opt_c",
+        "text": "Hard disk partition table"
+      },
+      {
+        "id": "opt_d",
+        "text": "Program Counter, CPU Registers, Stack Pointer, and Process Control Block (PCB)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Context switching preserves CPU register state, PC, and memory management registers within the process's PCB."
+  }
+]

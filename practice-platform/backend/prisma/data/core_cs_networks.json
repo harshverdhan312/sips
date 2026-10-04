@@ -1,0 +1,62 @@
+[
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Transport Layer",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "net-trans-01",
+    "title": "TCP Three-Way Handshake Flags",
+    "statement": "What is the correct sequence of control flags exchanged between client and server during the establishment of a standard TCP connection?",
+    "options": [
+      { "id": "opt_a", "text": "SYN -> SYN-ACK -> ACK" },
+      { "id": "opt_b", "text": "ACK -> SYN -> ACK" },
+      { "id": "opt_c", "text": "SYN -> ACK -> FIN" },
+      { "id": "opt_d", "text": "RST -> SYN -> ACK" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "TCP 3-way handshake: 1. Client sends SYN (Synchronize Sequence Number). 2. Server responds with SYN-ACK. 3. Client acknowledges with ACK."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "IP Addressing",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "net-ip-01",
+    "title": "CIDR Subnet Mask and Usable Host Count",
+    "statement": "How many usable host IP addresses are available in a subnet with a CIDR prefix of /27?",
+    "options": [
+      { "id": "opt_a", "text": "30" },
+      { "id": "opt_b", "text": "32" },
+      { "id": "opt_c", "text": "28" },
+      { "id": "opt_d", "text": "62" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "A /27 subnet has 32 - 27 = 5 host bits. Total IP addresses = 2^5 = 32. Subtracting 2 reserved addresses (1 for Network Address and 1 for Broadcast Address) gives 32 - 2 = 30 usable host IPs."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "NETWORKS",
+    "subcategory": "Application Layer",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "net-app-01",
+    "title": "DNS Protocol Port and Transport Layer",
+    "statement": "Which transport layer protocol and default port are primarily used for standard DNS query resolution?",
+    "options": [
+      { "id": "opt_a", "text": "UDP Port 53" },
+      { "id": "opt_b", "text": "TCP Port 80" },
+      { "id": "opt_c", "text": "UDP Port 67" },
+      { "id": "opt_d", "text": "TCP Port 443" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "Standard DNS lookups use UDP port 53 because of low latency and minimal overhead. TCP port 53 is reserved for zone transfers and queries exceeding 512 bytes."
+  }
+]

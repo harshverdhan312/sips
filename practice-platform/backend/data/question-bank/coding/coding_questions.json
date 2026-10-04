@@ -1,0 +1,862 @@
+[
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-coding-canonical",
+      "url": null,
+      "attribution": "SIPS Coding Assessment Panel"
+    },
+    "externalId": "CODE-ARR-001",
+    "status": "ACTIVE",
+    "tags": ["arrays", "hashing", "two-sum", "easy"],
+    "question": {
+      "type": "CODING",
+      "format": "CODING",
+      "domain": "DSA",
+      "topic": "ARRAYS_HASHING",
+      "difficulty": "EASY",
+      "title": "Two Sum Target Pair Indices",
+      "statement": "Given an array of integers `nums` and an integer `target`, return the 0-based indices of the two distinct elements such that they add up to `target`.\n\nPrint the two space-separated indices in ascending order (e.g., `0 1`). You may assume that each input has exactly one unique solution, and you may not use the same element twice.",
+      "options": null,
+      "correctAnswer": null,
+      "explanation": "Use a hash map to store each visited number and its index. For each element x at index i, compute complement = target - x. If complement exists in the map, return [map[complement], i]."
+    },
+    "coding": {
+      "inputFormat": "Line 1: Two space-separated integers N and Target\nLine 2: N space-separated integers representing the array nums",
+      "outputFormat": "Two space-separated 0-based indices i and j (where i < j)",
+      "constraints": "2 <= N <= 10^4\n-10^9 <= nums[i] <= 10^9\n-10^9 <= Target <= 10^9",
+      "timeLimitMs": 2000,
+      "memoryLimitKb": 128000,
+      "maxMarks": 100,
+      "starterCode": {
+        "python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().split()\n    if not lines:\n        return\n    n = int(lines[0])\n    target = int(lines[1])\n    nums = [int(x) for x in lines[2:2+n]]\n    # TODO: implement two sum logic\n    pass\n\nif __name__ == '__main__':\n    solve()\n",
+        "cpp": "#include <iostream>\n#include <vector>\n#include <unordered_map>\nusing namespace std;\n\nint main() {\n    int n; long long target;\n    if (!(cin >> n >> target)) return 0;\n    vector<long long> nums(n);\n    for (int i = 0; i < n; ++i) cin >> nums[i];\n    // TODO: implement two sum logic\n    return 0;\n}\n",
+        "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int n = sc.nextInt();\n        long target = sc.nextLong();\n        long[] nums = new long[n];\n        for (int i = 0; i < n; i++) nums[i] = sc.nextLong();\n        // TODO: implement two sum logic\n    }\n}\n",
+        "javascript": "const fs = require('fs');\n\nfunction main() {\n    const input = fs.readFileSync(0, 'utf-8').trim().split(/\\s+/);\n    if (input.length < 2) return;\n    const n = parseInt(input[0], 10);\n    const target = parseInt(input[1], 10);\n    const nums = input.slice(2, 2 + n).map(x => parseInt(x, 10));\n    // TODO: implement two sum logic\n}\n\nmain();\n"
+      },
+      "testCases": [
+        { "input": "4 9\n2 7 11 15", "expectedOutput": "0 1", "isHidden": false, "weight": 25, "order": 1 },
+        { "input": "3 6\n3 2 4", "expectedOutput": "1 2", "isHidden": false, "weight": 25, "order": 2 },
+        { "input": "5 10\n1 2 3 4 9", "expectedOutput": "0 4", "isHidden": true, "weight": 25, "order": 3 },
+        { "input": "6 100\n10 20 30 70 80 90", "expectedOutput": "1 4", "isHidden": true, "weight": 25, "order": 4 }
+      ]
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-coding-canonical",
+      "url": null,
+      "attribution": "SIPS Coding Assessment Panel"
+    },
+    "externalId": "CODE-ARR-002",
+    "status": "ACTIVE",
+    "tags": ["arrays", "hash-set", "duplicates", "easy"],
+    "question": {
+      "type": "CODING",
+      "format": "CODING",
+      "domain": "DSA",
+      "topic": "ARRAYS_HASHING",
+      "difficulty": "EASY",
+      "title": "Contains Duplicate Value",
+      "statement": "Given an integer array `nums`, return `true` if any value appears at least twice in the array, and return `false` if every element is distinct.\n\nPrint `true` or `false`.",
+      "options": null,
+      "correctAnswer": null,
+      "explanation": "Iterate through the array and insert each element into a hash set. If an element already exists in the set, a duplicate is found -> return true. Otherwise return false."
+    },
+    "coding": {
+      "inputFormat": "Line 1: An integer N representing the array length\nLine 2: N space-separated integers",
+      "outputFormat": "Print 'true' if duplicate exists, or 'false' otherwise",
+      "constraints": "1 <= N <= 10^5\n-10^9 <= nums[i] <= 10^9",
+      "timeLimitMs": 2000,
+      "memoryLimitKb": 128000,
+      "maxMarks": 100,
+      "starterCode": {
+        "python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().split()\n    if not lines:\n        return\n    n = int(lines[0])\n    nums = [int(x) for x in lines[1:1+n]]\n    # TODO: solve duplicate check\n    pass\n\nif __name__ == '__main__':\n    solve()\n",
+        "cpp": "#include <iostream>\n#include <vector>\n#include <unordered_set>\nusing namespace std;\n\nint main() {\n    int n;\n    if (!(cin >> n)) return 0;\n    vector<long long> nums(n);\n    for (int i = 0; i < n; ++i) cin >> nums[i];\n    // TODO: solve duplicate check\n    return 0;\n}\n",
+        "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int n = sc.nextInt();\n        long[] nums = new long[n];\n        for (int i = 0; i < n; i++) nums[i] = sc.nextLong();\n        // TODO: solve duplicate check\n    }\n}\n",
+        "javascript": "const fs = require('fs');\n\nfunction main() {\n    const input = fs.readFileSync(0, 'utf-8').trim().split(/\\s+/);\n    if (!input[0]) return;\n    const n = parseInt(input[0], 10);\n    const nums = input.slice(1, 1 + n).map(x => parseInt(x, 10));\n    // TODO: solve duplicate check\n}\n\nmain();\n"
+      },
+      "testCases": [
+        { "input": "4\n1 2 3 1", "expectedOutput": "true", "isHidden": false, "weight": 25, "order": 1 },
+        { "input": "4\n1 2 3 4", "expectedOutput": "false", "isHidden": false, "weight": 25, "order": 2 },
+        { "input": "5\n1 1 1 3 3", "expectedOutput": "true", "isHidden": true, "weight": 25, "order": 3 },
+        { "input": "1\n999", "expectedOutput": "false", "isHidden": true, "weight": 25, "order": 4 }
+      ]
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-coding-canonical",
+      "url": null,
+      "attribution": "SIPS Coding Assessment Panel"
+    },
+    "externalId": "CODE-ARR-003",
+    "status": "ACTIVE",
+    "tags": ["arrays", "hash-set", "longest-consecutive", "medium"],
+    "question": {
+      "type": "CODING",
+      "format": "CODING",
+      "domain": "DSA",
+      "topic": "ARRAYS_HASHING",
+      "difficulty": "MEDIUM",
+      "title": "Longest Consecutive Sequence Length",
+      "statement": "Given an unsorted array of integers `nums`, return the length of the longest consecutive elements sequence.\n\nYou must write an algorithm that runs in O(N) time complexity.",
+      "options": null,
+      "correctAnswer": null,
+      "explanation": "Store all numbers in a hash set. Iterate through the numbers: if (num - 1) is not in the set, num is the start of a sequence. Count consecutively upwards until numbers run out. Update max length."
+    },
+    "coding": {
+      "inputFormat": "Line 1: An integer N\nLine 2: N space-separated integers (if N > 0)",
+      "outputFormat": "An integer representing the length of the longest consecutive sequence",
+      "constraints": "0 <= N <= 10^5\n-10^9 <= nums[i] <= 10^9",
+      "timeLimitMs": 2000,
+      "memoryLimitKb": 128000,
+      "maxMarks": 100,
+      "starterCode": {
+        "python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().split()\n    if not lines:\n        print(0)\n        return\n    n = int(lines[0])\n    nums = [int(x) for x in lines[1:1+n]]\n    # TODO: solve longest consecutive sequence\n    pass\n\nif __name__ == '__main__':\n    solve()\n",
+        "cpp": "#include <iostream>\n#include <vector>\n#include <unordered_set>\nusing namespace std;\n\nint main() {\n    int n;\n    if (!(cin >> n) || n == 0) { cout << 0 << endl; return 0; }\n    vector<long long> nums(n);\n    for (int i = 0; i < n; ++i) cin >> nums[i];\n    // TODO: solve longest consecutive sequence\n    return 0;\n}\n",
+        "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) { System.out.println(0); return; }\n        int n = sc.nextInt();\n        long[] nums = new long[n];\n        for (int i = 0; i < n; i++) nums[i] = sc.nextLong();\n        // TODO: solve longest consecutive sequence\n    }\n}\n",
+        "javascript": "const fs = require('fs');\n\nfunction main() {\n    const input = fs.readFileSync(0, 'utf-8').trim().split(/\\s+/);\n    if (!input[0] || input[0] === '') { console.log(0); return; }\n    const n = parseInt(input[0], 10);\n    if (n === 0) { console.log(0); return; }\n    const nums = input.slice(1, 1 + n).map(x => parseInt(x, 10));\n    // TODO: solve longest consecutive sequence\n}\n\nmain();\n"
+      },
+      "testCases": [
+        { "input": "6\n100 4 200 1 3 2", "expectedOutput": "4", "isHidden": false, "weight": 25, "order": 1 },
+        { "input": "10\n0 3 7 2 5 8 4 6 0 1", "expectedOutput": "9", "isHidden": false, "weight": 25, "order": 2 },
+        { "input": "0", "expectedOutput": "0", "isHidden": true, "weight": 25, "order": 3 },
+        { "input": "5\n9 1 4 7 3", "expectedOutput": "1", "isHidden": true, "weight": 25, "order": 4 }
+      ]
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-coding-canonical",
+      "url": null,
+      "attribution": "SIPS Coding Assessment Panel"
+    },
+    "externalId": "CODE-STR-001",
+    "status": "ACTIVE",
+    "tags": ["strings", "hash-map", "anagram", "easy"],
+    "question": {
+      "type": "CODING",
+      "format": "CODING",
+      "domain": "DSA",
+      "topic": "STRINGS",
+      "difficulty": "EASY",
+      "title": "Valid Anagram Checker",
+      "statement": "Given two strings `s` and `t`, return `true` if `t` is an anagram of `s`, and `false` otherwise.\n\nAn Anagram is a word formed by rearranging the letters of a different word, typically using all the original letters exactly once.",
+      "options": null,
+      "correctAnswer": null,
+      "explanation": "Compare character frequency counts of both strings using an array of size 26 or a hash map. If lengths differ or character counts do not match, return false."
+    },
+    "coding": {
+      "inputFormat": "Line 1: String S\nLine 2: String T",
+      "outputFormat": "Print 'true' or 'false'",
+      "constraints": "1 <= length(S), length(T) <= 5 * 10^4\nStrings consist of lowercase English letters",
+      "timeLimitMs": 2000,
+      "memoryLimitKb": 128000,
+      "maxMarks": 100,
+      "starterCode": {
+        "python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().split()\n    if len(lines) < 2:\n        return\n    s, t = lines[0], lines[1]\n    # TODO: solve valid anagram\n    pass\n\nif __name__ == '__main__':\n    solve()\n",
+        "cpp": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\n\nint main() {\n    string s, t;\n    if (cin >> s >> t) {\n        // TODO: solve valid anagram\n    }\n    return 0;\n}\n",
+        "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (sc.hasNext()) {\n            String s = sc.next();\n            String t = sc.next();\n            // TODO: solve valid anagram\n        }\n    }\n}\n",
+        "javascript": "const fs = require('fs');\n\nfunction main() {\n    const input = fs.readFileSync(0, 'utf-8').trim().split(/\\s+/);\n    if (input.length < 2) return;\n    const s = input[0];\n    const t = input[1];\n    // TODO: solve valid anagram\n}\n\nmain();\n"
+      },
+      "testCases": [
+        { "input": "anagram\nnagaram", "expectedOutput": "true", "isHidden": false, "weight": 25, "order": 1 },
+        { "input": "rat\ncar", "expectedOutput": "false", "isHidden": false, "weight": 25, "order": 2 },
+        { "input": "listen\nsilent", "expectedOutput": "true", "isHidden": true, "weight": 25, "order": 3 },
+        { "input": "a\nab", "expectedOutput": "false", "isHidden": true, "weight": 25, "order": 4 }
+      ]
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-coding-canonical",
+      "url": null,
+      "attribution": "SIPS Coding Assessment Panel"
+    },
+    "externalId": "CODE-STR-002",
+    "status": "ACTIVE",
+    "tags": ["strings", "hashing", "sorting", "group-anagrams", "medium"],
+    "question": {
+      "type": "CODING",
+      "format": "CODING",
+      "domain": "DSA",
+      "topic": "STRINGS",
+      "difficulty": "MEDIUM",
+      "title": "Group Anagrams Count and Distribution",
+      "statement": "Given an array of strings `strs`, group the anagrams together.\n\nPrint the total number of distinct anagram groups on Line 1, and the sizes of each group sorted in non-decreasing order separated by spaces on Line 2.",
+      "options": null,
+      "correctAnswer": null,
+      "explanation": "Sort the characters of each string to create a canonical key. Group matching keys in a hash map. Output the number of unique keys and the sorted list of group sizes."
+    },
+    "coding": {
+      "inputFormat": "Line 1: An integer N\nLine 2: N space-separated strings",
+      "outputFormat": "Line 1: Number of distinct anagram groups\nLine 2: Group sizes sorted in ascending order",
+      "constraints": "1 <= N <= 10^4\n0 <= length(strs[i]) <= 100\nConsists of lowercase English letters",
+      "timeLimitMs": 2000,
+      "memoryLimitKb": 128000,
+      "maxMarks": 100,
+      "starterCode": {
+        "python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().split()\n    if not lines:\n        return\n    n = int(lines[0])\n    strs = lines[1:1+n]\n    # TODO: solve group anagrams\n    pass\n\nif __name__ == '__main__':\n    solve()\n",
+        "cpp": "#include <iostream>\n#include <vector>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    int n;\n    if (!(cin >> n)) return 0;\n    vector<string> strs(n);\n    for (int i = 0; i < n; ++i) cin >> strs[i];\n    // TODO: solve group anagrams\n    return 0;\n}\n",
+        "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int n = sc.nextInt();\n        String[] strs = new String[n];\n        for (int i = 0; i < n; i++) strs[i] = sc.next();\n        // TODO: solve group anagrams\n    }\n}\n",
+        "javascript": "const fs = require('fs');\n\nfunction main() {\n    const input = fs.readFileSync(0, 'utf-8').trim().split(/\\s+/);\n    if (!input[0]) return;\n    const n = parseInt(input[0], 10);\n    const strs = input.slice(1, 1 + n);\n    // TODO: solve group anagrams\n}\n\nmain();\n"
+      },
+      "testCases": [
+        { "input": "6\neat tea tan ate nat bat", "expectedOutput": "3\n1 2 3", "isHidden": false, "weight": 25, "order": 1 },
+        { "input": "1\na", "expectedOutput": "1\n1", "isHidden": false, "weight": 25, "order": 2 },
+        { "input": "3\nabc bca cba", "expectedOutput": "1\n3", "isHidden": true, "weight": 25, "order": 3 },
+        { "input": "4\ncat dog bird fish", "expectedOutput": "4\n1 1 1 1", "isHidden": true, "weight": 25, "order": 4 }
+      ]
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-coding-canonical",
+      "url": null,
+      "attribution": "SIPS Coding Assessment Panel"
+    },
+    "externalId": "CODE-PTR-001",
+    "status": "ACTIVE",
+    "tags": ["two-pointers", "strings", "palindrome", "easy"],
+    "question": {
+      "type": "CODING",
+      "format": "CODING",
+      "domain": "DSA",
+      "topic": "TWO_POINTERS_SLIDING_WINDOW",
+      "difficulty": "EASY",
+      "title": "Alphanumeric Valid Palindrome",
+      "statement": "A phrase is a palindrome if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward.\n\nGiven a string `s`, print `true` if it is a palindrome, or `false` otherwise.",
+      "options": null,
+      "correctAnswer": null,
+      "explanation": "Use two pointers starting at the beginning and end of the string. Advance pointers past non-alphanumeric characters. Compare lowercased characters until pointers meet."
+    },
+    "coding": {
+      "inputFormat": "A single line containing the string S",
+      "outputFormat": "Print 'true' or 'false'",
+      "constraints": "1 <= length(S) <= 2 * 10^5\nString consists of printable ASCII characters",
+      "timeLimitMs": 2000,
+      "memoryLimitKb": 128000,
+      "maxMarks": 100,
+      "starterCode": {
+        "python": "import sys\n\ndef solve():\n    s = sys.stdin.readline().strip()\n    # TODO: solve valid palindrome\n    pass\n\nif __name__ == '__main__':\n    solve()\n",
+        "cpp": "#include <iostream>\n#include <string>\n#include <cctype>\nusing namespace std;\n\nint main() {\n    string s;\n    if (getline(cin, s)) {\n        // TODO: solve valid palindrome\n    }\n    return 0;\n}\n",
+        "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (sc.hasNextLine()) {\n            String s = sc.nextLine();\n            // TODO: solve valid palindrome\n        }\n    }\n}\n",
+        "javascript": "const fs = require('fs');\n\nfunction main() {\n    const s = fs.readFileSync(0, 'utf-8').trim();\n    // TODO: solve valid palindrome\n}\n\nmain();\n"
+      },
+      "testCases": [
+        { "input": "A man, a plan, a canal: Panama", "expectedOutput": "true", "isHidden": false, "weight": 25, "order": 1 },
+        { "input": "race a car", "expectedOutput": "false", "isHidden": false, "weight": 25, "order": 2 },
+        { "input": "Was it a car or a cat I saw?", "expectedOutput": "true", "isHidden": true, "weight": 25, "order": 3 },
+        { "input": " ", "expectedOutput": "true", "isHidden": true, "weight": 25, "order": 4 }
+      ]
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-coding-canonical",
+      "url": null,
+      "attribution": "SIPS Coding Assessment Panel"
+    },
+    "externalId": "CODE-WIN-002",
+    "status": "ACTIVE",
+    "tags": ["sliding-window", "strings", "hash-set", "medium"],
+    "question": {
+      "type": "CODING",
+      "format": "CODING",
+      "domain": "DSA",
+      "topic": "TWO_POINTERS_SLIDING_WINDOW",
+      "difficulty": "MEDIUM",
+      "title": "Longest Substring Without Repeating Characters",
+      "statement": "Given a string `s`, find the length of the longest substring without repeating characters.",
+      "options": null,
+      "correctAnswer": null,
+      "explanation": "Maintain a sliding window [left, right] and a hash set of characters. As right expands, if s[right] is in the set, shrink from the left until the duplicate is removed. Track the maximum window size."
+    },
+    "coding": {
+      "inputFormat": "A single line containing the string S (can be empty)",
+      "outputFormat": "An integer representing the length of the longest substring with unique characters",
+      "constraints": "0 <= length(S) <= 5 * 10^4\nS consists of English letters, digits, symbols and spaces",
+      "timeLimitMs": 2000,
+      "memoryLimitKb": 128000,
+      "maxMarks": 100,
+      "starterCode": {
+        "python": "import sys\n\ndef solve():\n    s = sys.stdin.read().rstrip('\\r\\n')\n    # TODO: solve longest substring without repeating chars\n    pass\n\nif __name__ == '__main__':\n    solve()\n",
+        "cpp": "#include <iostream>\n#include <string>\n#include <unordered_set>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    string s;\n    getline(cin, s);\n    // TODO: solve longest substring without repeating chars\n    return 0;\n}\n",
+        "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.hasNextLine() ? sc.nextLine() : \"\";\n        // TODO: solve longest substring without repeating chars\n    }\n}\n",
+        "javascript": "const fs = require('fs');\n\nfunction main() {\n    const s = fs.readFileSync(0, 'utf-8').replace(/[\\r\\n]+$/, '');\n    // TODO: solve longest substring without repeating chars\n}\n\nmain();\n"
+      },
+      "testCases": [
+        { "input": "abcabcbb", "expectedOutput": "3", "isHidden": false, "weight": 25, "order": 1 },
+        { "input": "bbbbb", "expectedOutput": "1", "isHidden": false, "weight": 25, "order": 2 },
+        { "input": "pwwkew", "expectedOutput": "3", "isHidden": true, "weight": 25, "order": 3 },
+        { "input": "", "expectedOutput": "0", "isHidden": true, "weight": 25, "order": 4 }
+      ]
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-coding-canonical",
+      "url": null,
+      "attribution": "SIPS Coding Assessment Panel"
+    },
+    "externalId": "CODE-LL-001",
+    "status": "ACTIVE",
+    "tags": ["linked-list", "pointers", "reverse", "easy"],
+    "question": {
+      "type": "CODING",
+      "format": "CODING",
+      "domain": "DSA",
+      "topic": "LINKED_LISTS",
+      "difficulty": "EASY",
+      "title": "Reverse a Singly Linked List",
+      "statement": "Given the head of a singly linked list represented as a sequence of space-separated integers, reverse the list and print the reversed values in order.",
+      "options": null,
+      "correctAnswer": null,
+      "explanation": "Iteratively reverse the next pointers of each node using prev, curr, and next pointers in O(N) time and O(1) space."
+    },
+    "coding": {
+      "inputFormat": "Line 1: An integer N representing the number of nodes\nLine 2: N space-separated integers representing the list values",
+      "outputFormat": "N space-separated integers representing the reversed list (or empty line if N = 0)",
+      "constraints": "0 <= N <= 5000\n-5000 <= Node.val <= 5000",
+      "timeLimitMs": 2000,
+      "memoryLimitKb": 128000,
+      "maxMarks": 100,
+      "starterCode": {
+        "python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().split()\n    if not lines or int(lines[0]) == 0:\n        print(\"\")\n        return\n    n = int(lines[0])\n    vals = lines[1:1+n]\n    # TODO: reverse linked list values\n    pass\n\nif __name__ == '__main__':\n    solve()\n",
+        "cpp": "#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    int n;\n    if (!(cin >> n) || n == 0) { cout << \"\" << endl; return 0; }\n    vector<int> a(n);\n    for (int i = 0; i < n; ++i) cin >> a[i];\n    // TODO: reverse linked list values\n    return 0;\n}\n",
+        "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int n = sc.nextInt();\n        int[] a = new int[n];\n        for (int i = 0; i < n; i++) a[i] = sc.nextInt();\n        // TODO: reverse linked list values\n    }\n}\n",
+        "javascript": "const fs = require('fs');\n\nfunction main() {\n    const input = fs.readFileSync(0, 'utf-8').trim().split(/\\s+/);\n    if (!input[0] || parseInt(input[0], 10) === 0) { console.log(\"\"); return; }\n    const n = parseInt(input[0], 10);\n    const a = input.slice(1, 1 + n).map(x => parseInt(x, 10));\n    // TODO: reverse linked list values\n}\n\nmain();\n"
+      },
+      "testCases": [
+        { "input": "5\n1 2 3 4 5", "expectedOutput": "5 4 3 2 1", "isHidden": false, "weight": 25, "order": 1 },
+        { "input": "2\n1 2", "expectedOutput": "2 1", "isHidden": false, "weight": 25, "order": 2 },
+        { "input": "1\n42", "expectedOutput": "42", "isHidden": true, "weight": 25, "order": 3 },
+        { "input": "4\n10 20 30 40", "expectedOutput": "40 30 20 10", "isHidden": true, "weight": 25, "order": 4 }
+      ]
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-coding-canonical",
+      "url": null,
+      "attribution": "SIPS Coding Assessment Panel"
+    },
+    "externalId": "CODE-LL-002",
+    "status": "ACTIVE",
+    "tags": ["linked-list", "two-pointers", "merge", "medium"],
+    "question": {
+      "type": "CODING",
+      "format": "CODING",
+      "domain": "DSA",
+      "topic": "LINKED_LISTS",
+      "difficulty": "MEDIUM",
+      "title": "Merge Two Sorted Linked Lists",
+      "statement": "You are given the heads of two sorted singly linked lists `list1` and `list2`.\n\nMerge the two lists into one sorted list and print the space-separated elements.",
+      "options": null,
+      "correctAnswer": null,
+      "explanation": "Create a dummy head node and iteratively append the smaller node from list1 or list2 until one list is exhausted, then append the remainder."
+    },
+    "coding": {
+      "inputFormat": "Line 1: Integer N1 (size of list 1)\nLine 2: N1 space-separated integers\nLine 3: Integer N2 (size of list 2)\nLine 4: N2 space-separated integers",
+      "outputFormat": "Space-separated integers of the merged sorted list",
+      "constraints": "0 <= N1, N2 <= 1000\n-10^4 <= Node.val <= 10^4\nInput lists are sorted in non-decreasing order",
+      "timeLimitMs": 2000,
+      "memoryLimitKb": 128000,
+      "maxMarks": 100,
+      "starterCode": {
+        "python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().split()\n    if not lines:\n        return\n    # Read list 1\n    n1 = int(lines[0])\n    l1 = [int(x) for x in lines[1:1+n1]]\n    idx = 1 + n1\n    n2 = int(lines[idx])\n    l2 = [int(x) for x in lines[idx+1:idx+1+n2]]\n    # TODO: merge sorted lists\n    pass\n\nif __name__ == '__main__':\n    solve()\n",
+        "cpp": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    int n1;\n    if (!(cin >> n1)) return 0;\n    vector<int> l1(n1);\n    for (int i = 0; i < n1; ++i) cin >> l1[i];\n    int n2;\n    cin >> n2;\n    vector<int> l2(n2);\n    for (int i = 0; i < n2; ++i) cin >> l2[i];\n    // TODO: merge sorted lists\n    return 0;\n}\n",
+        "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int n1 = sc.nextInt();\n        int[] l1 = new int[n1];\n        for (int i = 0; i < n1; i++) l1[i] = sc.nextInt();\n        int n2 = sc.nextInt();\n        int[] l2 = new int[n2];\n        for (int i = 0; i < n2; i++) l2[i] = sc.nextInt();\n        // TODO: merge sorted lists\n    }\n}\n",
+        "javascript": "const fs = require('fs');\n\nfunction main() {\n    const input = fs.readFileSync(0, 'utf-8').trim().split(/\\s+/);\n    if (!input[0]) return;\n    const n1 = parseInt(input[0], 10);\n    const l1 = input.slice(1, 1 + n1).map(x => parseInt(x, 10));\n    const idx = 1 + n1;\n    const n2 = parseInt(input[idx], 10);\n    const l2 = input.slice(idx + 1, idx + 1 + n2).map(x => parseInt(x, 10));\n    // TODO: merge sorted lists\n}\n\nmain();\n"
+      },
+      "testCases": [
+        { "input": "3\n1 2 4\n3\n1 3 4", "expectedOutput": "1 1 2 3 4 4", "isHidden": false, "weight": 25, "order": 1 },
+        { "input": "0\n\n1\n0", "expectedOutput": "0", "isHidden": false, "weight": 25, "order": 2 },
+        { "input": "2\n5 10\n2\n1 20", "expectedOutput": "1 5 10 20", "isHidden": true, "weight": 25, "order": 3 },
+        { "input": "3\n-9 3 7\n3\n-8 2 10", "expectedOutput": "-9 -8 2 3 7 10", "isHidden": true, "weight": 25, "order": 4 }
+      ]
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-coding-canonical",
+      "url": null,
+      "attribution": "SIPS Coding Assessment Panel"
+    },
+    "externalId": "CODE-STK-001",
+    "status": "ACTIVE",
+    "tags": ["stack", "strings", "parentheses", "easy"],
+    "question": {
+      "type": "CODING",
+      "format": "CODING",
+      "domain": "DSA",
+      "topic": "STACKS_QUEUES",
+      "difficulty": "EASY",
+      "title": "Balanced Parentheses and Delimiters",
+      "statement": "Given a string `s` containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.\n\nAn input string is valid if:\n1. Open brackets must be closed by the same type of brackets.\n2. Open brackets must be closed in the correct order.\n3. Every close bracket has a corresponding open bracket of the same type.\n\nPrint 'true' if valid, or 'false' otherwise.",
+      "options": null,
+      "correctAnswer": null,
+      "explanation": "Push opening brackets onto a stack. When encountering a closing bracket, check if the stack is non-empty and the top matches the corresponding open bracket. Return true if the stack is empty at the end."
+    },
+    "coding": {
+      "inputFormat": "A single line containing the string S",
+      "outputFormat": "Print 'true' or 'false'",
+      "constraints": "1 <= length(S) <= 10^4\nS consists of parentheses only '()[]{}'",
+      "timeLimitMs": 2000,
+      "memoryLimitKb": 128000,
+      "maxMarks": 100,
+      "starterCode": {
+        "python": "import sys\n\ndef solve():\n    s = sys.stdin.read().strip()\n    # TODO: solve valid parentheses\n    pass\n\nif __name__ == '__main__':\n    solve()\n",
+        "cpp": "#include <iostream>\n#include <string>\n#include <stack>\nusing namespace std;\n\nint main() {\n    string s;\n    if (cin >> s) {\n        // TODO: solve valid parentheses\n    }\n    return 0;\n}\n",
+        "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (sc.hasNext()) {\n            String s = sc.next();\n            // TODO: solve valid parentheses\n        }\n    }\n}\n",
+        "javascript": "const fs = require('fs');\n\nfunction main() {\n    const s = fs.readFileSync(0, 'utf-8').trim();\n    // TODO: solve valid parentheses\n}\n\nmain();\n"
+      },
+      "testCases": [
+        { "input": "()[]{}", "expectedOutput": "true", "isHidden": false, "weight": 25, "order": 1 },
+        { "input": "(]", "expectedOutput": "false", "isHidden": false, "weight": 25, "order": 2 },
+        { "input": "([{}])", "expectedOutput": "true", "isHidden": true, "weight": 25, "order": 3 },
+        { "input": "]", "expectedOutput": "false", "isHidden": true, "weight": 25, "order": 4 }
+      ]
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-coding-canonical",
+      "url": null,
+      "attribution": "SIPS Coding Assessment Panel"
+    },
+    "externalId": "CODE-STK-002",
+    "status": "ACTIVE",
+    "tags": ["stack", "monotonic-stack", "next-greater-element", "medium"],
+    "question": {
+      "type": "CODING",
+      "format": "CODING",
+      "domain": "DSA",
+      "topic": "STACKS_QUEUES",
+      "difficulty": "MEDIUM",
+      "title": "Daily Temperature Waiting Days",
+      "statement": "Given an array of integers `temperatures` representing daily temperatures, return an array `answer` such that `answer[i]` is the number of days you have to wait after the `i-th` day to get a warmer temperature. If there is no future day for which this is possible, keep `answer[i] == 0`.",
+      "options": null,
+      "correctAnswer": null,
+      "explanation": "Use a monotonic decreasing stack storing indices. For each day i with temp T[i], while stack is non-empty and T[i] > T[stack.top()], pop prev_day and set answer[prev_day] = i - prev_day. Then push i."
+    },
+    "coding": {
+      "inputFormat": "Line 1: An integer N\nLine 2: N space-separated integers",
+      "outputFormat": "N space-separated integers representing the days to wait",
+      "constraints": "1 <= N <= 10^5\n30 <= temperatures[i] <= 100",
+      "timeLimitMs": 2000,
+      "memoryLimitKb": 128000,
+      "maxMarks": 100,
+      "starterCode": {
+        "python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().split()\n    if not lines:\n        return\n    n = int(lines[0])\n    temps = [int(x) for x in lines[1:1+n]]\n    # TODO: solve daily temperatures with monotonic stack\n    pass\n\nif __name__ == '__main__':\n    solve()\n",
+        "cpp": "#include <iostream>\n#include <vector>\n#include <stack>\nusing namespace std;\n\nint main() {\n    int n;\n    if (!(cin >> n)) return 0;\n    vector<int> t(n);\n    for (int i = 0; i < n; ++i) cin >> t[i];\n    // TODO: solve daily temperatures with monotonic stack\n    return 0;\n}\n",
+        "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int n = sc.nextInt();\n        int[] t = new int[n];\n        for (int i = 0; i < n; i++) t[i] = sc.nextInt();\n        // TODO: solve daily temperatures with monotonic stack\n    }\n}\n",
+        "javascript": "const fs = require('fs');\n\nfunction main() {\n    const input = fs.readFileSync(0, 'utf-8').trim().split(/\\s+/);\n    if (!input[0]) return;\n    const n = parseInt(input[0], 10);\n    const t = input.slice(1, 1 + n).map(x => parseInt(x, 10));\n    // TODO: solve daily temperatures with monotonic stack\n}\n\nmain();\n"
+      },
+      "testCases": [
+        { "input": "8\n73 74 75 71 69 72 76 73", "expectedOutput": "1 1 4 2 1 1 0 0", "isHidden": false, "weight": 25, "order": 1 },
+        { "input": "4\n30 40 50 60", "expectedOutput": "1 1 1 0", "isHidden": false, "weight": 25, "order": 2 },
+        { "input": "3\n30 60 90", "expectedOutput": "1 1 0", "isHidden": true, "weight": 25, "order": 3 },
+        { "input": "4\n80 70 60 50", "expectedOutput": "0 0 0 0", "isHidden": true, "weight": 25, "order": 4 }
+      ]
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-coding-canonical",
+      "url": null,
+      "attribution": "SIPS Coding Assessment Panel"
+    },
+    "externalId": "CODE-BS-001",
+    "status": "ACTIVE",
+    "tags": ["binary-search", "arrays", "search", "easy"],
+    "question": {
+      "type": "CODING",
+      "format": "CODING",
+      "domain": "DSA",
+      "topic": "BINARY_SEARCH",
+      "difficulty": "EASY",
+      "title": "Binary Search Index Lookup",
+      "statement": "Given an array of integers `nums` which is sorted in ascending order, and an integer `target`, write a function to search `target` in `nums`. If `target` exists, then return its 0-based index. Otherwise, return `-1`.\n\nYou must write an algorithm with O(log N) runtime complexity.",
+      "options": null,
+      "correctAnswer": null,
+      "explanation": "Maintain low and high pointers. Compute mid = low + (high - low) / 2. If nums[mid] == target return mid; if nums[mid] < target low = mid + 1; else high = mid - 1."
+    },
+    "coding": {
+      "inputFormat": "Line 1: Two integers N and Target\nLine 2: N space-separated sorted integers",
+      "outputFormat": "Print the 0-based index or -1 if not found",
+      "constraints": "1 <= N <= 10^5\n-10^9 <= nums[i], Target <= 10^9\nAll integers in nums are unique and sorted in ascending order",
+      "timeLimitMs": 2000,
+      "memoryLimitKb": 128000,
+      "maxMarks": 100,
+      "starterCode": {
+        "python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().split()\n    if not lines:\n        return\n    n = int(lines[0])\n    target = int(lines[1])\n    nums = [int(x) for x in lines[2:2+n]]\n    # TODO: binary search\n    pass\n\nif __name__ == '__main__':\n    solve()\n",
+        "cpp": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    int n; long long target;\n    if (!(cin >> n >> target)) return 0;\n    vector<long long> nums(n);\n    for (int i = 0; i < n; ++i) cin >> nums[i];\n    // TODO: binary search\n    return 0;\n}\n",
+        "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int n = sc.nextInt();\n        long target = sc.nextLong();\n        long[] nums = new long[n];\n        for (int i = 0; i < n; i++) nums[i] = sc.nextLong();\n        // TODO: binary search\n    }\n}\n",
+        "javascript": "const fs = require('fs');\n\nfunction main() {\n    const input = fs.readFileSync(0, 'utf-8').trim().split(/\\s+/);\n    if (input.length < 2) return;\n    const n = parseInt(input[0], 10);\n    const target = parseInt(input[1], 10);\n    const nums = input.slice(2, 2 + n).map(x => parseInt(x, 10));\n    // TODO: binary search\n}\n\nmain();\n"
+      },
+      "testCases": [
+        { "input": "6 9\n-1 0 3 5 9 12", "expectedOutput": "4", "isHidden": false, "weight": 25, "order": 1 },
+        { "input": "6 2\n-1 0 3 5 9 12", "expectedOutput": "-1", "isHidden": false, "weight": 25, "order": 2 },
+        { "input": "1 5\n5", "expectedOutput": "0", "isHidden": true, "weight": 25, "order": 3 },
+        { "input": "5 100\n10 20 30 40 50", "expectedOutput": "-1", "isHidden": true, "weight": 25, "order": 4 }
+      ]
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-coding-canonical",
+      "url": null,
+      "attribution": "SIPS Coding Assessment Panel"
+    },
+    "externalId": "CODE-BS-002",
+    "status": "ACTIVE",
+    "tags": ["binary-search", "rotated-sorted-array", "medium"],
+    "question": {
+      "type": "CODING",
+      "format": "CODING",
+      "domain": "DSA",
+      "topic": "BINARY_SEARCH",
+      "difficulty": "MEDIUM",
+      "title": "Search in Rotated Sorted Array",
+      "statement": "There is an integer array `nums` sorted in ascending order with distinct values, rotated at an unknown pivot index `k`.\n\nGiven the array `nums` after the possible rotation and an integer `target`, return the index of `target` if it is in `nums`, or `-1` if it is not in `nums`.\n\nYou must achieve an O(log N) runtime complexity.",
+      "options": null,
+      "correctAnswer": null,
+      "explanation": "At any mid index, at least one half [low..mid] or [mid..high] is normally sorted. Check if target lies within the sorted half; if so search there, otherwise search the other half."
+    },
+    "coding": {
+      "inputFormat": "Line 1: Two integers N and Target\nLine 2: N space-separated integers",
+      "outputFormat": "Print the 0-based index or -1 if not found",
+      "constraints": "1 <= N <= 10^5\n-10^9 <= nums[i], Target <= 10^9\nAll elements are unique",
+      "timeLimitMs": 2000,
+      "memoryLimitKb": 128000,
+      "maxMarks": 100,
+      "starterCode": {
+        "python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().split()\n    if not lines:\n        return\n    n = int(lines[0])\n    target = int(lines[1])\n    nums = [int(x) for x in lines[2:2+n]]\n    # TODO: search in rotated sorted array\n    pass\n\nif __name__ == '__main__':\n    solve()\n",
+        "cpp": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    int n; long long target;\n    if (!(cin >> n >> target)) return 0;\n    vector<long long> nums(n);\n    for (int i = 0; i < n; ++i) cin >> nums[i];\n    // TODO: search in rotated sorted array\n    return 0;\n}\n",
+        "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int n = sc.nextInt();\n        long target = sc.nextLong();\n        long[] nums = new long[n];\n        for (int i = 0; i < n; i++) nums[i] = sc.nextLong();\n        // TODO: search in rotated sorted array\n    }\n}\n",
+        "javascript": "const fs = require('fs');\n\nfunction main() {\n    const input = fs.readFileSync(0, 'utf-8').trim().split(/\\s+/);\n    if (input.length < 2) return;\n    const n = parseInt(input[0], 10);\n    const target = parseInt(input[1], 10);\n    const nums = input.slice(2, 2 + n).map(x => parseInt(x, 10));\n    // TODO: search in rotated sorted array\n}\n\nmain();\n"
+      },
+      "testCases": [
+        { "input": "7 0\n4 5 6 7 0 1 2", "expectedOutput": "4", "isHidden": false, "weight": 25, "order": 1 },
+        { "input": "7 3\n4 5 6 7 0 1 2", "expectedOutput": "-1", "isHidden": false, "weight": 25, "order": 2 },
+        { "input": "1 0\n0", "expectedOutput": "0", "isHidden": true, "weight": 25, "order": 3 },
+        { "input": "5 1\n5 1 2 3 4", "expectedOutput": "1", "isHidden": true, "weight": 25, "order": 4 }
+      ]
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-coding-canonical",
+      "url": null,
+      "attribution": "SIPS Coding Assessment Panel"
+    },
+    "externalId": "CODE-TREE-001",
+    "status": "ACTIVE",
+    "tags": ["trees", "binary-tree", "dfs", "depth", "easy"],
+    "question": {
+      "type": "CODING",
+      "format": "CODING",
+      "domain": "DSA",
+      "topic": "TREES_GRAPHS",
+      "difficulty": "EASY",
+      "title": "Maximum Depth of Binary Tree",
+      "statement": "Given the level-order traversal of a binary tree where 'null' indicates an empty node, return its maximum depth.\n\nA binary tree's maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.",
+      "options": null,
+      "correctAnswer": null,
+      "explanation": "Construct tree from level-order tokens. Recursively compute max depth: maxDepth(root) = 1 + max(maxDepth(root.left), maxDepth(root.right))."
+    },
+    "coding": {
+      "inputFormat": "Line 1: An integer N representing number of tokens\nLine 2: N space-separated tokens ('null' or integers)",
+      "outputFormat": "An integer representing the maximum depth of the binary tree",
+      "constraints": "0 <= N <= 10^4\n-100 <= Node.val <= 100",
+      "timeLimitMs": 2000,
+      "memoryLimitKb": 128000,
+      "maxMarks": 100,
+      "starterCode": {
+        "python": "import sys\nfrom collections import deque\n\ndef solve():\n    lines = sys.stdin.read().split()\n    if not lines or int(lines[0]) == 0:\n        print(0)\n        return\n    n = int(lines[0])\n    tokens = lines[1:1+n]\n    # TODO: max depth of binary tree\n    pass\n\nif __name__ == '__main__':\n    solve()\n",
+        "cpp": "#include <iostream>\n#include <vector>\n#include <string>\n#include <queue>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    int n;\n    if (!(cin >> n) || n == 0) { cout << 0 << endl; return 0; }\n    vector<string> tokens(n);\n    for (int i = 0; i < n; ++i) cin >> tokens[i];\n    // TODO: max depth of binary tree\n    return 0;\n}\n",
+        "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) { System.out.println(0); return; }\n        int n = sc.nextInt();\n        if (n == 0) { System.out.println(0); return; }\n        String[] tokens = new String[n];\n        for (int i = 0; i < n; i++) tokens[i] = sc.next();\n        // TODO: max depth of binary tree\n    }\n}\n",
+        "javascript": "const fs = require('fs');\n\nfunction main() {\n    const input = fs.readFileSync(0, 'utf-8').trim().split(/\\s+/);\n    if (!input[0] || parseInt(input[0], 10) === 0) { console.log(0); return; }\n    const n = parseInt(input[0], 10);\n    const tokens = input.slice(1, 1 + n);\n    // TODO: max depth of binary tree\n}\n\nmain();\n"
+      },
+      "testCases": [
+        { "input": "7\n3 9 20 null null 15 7", "expectedOutput": "3", "isHidden": false, "weight": 25, "order": 1 },
+        { "input": "2\n1 null 2", "expectedOutput": "2", "isHidden": false, "weight": 25, "order": 2 },
+        { "input": "0", "expectedOutput": "0", "isHidden": true, "weight": 25, "order": 3 },
+        { "input": "1\n10", "expectedOutput": "1", "isHidden": true, "weight": 25, "order": 4 }
+      ]
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-coding-canonical",
+      "url": null,
+      "attribution": "SIPS Coding Assessment Panel"
+    },
+    "externalId": "CODE-TREE-002",
+    "status": "ACTIVE",
+    "tags": ["bst", "trees", "lca", "medium"],
+    "question": {
+      "type": "CODING",
+      "format": "CODING",
+      "domain": "DSA",
+      "topic": "TREES_GRAPHS",
+      "difficulty": "MEDIUM",
+      "title": "Lowest Common Ancestor of a Binary Search Tree",
+      "statement": "Given a binary search tree (BST) and two node values `p` and `q`, find the lowest common ancestor (LCA) node value in the BST.\n\nAccording to the definition of LCA: The lowest common ancestor is defined between two nodes `p` and `q` as the lowest node in `T` that has both `p` and `q` as descendants (where a node can be a descendant of itself).",
+      "options": null,
+      "correctAnswer": null,
+      "explanation": "In a BST, if both p and q are smaller than the current root, LCA lies in root.left. If both are greater than root, LCA lies in root.right. Otherwise, the current root is the split point (LCA)."
+    },
+    "coding": {
+      "inputFormat": "Line 1: Two integer values p and q\nLine 2: Number of tree tokens N\nLine 3: N space-separated tree level-order tokens",
+      "outputFormat": "An integer representing the LCA node value",
+      "constraints": "2 <= N <= 10^5\nAll Node.val are unique\np != q and both p, q exist in the BST",
+      "timeLimitMs": 2000,
+      "memoryLimitKb": 128000,
+      "maxMarks": 100,
+      "starterCode": {
+        "python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().split()\n    if not lines:\n        return\n    p = int(lines[0])\n    q = int(lines[1])\n    n = int(lines[2])\n    tokens = lines[3:3+n]\n    # TODO: LCA of BST\n    pass\n\nif __name__ == '__main__':\n    solve()\n",
+        "cpp": "#include <iostream>\n#include <vector>\n#include <string>\nusing namespace std;\n\nint main() {\n    int p, q, n;\n    if (!(cin >> p >> q >> n)) return 0;\n    vector<string> tokens(n);\n    for (int i = 0; i < n; ++i) cin >> tokens[i];\n    // TODO: LCA of BST\n    return 0;\n}\n",
+        "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int p = sc.nextInt();\n        int q = sc.nextInt();\n        int n = sc.nextInt();\n        String[] tokens = new String[n];\n        for (int i = 0; i < n; i++) tokens[i] = sc.next();\n        // TODO: LCA of BST\n    }\n}\n",
+        "javascript": "const fs = require('fs');\n\nfunction main() {\n    const input = fs.readFileSync(0, 'utf-8').trim().split(/\\s+/);\n    if (input.length < 3) return;\n    const p = parseInt(input[0], 10);\n    const q = parseInt(input[1], 10);\n    const n = parseInt(input[2], 10);\n    const tokens = input.slice(3, 3 + n);\n    // TODO: LCA of BST\n}\n\nmain();\n"
+      },
+      "testCases": [
+        { "input": "2 8\n9\n6 2 8 0 4 7 9 null null", "expectedOutput": "6", "isHidden": false, "weight": 25, "order": 1 },
+        { "input": "2 4\n9\n6 2 8 0 4 7 9 null null", "expectedOutput": "2", "isHidden": false, "weight": 25, "order": 2 },
+        { "input": "7 9\n9\n6 2 8 0 4 7 9 null null", "expectedOutput": "8", "isHidden": true, "weight": 25, "order": 3 },
+        { "input": "0 4\n9\n6 2 8 0 4 7 9 null null", "expectedOutput": "2", "isHidden": true, "weight": 25, "order": 4 }
+      ]
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-coding-canonical",
+      "url": null,
+      "attribution": "SIPS Coding Assessment Panel"
+    },
+    "externalId": "CODE-GRP-001",
+    "status": "ACTIVE",
+    "tags": ["graphs", "bfs", "dfs", "matrix", "islands", "medium"],
+    "question": {
+      "type": "CODING",
+      "format": "CODING",
+      "domain": "DSA",
+      "topic": "TREES_GRAPHS",
+      "difficulty": "MEDIUM",
+      "title": "Number of Connected Islands in Grid",
+      "statement": "Given an `m x n` 2D binary grid `grid` which represents a map of '1's (land) and '0's (water), return the number of islands.\n\nAn island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically.",
+      "options": null,
+      "correctAnswer": null,
+      "explanation": "Iterate over every cell. When a '1' is encountered, increment island count and perform BFS or DFS to sink/mark all 4-directionally connected land cells as '0'."
+    },
+    "coding": {
+      "inputFormat": "Line 1: Two space-separated integers M and N\nNext M lines: N space-separated characters ('1' or '0')",
+      "outputFormat": "An integer representing the number of islands",
+      "constraints": "1 <= M, N <= 300\ngrid[i][j] is '0' or '1'",
+      "timeLimitMs": 2000,
+      "memoryLimitKb": 128000,
+      "maxMarks": 100,
+      "starterCode": {
+        "python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().split()\n    if not lines:\n        return\n    m = int(lines[0])\n    n = int(lines[1])\n    grid = []\n    idx = 2\n    for i in range(m):\n        grid.append(lines[idx:idx+n])\n        idx += n\n    # TODO: number of islands\n    pass\n\nif __name__ == '__main__':\n    solve()\n",
+        "cpp": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    int m, n;\n    if (!(cin >> m >> n)) return 0;\n    vector<vector<char>> grid(m, vector<char>(n));\n    for (int i = 0; i < m; ++i)\n        for (int j = 0; j < n; ++j) cin >> grid[i][j];\n    // TODO: number of islands\n    return 0;\n}\n",
+        "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int m = sc.nextInt();\n        int n = sc.nextInt();\n        char[][] grid = new char[m][n];\n        for (int i = 0; i < m; i++)\n            for (int j = 0; j < n; j++) grid[i][j] = sc.next().charAt(0);\n        // TODO: number of islands\n    }\n}\n",
+        "javascript": "const fs = require('fs');\n\nfunction main() {\n    const input = fs.readFileSync(0, 'utf-8').trim().split(/\\s+/);\n    if (input.length < 2) return;\n    const m = parseInt(input[0], 10);\n    const n = parseInt(input[1], 10);\n    const grid = [];\n    let idx = 2;\n    for (let i = 0; i < m; i++) {\n        grid.push(input.slice(idx, idx + n));\n        idx += n;\n    }\n    // TODO: number of islands\n}\n\nmain();\n"
+      },
+      "testCases": [
+        { "input": "4 5\n1 1 1 1 0\n1 1 0 1 0\n1 1 0 0 0\n0 0 0 0 0", "expectedOutput": "1", "isHidden": false, "weight": 25, "order": 1 },
+        { "input": "4 5\n1 1 0 0 0\n1 1 0 0 0\n0 0 1 0 0\n0 0 0 1 1", "expectedOutput": "3", "isHidden": false, "weight": 25, "order": 2 },
+        { "input": "1 1\n0", "expectedOutput": "0", "isHidden": true, "weight": 25, "order": 3 },
+        { "input": "3 3\n1 0 1\n0 1 0\n1 0 1", "expectedOutput": "5", "isHidden": true, "weight": 25, "order": 4 }
+      ]
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-coding-canonical",
+      "url": null,
+      "attribution": "SIPS Coding Assessment Panel"
+    },
+    "externalId": "CODE-GRP-002",
+    "status": "ACTIVE",
+    "tags": ["graphs", "bfs", "shortest-path", "unweighted", "hard"],
+    "question": {
+      "type": "CODING",
+      "format": "CODING",
+      "domain": "DSA",
+      "topic": "TREES_GRAPHS",
+      "difficulty": "HARD",
+      "title": "Shortest Path in Unweighted Graph",
+      "statement": "Given an unweighted undirected graph with `V` vertices (labeled 0 to V-1) and `E` edges, find the shortest distance (number of edges) from a given `source` vertex to a `destination` vertex.\n\nIf the destination is unreachable from the source, print `-1`.",
+      "options": null,
+      "correctAnswer": null,
+      "explanation": "Perform Breadth-First Search (BFS) from the source node tracking distances in an array initialized to -1. Since edge weights are unit 1, the first time destination is popped gives the minimum distance."
+    },
+    "coding": {
+      "inputFormat": "Line 1: Four integers V, E, Source, Destination\nNext E lines: Two space-separated integers u and v representing an undirected edge",
+      "outputFormat": "An integer representing the shortest path length or -1",
+      "constraints": "1 <= V <= 10^4\n0 <= E <= 5 * 10^4\n0 <= Source, Destination < V",
+      "timeLimitMs": 2000,
+      "memoryLimitKb": 128000,
+      "maxMarks": 100,
+      "starterCode": {
+        "python": "import sys\nfrom collections import deque\n\ndef solve():\n    lines = sys.stdin.read().split()\n    if not lines:\n        return\n    v, e, src, dest = map(int, lines[:4])\n    adj = [[] for _ in range(v)]\n    idx = 4\n    for _ in range(e):\n        u, w = int(lines[idx]), int(lines[idx+1])\n        adj[u].append(w)\n        adj[w].append(u)\n        idx += 2\n    # TODO: BFS shortest path\n    pass\n\nif __name__ == '__main__':\n    solve()\n",
+        "cpp": "#include <iostream>\n#include <vector>\n#include <queue>\nusing namespace std;\n\nint main() {\n    int v, e, src, dest;\n    if (!(cin >> v >> e >> src >> dest)) return 0;\n    vector<vector<int>> adj(v);\n    for (int i = 0; i < e; ++i) {\n        int u, w;\n        cin >> u >> w;\n        adj[u].push_back(w);\n        adj[w].push_back(u);\n    }\n    // TODO: BFS shortest path\n    return 0;\n}\n",
+        "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int v = sc.nextInt();\n        int e = sc.nextInt();\n        int src = sc.nextInt();\n        int dest = sc.nextInt();\n        List<List<Integer>> adj = new ArrayList<>();\n        for (int i = 0; i < v; i++) adj.add(new ArrayList<>());\n        for (int i = 0; i < e; i++) {\n            int u = sc.nextInt();\n            int w = sc.nextInt();\n            adj.get(u).add(w);\n            adj.get(w).add(u);\n        }\n        // TODO: BFS shortest path\n    }\n}\n",
+        "javascript": "const fs = require('fs');\n\nfunction main() {\n    const input = fs.readFileSync(0, 'utf-8').trim().split(/\\s+/);\n    if (input.length < 4) return;\n    const v = parseInt(input[0], 10);\n    const e = parseInt(input[1], 10);\n    const src = parseInt(input[2], 10);\n    const dest = parseInt(input[3], 10);\n    const adj = Array.from({ length: v }, () => []);\n    let idx = 4;\n    for (let i = 0; i < e; i++) {\n        const u = parseInt(input[idx], 10);\n        const w = parseInt(input[idx + 1], 10);\n        adj[u].push(w);\n        adj[w].push(u);\n        idx += 2;\n    }\n    // TODO: BFS shortest path\n}\n\nmain();\n"
+      },
+      "testCases": [
+        { "input": "5 5 0 4\n0 1\n0 2\n1 3\n2 3\n3 4", "expectedOutput": "3", "isHidden": false, "weight": 25, "order": 1 },
+        { "input": "4 2 0 3\n0 1\n1 2", "expectedOutput": "-1", "isHidden": false, "weight": 25, "order": 2 },
+        { "input": "1 0 0 0", "expectedOutput": "0", "isHidden": true, "weight": 25, "order": 3 },
+        { "input": "6 7 0 5\n0 1\n1 2\n2 5\n0 3\n3 4\n4 5\n0 5", "expectedOutput": "1", "isHidden": true, "weight": 25, "order": 4 }
+      ]
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-coding-canonical",
+      "url": null,
+      "attribution": "SIPS Coding Assessment Panel"
+    },
+    "externalId": "CODE-GRD-001",
+    "status": "ACTIVE",
+    "tags": ["greedy", "arrays", "jump-game", "medium"],
+    "question": {
+      "type": "CODING",
+      "format": "CODING",
+      "domain": "DSA",
+      "topic": "GREEDY",
+      "difficulty": "MEDIUM",
+      "title": "Jump Game Reachability",
+      "statement": "You are given an integer array `nums`. You are initially positioned at the array's first index, and each element in the array represents your maximum jump length at that position.\n\nPrint `true` if you can reach the last index, or `false` otherwise.",
+      "options": null,
+      "correctAnswer": null,
+      "explanation": "Maintain the maxReach index seen so far. For each index i <= maxReach, update maxReach = max(maxReach, i + nums[i]). If maxReach >= n - 1, return true. If i exceeds maxReach, return false."
+    },
+    "coding": {
+      "inputFormat": "Line 1: An integer N\nLine 2: N space-separated integers",
+      "outputFormat": "Print 'true' or 'false'",
+      "constraints": "1 <= N <= 10^4\n0 <= nums[i] <= 10^5",
+      "timeLimitMs": 2000,
+      "memoryLimitKb": 128000,
+      "maxMarks": 100,
+      "starterCode": {
+        "python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().split()\n    if not lines:\n        return\n    n = int(lines[0])\n    nums = [int(x) for x in lines[1:1+n]]\n    # TODO: solve jump game\n    pass\n\nif __name__ == '__main__':\n    solve()\n",
+        "cpp": "#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    int n;\n    if (!(cin >> n)) return 0;\n    vector<int> nums(n);\n    for (int i = 0; i < n; ++i) cin >> nums[i];\n    // TODO: solve jump game\n    return 0;\n}\n",
+        "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) nums[i] = sc.nextInt();\n        // TODO: solve jump game\n    }\n}\n",
+        "javascript": "const fs = require('fs');\n\nfunction main() {\n    const input = fs.readFileSync(0, 'utf-8').trim().split(/\\s+/);\n    if (!input[0]) return;\n    const n = parseInt(input[0], 10);\n    const nums = input.slice(1, 1 + n).map(x => parseInt(x, 10));\n    // TODO: solve jump game\n}\n\nmain();\n"
+      },
+      "testCases": [
+        { "input": "5\n2 3 1 1 4", "expectedOutput": "true", "isHidden": false, "weight": 25, "order": 1 },
+        { "input": "5\n3 2 1 0 4", "expectedOutput": "false", "isHidden": false, "weight": 25, "order": 2 },
+        { "input": "1\n0", "expectedOutput": "true", "isHidden": true, "weight": 25, "order": 3 },
+        { "input": "4\n1 0 1 0", "expectedOutput": "false", "isHidden": true, "weight": 25, "order": 4 }
+      ]
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-coding-canonical",
+      "url": null,
+      "attribution": "SIPS Coding Assessment Panel"
+    },
+    "externalId": "CODE-DP-001",
+    "status": "ACTIVE",
+    "tags": ["dynamic-programming", "fibonacci", "climbing-stairs", "easy"],
+    "question": {
+      "type": "CODING",
+      "format": "CODING",
+      "domain": "DSA",
+      "topic": "DYNAMIC_PROGRAMMING",
+      "difficulty": "EASY",
+      "title": "Climbing Stairs Distinct Ways",
+      "statement": "You are climbing a staircase. It takes `n` steps to reach the top.\n\nEach time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?",
+      "options": null,
+      "correctAnswer": null,
+      "explanation": "dp[i] = dp[i-1] + dp[i-2] with base cases dp[1] = 1, dp[2] = 2. This reduces to Fibonacci recurrence."
+    },
+    "coding": {
+      "inputFormat": "A single integer N",
+      "outputFormat": "An integer representing the number of distinct ways",
+      "constraints": "1 <= N <= 45",
+      "timeLimitMs": 2000,
+      "memoryLimitKb": 128000,
+      "maxMarks": 100,
+      "starterCode": {
+        "python": "import sys\n\ndef solve():\n    line = sys.stdin.read().strip()\n    if not line:\n        return\n    n = int(line)\n    # TODO: solve climbing stairs\n    pass\n\nif __name__ == '__main__':\n    solve()\n",
+        "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    if (cin >> n) {\n        // TODO: solve climbing stairs\n    }\n    return 0;\n}\n",
+        "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (sc.hasNextInt()) {\n            int n = sc.nextInt();\n            // TODO: solve climbing stairs\n        }\n    }\n}\n",
+        "javascript": "const fs = require('fs');\n\nfunction main() {\n    const line = fs.readFileSync(0, 'utf-8').trim();\n    if (!line) return;\n    const n = parseInt(line, 10);\n    // TODO: solve climbing stairs\n}\n\nmain();\n"
+      },
+      "testCases": [
+        { "input": "2", "expectedOutput": "2", "isHidden": false, "weight": 25, "order": 1 },
+        { "input": "3", "expectedOutput": "3", "isHidden": false, "weight": 25, "order": 2 },
+        { "input": "4", "expectedOutput": "5", "isHidden": true, "weight": 25, "order": 3 },
+        { "input": "10", "expectedOutput": "89", "isHidden": true, "weight": 25, "order": 4 }
+      ]
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-coding-canonical",
+      "url": null,
+      "attribution": "SIPS Coding Assessment Panel"
+    },
+    "externalId": "CODE-DP-002",
+    "status": "ACTIVE",
+    "tags": ["dynamic-programming", "coin-change", "knapsack", "hard"],
+    "question": {
+      "type": "CODING",
+      "format": "CODING",
+      "domain": "DSA",
+      "topic": "DYNAMIC_PROGRAMMING",
+      "difficulty": "HARD",
+      "title": "Fewest Coins for Change",
+      "statement": "You are given an integer array `coins` representing coins of different denominations and an integer `amount` representing a total amount of money.\n\nReturn the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return `-1`.\n\nYou may assume that you have an infinite number of each kind of coin.",
+      "options": null,
+      "correctAnswer": null,
+      "explanation": "Initialize dp array of size amount + 1 with infinity, dp[0] = 0. For each coin c and i from c to amount, dp[i] = min(dp[i], dp[i - c] + 1). Return dp[amount] if != infinity else -1."
+    },
+    "coding": {
+      "inputFormat": "Line 1: Two integers N (number of coin types) and Amount\nLine 2: N space-separated coin denominations",
+      "outputFormat": "An integer representing the minimum coin count or -1",
+      "constraints": "1 <= N <= 12\n1 <= coins[i] <= 2^31 - 1\n0 <= Amount <= 10^4",
+      "timeLimitMs": 2000,
+      "memoryLimitKb": 128000,
+      "maxMarks": 100,
+      "starterCode": {
+        "python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().split()\n    if not lines:\n        return\n    n = int(lines[0])\n    amount = int(lines[1])\n    coins = [int(x) for x in lines[2:2+n]]\n    # TODO: solve coin change\n    pass\n\nif __name__ == '__main__':\n    solve()\n",
+        "cpp": "#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    int n, amount;\n    if (!(cin >> n >> amount)) return 0;\n    vector<int> coins(n);\n    for (int i = 0; i < n; ++i) cin >> coins[i];\n    // TODO: solve coin change\n    return 0;\n}\n",
+        "java": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int n = sc.nextInt();\n        int amount = sc.nextInt();\n        int[] coins = new int[n];\n        for (int i = 0; i < n; i++) coins[i] = sc.nextInt();\n        // TODO: solve coin change\n    }\n}\n",
+        "javascript": "const fs = require('fs');\n\nfunction main() {\n    const input = fs.readFileSync(0, 'utf-8').trim().split(/\\s+/);\n    if (input.length < 2) return;\n    const n = parseInt(input[0], 10);\n    const amount = parseInt(input[1], 10);\n    const coins = input.slice(2, 2 + n).map(x => parseInt(x, 10));\n    // TODO: solve coin change\n}\n\nmain();\n"
+      },
+      "testCases": [
+        { "input": "3 11\n1 2 5", "expectedOutput": "3", "isHidden": false, "weight": 25, "order": 1 },
+        { "input": "1 3\n2", "expectedOutput": "-1", "isHidden": false, "weight": 25, "order": 2 },
+        { "input": "1 0\n1", "expectedOutput": "0", "isHidden": true, "weight": 25, "order": 3 },
+        { "input": "4 6249\n186 419 83 408", "expectedOutput": "20", "isHidden": true, "weight": 25, "order": 4 }
+      ]
+    }
+  }
+]

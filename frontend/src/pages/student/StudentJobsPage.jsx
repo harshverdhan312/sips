@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Briefcase,
   Search,
@@ -13,9 +14,12 @@ import {
   GraduationCap,
   Filter,
   Check,
-  RefreshCw
+  RefreshCw,
+  BookOpen,
+  Play
 } from "lucide-react";
 import { studentService } from "../../services/studentService";
+import { practiceService } from "../../services/practiceService";
 import { Card, CardHeader } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
@@ -24,6 +28,7 @@ import { DashboardSkeleton } from "../../components/common/LoadingSkeleton";
 import { useNotifications } from "../../context/NotificationContext";
 
 export function StudentJobsPage() {
+  const navigate = useNavigate();
   const { addToast } = useNotifications();
   const [jobs, setJobs] = useState([]);
   const [student, setStudent] = useState(null);
@@ -33,13 +38,24 @@ export function StudentJobsPage() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedJob, setSelectedJob] = useState(null);
+  const [jobAssessment, setJobAssessment] = useState(null);
   const [analyzingMl, setAnalyzingMl] = useState(false);
   const [mlAnalysisResult, setMlAnalysisResult] = useState(null);
   const [applyingJobId, setApplyingJobId] = useState(null);
 
-  const handleSelectJob = (job) => {
+  const handleSelectJob = async (job) => {
     setSelectedJob(job);
     setMlAnalysisResult(null);
+    setJobAssessment(null);
+    if (job) {
+      const jobId = job.id || job._id;
+      try {
+        const assessment = await practiceService.getAssessmentByDriveId(jobId);
+        setJobAssessment(assessment);
+      } catch (_) {
+        setJobAssessment(null);
+      }
+    }
   };
 
   const handleAnalyzeMatch = async (jobId) => {
@@ -520,6 +536,41 @@ export function StudentJobsPage() {
                 <span className="text-xl font-black text-emerald-700">{selectedJob.ctc}</span>
               </div>
             </div>
+
+            {/* Linked Official Placement Assessment Banner */}
+            {jobAssessment && (
+              <div className="p-4 rounded-xl bg-gradient-to-r from-indigo-900 to-indigo-800 text-white shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <div className="p-2.5 rounded-xl bg-white/10 text-amber-300 shrink-0">
+                    <BookOpen className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold uppercase tracking-wider text-indigo-200">
+                        Official Drive Assessment
+                      </span>
+                      <Badge variant="primary" size="xs" className="bg-amber-400 text-slate-900 border-none font-bold">
+                        REQUIRED
+                      </Badge>
+                    </div>
+                    <p className="text-base font-bold text-white mt-0.5">{jobAssessment.title}</p>
+                    <p className="text-xs text-indigo-200">
+                      Duration: {jobAssessment.durationMinutes} mins • {jobAssessment.questionCount} Questions • {jobAssessment.totalMarks} Points
+                    </p>
+                  </div>
+                </div>
+
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => navigate(`/student/assessments/${jobAssessment.id}`)}
+                  className="bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold border-none shadow-md shrink-0 flex items-center gap-1.5"
+                >
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>Open Assessment</span>
+                </Button>
+              </div>
+            )}
 
             {/* Eligibility Ineligibility Banner if not eligible */}
             {selectedJob.isEligible === false && (

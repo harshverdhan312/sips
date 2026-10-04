@@ -30,6 +30,27 @@ class ApiConfig {
   static String baseUrl = defaultBaseUrl;
 }
 
+class PracticeApiConfig {
+  static const String _envPracticeUrl = String.fromEnvironment('PRACTICE_API_BASE_URL');
+
+  static String get defaultBaseUrl {
+    if (_envPracticeUrl.isNotEmpty) {
+      return _envPracticeUrl;
+    }
+    if (kIsWeb) {
+      return 'http://127.0.0.1:5050';
+    }
+    try {
+      if (Platform.isAndroid) {
+        return 'http://10.0.2.2:5050';
+      }
+    } catch (_) {}
+    return 'http://127.0.0.1:5050';
+  }
+
+  static String baseUrl = defaultBaseUrl;
+}
+
 class ApiClient {
   final http.Client _client;
   final String _baseUrl;

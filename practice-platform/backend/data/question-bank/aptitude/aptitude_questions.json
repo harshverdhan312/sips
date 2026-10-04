@@ -1,0 +1,282 @@
+[
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-aptitude-canonical",
+      "url": null,
+      "attribution": "SIPS Assessment Core Team"
+    },
+    "externalId": "APT-QUANT-001",
+    "status": "ACTIVE",
+    "tags": ["time-and-work", "efficiency", "arithmetic"],
+    "question": {
+      "type": "APTITUDE",
+      "format": "SINGLE_CHOICE",
+      "domain": "QUANTITATIVE",
+      "topic": "TIME_AND_WORK",
+      "difficulty": "EASY",
+      "title": "Dual Worker Job Completion Time",
+      "statement": "Worker A can complete a software documentation task in 10 hours, while Worker B can complete the same task in 15 hours. If they work together at their constant rates, how many hours will it take them to complete the documentation?",
+      "options": [
+        { "id": "A", "text": "5.0 hours" },
+        { "id": "B", "text": "6.0 hours" },
+        { "id": "C", "text": "7.5 hours" },
+        { "id": "D", "text": "12.5 hours" }
+      ],
+      "correctAnswer": { "optionId": "B" },
+      "explanation": "Rate of Worker A = 1/10 per hour. Rate of Worker B = 1/15 per hour. Combined rate = (1/10) + (1/15) = (3 + 2)/30 = 5/30 = 1/6 per hour. Total time needed = 1 / (1/6) = 6.0 hours."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-aptitude-canonical",
+      "url": null,
+      "attribution": "SIPS Assessment Core Team"
+    },
+    "externalId": "APT-QUANT-002",
+    "status": "ACTIVE",
+    "tags": ["percentages", "consumption", "expenditure"],
+    "question": {
+      "type": "APTITUDE",
+      "format": "SINGLE_CHOICE",
+      "domain": "QUANTITATIVE",
+      "topic": "PERCENTAGES",
+      "difficulty": "EASY",
+      "title": "Commodity Price Increase and Expenditure Invariance",
+      "statement": "The price of cloud compute instances increases by 25%. By what percentage must an engineering team reduce its instance running time so that total expenditure remains unchanged?",
+      "options": [
+        { "id": "A", "text": "20.0%" },
+        { "id": "B", "text": "25.0%" },
+        { "id": "C", "text": "16.67%" },
+        { "id": "D", "text": "30.0%" }
+      ],
+      "correctAnswer": { "optionId": "A" },
+      "explanation": "Let initial price = P and initial consumption = C, so expenditure E = P * C. New price = 1.25P. For expenditure to remain E, new consumption C' = E / (1.25P) = (P * C) / (1.25P) = C / 1.25 = 0.8C. The reduction is (1 - 0.8) * 100% = 20.0%."
+    }
+  },
+  {
+    "source": {
+      "type": "THIRD_PARTY",
+      "namespace": "placement-prep-open",
+      "url": "https://example.org/aptitude/trains-relative-speed",
+      "attribution": "Campus Placement Quantitative Practice Archive"
+    },
+    "externalId": "APT-QUANT-003",
+    "status": "ACTIVE",
+    "tags": ["speed-distance-time", "relative-velocity", "trains"],
+    "question": {
+      "type": "APTITUDE",
+      "format": "SINGLE_CHOICE",
+      "domain": "QUANTITATIVE",
+      "topic": "SPEED_TIME_DISTANCE",
+      "difficulty": "MEDIUM",
+      "title": "Opposite Direction Train Crossing Duration",
+      "statement": "Two express trains with lengths of 180 meters and 120 meters are travelling towards each other on parallel tracks at speeds of 72 km/h and 54 km/h respectively. How many seconds will elapse from the moment their front engines meet until their tail ends clear each other completely?",
+      "options": [
+        { "id": "A", "text": "6.86 seconds" },
+        { "id": "B", "text": "8.57 seconds" },
+        { "id": "C", "text": "10.00 seconds" },
+        { "id": "D", "text": "12.00 seconds" }
+      ],
+      "correctAnswer": { "optionId": "B" },
+      "explanation": "Total distance to be covered = 180m + 120m = 300m. Relative speed = 72 + 54 = 126 km/h = 126 * (5 / 18) = 35 m/s. Time required = Total Distance / Relative Speed = 300 / 35 = 60 / 7 ≈ 8.57 seconds."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-aptitude-canonical",
+      "url": null,
+      "attribution": "SIPS Assessment Core Team"
+    },
+    "externalId": "APT-QUANT-004",
+    "status": "ACTIVE",
+    "tags": ["probability", "dice", "combinatorics"],
+    "question": {
+      "type": "APTITUDE",
+      "format": "SINGLE_CHOICE",
+      "domain": "QUANTITATIVE",
+      "topic": "PROBABILITY",
+      "difficulty": "MEDIUM",
+      "title": "Sum of Two Independent Fair Dice",
+      "statement": "Two fair six-sided standard dice are rolled simultaneously. What is the exact probability that the sum of the top faces is a prime number strictly greater than 5?",
+      "options": [
+        { "id": "A", "text": "1/6" },
+        { "id": "B", "text": "7/36" },
+        { "id": "C", "text": "2/9" },
+        { "id": "D", "text": "1/4" }
+      ],
+      "correctAnswer": { "optionId": "C" },
+      "explanation": "Total possible outcomes = 6 * 6 = 36. Prime numbers strictly greater than 5 within dice sums (range 2..12) are 7 and 11. Outcomes summing to 7: (1,6), (2,5), (3,4), (4,3), (5,2), (6,1) = 6 pairs. Outcomes summing to 11: (5,6), (6,5) = 2 pairs. Total favorable outcomes = 6 + 2 = 8. Probability = 8/36 = 2/9."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-aptitude-canonical",
+      "url": null,
+      "attribution": "SIPS Assessment Core Team"
+    },
+    "externalId": "APT-QUANT-005",
+    "status": "ACTIVE",
+    "tags": ["permutations", "combinatorics", "circular-arrangements"],
+    "question": {
+      "type": "APTITUDE",
+      "format": "SINGLE_CHOICE",
+      "domain": "QUANTITATIVE",
+      "topic": "PERMUTATION_COMBINATION",
+      "difficulty": "HARD",
+      "title": "Circular Round Table Seating with Adjacency Restriction",
+      "statement": "In how many distinct ways can 6 executives be seated around a circular conference table such that two specific executives, Alice and Bob, never sit immediately next to each other?",
+      "options": [
+        { "id": "A", "text": "48" },
+        { "id": "B", "text": "72" },
+        { "id": "C", "text": "96" },
+        { "id": "D", "text": "120" }
+      ],
+      "correctAnswer": { "optionId": "B" },
+      "explanation": "Total unrestricted circular arrangements of 6 people = (6 - 1)! = 5! = 120. Arrangements where Alice and Bob sit together: treat (Alice, Bob) as a single unit, giving 5 circular units arranged in (5 - 1)! = 4! = 24 ways. Alice and Bob can swap internal seats in 2! = 2 ways, so adjacent arrangements = 24 * 2 = 48. Arrangements where they are NOT adjacent = 120 - 48 = 72."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-aptitude-canonical",
+      "url": null,
+      "attribution": "SIPS Assessment Core Team"
+    },
+    "externalId": "APT-LOG-001",
+    "status": "ACTIVE",
+    "tags": ["series", "number-series", "pattern-recognition"],
+    "question": {
+      "type": "APTITUDE",
+      "format": "SINGLE_CHOICE",
+      "domain": "LOGICAL",
+      "topic": "NUMBER_SERIES",
+      "difficulty": "EASY",
+      "title": "Interleaved Arithmetic Sequence Pattern",
+      "statement": "Identify the missing term in the given sequence:\n7, 12, 19, 28, 39, ___?",
+      "options": [
+        { "id": "A", "text": "50" },
+        { "id": "B", "text": "52" },
+        { "id": "C", "text": "54" },
+        { "id": "D", "text": "56" }
+      ],
+      "correctAnswer": { "optionId": "B" },
+      "explanation": "Look at the differences between consecutive terms: 12 - 7 = 5; 19 - 12 = 7; 28 - 19 = 9; 39 - 28 = 11. The differences are consecutive odd numbers: 5, 7, 9, 11. The next difference is 13. Thus, missing term = 39 + 13 = 52."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-aptitude-canonical",
+      "url": null,
+      "attribution": "SIPS Assessment Core Team"
+    },
+    "externalId": "APT-LOG-002",
+    "status": "ACTIVE",
+    "tags": ["blood-relations", "deductive-logic", "reasoning"],
+    "question": {
+      "type": "APTITUDE",
+      "format": "SINGLE_CHOICE",
+      "domain": "LOGICAL",
+      "topic": "BLOOD_RELATIONS",
+      "difficulty": "MEDIUM",
+      "title": "Kinship Lineage Deduction",
+      "statement": "Pointing to a photograph of a man, Priya said: 'His mother is the only daughter of my mother.' How is Priya related to the man in the photograph, assuming Priya is female?",
+      "options": [
+        { "id": "A", "text": "Sister" },
+        { "id": "B", "text": "Maternal Aunt" },
+        { "id": "C", "text": "Mother" },
+        { "id": "D", "text": "Grandmother" }
+      ],
+      "correctAnswer": { "optionId": "C" },
+      "explanation": "Priya's mother's only daughter is Priya herself (since Priya is female and the daughter is unique). Therefore, the man's mother is Priya. This makes Priya the mother of the man."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-aptitude-canonical",
+      "url": null,
+      "attribution": "SIPS Assessment Core Team"
+    },
+    "externalId": "APT-LOG-003",
+    "status": "ACTIVE",
+    "tags": ["syllogisms", "formal-logic", "deduction"],
+    "question": {
+      "type": "APTITUDE",
+      "format": "SINGLE_CHOICE",
+      "domain": "LOGICAL",
+      "topic": "SYLLOGISMS",
+      "difficulty": "MEDIUM",
+      "title": "Categorical Syllogism Validity",
+      "statement": "Statements:\n1. All compilers are translators.\n2. Some translators are interpreters.\n\nConclusions:\nI. Some compilers are interpreters.\nII. All translators are compilers.\n\nWhich of the conclusions logically follow?",
+      "options": [
+        { "id": "A", "text": "Only conclusion I follows" },
+        { "id": "B", "text": "Only conclusion II follows" },
+        { "id": "C", "text": "Both conclusions I and II follow" },
+        { "id": "D", "text": "Neither conclusion I nor II follows" }
+      ],
+      "correctAnswer": { "optionId": "D" },
+      "explanation": "From Statements 1 and 2, compilers are a subset of translators, while interpreters overlap with translators. The intersection between compilers and interpreters is not guaranteed (undistributed middle term). Conclusion II is an invalid conversion of an 'All' statement. Hence, neither conclusion logically follows."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-aptitude-canonical",
+      "url": null,
+      "attribution": "SIPS Assessment Core Team"
+    },
+    "externalId": "APT-VERB-001",
+    "status": "ACTIVE",
+    "tags": ["verbal", "vocabulary", "antonyms"],
+    "question": {
+      "type": "APTITUDE",
+      "format": "SINGLE_CHOICE",
+      "domain": "VERBAL",
+      "topic": "SYNONYMS_ANTONYMS",
+      "difficulty": "EASY",
+      "title": "Contextual Antonym of Pragmatic",
+      "statement": "Choose the word that is most nearly opposite in meaning to the word 'PRAGMATIC'.",
+      "options": [
+        { "id": "A", "text": "Idealistic" },
+        { "id": "B", "text": "Practical" },
+        { "id": "C", "text": "Sensible" },
+        { "id": "D", "text": "Lucid" }
+      ],
+      "correctAnswer": { "optionId": "A" },
+      "explanation": "'Pragmatic' refers to dealing with matters realistically and based on practical rather than theoretical considerations. The direct antonym is 'Idealistic' (guided by abstract ideals rather than practical realities)."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-aptitude-canonical",
+      "url": null,
+      "attribution": "SIPS Assessment Core Team"
+    },
+    "externalId": "APT-DI-001",
+    "status": "ACTIVE",
+    "tags": ["data-interpretation", "pie-charts", "budget-analysis"],
+    "question": {
+      "type": "APTITUDE",
+      "format": "SINGLE_CHOICE",
+      "domain": "DATA_INTERPRETATION",
+      "topic": "PIE_CHARTS",
+      "difficulty": "MEDIUM",
+      "title": "Departmental Budget Pie Chart Allocation",
+      "statement": "In a corporate annual budget pie chart representing a total expenditure of $1,800,000, the central angle allocated for the Research & Development sector is exactly 54 degrees. What is the dollar expenditure allocated to Research & Development?",
+      "options": [
+        { "id": "A", "text": "$225,000" },
+        { "id": "B", "text": "$270,000" },
+        { "id": "C", "text": "$300,000" },
+        { "id": "D", "text": "$360,000" }
+      ],
+      "correctAnswer": { "optionId": "B" },
+      "explanation": "A full circular pie chart represents 360 degrees. The fraction allocated to R&D = 54° / 360° = 3 / 20 = 15%. Total budget = $1,800,000. R&D Expenditure = $1,800,000 * (54 / 360) = $1,800,000 * 0.15 = $270,000."
+    }
+  }
+]
