@@ -53,7 +53,11 @@ export function AssessmentBuilderPage() {
   const [bankLoading, setBankLoading] = useState(false);
   const [bankSearch, setBankSearch] = useState("");
   const [bankTypeFilter, setBankTypeFilter] = useState("ALL");
+  const [bankCategoryFilter, setBankCategoryFilter] = useState("ALL");
   const [bankDifficultyFilter, setBankDifficultyFilter] = useState("ALL");
+  const [bankPage, setBankPage] = useState(1);
+  const [bankLimit] = useState(15);
+  const [bankPagination, setBankPagination] = useState({ total: 0, page: 1, limit: 15, totalPages: 1 });
 
   // Selected Question to Add
   const [selectedBankQuestion, setSelectedBankQuestion] = useState(null);
@@ -108,21 +112,26 @@ export function AssessmentBuilderPage() {
         status: "ACTIVE",
         search: bankSearch,
         type: bankTypeFilter,
+        category: bankCategoryFilter,
         difficulty: bankDifficultyFilter,
-        limit: 50
+        page: bankPage,
+        limit: bankLimit
       });
       if (res && res.data) {
         // Filter out already pinned questions
         const pinnedVersionIds = new Set(assessment?.questions?.map((q) => q.questionVersionId) || []);
         const filtered = res.data.filter((q) => !pinnedVersionIds.has(q.id));
         setBankQuestions(filtered);
+        if (res.pagination) {
+          setBankPagination(res.pagination);
+        }
       }
     } catch (err) {
       console.error("Failed to load question bank:", err);
     } finally {
       setBankLoading(false);
     }
-  }, [bankSearch, bankTypeFilter, bankDifficultyFilter, assessment]);
+  }, [bankSearch, bankTypeFilter, bankCategoryFilter, bankDifficultyFilter, bankPage, bankLimit, assessment]);
 
   useEffect(() => {
     if (addModalOpen) {
@@ -583,51 +592,120 @@ export function AssessmentBuilderPage() {
         isOpen={addModalOpen}
         onClose={() => setAddModalOpen(false)}
         title="Pin Question from Question Bank"
+        maxWidth="max-w-4xl"
       >
-        <div className="space-y-4 max-h-[75vh] flex flex-col">
-          {/* Bank Filters */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 shrink-0">
-            <div className="sm:col-span-1">
-              <input
-                type="text"
-                placeholder="Filter bank..."
-                value={bankSearch}
-                onChange={(e) => setBankSearch(e.target.value)}
-                className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs"
-              />
+        <div className="space-y-4 max-h-[78vh] flex flex-col">
+          {/* Bank Filters Bar */}
+          <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2.5 shrink-0">
+            <div className="flex flex-col sm:flex-row gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search by title, external ID (e.g. nc-001-two-sum, quant-tw-01), or topic..."
+                  value={bankSearch}
+                  onChange={(e) => {
+                    setBankSearch(e.target.value);
+                    setBankPage(1);
+                  }}
+                  className="w-full pl-9 pr-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setBankSearch("");
+                    setBankTypeFilter("ALL");
+                    setBankCategoryFilter("ALL");
+                    setBankDifficultyFilter("ALL");
+                    setBankPage(1);
+                  }}
+                  className="px-2.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 rounded-lg text-xs font-medium transition-colors cursor-pointer shrink-0"
+                >
+                  Reset
+                </button>
+              </div>
             </div>
-            <div>
-              <select
-                value={bankTypeFilter}
-                onChange={(e) => setBankTypeFilter(e.target.value)}
-                className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs"
-              >
-                <option value="ALL">All Types</option>
-                <option value="APTITUDE">Aptitude</option>
-                <option value="TECHNICAL">Technical</option>
-                <option value="CODING">Coding</option>
-              </select>
-            </div>
-            <div>
-              <select
-                value={bankDifficultyFilter}
-                onChange={(e) => setBankDifficultyFilter(e.target.value)}
-                className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs"
-              >
-                <option value="ALL">All Difficulties</option>
-                <option value="EASY">Easy</option>
-                <option value="MEDIUM">Medium</option>
-                <option value="HARD">Hard</option>
-              </select>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {/* Type Filter */}
+              <div>
+                <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-0.5">Question Type</label>
+                <select
+                  value={bankTypeFilter}
+                  onChange={(e) => {
+                    setBankTypeFilter(e.target.value);
+                    setBankPage(1);
+                  }}
+                  className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
+                >
+                  <option value="ALL">All Types</option>
+                  <option value="APTITUDE">Aptitude MCQ</option>
+                  <option value="TECHNICAL">Technical MCQ</option>
+                  <option value="CODING">Coding Arena</option>
+                </select>
+              </div>
+
+              {/* Category Filter */}
+              <div>
+                <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-0.5">Category / Domain</label>
+                <select
+                  value={bankCategoryFilter}
+                  onChange={(e) => {
+                    setBankCategoryFilter(e.target.value);
+                    setBankPage(1);
+                  }}
+                  className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
+                >
+                  <option value="ALL">All Categories (1200+ Qs)</option>
+                  <option value="QUANTITATIVE">Quantitative Aptitude</option>
+                  <option value="LOGICAL">Logical Reasoning</option>
+                  <option value="VERBAL">Verbal Ability</option>
+                  <option value="DSA">Data Structures & Algorithms</option>
+                  <option value="DBMS">Database Management (DBMS)</option>
+                  <option value="OS">Operating Systems (OS)</option>
+                  <option value="NETWORKS">Computer Networks</option>
+                  <option value="OOP">Object Oriented Programming</option>
+                  <option value="SQL">SQL & Relational</option>
+                  <option value="DATA_INTERPRETATION">Data Interpretation</option>
+                </select>
+              </div>
+
+              {/* Difficulty Filter */}
+              <div>
+                <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-0.5">Difficulty</label>
+                <select
+                  value={bankDifficultyFilter}
+                  onChange={(e) => {
+                    setBankDifficultyFilter(e.target.value);
+                    setBankPage(1);
+                  }}
+                  className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
+                >
+                  <option value="ALL">All Difficulties</option>
+                  <option value="EASY">Easy</option>
+                  <option value="MEDIUM">Medium</option>
+                  <option value="HARD">Hard</option>
+                </select>
+              </div>
             </div>
           </div>
 
           {/* Question List to select */}
-          <div className="flex-1 overflow-y-auto space-y-2 max-h-60 border border-slate-100 rounded-xl p-1 bg-slate-50/50">
+          <div className="flex-1 overflow-y-auto space-y-2 max-h-[42vh] border border-slate-100 rounded-xl p-1.5 bg-slate-50/50">
             {bankLoading ? (
-              <div className="py-10 text-center text-xs text-slate-400">Loading Question Bank...</div>
+              <div className="py-12 text-center text-xs text-slate-400 flex flex-col items-center gap-2">
+                <RefreshCw className="w-5 h-5 text-indigo-500 animate-spin" />
+                <span>Loading Question Bank...</span>
+              </div>
             ) : bankQuestions.length === 0 ? (
-              <div className="py-10 text-center text-xs text-slate-400">No matching active questions available.</div>
+              <div className="py-12 text-center text-xs text-slate-400 space-y-1">
+                <BookOpen className="w-6 h-6 text-slate-300 mx-auto" />
+                <p className="font-semibold text-slate-600">No matching active questions available.</p>
+                <p className="text-[11px] text-slate-400">Try adjusting your search query, type, or category filter.</p>
+              </div>
             ) : (
               bankQuestions.map((q) => {
                 const isSelected = selectedBankQuestion?.id === q.id;
@@ -637,50 +715,107 @@ export function AssessmentBuilderPage() {
                     onClick={() => handleSelectBankQuestion(q)}
                     className={`p-3 rounded-xl border text-xs transition-all cursor-pointer ${
                       isSelected
-                        ? "bg-indigo-50/80 border-indigo-300 shadow-2xs"
-                        : "bg-white border-slate-200 hover:border-slate-300"
+                        ? "bg-indigo-50/90 border-indigo-400 shadow-xs ring-1 ring-indigo-400/40"
+                        : "bg-white border-slate-200/80 hover:border-slate-300 hover:shadow-2xs"
                     }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-mono font-bold text-slate-900">{q.externalId || q.id.slice(0, 8)}</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-1.5">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="font-mono font-bold text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded text-[11px] border border-slate-200">
+                          {q.externalId || q.id.slice(0, 8)}
+                        </span>
                         <Badge variant="neutral" size="sm">{q.type}</Badge>
                         <Badge variant={q.difficulty === "EASY" ? "success" : q.difficulty === "MEDIUM" ? "warning" : "danger"} size="sm">
                           {q.difficulty}
                         </Badge>
+                        <span className="text-[11px] font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100">
+                          {q.category}
+                        </span>
+                        {q.subcategory && (
+                          <span className="text-[11px] text-slate-500 font-medium">
+                            • {q.subcategory}
+                          </span>
+                        )}
                       </div>
-                      <span className="text-[11px] text-slate-400">{q.category}</span>
+
+                      {isSelected && (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-700 bg-white px-2 py-0.5 rounded-full border border-indigo-200 shadow-2xs">
+                          <Check className="w-3 h-3 text-indigo-600" /> Selected
+                        </span>
+                      )}
                     </div>
-                    <div className="font-semibold text-slate-800 mt-1 truncate">{q.title}</div>
+
+                    <div className="font-semibold text-slate-900 text-sm">{q.title}</div>
+                    {q.statement && (
+                      <p className="text-slate-500 text-xs mt-1 line-clamp-2 leading-relaxed">
+                        {q.statement}
+                      </p>
+                    )}
                   </div>
                 );
               })
             )}
           </div>
 
-          {/* Configuration for selected question */}
-          {selectedBankQuestion && (
-            <form onSubmit={handleAddQuestionSubmit} className="p-3.5 bg-indigo-50/60 rounded-xl border border-indigo-100 space-y-3 shrink-0">
-              <div className="text-xs font-bold text-indigo-950">
-                Configure Pinning: {selectedBankQuestion.title}
+          {/* Modal Pagination Bar */}
+          {!bankLoading && bankQuestions.length > 0 && (
+            <div className="flex items-center justify-between px-2 py-1 text-xs text-slate-500 shrink-0">
+              <div>
+                Showing <span className="font-semibold text-slate-800">{(bankPage - 1) * bankLimit + 1}</span> to{" "}
+                <span className="font-semibold text-slate-800">{Math.min(bankPage * bankLimit, bankPagination.total)}</span> of{" "}
+                <span className="font-semibold text-slate-800">{bankPagination.total}</span> questions
               </div>
 
-              <div className="grid grid-cols-3 gap-2">
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setBankPage((p) => Math.max(1, p - 1))}
+                  disabled={bankPage <= 1}
+                  className="px-2.5 py-1 rounded-md border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-medium cursor-pointer"
+                >
+                  Previous
+                </button>
+                <span className="font-semibold text-slate-700 px-1">
+                  {bankPage} / {bankPagination.totalPages || 1}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setBankPage((p) => Math.min(bankPagination.totalPages || 1, p + 1))}
+                  disabled={bankPage >= (bankPagination.totalPages || 1)}
+                  className="px-2.5 py-1 rounded-md border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-medium cursor-pointer"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Configuration for selected question */}
+          {selectedBankQuestion && (
+            <form onSubmit={handleAddQuestionSubmit} className="p-4 bg-indigo-50/70 rounded-xl border border-indigo-100 space-y-3 shrink-0">
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-bold text-indigo-950 truncate max-w-lg">
+                  Configure Pinning: <span className="text-indigo-700">{selectedBankQuestion.title}</span>
+                </div>
+                <Badge variant="primary" size="sm">{selectedBankQuestion.category}</Badge>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">Section</label>
+                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">Target Section</label>
                   <select
                     value={addPayload.section}
                     onChange={(e) => setAddPayload({ ...addPayload, section: e.target.value })}
-                    className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs"
+                    className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
                   >
-                    <option value="APTITUDE">Aptitude</option>
-                    <option value="TECHNICAL">Technical</option>
-                    <option value="CODING">Coding</option>
+                    <option value="APTITUDE">Aptitude Section</option>
+                    <option value="TECHNICAL">Technical Section</option>
+                    <option value="CODING">Coding Section</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">Marks</label>
+                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">Marks Awarded</label>
                   <input
                     type="number"
                     step="0.5"
@@ -688,7 +823,7 @@ export function AssessmentBuilderPage() {
                     required
                     value={addPayload.marks}
                     onChange={(e) => setAddPayload({ ...addPayload, marks: e.target.value })}
-                    className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs"
+                    className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
                   />
                 </div>
 
@@ -700,7 +835,7 @@ export function AssessmentBuilderPage() {
                     min="0"
                     value={addPayload.negativeMarks}
                     onChange={(e) => setAddPayload({ ...addPayload, negativeMarks: e.target.value })}
-                    className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs"
+                    className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
                   />
                 </div>
               </div>
@@ -711,7 +846,7 @@ export function AssessmentBuilderPage() {
                   variant="primary"
                   size="sm"
                   disabled={addingLoading}
-                  className="w-full"
+                  className="w-full font-semibold shadow-xs"
                 >
                   {addingLoading ? "Pinning..." : "Pin Question to Assessment"}
                 </Button>
