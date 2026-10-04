@@ -1,7 +1,7 @@
 const request = require('supertest');
 const app = require('../src/app');
 const prisma = require('../src/utils/prisma');
-const { cleanDatabase } = require('./testHelper');
+const { cleanDatabase, createTestToken } = require('./testHelper');
 const contestService = require('../src/services/contestService');
 const judge0Service = require('../src/services/judge0Service');
 
@@ -373,10 +373,11 @@ describe('Contest Submission, MCQ Scoring & Coding Evaluation (Phase 5B.3)', () 
       const attemptId = startRes.body.data.attempt.id;
 
       // Submit code through coding execution engine with contestAttemptId
+      const coderFullToken = createTestToken({ id: 'student_coder_full', collegeId: collegeA });
       const codeRes = await request(app)
         .post('/api/coding/execute/submit')
+        .set('Authorization', `Bearer ${coderFullToken}`)
         .send({
-          studentId: 'student_coder_full',
           questionVersionId: codingQVersionId,
           contestAttemptId: attemptId,
           language: 'python',
@@ -413,10 +414,11 @@ describe('Contest Submission, MCQ Scoring & Coding Evaluation (Phase 5B.3)', () 
         .set('x-college-id', collegeA);
       const attemptId = startRes.body.data.attempt.id;
 
+      const coderPartialToken = createTestToken({ id: 'student_coder_partial', collegeId: collegeA });
       const codeRes = await request(app)
         .post('/api/coding/execute/submit')
+        .set('Authorization', `Bearer ${coderPartialToken}`)
         .send({
-          studentId: 'student_coder_partial',
           questionVersionId: codingQVersionId,
           contestAttemptId: attemptId,
           language: 'python',
@@ -453,10 +455,11 @@ describe('Contest Submission, MCQ Scoring & Coding Evaluation (Phase 5B.3)', () 
         .set('x-college-id', collegeA);
       const attemptId = startRes.body.data.attempt.id;
 
+      const coderCeToken = createTestToken({ id: 'student_coder_ce', collegeId: collegeA });
       const codeRes = await request(app)
         .post('/api/coding/execute/submit')
+        .set('Authorization', `Bearer ${coderCeToken}`)
         .send({
-          studentId: 'student_coder_ce',
           questionVersionId: codingQVersionId,
           contestAttemptId: attemptId,
           language: 'python',

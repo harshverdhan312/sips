@@ -1,0 +1,171 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SIPS Question Bank Canonical Item Schema",
+  "description": "Validation schema for individual Aptitude, Technical, and Objective question items in the SIPS Question Bank.",
+  "type": "object",
+  "required": ["source", "externalId", "question"],
+  "properties": {
+    "source": {
+      "type": "object",
+      "required": ["type", "namespace"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "ORIGINAL",
+            "THIRD_PARTY",
+            "COMPANY_PROVIDED",
+            "COLLEGE_PROVIDED",
+            "PUBLIC_SOURCE",
+            "CURATED",
+            "COLLEGE_CREATED"
+          ]
+        },
+        "namespace": {
+          "type": "string",
+          "minLength": 2
+        },
+        "url": {
+          "type": ["string", "null"]
+        },
+        "attribution": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "externalId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": ["DRAFT", "ACTIVE", "ARCHIVED"],
+      "default": "ACTIVE"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "collegeId": {
+      "type": ["string", "null"]
+    },
+    "question": {
+      "type": "object",
+      "required": [
+        "type",
+        "format",
+        "domain",
+        "topic",
+        "difficulty",
+        "title",
+        "statement",
+        "correctAnswer",
+        "explanation"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["APTITUDE", "TECHNICAL", "CODING"]
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "SINGLE_CHOICE",
+            "MULTIPLE_CHOICE",
+            "TRUE_FALSE",
+            "NUMERICAL",
+            "CODING"
+          ]
+        },
+        "domain": {
+          "type": "string",
+          "minLength": 2
+        },
+        "topic": {
+          "type": "string",
+          "minLength": 2
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": ["EASY", "MEDIUM", "HARD"]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 3
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 5
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "text"],
+            "properties": {
+              "id": { "type": "string" },
+              "text": { "type": "string" },
+              "codeSnippet": { "type": "string" }
+            }
+          }
+        },
+        "correctAnswer": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "optionId": { "type": "string" },
+                "optionIds": { "type": "array", "items": { "type": "string" } },
+                "value": { "type": ["boolean", "number", "string"] },
+                "tolerance": { "type": "number" }
+              }
+            },
+            { "type": "string" },
+            { "type": "array", "items": { "type": "string" } },
+            { "type": "boolean" },
+            { "type": "number" }
+          ]
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 5
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "coding": {
+      "type": "object",
+      "properties": {
+        "constraints": { "type": ["string", "null"] },
+        "inputFormat": { "type": ["string", "null"] },
+        "outputFormat": { "type": ["string", "null"] },
+        "starterCode": { "type": "object" },
+        "timeLimitMs": { "type": "integer", "minimum": 1, "maximum": 10000 },
+        "memoryLimitKb": { "type": "integer", "minimum": 1, "maximum": 1048576 },
+        "maxMarks": { "type": "number", "minimum": 1 },
+        "testCases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["input", "expectedOutput"],
+            "properties": {
+              "input": { "type": "string" },
+              "expectedOutput": { "type": "string" },
+              "isHidden": { "type": "boolean" },
+              "weight": { "type": "number", "minimum": 0.01 },
+              "order": { "type": "integer" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

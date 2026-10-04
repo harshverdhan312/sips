@@ -81,6 +81,16 @@ function getHeaders() {
   return headers;
 }
 
+function encodeBase64(val) {
+  if (val === null || val === undefined) return val;
+  return Buffer.from(String(val), 'utf8').toString('base64');
+}
+
+function decodeBase64(val) {
+  if (val === null || val === undefined) return val;
+  return Buffer.from(String(val), 'base64').toString('utf8');
+}
+
 /**
  * Submit batch of test cases to Judge0
  * @param {Array<{ source_code: string, language_id: number, stdin: string, expected_output?: string, cpu_time_limit?: number, memory_limit?: number }>} submissions
@@ -91,13 +101,29 @@ async function submitBatch(submissions) {
     return mockProvider.submitBatch(submissions);
   }
 
-  const url = `${config.judge0BaseUrl}/submissions/batch?base64_encoded=false`;
+  const encodedSubmissions = submissions.map((sub) => ({
+    ...sub,
+    source_code: encodeBase64(sub.source_code),
+    stdin: encodeBase64(sub.stdin),
+    expected_output: encodeBase64(sub.expected_output)
+  }));
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: getHeaders(),
-    body: JSON.stringify({ submissions })
-  });
+  const url = `${config.judge0BaseUrl}/submissions/batch?base64_encoded=true`;
+
+  let response;
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ submissions: encodedSubmissions })
+    });
+  } catch (networkErr) {
+    if (networkErr instanceof AppError) throw networkErr;
+    throw new AppError(
+      `Judge0 service unavailable at ${config.judge0BaseUrl}: ${networkErr.message || 'Connection failed'}`,
+      503
+    );
+  }
 
   if (!response.ok) {
     const errText = await response.text();
@@ -121,13 +147,22 @@ async function pollBatch(tokens) {
   }
 
   const tokenList = tokens.join(',');
-  const fields = 'token,status_id,status,stdout,stderr,compile_output,time,memory';
-  const url = `${config.judge0BaseUrl}/submissions/batch?tokens=${encodeURIComponent(tokenList)}&base64_encoded=false&fields=${fields}`;
+  const fields = 'token,status_id,status,stdout,stderr,compile_output,message,time,memory';
+  const url = `${config.judge0BaseUrl}/submissions/batch?tokens=${encodeURIComponent(tokenList)}&base64_encoded=true&fields=${fields}`;
 
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: getHeaders()
-  });
+  let response;
+  try {
+    response = await fetch(url, {
+      method: 'GET',
+      headers: getHeaders()
+    });
+  } catch (networkErr) {
+    if (networkErr instanceof AppError) throw networkErr;
+    throw new AppError(
+      `Judge0 service unavailable during polling at ${config.judge0BaseUrl}: ${networkErr.message || 'Connection failed'}`,
+      503
+    );
+  }
 
   if (!response.ok) {
     const errText = await response.text();
@@ -135,7 +170,15 @@ async function pollBatch(tokens) {
   }
 
   const data = await response.json();
-  return data && Array.isArray(data.submissions) ? data.submissions : [];
+  const rawSubmissions = data && Array.isArray(data.submissions) ? data.submissions : [];
+
+  return rawSubmissions.map((sub) => ({
+    ...sub,
+    stdout: decodeBase64(sub.stdout),
+    stderr: decodeBase64(sub.stderr),
+    compile_output: decodeBase64(sub.compile_output),
+    message: decodeBase64(sub.message)
+  }));
 }
 
 module.exports = {

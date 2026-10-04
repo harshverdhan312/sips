@@ -39,6 +39,9 @@ function serializeStudentQuestionVersion(version, questionMeta = null) {
     result.sourceType = version.question.sourceType;
     result.sourceUrl = version.question.sourceUrl;
     result.attribution = version.question.attribution;
+  } else {
+    result.type = version.type || 'APTITUDE';
+    result.format = version.format || 'SINGLE_CHOICE';
   }
 
   // If coding problem is attached, serialize only public test cases
@@ -124,6 +127,7 @@ function serializeCodeSubmissionResponse(submission, { isAdmin = false } = {}) {
     questionVersionId: submission.questionVersionId,
     practiceAttemptId: submission.practiceAttemptId,
     contestAttemptId: submission.contestAttemptId,
+    assessmentAttemptId: submission.assessmentAttemptId,
     mode: submission.mode,
     language: submission.language,
     sourceCode: submission.sourceCode,
@@ -375,6 +379,109 @@ function serializeContestResponse(response) {
   };
 }
 
+/**
+ * Serialize Assessment summary for Student view
+ */
+function serializeStudentAssessment(assessment) {
+  if (!assessment) return null;
+
+  const questions = assessment.questions || [];
+  const totalQuestions = questions.length || (assessment._count ? assessment._count.questions : 0);
+  const totalMarks = Number(assessment.totalMarks || questions.reduce((sum, q) => sum + Number(q.marks || 0), 0));
+
+  const sectionBreakdown = questions.reduce(
+    (acc, q) => {
+      const sec = q.section;
+      if (acc[sec]) {
+        acc[sec].count += 1;
+        acc[sec].marks += Number(q.marks || 0);
+      }
+      return acc;
+    },
+    {
+      CODING: { count: 0, marks: 0 },
+      APTITUDE: { count: 0, marks: 0 },
+      TECHNICAL: { count: 0, marks: 0 }
+    }
+  );
+
+  return {
+    id: assessment.id,
+    title: assessment.title,
+    description: assessment.description,
+    type: assessment.type,
+    status: assessment.status,
+    collegeId: assessment.collegeId,
+    durationMinutes: assessment.durationMinutes,
+    totalMarks,
+    sipsDriveId: assessment.sipsDriveId,
+    totalQuestions,
+    sectionBreakdown
+  };
+}
+
+/**
+ * Serialize AssessmentAttempt for Student consumption
+ */
+function serializeAssessmentAttempt(attempt, { remainingMs = null, effectiveDeadline = null } = {}) {
+  if (!attempt) return null;
+
+  return {
+    id: attempt.id,
+    assessmentId: attempt.assessmentId,
+    studentId: attempt.studentId,
+    collegeId: attempt.collegeId,
+    status: attempt.status,
+    startedAt: attempt.startedAt,
+    submittedAt: attempt.submittedAt,
+    finalizedAt: attempt.finalizedAt,
+    effectiveDeadline: effectiveDeadline || attempt.effectiveDeadline,
+    remainingMs: remainingMs !== null ? remainingMs : attempt.remainingMs,
+    totalMarks: Number(attempt.totalMarks || 0),
+    totalScore: ['SUBMITTED', 'FINALIZED', 'TIMED_OUT'].includes(attempt.status) ? Number(attempt.totalScore || 0) : undefined,
+    aptitudeScore: ['SUBMITTED', 'FINALIZED', 'TIMED_OUT'].includes(attempt.status) ? Number(attempt.aptitudeScore || 0) : undefined,
+    technicalScore: ['SUBMITTED', 'FINALIZED', 'TIMED_OUT'].includes(attempt.status) ? Number(attempt.technicalScore || 0) : undefined,
+    codingScore: ['SUBMITTED', 'FINALIZED', 'TIMED_OUT'].includes(attempt.status) ? Number(attempt.codingScore || 0) : undefined,
+    responseCount: attempt._count ? attempt._count.responses : (attempt.responses ? attempt.responses.length : 0),
+    createdAt: attempt.createdAt,
+    updatedAt: attempt.updatedAt
+  };
+}
+
+/**
+ * Serialize AssessmentQuestion strictly for Student delivery during assessment attempt
+ */
+function serializeAssessmentQuestionForStudent(aq) {
+  if (!aq) return null;
+
+  return {
+    id: aq.id,
+    assessmentId: aq.assessmentId,
+    questionVersionId: aq.questionVersionId,
+    section: aq.section,
+    order: aq.order,
+    marks: Number(aq.marks),
+    negativeMarks: Number(aq.negativeMarks),
+    questionVersion: aq.questionVersion ? serializeStudentQuestionVersion(aq.questionVersion) : undefined
+  };
+}
+
+/**
+ * Serialize AssessmentResponse for student view
+ */
+function serializeAssessmentResponse(response) {
+  if (!response) return null;
+
+  return {
+    id: response.id,
+    assessmentAttemptId: response.assessmentAttemptId,
+    assessmentQuestionId: response.assessmentQuestionId,
+    questionVersionId: response.questionVersionId,
+    answerData: response.answerData,
+    answeredAt: response.answeredAt
+  };
+}
+
 module.exports = {
   serializeStudentQuestionVersion,
   serializeAdminQuestionVersion,
@@ -384,7 +491,11 @@ module.exports = {
   serializeStudentContest,
   serializeContestAttempt,
   serializeContestQuestionForStudent,
-  serializeContestResponse
+  serializeContestResponse,
+  serializeStudentAssessment,
+  serializeAssessmentAttempt,
+  serializeAssessmentQuestionForStudent,
+  serializeAssessmentResponse
 };
 
 

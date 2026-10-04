@@ -1,0 +1,82 @@
+[
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "ACID Properties",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "dbms-acid-01",
+    "title": "Database Transaction Isolation and Atomicity",
+    "statement": "Which ACID property guarantees that once a transaction has committed, its changes survive system crashes and power failures?",
+    "options": [
+      { "id": "opt_a", "text": "Atomicity" },
+      { "id": "opt_b", "text": "Consistency" },
+      { "id": "opt_c", "text": "Isolation" },
+      { "id": "opt_d", "text": "Durability" }
+    ],
+    "correctAnswer": { "optionId": "opt_d" },
+    "explanation": "Durability guarantees that once a transaction has been committed, it will remain committed even in the case of a system crash, usually implemented via Write-Ahead Logging (WAL) to non-volatile storage."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Normalization",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "dbms-norm-01",
+    "title": "Boyce-Codd Normal Form Definition",
+    "statement": "A relation schema R is in Boyce-Codd Normal Form (BCNF) if for every non-trivial functional dependency X -> Y:",
+    "options": [
+      { "id": "opt_a", "text": "X is a Superkey" },
+      { "id": "opt_b", "text": "Y is a Prime Attribute" },
+      { "id": "opt_c", "text": "X is a Candidate Key and Y is non-prime" },
+      { "id": "opt_d", "text": "R has no multi-valued dependencies" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "BCNF requires that for every non-trivial functional dependency X -> Y, X must be a superkey of relation R. 3NF allows Y to be a prime attribute, but BCNF strictly eliminates this exception."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Indexing",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "dbms-index-01",
+    "title": "B+ Tree vs B Tree Storage in Relational Databases",
+    "statement": "Why are B+ Trees preferred over standard B-Trees for database disk indexes?",
+    "options": [
+      { "id": "opt_a", "text": "B+ Trees have fewer levels and all actual data records are stored exclusively in linked leaf nodes for fast range scans" },
+      { "id": "opt_b", "text": "B+ Trees store data in internal nodes only" },
+      { "id": "opt_c", "text": "B+ Trees do not require rebalancing on insertion" },
+      { "id": "opt_d", "text": "B+ Trees have O(1) worst-case search complexity" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "In a B+ tree, internal nodes store only routing keys (allowing higher fanout and shallower tree height), while all data pointers reside in leaf nodes, which are linked together in a doubly linked list for optimal sequential and range queries."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "SQL Queries",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "dbms-sql-01",
+    "title": "HAVING vs WHERE Clause in SQL",
+    "statement": "In SQL, what is the key difference between the WHERE clause and the HAVING clause?",
+    "options": [
+      { "id": "opt_a", "text": "WHERE filters rows before aggregation; HAVING filters grouped rows after aggregation with functions like SUM/COUNT" },
+      { "id": "opt_b", "text": "WHERE is used with aggregate functions; HAVING is used with individual row columns" },
+      { "id": "opt_c", "text": "WHERE and HAVING can be used interchangeably in any SQL statement" },
+      { "id": "opt_d", "text": "HAVING is executed before GROUP BY" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "WHERE filters individual records prior to grouping. HAVING is applied after GROUP BY to filter aggregate results (e.g. HAVING COUNT(*) > 5)."
+  }
+]

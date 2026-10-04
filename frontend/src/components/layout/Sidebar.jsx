@@ -21,7 +21,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Zap,
-  BookOpen
+  BookOpen,
+  Code2,
+  Layers
 } from "lucide-react";
 import Avatar from "../common/Avatar";
 import { useAuth } from "../../context/AuthContext";
@@ -33,6 +35,8 @@ export function Sidebar({ isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen
 
   const studentLinks = [
     { to: "/student/dashboard", label: "Overview", icon: LayoutDashboard },
+    { to: "/student/practice", label: "Practice", icon: Code2 },
+    { to: "/student/assessments", label: "Assessments", icon: BookOpen },
     { to: "/student/resume", label: "Resume Intelligence", icon: FileText, badge: "ATS" },
     { to: "/student/skills", label: "Skill Gap Analysis", icon: Target },
     { to: "/student/readiness", label: "Placement Readiness", icon: GraduationCap },
@@ -47,6 +51,8 @@ export function Sidebar({ isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen
 
   const placementLinks = [
     { to: "/placement/dashboard", label: "Batch Overview", icon: LayoutDashboard },
+    { to: "/placement/assessments", label: "Assessments", icon: Layers },
+    { to: "/placement/questions", label: "Question Bank", icon: BookOpen },
     { to: "/placement/students", label: "Student Directory", icon: Users },
     { to: "/placement/jobs", label: "Job Descriptions", icon: Briefcase, badge: "Match" },
     { to: "/placement/analytics", label: "Placement Analytics", icon: BarChart3 },
@@ -56,6 +62,8 @@ export function Sidebar({ isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen
 
   const adminLinks = [
     { to: "/admin/dashboard", label: "System Overview", icon: LayoutDashboard },
+    { to: "/admin/assessments", label: "Assessments", icon: Layers },
+    { to: "/admin/questions", label: "Question Bank", icon: BookOpen },
     { to: "/admin/users", label: "User Management", icon: Users },
     { to: "/admin/students", label: "Student Records", icon: GraduationCap },
     { to: "/admin/analytics", label: "Platform Analytics", icon: BarChart3 },

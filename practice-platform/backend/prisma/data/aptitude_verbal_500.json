@@ -1,0 +1,3402 @@
+[
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Grammar",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-001",
+    "title": "Subject-Verb Agreement #1",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Neither of the two candidate were qualified."
+      },
+      {
+        "id": "opt_b",
+        "text": "Neither of the two candidates are qualified."
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither of the two candidates was qualified."
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither of the two candidates were qualified."
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "\"Neither\" is a singular pronoun and requires the singular verb \"was\"."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-002",
+    "title": "Antonym Identification #2",
+    "statement": "Choose the antonym of \"UBIQUITOUS\":",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Abundant"
+      },
+      {
+        "id": "opt_b",
+        "text": "Omnipresent"
+      },
+      {
+        "id": "opt_c",
+        "text": "Pervasive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Rare"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Ubiquitous means found everywhere. The opposite is Rare or Scarce."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-003",
+    "title": "Tense Inconsistency #3",
+    "statement": "Find the error: \"She has left (A) / for New York (B) / yesterday evening (C) / No error (D)\"",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Part A"
+      },
+      {
+        "id": "opt_b",
+        "text": "Part B"
+      },
+      {
+        "id": "opt_c",
+        "text": "Part C"
+      },
+      {
+        "id": "opt_d",
+        "text": "Part D"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "With specific past time expressions (\"yesterday evening\"), simple past (\"She left\") must be used instead of present perfect."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-004",
+    "title": "Idiomatic Phrase Meaning #4",
+    "statement": "What does the idiom \"Burn the midnight oil\" mean?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "To spend money recklessly"
+      },
+      {
+        "id": "opt_b",
+        "text": "To start a fire intentionally"
+      },
+      {
+        "id": "opt_c",
+        "text": "To waste precious energy"
+      },
+      {
+        "id": "opt_d",
+        "text": "To work late into the night"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "\"Burn the midnight oil\" means to study or work diligently late into the night."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-005",
+    "title": "Vocabulary Context #5",
+    "statement": "The CEO gave a _______ explanation that left the board of directors thoroughly confused.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Convoluted"
+      },
+      {
+        "id": "opt_b",
+        "text": "Lucid"
+      },
+      {
+        "id": "opt_c",
+        "text": "Precise"
+      },
+      {
+        "id": "opt_d",
+        "text": "Succinct"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "\"Convoluted\" means intricate and difficult to understand, matching the context of leaving directors confused."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Grammar",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-006",
+    "title": "Subject-Verb Agreement #6",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Neither of the two candidate were qualified."
+      },
+      {
+        "id": "opt_b",
+        "text": "Neither of the two candidates are qualified."
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither of the two candidates was qualified."
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither of the two candidates were qualified."
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "\"Neither\" is a singular pronoun and requires the singular verb \"was\"."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-007",
+    "title": "Antonym Identification #7",
+    "statement": "Choose the antonym of \"UBIQUITOUS\":",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Abundant"
+      },
+      {
+        "id": "opt_b",
+        "text": "Omnipresent"
+      },
+      {
+        "id": "opt_c",
+        "text": "Pervasive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Rare"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Ubiquitous means found everywhere. The opposite is Rare or Scarce."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-008",
+    "title": "Tense Inconsistency #8",
+    "statement": "Find the error: \"She has left (A) / for New York (B) / yesterday evening (C) / No error (D)\"",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Part A"
+      },
+      {
+        "id": "opt_b",
+        "text": "Part B"
+      },
+      {
+        "id": "opt_c",
+        "text": "Part C"
+      },
+      {
+        "id": "opt_d",
+        "text": "Part D"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "With specific past time expressions (\"yesterday evening\"), simple past (\"She left\") must be used instead of present perfect."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-009",
+    "title": "Idiomatic Phrase Meaning #9",
+    "statement": "What does the idiom \"Burn the midnight oil\" mean?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "To spend money recklessly"
+      },
+      {
+        "id": "opt_b",
+        "text": "To start a fire intentionally"
+      },
+      {
+        "id": "opt_c",
+        "text": "To waste precious energy"
+      },
+      {
+        "id": "opt_d",
+        "text": "To work late into the night"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "\"Burn the midnight oil\" means to study or work diligently late into the night."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Completion",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-010",
+    "title": "Vocabulary Context #10",
+    "statement": "The CEO gave a _______ explanation that left the board of directors thoroughly confused.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Convoluted"
+      },
+      {
+        "id": "opt_b",
+        "text": "Lucid"
+      },
+      {
+        "id": "opt_c",
+        "text": "Precise"
+      },
+      {
+        "id": "opt_d",
+        "text": "Succinct"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "\"Convoluted\" means intricate and difficult to understand, matching the context of leaving directors confused."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Grammar",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-011",
+    "title": "Subject-Verb Agreement #11",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Neither of the two candidate were qualified."
+      },
+      {
+        "id": "opt_b",
+        "text": "Neither of the two candidates are qualified."
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither of the two candidates was qualified."
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither of the two candidates were qualified."
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "\"Neither\" is a singular pronoun and requires the singular verb \"was\"."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-012",
+    "title": "Antonym Identification #12",
+    "statement": "Choose the antonym of \"UBIQUITOUS\":",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Abundant"
+      },
+      {
+        "id": "opt_b",
+        "text": "Omnipresent"
+      },
+      {
+        "id": "opt_c",
+        "text": "Pervasive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Rare"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Ubiquitous means found everywhere. The opposite is Rare or Scarce."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-013",
+    "title": "Tense Inconsistency #13",
+    "statement": "Find the error: \"She has left (A) / for New York (B) / yesterday evening (C) / No error (D)\"",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Part A"
+      },
+      {
+        "id": "opt_b",
+        "text": "Part B"
+      },
+      {
+        "id": "opt_c",
+        "text": "Part C"
+      },
+      {
+        "id": "opt_d",
+        "text": "Part D"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "With specific past time expressions (\"yesterday evening\"), simple past (\"She left\") must be used instead of present perfect."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-014",
+    "title": "Idiomatic Phrase Meaning #14",
+    "statement": "What does the idiom \"Burn the midnight oil\" mean?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "To spend money recklessly"
+      },
+      {
+        "id": "opt_b",
+        "text": "To start a fire intentionally"
+      },
+      {
+        "id": "opt_c",
+        "text": "To waste precious energy"
+      },
+      {
+        "id": "opt_d",
+        "text": "To work late into the night"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "\"Burn the midnight oil\" means to study or work diligently late into the night."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Completion",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-015",
+    "title": "Vocabulary Context #15",
+    "statement": "The CEO gave a _______ explanation that left the board of directors thoroughly confused.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Convoluted"
+      },
+      {
+        "id": "opt_b",
+        "text": "Lucid"
+      },
+      {
+        "id": "opt_c",
+        "text": "Precise"
+      },
+      {
+        "id": "opt_d",
+        "text": "Succinct"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "\"Convoluted\" means intricate and difficult to understand, matching the context of leaving directors confused."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Grammar",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-016",
+    "title": "Subject-Verb Agreement #16",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Neither of the two candidate were qualified."
+      },
+      {
+        "id": "opt_b",
+        "text": "Neither of the two candidates are qualified."
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither of the two candidates was qualified."
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither of the two candidates were qualified."
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "\"Neither\" is a singular pronoun and requires the singular verb \"was\"."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-017",
+    "title": "Antonym Identification #17",
+    "statement": "Choose the antonym of \"UBIQUITOUS\":",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Abundant"
+      },
+      {
+        "id": "opt_b",
+        "text": "Omnipresent"
+      },
+      {
+        "id": "opt_c",
+        "text": "Pervasive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Rare"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Ubiquitous means found everywhere. The opposite is Rare or Scarce."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-018",
+    "title": "Tense Inconsistency #18",
+    "statement": "Find the error: \"She has left (A) / for New York (B) / yesterday evening (C) / No error (D)\"",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Part A"
+      },
+      {
+        "id": "opt_b",
+        "text": "Part B"
+      },
+      {
+        "id": "opt_c",
+        "text": "Part C"
+      },
+      {
+        "id": "opt_d",
+        "text": "Part D"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "With specific past time expressions (\"yesterday evening\"), simple past (\"She left\") must be used instead of present perfect."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-019",
+    "title": "Idiomatic Phrase Meaning #19",
+    "statement": "What does the idiom \"Burn the midnight oil\" mean?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "To spend money recklessly"
+      },
+      {
+        "id": "opt_b",
+        "text": "To start a fire intentionally"
+      },
+      {
+        "id": "opt_c",
+        "text": "To waste precious energy"
+      },
+      {
+        "id": "opt_d",
+        "text": "To work late into the night"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "\"Burn the midnight oil\" means to study or work diligently late into the night."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Completion",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-020",
+    "title": "Vocabulary Context #20",
+    "statement": "The CEO gave a _______ explanation that left the board of directors thoroughly confused.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Convoluted"
+      },
+      {
+        "id": "opt_b",
+        "text": "Lucid"
+      },
+      {
+        "id": "opt_c",
+        "text": "Precise"
+      },
+      {
+        "id": "opt_d",
+        "text": "Succinct"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "\"Convoluted\" means intricate and difficult to understand, matching the context of leaving directors confused."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Grammar",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-021",
+    "title": "Subject-Verb Agreement #21",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Neither of the two candidate were qualified."
+      },
+      {
+        "id": "opt_b",
+        "text": "Neither of the two candidates are qualified."
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither of the two candidates was qualified."
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither of the two candidates were qualified."
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "\"Neither\" is a singular pronoun and requires the singular verb \"was\"."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-022",
+    "title": "Antonym Identification #22",
+    "statement": "Choose the antonym of \"UBIQUITOUS\":",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Abundant"
+      },
+      {
+        "id": "opt_b",
+        "text": "Omnipresent"
+      },
+      {
+        "id": "opt_c",
+        "text": "Pervasive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Rare"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Ubiquitous means found everywhere. The opposite is Rare or Scarce."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-023",
+    "title": "Tense Inconsistency #23",
+    "statement": "Find the error: \"She has left (A) / for New York (B) / yesterday evening (C) / No error (D)\"",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Part A"
+      },
+      {
+        "id": "opt_b",
+        "text": "Part B"
+      },
+      {
+        "id": "opt_c",
+        "text": "Part C"
+      },
+      {
+        "id": "opt_d",
+        "text": "Part D"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "With specific past time expressions (\"yesterday evening\"), simple past (\"She left\") must be used instead of present perfect."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-024",
+    "title": "Idiomatic Phrase Meaning #24",
+    "statement": "What does the idiom \"Burn the midnight oil\" mean?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "To spend money recklessly"
+      },
+      {
+        "id": "opt_b",
+        "text": "To start a fire intentionally"
+      },
+      {
+        "id": "opt_c",
+        "text": "To waste precious energy"
+      },
+      {
+        "id": "opt_d",
+        "text": "To work late into the night"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "\"Burn the midnight oil\" means to study or work diligently late into the night."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-025",
+    "title": "Vocabulary Context #25",
+    "statement": "The CEO gave a _______ explanation that left the board of directors thoroughly confused.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Convoluted"
+      },
+      {
+        "id": "opt_b",
+        "text": "Lucid"
+      },
+      {
+        "id": "opt_c",
+        "text": "Precise"
+      },
+      {
+        "id": "opt_d",
+        "text": "Succinct"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "\"Convoluted\" means intricate and difficult to understand, matching the context of leaving directors confused."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Grammar",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-026",
+    "title": "Subject-Verb Agreement #26",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Neither of the two candidate were qualified."
+      },
+      {
+        "id": "opt_b",
+        "text": "Neither of the two candidates are qualified."
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither of the two candidates was qualified."
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither of the two candidates were qualified."
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "\"Neither\" is a singular pronoun and requires the singular verb \"was\"."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-027",
+    "title": "Antonym Identification #27",
+    "statement": "Choose the antonym of \"UBIQUITOUS\":",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Abundant"
+      },
+      {
+        "id": "opt_b",
+        "text": "Omnipresent"
+      },
+      {
+        "id": "opt_c",
+        "text": "Pervasive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Rare"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Ubiquitous means found everywhere. The opposite is Rare or Scarce."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-028",
+    "title": "Tense Inconsistency #28",
+    "statement": "Find the error: \"She has left (A) / for New York (B) / yesterday evening (C) / No error (D)\"",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Part A"
+      },
+      {
+        "id": "opt_b",
+        "text": "Part B"
+      },
+      {
+        "id": "opt_c",
+        "text": "Part C"
+      },
+      {
+        "id": "opt_d",
+        "text": "Part D"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "With specific past time expressions (\"yesterday evening\"), simple past (\"She left\") must be used instead of present perfect."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-029",
+    "title": "Idiomatic Phrase Meaning #29",
+    "statement": "What does the idiom \"Burn the midnight oil\" mean?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "To spend money recklessly"
+      },
+      {
+        "id": "opt_b",
+        "text": "To start a fire intentionally"
+      },
+      {
+        "id": "opt_c",
+        "text": "To waste precious energy"
+      },
+      {
+        "id": "opt_d",
+        "text": "To work late into the night"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "\"Burn the midnight oil\" means to study or work diligently late into the night."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Completion",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-030",
+    "title": "Vocabulary Context #30",
+    "statement": "The CEO gave a _______ explanation that left the board of directors thoroughly confused.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Convoluted"
+      },
+      {
+        "id": "opt_b",
+        "text": "Lucid"
+      },
+      {
+        "id": "opt_c",
+        "text": "Precise"
+      },
+      {
+        "id": "opt_d",
+        "text": "Succinct"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "\"Convoluted\" means intricate and difficult to understand, matching the context of leaving directors confused."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Grammar",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-031",
+    "title": "Subject-Verb Agreement #31",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Neither of the two candidate were qualified."
+      },
+      {
+        "id": "opt_b",
+        "text": "Neither of the two candidates are qualified."
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither of the two candidates was qualified."
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither of the two candidates were qualified."
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "\"Neither\" is a singular pronoun and requires the singular verb \"was\"."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-032",
+    "title": "Antonym Identification #32",
+    "statement": "Choose the antonym of \"UBIQUITOUS\":",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Abundant"
+      },
+      {
+        "id": "opt_b",
+        "text": "Omnipresent"
+      },
+      {
+        "id": "opt_c",
+        "text": "Pervasive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Rare"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Ubiquitous means found everywhere. The opposite is Rare or Scarce."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-033",
+    "title": "Tense Inconsistency #33",
+    "statement": "Find the error: \"She has left (A) / for New York (B) / yesterday evening (C) / No error (D)\"",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Part A"
+      },
+      {
+        "id": "opt_b",
+        "text": "Part B"
+      },
+      {
+        "id": "opt_c",
+        "text": "Part C"
+      },
+      {
+        "id": "opt_d",
+        "text": "Part D"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "With specific past time expressions (\"yesterday evening\"), simple past (\"She left\") must be used instead of present perfect."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-034",
+    "title": "Idiomatic Phrase Meaning #34",
+    "statement": "What does the idiom \"Burn the midnight oil\" mean?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "To spend money recklessly"
+      },
+      {
+        "id": "opt_b",
+        "text": "To start a fire intentionally"
+      },
+      {
+        "id": "opt_c",
+        "text": "To waste precious energy"
+      },
+      {
+        "id": "opt_d",
+        "text": "To work late into the night"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "\"Burn the midnight oil\" means to study or work diligently late into the night."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-035",
+    "title": "Vocabulary Context #35",
+    "statement": "The CEO gave a _______ explanation that left the board of directors thoroughly confused.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Convoluted"
+      },
+      {
+        "id": "opt_b",
+        "text": "Lucid"
+      },
+      {
+        "id": "opt_c",
+        "text": "Precise"
+      },
+      {
+        "id": "opt_d",
+        "text": "Succinct"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "\"Convoluted\" means intricate and difficult to understand, matching the context of leaving directors confused."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Grammar",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-036",
+    "title": "Subject-Verb Agreement #36",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Neither of the two candidate were qualified."
+      },
+      {
+        "id": "opt_b",
+        "text": "Neither of the two candidates are qualified."
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither of the two candidates was qualified."
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither of the two candidates were qualified."
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "\"Neither\" is a singular pronoun and requires the singular verb \"was\"."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-037",
+    "title": "Antonym Identification #37",
+    "statement": "Choose the antonym of \"UBIQUITOUS\":",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Abundant"
+      },
+      {
+        "id": "opt_b",
+        "text": "Omnipresent"
+      },
+      {
+        "id": "opt_c",
+        "text": "Pervasive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Rare"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Ubiquitous means found everywhere. The opposite is Rare or Scarce."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-038",
+    "title": "Tense Inconsistency #38",
+    "statement": "Find the error: \"She has left (A) / for New York (B) / yesterday evening (C) / No error (D)\"",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Part A"
+      },
+      {
+        "id": "opt_b",
+        "text": "Part B"
+      },
+      {
+        "id": "opt_c",
+        "text": "Part C"
+      },
+      {
+        "id": "opt_d",
+        "text": "Part D"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "With specific past time expressions (\"yesterday evening\"), simple past (\"She left\") must be used instead of present perfect."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-039",
+    "title": "Idiomatic Phrase Meaning #39",
+    "statement": "What does the idiom \"Burn the midnight oil\" mean?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "To spend money recklessly"
+      },
+      {
+        "id": "opt_b",
+        "text": "To start a fire intentionally"
+      },
+      {
+        "id": "opt_c",
+        "text": "To waste precious energy"
+      },
+      {
+        "id": "opt_d",
+        "text": "To work late into the night"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "\"Burn the midnight oil\" means to study or work diligently late into the night."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Completion",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-040",
+    "title": "Vocabulary Context #40",
+    "statement": "The CEO gave a _______ explanation that left the board of directors thoroughly confused.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Convoluted"
+      },
+      {
+        "id": "opt_b",
+        "text": "Lucid"
+      },
+      {
+        "id": "opt_c",
+        "text": "Precise"
+      },
+      {
+        "id": "opt_d",
+        "text": "Succinct"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "\"Convoluted\" means intricate and difficult to understand, matching the context of leaving directors confused."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Grammar",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-041",
+    "title": "Subject-Verb Agreement #41",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Neither of the two candidate were qualified."
+      },
+      {
+        "id": "opt_b",
+        "text": "Neither of the two candidates are qualified."
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither of the two candidates was qualified."
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither of the two candidates were qualified."
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "\"Neither\" is a singular pronoun and requires the singular verb \"was\"."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-042",
+    "title": "Antonym Identification #42",
+    "statement": "Choose the antonym of \"UBIQUITOUS\":",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Abundant"
+      },
+      {
+        "id": "opt_b",
+        "text": "Omnipresent"
+      },
+      {
+        "id": "opt_c",
+        "text": "Pervasive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Rare"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Ubiquitous means found everywhere. The opposite is Rare or Scarce."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-043",
+    "title": "Tense Inconsistency #43",
+    "statement": "Find the error: \"She has left (A) / for New York (B) / yesterday evening (C) / No error (D)\"",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Part A"
+      },
+      {
+        "id": "opt_b",
+        "text": "Part B"
+      },
+      {
+        "id": "opt_c",
+        "text": "Part C"
+      },
+      {
+        "id": "opt_d",
+        "text": "Part D"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "With specific past time expressions (\"yesterday evening\"), simple past (\"She left\") must be used instead of present perfect."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-044",
+    "title": "Idiomatic Phrase Meaning #44",
+    "statement": "What does the idiom \"Burn the midnight oil\" mean?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "To spend money recklessly"
+      },
+      {
+        "id": "opt_b",
+        "text": "To start a fire intentionally"
+      },
+      {
+        "id": "opt_c",
+        "text": "To waste precious energy"
+      },
+      {
+        "id": "opt_d",
+        "text": "To work late into the night"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "\"Burn the midnight oil\" means to study or work diligently late into the night."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Completion",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-045",
+    "title": "Vocabulary Context #45",
+    "statement": "The CEO gave a _______ explanation that left the board of directors thoroughly confused.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Convoluted"
+      },
+      {
+        "id": "opt_b",
+        "text": "Lucid"
+      },
+      {
+        "id": "opt_c",
+        "text": "Precise"
+      },
+      {
+        "id": "opt_d",
+        "text": "Succinct"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "\"Convoluted\" means intricate and difficult to understand, matching the context of leaving directors confused."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Grammar",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-046",
+    "title": "Subject-Verb Agreement #46",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Neither of the two candidate were qualified."
+      },
+      {
+        "id": "opt_b",
+        "text": "Neither of the two candidates are qualified."
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither of the two candidates was qualified."
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither of the two candidates were qualified."
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "\"Neither\" is a singular pronoun and requires the singular verb \"was\"."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-047",
+    "title": "Antonym Identification #47",
+    "statement": "Choose the antonym of \"UBIQUITOUS\":",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Abundant"
+      },
+      {
+        "id": "opt_b",
+        "text": "Omnipresent"
+      },
+      {
+        "id": "opt_c",
+        "text": "Pervasive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Rare"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Ubiquitous means found everywhere. The opposite is Rare or Scarce."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-048",
+    "title": "Tense Inconsistency #48",
+    "statement": "Find the error: \"She has left (A) / for New York (B) / yesterday evening (C) / No error (D)\"",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Part A"
+      },
+      {
+        "id": "opt_b",
+        "text": "Part B"
+      },
+      {
+        "id": "opt_c",
+        "text": "Part C"
+      },
+      {
+        "id": "opt_d",
+        "text": "Part D"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "With specific past time expressions (\"yesterday evening\"), simple past (\"She left\") must be used instead of present perfect."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-049",
+    "title": "Idiomatic Phrase Meaning #49",
+    "statement": "What does the idiom \"Burn the midnight oil\" mean?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "To spend money recklessly"
+      },
+      {
+        "id": "opt_b",
+        "text": "To start a fire intentionally"
+      },
+      {
+        "id": "opt_c",
+        "text": "To waste precious energy"
+      },
+      {
+        "id": "opt_d",
+        "text": "To work late into the night"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "\"Burn the midnight oil\" means to study or work diligently late into the night."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Completion",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-050",
+    "title": "Vocabulary Context #50",
+    "statement": "The CEO gave a _______ explanation that left the board of directors thoroughly confused.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Convoluted"
+      },
+      {
+        "id": "opt_b",
+        "text": "Lucid"
+      },
+      {
+        "id": "opt_c",
+        "text": "Precise"
+      },
+      {
+        "id": "opt_d",
+        "text": "Succinct"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "\"Convoluted\" means intricate and difficult to understand, matching the context of leaving directors confused."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Grammar",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-051",
+    "title": "Subject-Verb Agreement #51",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Neither of the two candidate were qualified."
+      },
+      {
+        "id": "opt_b",
+        "text": "Neither of the two candidates are qualified."
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither of the two candidates was qualified."
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither of the two candidates were qualified."
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "\"Neither\" is a singular pronoun and requires the singular verb \"was\"."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-052",
+    "title": "Antonym Identification #52",
+    "statement": "Choose the antonym of \"UBIQUITOUS\":",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Abundant"
+      },
+      {
+        "id": "opt_b",
+        "text": "Omnipresent"
+      },
+      {
+        "id": "opt_c",
+        "text": "Pervasive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Rare"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Ubiquitous means found everywhere. The opposite is Rare or Scarce."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-053",
+    "title": "Tense Inconsistency #53",
+    "statement": "Find the error: \"She has left (A) / for New York (B) / yesterday evening (C) / No error (D)\"",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Part A"
+      },
+      {
+        "id": "opt_b",
+        "text": "Part B"
+      },
+      {
+        "id": "opt_c",
+        "text": "Part C"
+      },
+      {
+        "id": "opt_d",
+        "text": "Part D"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "With specific past time expressions (\"yesterday evening\"), simple past (\"She left\") must be used instead of present perfect."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-054",
+    "title": "Idiomatic Phrase Meaning #54",
+    "statement": "What does the idiom \"Burn the midnight oil\" mean?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "To spend money recklessly"
+      },
+      {
+        "id": "opt_b",
+        "text": "To start a fire intentionally"
+      },
+      {
+        "id": "opt_c",
+        "text": "To waste precious energy"
+      },
+      {
+        "id": "opt_d",
+        "text": "To work late into the night"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "\"Burn the midnight oil\" means to study or work diligently late into the night."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-055",
+    "title": "Vocabulary Context #55",
+    "statement": "The CEO gave a _______ explanation that left the board of directors thoroughly confused.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Convoluted"
+      },
+      {
+        "id": "opt_b",
+        "text": "Lucid"
+      },
+      {
+        "id": "opt_c",
+        "text": "Precise"
+      },
+      {
+        "id": "opt_d",
+        "text": "Succinct"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "\"Convoluted\" means intricate and difficult to understand, matching the context of leaving directors confused."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Grammar",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-056",
+    "title": "Subject-Verb Agreement #56",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Neither of the two candidate were qualified."
+      },
+      {
+        "id": "opt_b",
+        "text": "Neither of the two candidates are qualified."
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither of the two candidates was qualified."
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither of the two candidates were qualified."
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "\"Neither\" is a singular pronoun and requires the singular verb \"was\"."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-057",
+    "title": "Antonym Identification #57",
+    "statement": "Choose the antonym of \"UBIQUITOUS\":",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Abundant"
+      },
+      {
+        "id": "opt_b",
+        "text": "Omnipresent"
+      },
+      {
+        "id": "opt_c",
+        "text": "Pervasive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Rare"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Ubiquitous means found everywhere. The opposite is Rare or Scarce."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-058",
+    "title": "Tense Inconsistency #58",
+    "statement": "Find the error: \"She has left (A) / for New York (B) / yesterday evening (C) / No error (D)\"",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Part A"
+      },
+      {
+        "id": "opt_b",
+        "text": "Part B"
+      },
+      {
+        "id": "opt_c",
+        "text": "Part C"
+      },
+      {
+        "id": "opt_d",
+        "text": "Part D"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "With specific past time expressions (\"yesterday evening\"), simple past (\"She left\") must be used instead of present perfect."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-059",
+    "title": "Idiomatic Phrase Meaning #59",
+    "statement": "What does the idiom \"Burn the midnight oil\" mean?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "To spend money recklessly"
+      },
+      {
+        "id": "opt_b",
+        "text": "To start a fire intentionally"
+      },
+      {
+        "id": "opt_c",
+        "text": "To waste precious energy"
+      },
+      {
+        "id": "opt_d",
+        "text": "To work late into the night"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "\"Burn the midnight oil\" means to study or work diligently late into the night."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Completion",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-060",
+    "title": "Vocabulary Context #60",
+    "statement": "The CEO gave a _______ explanation that left the board of directors thoroughly confused.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Convoluted"
+      },
+      {
+        "id": "opt_b",
+        "text": "Lucid"
+      },
+      {
+        "id": "opt_c",
+        "text": "Precise"
+      },
+      {
+        "id": "opt_d",
+        "text": "Succinct"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "\"Convoluted\" means intricate and difficult to understand, matching the context of leaving directors confused."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Grammar",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-061",
+    "title": "Subject-Verb Agreement #61",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Neither of the two candidate were qualified."
+      },
+      {
+        "id": "opt_b",
+        "text": "Neither of the two candidates are qualified."
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither of the two candidates was qualified."
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither of the two candidates were qualified."
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "\"Neither\" is a singular pronoun and requires the singular verb \"was\"."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-062",
+    "title": "Antonym Identification #62",
+    "statement": "Choose the antonym of \"UBIQUITOUS\":",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Abundant"
+      },
+      {
+        "id": "opt_b",
+        "text": "Omnipresent"
+      },
+      {
+        "id": "opt_c",
+        "text": "Pervasive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Rare"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Ubiquitous means found everywhere. The opposite is Rare or Scarce."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-063",
+    "title": "Tense Inconsistency #63",
+    "statement": "Find the error: \"She has left (A) / for New York (B) / yesterday evening (C) / No error (D)\"",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Part A"
+      },
+      {
+        "id": "opt_b",
+        "text": "Part B"
+      },
+      {
+        "id": "opt_c",
+        "text": "Part C"
+      },
+      {
+        "id": "opt_d",
+        "text": "Part D"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "With specific past time expressions (\"yesterday evening\"), simple past (\"She left\") must be used instead of present perfect."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-064",
+    "title": "Idiomatic Phrase Meaning #64",
+    "statement": "What does the idiom \"Burn the midnight oil\" mean?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "To spend money recklessly"
+      },
+      {
+        "id": "opt_b",
+        "text": "To start a fire intentionally"
+      },
+      {
+        "id": "opt_c",
+        "text": "To waste precious energy"
+      },
+      {
+        "id": "opt_d",
+        "text": "To work late into the night"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "\"Burn the midnight oil\" means to study or work diligently late into the night."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-065",
+    "title": "Vocabulary Context #65",
+    "statement": "The CEO gave a _______ explanation that left the board of directors thoroughly confused.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Convoluted"
+      },
+      {
+        "id": "opt_b",
+        "text": "Lucid"
+      },
+      {
+        "id": "opt_c",
+        "text": "Precise"
+      },
+      {
+        "id": "opt_d",
+        "text": "Succinct"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "\"Convoluted\" means intricate and difficult to understand, matching the context of leaving directors confused."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Grammar",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-066",
+    "title": "Subject-Verb Agreement #66",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Neither of the two candidate were qualified."
+      },
+      {
+        "id": "opt_b",
+        "text": "Neither of the two candidates are qualified."
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither of the two candidates was qualified."
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither of the two candidates were qualified."
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "\"Neither\" is a singular pronoun and requires the singular verb \"was\"."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-067",
+    "title": "Antonym Identification #67",
+    "statement": "Choose the antonym of \"UBIQUITOUS\":",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Abundant"
+      },
+      {
+        "id": "opt_b",
+        "text": "Omnipresent"
+      },
+      {
+        "id": "opt_c",
+        "text": "Pervasive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Rare"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Ubiquitous means found everywhere. The opposite is Rare or Scarce."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-068",
+    "title": "Tense Inconsistency #68",
+    "statement": "Find the error: \"She has left (A) / for New York (B) / yesterday evening (C) / No error (D)\"",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Part A"
+      },
+      {
+        "id": "opt_b",
+        "text": "Part B"
+      },
+      {
+        "id": "opt_c",
+        "text": "Part C"
+      },
+      {
+        "id": "opt_d",
+        "text": "Part D"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "With specific past time expressions (\"yesterday evening\"), simple past (\"She left\") must be used instead of present perfect."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-069",
+    "title": "Idiomatic Phrase Meaning #69",
+    "statement": "What does the idiom \"Burn the midnight oil\" mean?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "To spend money recklessly"
+      },
+      {
+        "id": "opt_b",
+        "text": "To start a fire intentionally"
+      },
+      {
+        "id": "opt_c",
+        "text": "To waste precious energy"
+      },
+      {
+        "id": "opt_d",
+        "text": "To work late into the night"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "\"Burn the midnight oil\" means to study or work diligently late into the night."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Completion",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-070",
+    "title": "Vocabulary Context #70",
+    "statement": "The CEO gave a _______ explanation that left the board of directors thoroughly confused.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Convoluted"
+      },
+      {
+        "id": "opt_b",
+        "text": "Lucid"
+      },
+      {
+        "id": "opt_c",
+        "text": "Precise"
+      },
+      {
+        "id": "opt_d",
+        "text": "Succinct"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "\"Convoluted\" means intricate and difficult to understand, matching the context of leaving directors confused."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Grammar",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-071",
+    "title": "Subject-Verb Agreement #71",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Neither of the two candidate were qualified."
+      },
+      {
+        "id": "opt_b",
+        "text": "Neither of the two candidates are qualified."
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither of the two candidates was qualified."
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither of the two candidates were qualified."
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "\"Neither\" is a singular pronoun and requires the singular verb \"was\"."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-072",
+    "title": "Antonym Identification #72",
+    "statement": "Choose the antonym of \"UBIQUITOUS\":",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Abundant"
+      },
+      {
+        "id": "opt_b",
+        "text": "Omnipresent"
+      },
+      {
+        "id": "opt_c",
+        "text": "Pervasive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Rare"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Ubiquitous means found everywhere. The opposite is Rare or Scarce."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-073",
+    "title": "Tense Inconsistency #73",
+    "statement": "Find the error: \"She has left (A) / for New York (B) / yesterday evening (C) / No error (D)\"",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Part A"
+      },
+      {
+        "id": "opt_b",
+        "text": "Part B"
+      },
+      {
+        "id": "opt_c",
+        "text": "Part C"
+      },
+      {
+        "id": "opt_d",
+        "text": "Part D"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "With specific past time expressions (\"yesterday evening\"), simple past (\"She left\") must be used instead of present perfect."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-074",
+    "title": "Idiomatic Phrase Meaning #74",
+    "statement": "What does the idiom \"Burn the midnight oil\" mean?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "To spend money recklessly"
+      },
+      {
+        "id": "opt_b",
+        "text": "To start a fire intentionally"
+      },
+      {
+        "id": "opt_c",
+        "text": "To waste precious energy"
+      },
+      {
+        "id": "opt_d",
+        "text": "To work late into the night"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "\"Burn the midnight oil\" means to study or work diligently late into the night."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Completion",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-075",
+    "title": "Vocabulary Context #75",
+    "statement": "The CEO gave a _______ explanation that left the board of directors thoroughly confused.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Convoluted"
+      },
+      {
+        "id": "opt_b",
+        "text": "Lucid"
+      },
+      {
+        "id": "opt_c",
+        "text": "Precise"
+      },
+      {
+        "id": "opt_d",
+        "text": "Succinct"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "\"Convoluted\" means intricate and difficult to understand, matching the context of leaving directors confused."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Grammar",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-076",
+    "title": "Subject-Verb Agreement #76",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Neither of the two candidate were qualified."
+      },
+      {
+        "id": "opt_b",
+        "text": "Neither of the two candidates are qualified."
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither of the two candidates was qualified."
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither of the two candidates were qualified."
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "\"Neither\" is a singular pronoun and requires the singular verb \"was\"."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-077",
+    "title": "Antonym Identification #77",
+    "statement": "Choose the antonym of \"UBIQUITOUS\":",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Abundant"
+      },
+      {
+        "id": "opt_b",
+        "text": "Omnipresent"
+      },
+      {
+        "id": "opt_c",
+        "text": "Pervasive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Rare"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Ubiquitous means found everywhere. The opposite is Rare or Scarce."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-078",
+    "title": "Tense Inconsistency #78",
+    "statement": "Find the error: \"She has left (A) / for New York (B) / yesterday evening (C) / No error (D)\"",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Part A"
+      },
+      {
+        "id": "opt_b",
+        "text": "Part B"
+      },
+      {
+        "id": "opt_c",
+        "text": "Part C"
+      },
+      {
+        "id": "opt_d",
+        "text": "Part D"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "With specific past time expressions (\"yesterday evening\"), simple past (\"She left\") must be used instead of present perfect."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-079",
+    "title": "Idiomatic Phrase Meaning #79",
+    "statement": "What does the idiom \"Burn the midnight oil\" mean?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "To spend money recklessly"
+      },
+      {
+        "id": "opt_b",
+        "text": "To start a fire intentionally"
+      },
+      {
+        "id": "opt_c",
+        "text": "To waste precious energy"
+      },
+      {
+        "id": "opt_d",
+        "text": "To work late into the night"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "\"Burn the midnight oil\" means to study or work diligently late into the night."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Completion",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-080",
+    "title": "Vocabulary Context #80",
+    "statement": "The CEO gave a _______ explanation that left the board of directors thoroughly confused.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Convoluted"
+      },
+      {
+        "id": "opt_b",
+        "text": "Lucid"
+      },
+      {
+        "id": "opt_c",
+        "text": "Precise"
+      },
+      {
+        "id": "opt_d",
+        "text": "Succinct"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "\"Convoluted\" means intricate and difficult to understand, matching the context of leaving directors confused."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Grammar",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-081",
+    "title": "Subject-Verb Agreement #81",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Neither of the two candidate were qualified."
+      },
+      {
+        "id": "opt_b",
+        "text": "Neither of the two candidates are qualified."
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither of the two candidates was qualified."
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither of the two candidates were qualified."
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "\"Neither\" is a singular pronoun and requires the singular verb \"was\"."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-082",
+    "title": "Antonym Identification #82",
+    "statement": "Choose the antonym of \"UBIQUITOUS\":",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Abundant"
+      },
+      {
+        "id": "opt_b",
+        "text": "Omnipresent"
+      },
+      {
+        "id": "opt_c",
+        "text": "Pervasive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Rare"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Ubiquitous means found everywhere. The opposite is Rare or Scarce."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-083",
+    "title": "Tense Inconsistency #83",
+    "statement": "Find the error: \"She has left (A) / for New York (B) / yesterday evening (C) / No error (D)\"",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Part A"
+      },
+      {
+        "id": "opt_b",
+        "text": "Part B"
+      },
+      {
+        "id": "opt_c",
+        "text": "Part C"
+      },
+      {
+        "id": "opt_d",
+        "text": "Part D"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "With specific past time expressions (\"yesterday evening\"), simple past (\"She left\") must be used instead of present perfect."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-084",
+    "title": "Idiomatic Phrase Meaning #84",
+    "statement": "What does the idiom \"Burn the midnight oil\" mean?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "To spend money recklessly"
+      },
+      {
+        "id": "opt_b",
+        "text": "To start a fire intentionally"
+      },
+      {
+        "id": "opt_c",
+        "text": "To waste precious energy"
+      },
+      {
+        "id": "opt_d",
+        "text": "To work late into the night"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "\"Burn the midnight oil\" means to study or work diligently late into the night."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-085",
+    "title": "Vocabulary Context #85",
+    "statement": "The CEO gave a _______ explanation that left the board of directors thoroughly confused.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Convoluted"
+      },
+      {
+        "id": "opt_b",
+        "text": "Lucid"
+      },
+      {
+        "id": "opt_c",
+        "text": "Precise"
+      },
+      {
+        "id": "opt_d",
+        "text": "Succinct"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "\"Convoluted\" means intricate and difficult to understand, matching the context of leaving directors confused."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Grammar",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-086",
+    "title": "Subject-Verb Agreement #86",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Neither of the two candidate were qualified."
+      },
+      {
+        "id": "opt_b",
+        "text": "Neither of the two candidates are qualified."
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither of the two candidates was qualified."
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither of the two candidates were qualified."
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "\"Neither\" is a singular pronoun and requires the singular verb \"was\"."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-087",
+    "title": "Antonym Identification #87",
+    "statement": "Choose the antonym of \"UBIQUITOUS\":",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Abundant"
+      },
+      {
+        "id": "opt_b",
+        "text": "Omnipresent"
+      },
+      {
+        "id": "opt_c",
+        "text": "Pervasive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Rare"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Ubiquitous means found everywhere. The opposite is Rare or Scarce."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-088",
+    "title": "Tense Inconsistency #88",
+    "statement": "Find the error: \"She has left (A) / for New York (B) / yesterday evening (C) / No error (D)\"",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Part A"
+      },
+      {
+        "id": "opt_b",
+        "text": "Part B"
+      },
+      {
+        "id": "opt_c",
+        "text": "Part C"
+      },
+      {
+        "id": "opt_d",
+        "text": "Part D"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "With specific past time expressions (\"yesterday evening\"), simple past (\"She left\") must be used instead of present perfect."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-089",
+    "title": "Idiomatic Phrase Meaning #89",
+    "statement": "What does the idiom \"Burn the midnight oil\" mean?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "To spend money recklessly"
+      },
+      {
+        "id": "opt_b",
+        "text": "To start a fire intentionally"
+      },
+      {
+        "id": "opt_c",
+        "text": "To waste precious energy"
+      },
+      {
+        "id": "opt_d",
+        "text": "To work late into the night"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "\"Burn the midnight oil\" means to study or work diligently late into the night."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Completion",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-090",
+    "title": "Vocabulary Context #90",
+    "statement": "The CEO gave a _______ explanation that left the board of directors thoroughly confused.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Convoluted"
+      },
+      {
+        "id": "opt_b",
+        "text": "Lucid"
+      },
+      {
+        "id": "opt_c",
+        "text": "Precise"
+      },
+      {
+        "id": "opt_d",
+        "text": "Succinct"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "\"Convoluted\" means intricate and difficult to understand, matching the context of leaving directors confused."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Grammar",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-091",
+    "title": "Subject-Verb Agreement #91",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Neither of the two candidate were qualified."
+      },
+      {
+        "id": "opt_b",
+        "text": "Neither of the two candidates are qualified."
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither of the two candidates was qualified."
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither of the two candidates were qualified."
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "\"Neither\" is a singular pronoun and requires the singular verb \"was\"."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-092",
+    "title": "Antonym Identification #92",
+    "statement": "Choose the antonym of \"UBIQUITOUS\":",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Abundant"
+      },
+      {
+        "id": "opt_b",
+        "text": "Omnipresent"
+      },
+      {
+        "id": "opt_c",
+        "text": "Pervasive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Rare"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Ubiquitous means found everywhere. The opposite is Rare or Scarce."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-093",
+    "title": "Tense Inconsistency #93",
+    "statement": "Find the error: \"She has left (A) / for New York (B) / yesterday evening (C) / No error (D)\"",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Part A"
+      },
+      {
+        "id": "opt_b",
+        "text": "Part B"
+      },
+      {
+        "id": "opt_c",
+        "text": "Part C"
+      },
+      {
+        "id": "opt_d",
+        "text": "Part D"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "With specific past time expressions (\"yesterday evening\"), simple past (\"She left\") must be used instead of present perfect."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-094",
+    "title": "Idiomatic Phrase Meaning #94",
+    "statement": "What does the idiom \"Burn the midnight oil\" mean?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "To spend money recklessly"
+      },
+      {
+        "id": "opt_b",
+        "text": "To start a fire intentionally"
+      },
+      {
+        "id": "opt_c",
+        "text": "To waste precious energy"
+      },
+      {
+        "id": "opt_d",
+        "text": "To work late into the night"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "\"Burn the midnight oil\" means to study or work diligently late into the night."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-095",
+    "title": "Vocabulary Context #95",
+    "statement": "The CEO gave a _______ explanation that left the board of directors thoroughly confused.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Convoluted"
+      },
+      {
+        "id": "opt_b",
+        "text": "Lucid"
+      },
+      {
+        "id": "opt_c",
+        "text": "Precise"
+      },
+      {
+        "id": "opt_d",
+        "text": "Succinct"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "\"Convoluted\" means intricate and difficult to understand, matching the context of leaving directors confused."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Grammar",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-096",
+    "title": "Subject-Verb Agreement #96",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Neither of the two candidate were qualified."
+      },
+      {
+        "id": "opt_b",
+        "text": "Neither of the two candidates are qualified."
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither of the two candidates was qualified."
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither of the two candidates were qualified."
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "\"Neither\" is a singular pronoun and requires the singular verb \"was\"."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-097",
+    "title": "Antonym Identification #97",
+    "statement": "Choose the antonym of \"UBIQUITOUS\":",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Abundant"
+      },
+      {
+        "id": "opt_b",
+        "text": "Omnipresent"
+      },
+      {
+        "id": "opt_c",
+        "text": "Pervasive"
+      },
+      {
+        "id": "opt_d",
+        "text": "Rare"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Ubiquitous means found everywhere. The opposite is Rare or Scarce."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-098",
+    "title": "Tense Inconsistency #98",
+    "statement": "Find the error: \"She has left (A) / for New York (B) / yesterday evening (C) / No error (D)\"",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Part A"
+      },
+      {
+        "id": "opt_b",
+        "text": "Part B"
+      },
+      {
+        "id": "opt_c",
+        "text": "Part C"
+      },
+      {
+        "id": "opt_d",
+        "text": "Part D"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "With specific past time expressions (\"yesterday evening\"), simple past (\"She left\") must be used instead of present perfect."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-099",
+    "title": "Idiomatic Phrase Meaning #99",
+    "statement": "What does the idiom \"Burn the midnight oil\" mean?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "To spend money recklessly"
+      },
+      {
+        "id": "opt_b",
+        "text": "To start a fire intentionally"
+      },
+      {
+        "id": "opt_c",
+        "text": "To waste precious energy"
+      },
+      {
+        "id": "opt_d",
+        "text": "To work late into the night"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "\"Burn the midnight oil\" means to study or work diligently late into the night."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Completion",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "verbal-100",
+    "title": "Vocabulary Context #100",
+    "statement": "The CEO gave a _______ explanation that left the board of directors thoroughly confused.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Convoluted"
+      },
+      {
+        "id": "opt_b",
+        "text": "Lucid"
+      },
+      {
+        "id": "opt_c",
+        "text": "Precise"
+      },
+      {
+        "id": "opt_d",
+        "text": "Succinct"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "\"Convoluted\" means intricate and difficult to understand, matching the context of leaving directors confused."
+  }
+]

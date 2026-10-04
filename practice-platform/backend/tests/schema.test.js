@@ -1,4 +1,4 @@
-const { PrismaClient, QuestionType, QuestionFormat, QuestionDifficulty, SourceType, PracticeAttemptStatus, ContestStatus, ContestSection, ContestAttemptStatus, SubmissionStatus } = require('@prisma/client');
+const { PrismaClient, QuestionType, QuestionFormat, QuestionDifficulty, QuestionStatus, SourceType, PracticeAttemptStatus, ContestStatus, ContestSection, ContestAttemptStatus, SubmissionStatus } = require('@prisma/client');
 
 describe('Prisma Domain Schema & Client Structure', () => {
   let prisma;
@@ -25,6 +25,12 @@ describe('Prisma Domain Schema & Client Structure', () => {
   });
 
   test('Prisma Enums are correctly exported with standard values', () => {
+    expect(QuestionStatus).toEqual({
+      DRAFT: 'DRAFT',
+      ACTIVE: 'ACTIVE',
+      ARCHIVED: 'ARCHIVED'
+    });
+
     expect(QuestionType).toEqual({
       CODING: 'CODING',
       APTITUDE: 'APTITUDE',
@@ -48,7 +54,11 @@ describe('Prisma Domain Schema & Client Structure', () => {
     expect(SourceType).toEqual({
       COLLEGE_CREATED: 'COLLEGE_CREATED',
       PUBLIC_SOURCE: 'PUBLIC_SOURCE',
-      CURATED: 'CURATED'
+      CURATED: 'CURATED',
+      ORIGINAL: 'ORIGINAL',
+      THIRD_PARTY: 'THIRD_PARTY',
+      COMPANY_PROVIDED: 'COMPANY_PROVIDED',
+      COLLEGE_PROVIDED: 'COLLEGE_PROVIDED'
     });
 
     expect(PracticeAttemptStatus).toEqual({

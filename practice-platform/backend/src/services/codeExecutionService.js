@@ -15,9 +15,11 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function executeCode(payload, { isAdmin = false } = {}) {
   const {
     studentId,
+    collegeId,
     questionVersionId,
     practiceAttemptId,
     contestAttemptId,
+    assessmentAttemptId,
     language,
     sourceCode,
     mode = 'RUN'
@@ -83,12 +85,13 @@ async function executeCode(payload, { isAdmin = false } = {}) {
   let maxMarks = Number(codingProblem.maxMarks);
 
   // 3. Validate Attempt Context (XOR Rule & Status Verification)
+  const attemptContextsCount = [practiceAttemptId, contestAttemptId, assessmentAttemptId].filter(Boolean).length;
   if (executionMode === 'SUBMIT') {
-    if (!practiceAttemptId && !contestAttemptId) {
-      throw new AppError('Official SUBMIT requires either practiceAttemptId or contestAttemptId', 400);
+    if (attemptContextsCount === 0) {
+      throw new AppError('Official SUBMIT requires practiceAttemptId, contestAttemptId, or assessmentAttemptId', 400);
     }
-    if (practiceAttemptId && contestAttemptId) {
-      throw new AppError('Cannot submit to both practiceAttempt and contestAttempt simultaneously', 400);
+    if (attemptContextsCount > 1) {
+      throw new AppError('Cannot submit to multiple attempt contexts simultaneously', 400);
     }
   }
 
@@ -103,6 +106,10 @@ async function executeCode(payload, { isAdmin = false } = {}) {
 
     if (practiceAttempt.studentId !== studentId.trim()) {
       throw new AppError('Unauthorized: PracticeAttempt belongs to another student', 403);
+    }
+
+    if (collegeId && practiceAttempt.collegeId && practiceAttempt.collegeId !== collegeId.trim()) {
+      throw new AppError('Unauthorized: PracticeAttempt belongs to another institution', 403);
     }
 
     if (practiceAttempt.status !== 'IN_PROGRESS') {
@@ -138,12 +145,16 @@ async function executeCode(payload, { isAdmin = false } = {}) {
       throw new AppError('Unauthorized: ContestAttempt belongs to another student', 403);
     }
 
+    if (collegeId && contestAttempt.collegeId && contestAttempt.collegeId !== collegeId.trim()) {
+      throw new AppError('Unauthorized: ContestAttempt belongs to another institution', 403);
+    }
+
     if (contestAttempt.status !== 'IN_PROGRESS') {
       throw new AppError(`Cannot execute code. ContestAttempt is ${contestAttempt.status}`, 409);
     }
 
-    if (contestAttempt.contest.status === 'CANCELLED') {
-      throw new AppError('Cannot execute code. Contest has been cancelled', 400);
+    if (['CANCELLED', 'DRAFT', 'ENDED', 'EVALUATED', 'ARCHIVED'].includes(contestAttempt.contest.status)) {
+      throw new AppError(`Cannot execute code. Contest is ${contestAttempt.contest.status.toLowerCase()}`, 400);
     }
 
     // Verify deadline
@@ -180,6 +191,64 @@ async function executeCode(payload, { isAdmin = false } = {}) {
     maxMarks = Number(contestQuestion.marks);
   }
 
+  let assessmentQuestion = null;
+  if (assessmentAttemptId) {
+    const assessmentAttempt = await prisma.assessmentAttempt.findUnique({
+      where: { id: assessmentAttemptId },
+      include: {
+        assessment: true
+      }
+    });
+
+    if (!assessmentAttempt) {
+      throw new AppError(`AssessmentAttempt not found with id: ${assessmentAttemptId}`, 404);
+    }
+
+    if (assessmentAttempt.studentId !== studentId.trim()) {
+      throw new AppError('Unauthorized: AssessmentAttempt belongs to another student', 403);
+    }
+
+    if (collegeId && assessmentAttempt.collegeId && assessmentAttempt.collegeId !== collegeId.trim()) {
+      throw new AppError('Unauthorized: AssessmentAttempt belongs to another institution', 403);
+    }
+
+    if (assessmentAttempt.status !== 'IN_PROGRESS') {
+      throw new AppError(`Cannot execute code. AssessmentAttempt is ${assessmentAttempt.status}`, 409);
+    }
+
+    if (assessmentAttempt.assessment.status !== 'PUBLISHED') {
+      throw new AppError(`Cannot execute code. Assessment is ${assessmentAttempt.assessment.status.toLowerCase()}`, 400);
+    }
+
+    // Verify deadline
+    const deadlineMs = new Date(assessmentAttempt.effectiveDeadline).getTime();
+    if (Date.now() > deadlineMs) {
+      await prisma.assessmentAttempt.update({
+        where: { id: assessmentAttemptId },
+        data: { status: 'TIMED_OUT' }
+      });
+      throw new AppError('Assessment attempt deadline has passed. Execution rejected.', 400, {
+        code: 'ATTEMPT_TIMED_OUT'
+      });
+    }
+
+    // Verify question belongs to assessment and obtain assessmentQuestion.marks
+    assessmentQuestion = await prisma.assessmentQuestion.findUnique({
+      where: {
+        assessmentId_questionVersionId: {
+          assessmentId: assessmentAttempt.assessmentId,
+          questionVersionId
+        }
+      }
+    });
+
+    if (!assessmentQuestion) {
+      throw new AppError('This coding problem does not belong to the specified assessment', 404);
+    }
+
+    maxMarks = Number(assessmentQuestion.marks);
+  }
+
   // 4. Select Server-Controlled Test Cases
   let selectedTestCases = [];
   if (executionMode === 'RUN') {
@@ -212,6 +281,7 @@ async function executeCode(payload, { isAdmin = false } = {}) {
       questionVersionId,
       practiceAttemptId: practiceAttemptId || null,
       contestAttemptId: contestAttemptId || null,
+      assessmentAttemptId: assessmentAttemptId || null,
       mode: executionMode,
       language: language.toLowerCase().trim(),
       sourceCode,
@@ -222,276 +292,326 @@ async function executeCode(payload, { isAdmin = false } = {}) {
     }
   });
 
-  // 7. Dispatch Batch to Judge0
-  const batchPayload = selectedTestCases.map((tc) => ({
-    source_code: sourceCode,
-    language_id: judge0LangId,
-    stdin: tc.input,
-    expected_output: tc.expectedOutput,
-    cpu_time_limit: cpuTimeLimitSec,
-    memory_limit: memoryLimitKb
-  }));
+  try {
+    // 7. Dispatch Batch to Judge0
+    const batchPayload = selectedTestCases.map((tc) => ({
+      source_code: sourceCode,
+      language_id: judge0LangId,
+      stdin: tc.input,
+      expected_output: tc.expectedOutput,
+      cpu_time_limit: cpuTimeLimitSec,
+      memory_limit: memoryLimitKb
+    }));
 
-  const tokenResults = await judge0Service.submitBatch(batchPayload);
+    const tokenResults = await judge0Service.submitBatch(batchPayload);
 
-  // 8. Create CodeSubmissionTestResult placeholder records
-  const createdTestResults = [];
-  for (let i = 0; i < selectedTestCases.length; i++) {
-    const tc = selectedTestCases[i];
-    const tokenObj = tokenResults[i] || {};
-    const tr = await prisma.codeSubmissionTestResult.create({
-      data: {
-        submissionId: submission.id,
-        testCaseId: tc.id,
-        judge0Token: tokenObj.token || null,
-        status: 'RUNNING',
-        passed: false,
-        earnedWeight: 0.0,
-        order: tc.order,
-        isHidden: tc.isHidden
-      }
-    });
-    createdTestResults.push({ ...tr, testCase: tc });
-  }
-
-  // 9. Poll Judge0 for Results
-  const tokensToPoll = tokenResults.map((t) => t.token).filter(Boolean);
-  let pollAttempts = 0;
-  let finishedResults = [];
-
-  while (pollAttempts < config.executionPollMaxRetries && tokensToPoll.length > 0) {
-    pollAttempts++;
-    const polled = await judge0Service.pollBatch(tokensToPoll);
-
-    const allFinished = polled.length === tokensToPoll.length &&
-      polled.every((p) => p && p.status_id > 2); // status_id > 2 means finished (Accepted, WA, CE, etc.)
-
-    if (allFinished) {
-      finishedResults = polled;
-      break;
-    }
-
-    await delay(config.executionPollIntervalMs);
-    finishedResults = polled;
-  }
-
-  // Map tokens to results
-  const resultMap = new Map();
-  for (const item of finishedResults) {
-    if (item && item.token) {
-      resultMap.set(item.token, item);
-    }
-  }
-
-  // 10. Check Compilation Error Short-Circuit
-  let compilationError = null;
-  for (const tr of createdTestResults) {
-    const rawRes = resultMap.get(tr.judge0Token);
-    if (rawRes && (rawRes.status_id === 6 || (rawRes.compile_output && rawRes.compile_output.trim()))) {
-      compilationError = rawRes.compile_output || 'Compilation Error';
-      break;
-    }
-  }
-
-  // 11. Process and Persist Each Test Result
-  let testsPassedCount = 0;
-  let totalWeightSum = 0.0;
-  let earnedWeightSum = 0.0;
-  let maxExecutionTime = 0;
-  let maxMemoryUsed = 0;
-  let hasTimeout = false;
-  let hasRuntimeError = false;
-  let hasMemoryLimit = false;
-
-  const finalTestResults = [];
-
-  for (let i = 0; i < createdTestResults.length; i++) {
-    const tr = createdTestResults[i];
-    const tc = tr.testCase;
-    const raw = resultMap.get(tr.judge0Token) || {};
-
-    const testWeight = Number(tc.weight);
-    totalWeightSum += testWeight;
-
-    let testStatus = 'WRONG_ANSWER';
-    let testPassed = false;
-    let earnedWeight = 0.0;
-
-    const timeTakenMs = raw.time ? Math.round(parseFloat(raw.time) * 1000) : 0;
-    const memoryKb = raw.memory || 0;
-
-    if (timeTakenMs > maxExecutionTime) maxExecutionTime = timeTakenMs;
-    if (memoryKb > maxMemoryUsed) maxMemoryUsed = memoryKb;
-
-    if (compilationError) {
-      testStatus = 'COMPILATION_ERROR';
-      testPassed = false;
-    } else if (raw.status_id === 3) {
-      // Direct Judge0 Accepted
-      testPassed = true;
-      testStatus = 'ACCEPTED';
-    } else if (raw.status_id === 5) {
-      testStatus = 'TIME_LIMIT_EXCEEDED';
-      hasTimeout = true;
-    } else if (raw.status_id && [7, 8, 9, 10, 11, 12].includes(raw.status_id)) {
-      testStatus = 'RUNTIME_ERROR';
-      hasRuntimeError = true;
-    } else {
-      // Check output comparison
-      const isMatch = compareCodeOutputs(raw.stdout, tc.expectedOutput);
-      if (isMatch) {
-        testPassed = true;
-        testStatus = 'ACCEPTED';
-      } else {
-        testStatus = judge0Service.mapStatusId(raw.status_id) || 'WRONG_ANSWER';
-        if (testStatus === 'TIME_LIMIT_EXCEEDED') hasTimeout = true;
-        if (testStatus === 'RUNTIME_ERROR') hasRuntimeError = true;
-      }
-    }
-
-    if (testPassed) {
-      testsPassedCount++;
-      earnedWeight = testWeight;
-      earnedWeightSum += testWeight;
-    }
-
-    const updatedTr = await prisma.codeSubmissionTestResult.update({
-      where: { id: tr.id },
-      data: {
-        status: testStatus,
-        passed: testPassed,
-        executionTimeMs: timeTakenMs,
-        memoryUsedKb: memoryKb,
-        stdout: raw.stdout || null,
-        stderr: raw.stderr || null,
-        compileOutput: raw.compile_output || null,
-        earnedWeight
-      },
-      include: {
-        testCase: true
-      }
-    });
-
-    finalTestResults.push(updatedTr);
-  }
-
-  // 12. Determine Aggregate Parent Status & Calculate Marks
-  let aggregateStatus = 'WRONG_ANSWER';
-  let earnedMarks = 0.0;
-
-  if (compilationError) {
-    aggregateStatus = 'COMPILATION_ERROR';
-    earnedMarks = 0.0;
-  } else if (executionMode === 'RUN') {
-    earnedMarks = 0.0; // RUN never awards official marks
-    if (testsPassedCount === selectedTestCases.length) {
-      aggregateStatus = 'ACCEPTED';
-    } else if (hasTimeout) {
-      aggregateStatus = 'TIME_LIMIT_EXCEEDED';
-    } else if (hasRuntimeError) {
-      aggregateStatus = 'RUNTIME_ERROR';
-    } else if (testsPassedCount > 0) {
-      aggregateStatus = 'PARTIAL';
-    } else {
-      aggregateStatus = 'WRONG_ANSWER';
-    }
-  } else {
-    // SUBMIT mode: Calculate weighted marks
-    if (totalWeightSum === 0) {
-      throw new AppError('Total test case weight cannot be zero for official submission', 400);
-    }
-
-    earnedMarks = (earnedWeightSum / totalWeightSum) * maxMarks;
-
-    // Round to 2 decimal places
-    earnedMarks = Math.round(earnedMarks * 100) / 100;
-
-    if (testsPassedCount === selectedTestCases.length) {
-      aggregateStatus = 'ACCEPTED';
-    } else if (testsPassedCount > 0) {
-      aggregateStatus = 'PARTIAL';
-    } else if (hasTimeout) {
-      aggregateStatus = 'TIME_LIMIT_EXCEEDED';
-    } else if (hasRuntimeError) {
-      aggregateStatus = 'RUNTIME_ERROR';
-    } else {
-      aggregateStatus = 'WRONG_ANSWER';
-    }
-
-    // Update PracticeAttempt QuestionResponse record if in practice context
-    if (practiceAttemptId) {
-      await prisma.questionResponse.updateMany({
-        where: {
-          practiceAttemptId,
-          questionVersionId
-        },
+    // 8. Create CodeSubmissionTestResult placeholder records
+    const createdTestResults = [];
+    for (let i = 0; i < selectedTestCases.length; i++) {
+      const tc = selectedTestCases[i];
+      const tokenObj = tokenResults[i] || {};
+      const tr = await prisma.codeSubmissionTestResult.create({
         data: {
-          isCorrect: aggregateStatus === 'ACCEPTED',
-          marksAwarded: earnedMarks,
-          answeredAt: new Date()
+          submissionId: submission.id,
+          testCaseId: tc.id,
+          judge0Token: tokenObj.token || null,
+          status: 'RUNNING',
+          passed: false,
+          earnedWeight: 0.0,
+          order: tc.order,
+          isHidden: tc.isHidden
         }
       });
+      createdTestResults.push({ ...tr, testCase: tc });
     }
 
-    // Upsert ContestAttempt QuestionResponse record if in contest context
-    if (contestAttemptId) {
-      const existingContestResp = await prisma.questionResponse.findFirst({
-        where: { contestAttemptId, questionVersionId }
-      });
-      if (existingContestResp) {
-        await prisma.questionResponse.update({
-          where: { id: existingContestResp.id },
-          data: {
-            isCorrect: aggregateStatus === 'ACCEPTED',
-            marksAwarded: earnedMarks,
-            answerData: { language, sourceCode },
-            answeredAt: new Date()
-          }
-        });
-      } else {
-        await prisma.questionResponse.create({
-          data: {
-            contestAttemptId,
-            questionVersionId,
-            isCorrect: aggregateStatus === 'ACCEPTED',
-            marksAwarded: earnedMarks,
-            answerData: { language, sourceCode },
-            answeredAt: new Date()
-          }
-        });
+    // 9. Poll Judge0 for Results
+    const tokensToPoll = tokenResults.map((t) => t.token).filter(Boolean);
+    let pollAttempts = 0;
+    let finishedResults = [];
+
+    while (pollAttempts < config.executionPollMaxRetries && tokensToPoll.length > 0) {
+      pollAttempts++;
+      const polled = await judge0Service.pollBatch(tokensToPoll);
+
+      const allFinished = polled.length === tokensToPoll.length &&
+        polled.every((p) => p && p.status_id > 2); // status_id > 2 means finished (Accepted, WA, CE, etc.)
+
+      if (allFinished) {
+        finishedResults = polled;
+        break;
+      }
+
+      await delay(config.executionPollIntervalMs);
+      finishedResults = polled;
+    }
+
+    // Map tokens to results
+    const resultMap = new Map();
+    for (const item of finishedResults) {
+      if (item && item.token) {
+        resultMap.set(item.token, item);
       }
     }
-  }
 
-  // 13. Update Parent CodeSubmission in Database
-  const finalSubmission = await prisma.codeSubmission.update({
-    where: { id: submission.id },
-    data: {
-      status: aggregateStatus,
-      testsPassed: testsPassedCount,
-      testsTotal: selectedTestCases.length,
-      earnedMarks,
-      executionTimeMs: maxExecutionTime,
-      memoryUsedKb: maxMemoryUsed,
-      compileOutput: compilationError
-    },
-    include: {
-      testResults: {
+    // 10. Check Compilation Error Short-Circuit
+    let compilationError = null;
+    for (const tr of createdTestResults) {
+      const rawRes = resultMap.get(tr.judge0Token);
+      if (rawRes && (rawRes.status_id === 6 || (rawRes.compile_output && rawRes.compile_output.trim()))) {
+        compilationError = rawRes.compile_output || 'Compilation Error';
+        break;
+      }
+    }
+
+    // 11. Process and Persist Each Test Result
+    let testsPassedCount = 0;
+    let totalWeightSum = 0.0;
+    let earnedWeightSum = 0.0;
+    let maxExecutionTime = 0;
+    let maxMemoryUsed = 0;
+    let hasTimeout = false;
+    let hasRuntimeError = false;
+    let hasMemoryLimit = false;
+    let hasSystemError = false;
+
+    const finalTestResults = [];
+
+    for (let i = 0; i < createdTestResults.length; i++) {
+      const tr = createdTestResults[i];
+      const tc = tr.testCase;
+      const raw = resultMap.get(tr.judge0Token) || {};
+
+      const testWeight = Number(tc.weight);
+      totalWeightSum += testWeight;
+
+      let testStatus = 'WRONG_ANSWER';
+      let testPassed = false;
+      let earnedWeight = 0.0;
+
+      const timeTakenMs = raw.time ? Math.round(parseFloat(raw.time) * 1000) : 0;
+      const memoryKb = raw.memory || 0;
+
+      if (timeTakenMs > maxExecutionTime) maxExecutionTime = timeTakenMs;
+      if (memoryKb > maxMemoryUsed) maxMemoryUsed = memoryKb;
+
+      if (compilationError) {
+        testStatus = 'COMPILATION_ERROR';
+        testPassed = false;
+      } else if (raw.status_id === 3) {
+        // Direct Judge0 Accepted
+        testPassed = true;
+        testStatus = 'ACCEPTED';
+      } else if (raw.status_id === 5) {
+        testStatus = 'TIME_LIMIT_EXCEEDED';
+        hasTimeout = true;
+      } else if (raw.status_id && [7, 8, 9, 10, 11, 12].includes(raw.status_id)) {
+        testStatus = 'RUNTIME_ERROR';
+        hasRuntimeError = true;
+      } else if (raw.status_id && [13, 14].includes(raw.status_id)) {
+        testStatus = 'SYSTEM_ERROR';
+        hasSystemError = true;
+      } else {
+        // Check output comparison
+        const isMatch = compareCodeOutputs(raw.stdout, tc.expectedOutput);
+        if (isMatch) {
+          testPassed = true;
+          testStatus = 'ACCEPTED';
+        } else {
+          testStatus = judge0Service.mapStatusId(raw.status_id) || 'WRONG_ANSWER';
+          if (testStatus === 'TIME_LIMIT_EXCEEDED') hasTimeout = true;
+          if (testStatus === 'RUNTIME_ERROR') hasRuntimeError = true;
+          if (testStatus === 'SYSTEM_ERROR') hasSystemError = true;
+        }
+      }
+
+      if (testPassed) {
+        testsPassedCount++;
+        earnedWeight = testWeight;
+        earnedWeightSum += testWeight;
+      }
+
+      const updatedTr = await prisma.codeSubmissionTestResult.update({
+        where: { id: tr.id },
+        data: {
+          status: testStatus,
+          passed: testPassed,
+          executionTimeMs: timeTakenMs,
+          memoryUsedKb: memoryKb,
+          stdout: raw.stdout || null,
+          stderr: raw.stderr || null,
+          compileOutput: raw.compile_output || null,
+          earnedWeight
+        },
         include: {
           testCase: true
-        },
-        orderBy: { order: 'asc' }
+        }
+      });
+
+      finalTestResults.push(updatedTr);
+    }
+
+    // 12. Determine Aggregate Parent Status & Calculate Marks
+    let aggregateStatus = 'WRONG_ANSWER';
+    let earnedMarks = 0.0;
+
+    if (compilationError) {
+      aggregateStatus = 'COMPILATION_ERROR';
+      earnedMarks = 0.0;
+    } else if (hasSystemError) {
+      aggregateStatus = 'SYSTEM_ERROR';
+      earnedMarks = 0.0;
+    } else if (executionMode === 'RUN') {
+      earnedMarks = 0.0; // RUN never awards official marks
+      if (testsPassedCount === selectedTestCases.length) {
+        aggregateStatus = 'ACCEPTED';
+      } else if (hasTimeout) {
+        aggregateStatus = 'TIME_LIMIT_EXCEEDED';
+      } else if (hasRuntimeError) {
+        aggregateStatus = 'RUNTIME_ERROR';
+      } else if (testsPassedCount > 0) {
+        aggregateStatus = 'PARTIAL';
+      } else {
+        aggregateStatus = 'WRONG_ANSWER';
+      }
+    } else {
+      // SUBMIT mode: Calculate weighted marks
+      if (totalWeightSum === 0) {
+        throw new AppError('Total test case weight cannot be zero for official submission', 400);
+      }
+
+      earnedMarks = (earnedWeightSum / totalWeightSum) * maxMarks;
+
+      // Round to 2 decimal places
+      earnedMarks = Math.round(earnedMarks * 100) / 100;
+
+      if (testsPassedCount === selectedTestCases.length) {
+        aggregateStatus = 'ACCEPTED';
+      } else if (testsPassedCount > 0) {
+        aggregateStatus = 'PARTIAL';
+      } else if (hasTimeout) {
+        aggregateStatus = 'TIME_LIMIT_EXCEEDED';
+      } else if (hasRuntimeError) {
+        aggregateStatus = 'RUNTIME_ERROR';
+      } else {
+        aggregateStatus = 'WRONG_ANSWER';
+      }
+
+      // Update PracticeAttempt QuestionResponse record if in practice context
+      if (practiceAttemptId) {
+        await prisma.questionResponse.updateMany({
+          where: {
+            practiceAttemptId,
+            questionVersionId
+          },
+          data: {
+            isCorrect: aggregateStatus === 'ACCEPTED',
+            marksAwarded: earnedMarks,
+            answeredAt: new Date()
+          }
+        });
+      }
+
+      // Upsert ContestAttempt QuestionResponse record if in contest context
+      if (contestAttemptId) {
+        const existingContestResp = await prisma.questionResponse.findFirst({
+          where: { contestAttemptId, questionVersionId }
+        });
+        if (existingContestResp) {
+          await prisma.questionResponse.update({
+            where: { id: existingContestResp.id },
+            data: {
+              isCorrect: aggregateStatus === 'ACCEPTED',
+              marksAwarded: earnedMarks,
+              answerData: { language, sourceCode },
+              answeredAt: new Date()
+            }
+          });
+        } else {
+          await prisma.questionResponse.create({
+            data: {
+              contestAttemptId,
+              questionVersionId,
+              isCorrect: aggregateStatus === 'ACCEPTED',
+              marksAwarded: earnedMarks,
+              answerData: { language, sourceCode },
+              answeredAt: new Date()
+            }
+          });
+        }
+      }
+
+      // Upsert AssessmentAttempt AssessmentResponse record if in assessment context
+      if (assessmentAttemptId && assessmentQuestion) {
+        const existingAssessmentResp = await prisma.assessmentResponse.findFirst({
+          where: { assessmentAttemptId, assessmentQuestionId: assessmentQuestion.id }
+        });
+        if (existingAssessmentResp) {
+          await prisma.assessmentResponse.update({
+            where: { id: existingAssessmentResp.id },
+            data: {
+              isCorrect: aggregateStatus === 'ACCEPTED',
+              marksAwarded: earnedMarks,
+              answerData: { language, sourceCode, submissionId: submission.id },
+              answeredAt: new Date()
+            }
+          });
+        } else {
+          await prisma.assessmentResponse.create({
+            data: {
+              assessmentAttemptId,
+              assessmentQuestionId: assessmentQuestion.id,
+              questionVersionId,
+              isCorrect: aggregateStatus === 'ACCEPTED',
+              marksAwarded: earnedMarks,
+              answerData: { language, sourceCode, submissionId: submission.id },
+              answeredAt: new Date()
+            }
+          });
+        }
       }
     }
-  });
 
-  return serializeCodeSubmissionResponse(finalSubmission, { isAdmin });
+    // 13. Update Parent CodeSubmission in Database
+    const finalSubmission = await prisma.codeSubmission.update({
+      where: { id: submission.id },
+      data: {
+        status: aggregateStatus,
+        testsPassed: testsPassedCount,
+        testsTotal: selectedTestCases.length,
+        earnedMarks,
+        executionTimeMs: maxExecutionTime,
+        memoryUsedKb: maxMemoryUsed,
+        compileOutput: compilationError
+      },
+      include: {
+        testResults: {
+          include: {
+            testCase: true
+          },
+          orderBy: { order: 'asc' }
+        }
+      }
+    });
+
+    return serializeCodeSubmissionResponse(finalSubmission, { isAdmin });
+  } catch (err) {
+    // If Judge0 submission or polling fails with unhandled error, ensure submission record is marked SYSTEM_ERROR
+    await prisma.codeSubmission.update({
+      where: { id: submission.id },
+      data: { status: 'SYSTEM_ERROR' }
+    }).catch(() => {});
+    throw err;
+  }
 }
 
-async function getSubmissionById(submissionId, { isAdmin = false } = {}) {
+async function getSubmissionById(submissionId, { isAdmin = false, studentId = null, collegeId = null } = {}) {
   const submission = await prisma.codeSubmission.findUnique({
     where: { id: submissionId },
     include: {
+      practiceAttempt: true,
+      contestAttempt: true,
+      assessmentAttempt: true,
       testResults: {
         include: {
           testCase: true
@@ -503,6 +623,22 @@ async function getSubmissionById(submissionId, { isAdmin = false } = {}) {
 
   if (!submission) {
     throw new AppError(`CodeSubmission not found with id: ${submissionId}`, 404);
+  }
+
+  if (!isAdmin && studentId && submission.studentId !== studentId.trim()) {
+    throw new AppError('Unauthorized: Submission belongs to another student', 403);
+  }
+
+  if (!isAdmin && collegeId) {
+    if (submission.practiceAttempt && submission.practiceAttempt.collegeId !== collegeId.trim()) {
+      throw new AppError('Unauthorized: Submission belongs to another institution', 403);
+    }
+    if (submission.contestAttempt && submission.contestAttempt.collegeId !== collegeId.trim()) {
+      throw new AppError('Unauthorized: Submission belongs to another institution', 403);
+    }
+    if (submission.assessmentAttempt && submission.assessmentAttempt.collegeId !== collegeId.trim()) {
+      throw new AppError('Unauthorized: Submission belongs to another institution', 403);
+    }
   }
 
   return serializeCodeSubmissionResponse(submission, { isAdmin });

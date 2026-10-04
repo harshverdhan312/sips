@@ -1,0 +1,82 @@
+[
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Sentence Correction",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "verbal-sc-01",
+    "title": "Subject-Verb Agreement with Prepositional Phrase",
+    "statement": "Identify the grammatically correct sentence:",
+    "options": [
+      { "id": "opt_a", "text": "The bouquet of red roses smell wonderful." },
+      { "id": "opt_b", "text": "The bouquet of red roses smells wonderful." },
+      { "id": "opt_c", "text": "The bouquets of red rose smells wonderful." },
+      { "id": "opt_d", "text": "The bouquet of red rose smell wonderful." }
+    ],
+    "correctAnswer": { "optionId": "opt_b" },
+    "explanation": "The singular subject is 'The bouquet' (not 'roses'). A singular subject requires the singular verb 'smells'."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Vocabulary",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "verbal-syn-01",
+    "title": "Synonym Identification",
+    "statement": "Choose the word most nearly opposite in meaning (Antonym) to 'EPHEMERAL':",
+    "options": [
+      { "id": "opt_a", "text": "Transient" },
+      { "id": "opt_b", "text": "Permanent" },
+      { "id": "opt_c", "text": "Fleeting" },
+      { "id": "opt_d", "text": "Momentary" }
+    ],
+    "correctAnswer": { "optionId": "opt_b" },
+    "explanation": "'Ephemeral' means lasting for a very short time. Its direct antonym is 'Permanent' (enduring/long-lasting)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Spotting Errors",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "verbal-err-01",
+    "title": "Conditional Clause Error",
+    "statement": "Find the incorrect part: 'If I was the Prime Minister (A) / of this country (B) / I would eradicate poverty (C) / No error (D)'",
+    "options": [
+      { "id": "opt_a", "text": "Part A" },
+      { "id": "opt_b", "text": "Part B" },
+      { "id": "opt_c", "text": "Part C" },
+      { "id": "opt_d", "text": "Part D" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "In hypothetical/unreal conditional statements (subjunctive mood), 'were' is used instead of 'was': 'If I were the Prime Minister...'"
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "VERBAL",
+    "subcategory": "Idioms and Phrases",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "verbal-idm-01",
+    "title": "Meaning of Idiom",
+    "statement": "What does the idiom 'Bite the bullet' mean?",
+    "options": [
+      { "id": "opt_a", "text": "To eat food quickly" },
+      { "id": "opt_b", "text": "To face a difficult or unpleasant situation with courage" },
+      { "id": "opt_c", "text": "To start a conflict" },
+      { "id": "opt_d", "text": "To make an irreversible mistake" }
+    ],
+    "correctAnswer": { "optionId": "opt_b" },
+    "explanation": "'Bite the bullet' means to bravely accept or endure an inevitable, difficult situation."
+  }
+]

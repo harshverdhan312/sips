@@ -16,9 +16,13 @@ async function createQuestion(data) {
     category,
     subcategory,
     difficulty,
+    status = 'ACTIVE',
     sourceType = 'CURATED',
+    sourceNamespace,
+    externalId,
     sourceUrl,
     attribution,
+    tags = [],
     collegeId,
     createdBy,
     title,
@@ -38,9 +42,13 @@ async function createQuestion(data) {
         category: category.trim(),
         subcategory: subcategory ? subcategory.trim() : null,
         difficulty,
+        status,
         sourceType,
+        sourceNamespace: sourceNamespace ? sourceNamespace.trim() : null,
+        externalId: externalId ? externalId.trim() : null,
         sourceUrl: sourceUrl || null,
         attribution: attribution || null,
+        tags: Array.isArray(tags) ? tags : [],
         collegeId: collegeId || null,
         createdBy: createdBy || null
       }
@@ -70,13 +78,21 @@ async function createQuestion(data) {
 }
 
 async function getQuestions(filters = {}) {
-  const { type, category, difficulty, sourceType, collegeId } = filters;
+  const { type, category, difficulty, sourceType, collegeId, status, sourceNamespace, externalId } = filters;
   const where = {};
+
+  if (status) {
+    if (status !== 'ALL') where.status = status;
+  } else {
+    where.status = 'ACTIVE';
+  }
 
   if (type) where.type = type;
   if (category) where.category = { contains: category, mode: 'insensitive' };
   if (difficulty) where.difficulty = difficulty;
   if (sourceType) where.sourceType = sourceType;
+  if (sourceNamespace) where.sourceNamespace = sourceNamespace;
+  if (externalId) where.externalId = externalId;
   if (collegeId) where.collegeId = collegeId;
 
   const questions = await prisma.practiceQuestion.findMany({
@@ -92,14 +108,18 @@ async function getQuestions(filters = {}) {
 
   return questions.map((q) => ({
     id: q.id,
+    externalId: q.externalId,
+    sourceNamespace: q.sourceNamespace,
     type: q.type,
     format: q.format,
     category: q.category,
     subcategory: q.subcategory,
     difficulty: q.difficulty,
+    status: q.status,
     sourceType: q.sourceType,
     sourceUrl: q.sourceUrl,
     attribution: q.attribution,
+    tags: q.tags,
     collegeId: q.collegeId,
     createdBy: q.createdBy,
     createdAt: q.createdAt,

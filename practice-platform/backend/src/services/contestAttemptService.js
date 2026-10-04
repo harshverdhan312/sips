@@ -445,9 +445,9 @@ async function recordContestResponse({
     });
   }
 
-  if (attempt.contest.status === 'CANCELLED') {
-    throw new AppError('Cannot submit response. Contest has been cancelled.', 400, {
-      code: 'CONTEST_CANCELLED'
+  if (['CANCELLED', 'DRAFT', 'ENDED', 'EVALUATED', 'ARCHIVED'].includes(attempt.contest.status)) {
+    throw new AppError(`Cannot submit response. Contest is ${attempt.contest.status.toLowerCase()}.`, 400, {
+      code: 'CONTEST_NOT_ACTIVE'
     });
   }
 

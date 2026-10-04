@@ -18,7 +18,8 @@ const config = {
   cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET || '',
   mlServiceUrl: process.env.ML_SERVICE_URL || 'http://127.0.0.1:8000',
   mlServiceTimeoutMs: parseInt(process.env.ML_SERVICE_TIMEOUT_MS, 10) || 5000,
-  mlServiceApiKey: process.env.ML_SERVICE_API_KEY || ''
+  mlServiceApiKey: process.env.ML_SERVICE_API_KEY || '',
+  internalApiSecret: process.env.SIPS_INTERNAL_API_SECRET || 'sips-dev-internal-secret-2025'
 };
 
 module.exports = config;

@@ -127,8 +127,8 @@ async function submitAndEvaluateContestAttempt({
     });
   }
 
-  // Idempotency: If already SUBMITTED and finalized, return existing score
-  if (attempt.status === 'SUBMITTED') {
+  // Idempotency: If already SUBMITTED or finalized with submittedAt, return existing score
+  if (attempt.status === 'SUBMITTED' || (attempt.submittedAt !== null && ['TIMED_OUT', 'DISQUALIFIED'].includes(attempt.status))) {
     return {
       attemptId: attempt.id,
       status: attempt.status,

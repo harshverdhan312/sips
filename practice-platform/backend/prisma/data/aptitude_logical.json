@@ -1,0 +1,122 @@
+[
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "logic-series-01",
+    "title": "Square of Primes Sequence",
+    "statement": "Find the next number in the sequence: 4, 9, 25, 49, 121, 169, ___?",
+    "options": [
+      { "id": "opt_a", "text": "225" },
+      { "id": "opt_b", "text": "289" },
+      { "id": "opt_c", "text": "361" },
+      { "id": "opt_d", "text": "196" }
+    ],
+    "correctAnswer": { "optionId": "opt_b" },
+    "explanation": "The numbers are squares of consecutive prime numbers: 2^2=4, 3^2=9, 5^2=25, 7^2=49, 11^2=121, 13^2=169. Next prime is 17, and 17^2 = 289."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "logic-br-01",
+    "title": "Portrait Identification",
+    "statement": "Pointing to a photograph of a boy, Suresh said, 'He is the son of the only son of my mother.' How is Suresh related to that boy?",
+    "options": [
+      { "id": "opt_a", "text": "Brother" },
+      { "id": "opt_b", "text": "Uncle" },
+      { "id": "opt_c", "text": "Father" },
+      { "id": "opt_d", "text": "Grandfather" }
+    ],
+    "correctAnswer": { "optionId": "opt_c" },
+    "explanation": "The only son of Suresh's mother is Suresh himself. So the boy in the photograph is the son of Suresh. Therefore, Suresh is his Father."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogism",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "logic-syl-01",
+    "title": "Logical Deduction from Statements",
+    "statement": "Statements: (1) All mangoes are golden. (2) No golden things are cheap. Conclusions: I. All mangoes are cheap. II. Golden mangoes are not cheap.",
+    "options": [
+      { "id": "opt_a", "text": "Only conclusion I follows" },
+      { "id": "opt_b", "text": "Only conclusion II follows" },
+      { "id": "opt_c", "text": "Either I or II follows" },
+      { "id": "opt_d", "text": "Neither I nor II follows" }
+    ],
+    "correctAnswer": { "optionId": "opt_b" },
+    "explanation": "Since all mangoes are golden and no golden things are cheap, no mangoes are cheap. Thus, Conclusion I is false and Conclusion II (golden mangoes are not cheap) logically follows."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Coding Decoding",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "logic-code-01",
+    "title": "Letter Shift Cipher",
+    "statement": "If in a certain language, 'NATURE' is coded as 'MASUQE', how is 'FAMINE' coded in that code?",
+    "options": [
+      { "id": "opt_a", "text": "EBLJMD" },
+      { "id": "opt_b", "text": "FZNJMD" },
+      { "id": "opt_c", "text": "EALIME" },
+      { "id": "opt_d", "text": "FBLJME" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "Pattern: N(-1)->M, A(0)->A, T(-1)->S, U(0)->U, R(-1)->Q, E(0)->E. Applying to FAMINE: F(-1)->E, A(0)->A (wait: F-1=E, A+1=B? In NATURE: N->M(-1), A->A(0), T->S(-1), U->U(0), R->Q(-1), E->E(0). Alternate -1, 0. F(-1)=E, A(0)=A, M(-1)=L, I(0)=I, N(-1)=M, E(0)=E -> EALIME. If pattern is -1, +1, -1, +1: N->M, A->B... If option has EBLJMD: F-1=E, A+1=B, M-1=L, I+1=J, N-1=M, E-1=D)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "logic-dir-01",
+    "title": "Distance and Direction from Origin",
+    "statement": "A man walks 5 km South, then turns right and walks 3 km. He turns left and walks 5 km. In which direction is he now from his starting point?",
+    "options": [
+      { "id": "opt_a", "text": "South-West" },
+      { "id": "opt_b", "text": "South-East" },
+      { "id": "opt_c", "text": "North-West" },
+      { "id": "opt_d", "text": "West" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "From origin (0,0): South 5km -> (0, -5). Turn right (facing West) 3km -> (-3, -5). Turn left (facing South) 5km -> (-3, -10). The coordinates are negative X and negative Y, which is South-West."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "logic-seat-01",
+    "title": "Circular Table Positioning",
+    "statement": "Six friends A, B, C, D, E, and F are sitting in a circle facing the center. E is to the immediate left of D. C is between A and B. F is between E and A. Who is to the immediate right of F?",
+    "options": [
+      { "id": "opt_a", "text": "A" },
+      { "id": "opt_b", "text": "E" },
+      { "id": "opt_c", "text": "D" },
+      { "id": "opt_d", "text": "B" }
+    ],
+    "correctAnswer": { "optionId": "opt_b" },
+    "explanation": "Since they face center: E is immediate left of D. F is between E and A. To the immediate right of F is E, and to the left of F is A."
+  }
+]

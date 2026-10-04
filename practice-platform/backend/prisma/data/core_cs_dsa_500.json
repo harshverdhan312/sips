@@ -1,0 +1,5102 @@
+[
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-001",
+    "title": "Time Complexity of QuickSort #1",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-002",
+    "title": "Balanced BST Height Property #2",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-003",
+    "title": "Topological Sort Applicability #3",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-004",
+    "title": "Floyd Warshall Dynamic Programming #4",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-005",
+    "title": "Monotonic Stack Applications #5",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-006",
+    "title": "Time Complexity of QuickSort #6",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-007",
+    "title": "Balanced BST Height Property #7",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-008",
+    "title": "Topological Sort Applicability #8",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-009",
+    "title": "Floyd Warshall Dynamic Programming #9",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-010",
+    "title": "Monotonic Stack Applications #10",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-011",
+    "title": "Time Complexity of QuickSort #11",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-012",
+    "title": "Balanced BST Height Property #12",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-013",
+    "title": "Topological Sort Applicability #13",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-014",
+    "title": "Floyd Warshall Dynamic Programming #14",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-015",
+    "title": "Monotonic Stack Applications #15",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-016",
+    "title": "Time Complexity of QuickSort #16",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-017",
+    "title": "Balanced BST Height Property #17",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-018",
+    "title": "Topological Sort Applicability #18",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-019",
+    "title": "Floyd Warshall Dynamic Programming #19",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-020",
+    "title": "Monotonic Stack Applications #20",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-021",
+    "title": "Time Complexity of QuickSort #21",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-022",
+    "title": "Balanced BST Height Property #22",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-023",
+    "title": "Topological Sort Applicability #23",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-024",
+    "title": "Floyd Warshall Dynamic Programming #24",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-025",
+    "title": "Monotonic Stack Applications #25",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-026",
+    "title": "Time Complexity of QuickSort #26",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-027",
+    "title": "Balanced BST Height Property #27",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-028",
+    "title": "Topological Sort Applicability #28",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-029",
+    "title": "Floyd Warshall Dynamic Programming #29",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-030",
+    "title": "Monotonic Stack Applications #30",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-031",
+    "title": "Time Complexity of QuickSort #31",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-032",
+    "title": "Balanced BST Height Property #32",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-033",
+    "title": "Topological Sort Applicability #33",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-034",
+    "title": "Floyd Warshall Dynamic Programming #34",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-035",
+    "title": "Monotonic Stack Applications #35",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-036",
+    "title": "Time Complexity of QuickSort #36",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-037",
+    "title": "Balanced BST Height Property #37",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-038",
+    "title": "Topological Sort Applicability #38",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-039",
+    "title": "Floyd Warshall Dynamic Programming #39",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-040",
+    "title": "Monotonic Stack Applications #40",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-041",
+    "title": "Time Complexity of QuickSort #41",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-042",
+    "title": "Balanced BST Height Property #42",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-043",
+    "title": "Topological Sort Applicability #43",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-044",
+    "title": "Floyd Warshall Dynamic Programming #44",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-045",
+    "title": "Monotonic Stack Applications #45",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-046",
+    "title": "Time Complexity of QuickSort #46",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-047",
+    "title": "Balanced BST Height Property #47",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-048",
+    "title": "Topological Sort Applicability #48",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-049",
+    "title": "Floyd Warshall Dynamic Programming #49",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-050",
+    "title": "Monotonic Stack Applications #50",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-051",
+    "title": "Time Complexity of QuickSort #51",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-052",
+    "title": "Balanced BST Height Property #52",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-053",
+    "title": "Topological Sort Applicability #53",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-054",
+    "title": "Floyd Warshall Dynamic Programming #54",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-055",
+    "title": "Monotonic Stack Applications #55",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-056",
+    "title": "Time Complexity of QuickSort #56",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-057",
+    "title": "Balanced BST Height Property #57",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-058",
+    "title": "Topological Sort Applicability #58",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-059",
+    "title": "Floyd Warshall Dynamic Programming #59",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-060",
+    "title": "Monotonic Stack Applications #60",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-061",
+    "title": "Time Complexity of QuickSort #61",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-062",
+    "title": "Balanced BST Height Property #62",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-063",
+    "title": "Topological Sort Applicability #63",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-064",
+    "title": "Floyd Warshall Dynamic Programming #64",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-065",
+    "title": "Monotonic Stack Applications #65",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-066",
+    "title": "Time Complexity of QuickSort #66",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-067",
+    "title": "Balanced BST Height Property #67",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-068",
+    "title": "Topological Sort Applicability #68",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-069",
+    "title": "Floyd Warshall Dynamic Programming #69",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-070",
+    "title": "Monotonic Stack Applications #70",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-071",
+    "title": "Time Complexity of QuickSort #71",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-072",
+    "title": "Balanced BST Height Property #72",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-073",
+    "title": "Topological Sort Applicability #73",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-074",
+    "title": "Floyd Warshall Dynamic Programming #74",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-075",
+    "title": "Monotonic Stack Applications #75",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-076",
+    "title": "Time Complexity of QuickSort #76",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-077",
+    "title": "Balanced BST Height Property #77",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-078",
+    "title": "Topological Sort Applicability #78",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-079",
+    "title": "Floyd Warshall Dynamic Programming #79",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-080",
+    "title": "Monotonic Stack Applications #80",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-081",
+    "title": "Time Complexity of QuickSort #81",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-082",
+    "title": "Balanced BST Height Property #82",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-083",
+    "title": "Topological Sort Applicability #83",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-084",
+    "title": "Floyd Warshall Dynamic Programming #84",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-085",
+    "title": "Monotonic Stack Applications #85",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-086",
+    "title": "Time Complexity of QuickSort #86",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-087",
+    "title": "Balanced BST Height Property #87",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-088",
+    "title": "Topological Sort Applicability #88",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-089",
+    "title": "Floyd Warshall Dynamic Programming #89",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-090",
+    "title": "Monotonic Stack Applications #90",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-091",
+    "title": "Time Complexity of QuickSort #91",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-092",
+    "title": "Balanced BST Height Property #92",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-093",
+    "title": "Topological Sort Applicability #93",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-094",
+    "title": "Floyd Warshall Dynamic Programming #94",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-095",
+    "title": "Monotonic Stack Applications #95",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-096",
+    "title": "Time Complexity of QuickSort #96",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-097",
+    "title": "Balanced BST Height Property #97",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-098",
+    "title": "Topological Sort Applicability #98",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-099",
+    "title": "Floyd Warshall Dynamic Programming #99",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-100",
+    "title": "Monotonic Stack Applications #100",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-101",
+    "title": "Time Complexity of QuickSort #101",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-102",
+    "title": "Balanced BST Height Property #102",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-103",
+    "title": "Topological Sort Applicability #103",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-104",
+    "title": "Floyd Warshall Dynamic Programming #104",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-105",
+    "title": "Monotonic Stack Applications #105",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-106",
+    "title": "Time Complexity of QuickSort #106",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-107",
+    "title": "Balanced BST Height Property #107",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-108",
+    "title": "Topological Sort Applicability #108",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-109",
+    "title": "Floyd Warshall Dynamic Programming #109",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-110",
+    "title": "Monotonic Stack Applications #110",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-111",
+    "title": "Time Complexity of QuickSort #111",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-112",
+    "title": "Balanced BST Height Property #112",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-113",
+    "title": "Topological Sort Applicability #113",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-114",
+    "title": "Floyd Warshall Dynamic Programming #114",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-115",
+    "title": "Monotonic Stack Applications #115",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-116",
+    "title": "Time Complexity of QuickSort #116",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-117",
+    "title": "Balanced BST Height Property #117",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-118",
+    "title": "Topological Sort Applicability #118",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-119",
+    "title": "Floyd Warshall Dynamic Programming #119",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-120",
+    "title": "Monotonic Stack Applications #120",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-121",
+    "title": "Time Complexity of QuickSort #121",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-122",
+    "title": "Balanced BST Height Property #122",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-123",
+    "title": "Topological Sort Applicability #123",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-124",
+    "title": "Floyd Warshall Dynamic Programming #124",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-125",
+    "title": "Monotonic Stack Applications #125",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-126",
+    "title": "Time Complexity of QuickSort #126",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-127",
+    "title": "Balanced BST Height Property #127",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-128",
+    "title": "Topological Sort Applicability #128",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-129",
+    "title": "Floyd Warshall Dynamic Programming #129",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-130",
+    "title": "Monotonic Stack Applications #130",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-131",
+    "title": "Time Complexity of QuickSort #131",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-132",
+    "title": "Balanced BST Height Property #132",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-133",
+    "title": "Topological Sort Applicability #133",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-134",
+    "title": "Floyd Warshall Dynamic Programming #134",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-135",
+    "title": "Monotonic Stack Applications #135",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-136",
+    "title": "Time Complexity of QuickSort #136",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-137",
+    "title": "Balanced BST Height Property #137",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-138",
+    "title": "Topological Sort Applicability #138",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-139",
+    "title": "Floyd Warshall Dynamic Programming #139",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-140",
+    "title": "Monotonic Stack Applications #140",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-141",
+    "title": "Time Complexity of QuickSort #141",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-142",
+    "title": "Balanced BST Height Property #142",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-143",
+    "title": "Topological Sort Applicability #143",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-144",
+    "title": "Floyd Warshall Dynamic Programming #144",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-145",
+    "title": "Monotonic Stack Applications #145",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-146",
+    "title": "Time Complexity of QuickSort #146",
+    "statement": "What is the worst-case time complexity of standard QuickSort and when does it occur?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N log N), in all cases"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(N), when elements are reverse sorted"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(N^2), when the pivot is always the smallest or largest element in an already sorted array"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(log N), with randomized pivots"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "When pivot partitioning is highly unbalanced (1 and N-1 elements), recursion depth is N leading to O(N^2)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-147",
+    "title": "Balanced BST Height Property #147",
+    "statement": "What is the maximum height of an AVL Tree containing N nodes?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(N)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(log N) — approximately 1.44 log2(N)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(log log N)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(sqrt(N))"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "AVL trees strictly enforce a balance factor of {-1, 0, +1}, ensuring height is strictly bounded by ~1.44 log2(N)."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-148",
+    "title": "Topological Sort Applicability #148",
+    "statement": "Topological sorting is uniquely defined for which class of graphs?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Any Weighted Graph"
+      },
+      {
+        "id": "opt_b",
+        "text": "Bipartite Graphs only"
+      },
+      {
+        "id": "opt_c",
+        "text": "Directed Acyclic Graphs (DAG)"
+      },
+      {
+        "id": "opt_d",
+        "text": "Undirected Connected Graphs"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Topological sort requires a directed graph without any cycles (DAG) to ensure linear vertex dependency ordering."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-149",
+    "title": "Floyd Warshall Dynamic Programming #149",
+    "statement": "What is the time complexity of the Floyd-Warshall algorithm for All-Pairs Shortest Paths?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "O(E log V)"
+      },
+      {
+        "id": "opt_b",
+        "text": "O(V * E)"
+      },
+      {
+        "id": "opt_c",
+        "text": "O(V^2 log V)"
+      },
+      {
+        "id": "opt_d",
+        "text": "O(V^3)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Floyd-Warshall uses three nested loops over all vertices V, resulting in O(V^3) time complexity."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DSA",
+    "subcategory": "Data Structures and Algorithms",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dsa-150",
+    "title": "Monotonic Stack Applications #150",
+    "statement": "Which data structure is optimal for finding the \"Next Greater Element\" for every element in an array in O(N) total time?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Binary Heap"
+      },
+      {
+        "id": "opt_b",
+        "text": "Disjoint Set Union (DSU)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Monotonic Stack"
+      },
+      {
+        "id": "opt_d",
+        "text": "Segment Tree"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A monotonic decreasing stack processes each element at most twice (one push, one pop), achieving O(N) overall time."
+  }
+]

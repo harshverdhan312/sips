@@ -1,0 +1,82 @@
+[
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Deadlocks",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "os-deadlock-01",
+    "title": "Coffman Conditions for Deadlock",
+    "statement": "Which of the following is NOT one of the four necessary Coffman conditions required for a deadlock to occur?",
+    "options": [
+      { "id": "opt_a", "text": "Mutual Exclusion" },
+      { "id": "opt_b", "text": "Hold and Wait" },
+      { "id": "opt_c", "text": "Preemption Allowed" },
+      { "id": "opt_d", "text": "Circular Wait" }
+    ],
+    "correctAnswer": { "optionId": "opt_c" },
+    "explanation": "The four Coffman conditions for deadlock are: Mutual Exclusion, Hold and Wait, No Preemption (resources cannot be forcibly taken away), and Circular Wait. 'Preemption Allowed' prevents deadlock."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Virtual Memory",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "os-vm-01",
+    "title": "Thrashing in Operating Systems",
+    "statement": "What causes 'Thrashing' in a virtual memory operating system?",
+    "options": [
+      { "id": "opt_a", "text": "CPU spending more time swapping pages between RAM and disk than executing user instructions" },
+      { "id": "opt_b", "text": "High CPU utilization with zero disk I/O" },
+      { "id": "opt_c", "text": "A deadlock between kernel threads" },
+      { "id": "opt_d", "text": "Too much free RAM causing TLB misses" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "Thrashing occurs when the total working sets of active processes exceed available physical memory, forcing the OS into continuous page faulting and page swapping (I/O) at the expense of CPU execution."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "Process Synchronization",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "os-sync-01",
+    "title": "Mutex vs Counting Semaphore",
+    "statement": "What is the key functional distinction between a Binary Semaphore (Mutex) and a Counting Semaphore?",
+    "options": [
+      { "id": "opt_a", "text": "Mutex includes ownership (only the locking thread can unlock), whereas Counting Semaphore coordinates access to N resource instances and can be signaled by any thread" },
+      { "id": "opt_b", "text": "Counting Semaphore can only take values 0 and 1" },
+      { "id": "opt_c", "text": "Mutex uses busy-waiting while Counting Semaphore never blocks" },
+      { "id": "opt_d", "text": "Counting Semaphore cannot be used in multi-threaded programs" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "A Mutex provides exclusive mutual exclusion with strict thread ownership (the thread that acquires the lock must release it). A counting semaphore maintains an integer counter representing available shared resources and can be signaled by producer/consumer threads."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "OS",
+    "subcategory": "CPU Scheduling",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "os-sched-01",
+    "title": "Starvation in Shortest Job First (SJF) Scheduling",
+    "statement": "Which scheduling algorithm is susceptible to process starvation when a continuous stream of short processes arrives?",
+    "options": [
+      { "id": "opt_a", "text": "Shortest Remaining Time First (SRTF / SJF Preemptive)" },
+      { "id": "opt_b", "text": "Round Robin (RR)" },
+      { "id": "opt_c", "text": "First-Come, First-Served (FCFS)" },
+      { "id": "opt_d", "text": "Earliest Deadline First with Aging" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "In SJF / SRTF, long CPU-bound processes can starve indefinitely if new short processes keep arriving. Round Robin prevents starvation using time slicing."
+  }
+]

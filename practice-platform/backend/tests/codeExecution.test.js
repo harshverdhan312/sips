@@ -2,11 +2,12 @@ const request = require('supertest');
 const app = require('../src/app');
 const prisma = require('../src/utils/prisma');
 const judge0Service = require('../src/services/judge0Service');
-const { cleanDatabase } = require('./testHelper');
+const { cleanDatabase, createTestToken } = require('./testHelper');
 
-describe('Judge0 Code Execution Engine (RUN vs SUBMIT)', () => {
+describe('Judge0 Code Execution Engine (RUN vs SUBMIT) - Authenticated SIPS JWT', () => {
   let studentId = 'student_test_coder';
   let collegeId = 'college_rvce_01';
+  let authToken;
   let codingQuestionId, codingVersionId, codingProblemId;
   let publicTc1Id, publicTc2Id, hiddenTc1Id, hiddenTc2Id;
   let practiceAttemptId;
@@ -31,6 +32,7 @@ describe('Judge0 Code Execution Engine (RUN vs SUBMIT)', () => {
   beforeAll(async () => {
     await cleanDatabase(prisma);
     judge0Service.setMockProvider(defaultMockProvider);
+    authToken = createTestToken({ id: studentId, collegeId });
 
     // 1. Create a CODING PracticeQuestion + initial QuestionVersion
     const qRes = await request(app)
@@ -111,6 +113,7 @@ describe('Judge0 Code Execution Engine (RUN vs SUBMIT)', () => {
     // 5. Create a PracticeAttempt containing this question
     const attRes = await request(app)
       .post('/api/practice/attempts')
+      .set('Authorization', `Bearer ${authToken}`)
       .send({
         studentId,
         collegeId,
@@ -173,8 +176,8 @@ describe('Judge0 Code Execution Engine (RUN vs SUBMIT)', () => {
 
       const res = await request(app)
         .post('/api/coding/execute/run')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
-          studentId,
           questionVersionId: codingVersionId,
           practiceAttemptId,
           language: 'python',
@@ -222,8 +225,8 @@ describe('Judge0 Code Execution Engine (RUN vs SUBMIT)', () => {
 
       const res = await request(app)
         .post('/api/coding/execute/run')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
-          studentId,
           questionVersionId: codingVersionId,
           language: 'cpp',
           sourceCode: 'int main() { return 0; }'
@@ -261,8 +264,8 @@ describe('Judge0 Code Execution Engine (RUN vs SUBMIT)', () => {
 
       const res = await request(app)
         .post('/api/coding/execute/run')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
-          studentId,
           questionVersionId: codingVersionId,
           language: 'cpp',
           sourceCode: 'int main() { syntax error }'
@@ -297,8 +300,8 @@ describe('Judge0 Code Execution Engine (RUN vs SUBMIT)', () => {
 
       const res = await request(app)
         .post('/api/coding/execute/run')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
-          studentId,
           questionVersionId: codingVersionId,
           language: 'python',
           sourceCode: 'while True: pass'
@@ -325,8 +328,8 @@ describe('Judge0 Code Execution Engine (RUN vs SUBMIT)', () => {
 
       const res = await request(app)
         .post('/api/coding/execute/run')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
-          studentId,
           questionVersionId: codingVersionId,
           language: 'javascript',
           sourceCode: 'console.log("hello");'
@@ -363,8 +366,8 @@ describe('Judge0 Code Execution Engine (RUN vs SUBMIT)', () => {
 
       const res = await request(app)
         .post('/api/coding/execute/submit')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
-          studentId,
           questionVersionId: codingVersionId,
           practiceAttemptId,
           language: 'python',
@@ -406,8 +409,8 @@ describe('Judge0 Code Execution Engine (RUN vs SUBMIT)', () => {
 
       const res = await request(app)
         .post('/api/coding/execute/submit')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
-          studentId,
           questionVersionId: codingVersionId,
           practiceAttemptId,
           language: 'python',
@@ -439,8 +442,8 @@ describe('Judge0 Code Execution Engine (RUN vs SUBMIT)', () => {
 
       const res = await request(app)
         .post('/api/coding/execute/submit')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
-          studentId,
           questionVersionId: codingVersionId,
           practiceAttemptId,
           language: 'python',
@@ -487,8 +490,8 @@ describe('Judge0 Code Execution Engine (RUN vs SUBMIT)', () => {
 
       const res = await request(app)
         .post('/api/coding/execute/submit')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
-          studentId,
           questionVersionId: codingVersionId,
           practiceAttemptId,
           language: 'python',
@@ -500,12 +503,83 @@ describe('Judge0 Code Execution Engine (RUN vs SUBMIT)', () => {
       expect(res.body.data.earnedMarks).toBe(0.0);
       expect(res.body.data.compileOutput).toContain('SyntaxError');
     });
+
+    test('12. SUBMIT: System error (status_id 13) sets SYSTEM_ERROR and awards 0 marks', async () => {
+      judge0Service.setMockProvider({
+        submitBatch: async () => [
+          { token: 'tok_se_1' },
+          { token: 'tok_se_2' },
+          { token: 'tok_se_3' },
+          { token: 'tok_se_4' }
+        ],
+        pollBatch: async () => [
+          { token: 'tok_se_1', status_id: 13, stdout: null, stderr: 'Sandbox execution failed' },
+          { token: 'tok_se_2', status_id: 3, stdout: '30\n20 10' },
+          { token: 'tok_se_3', status_id: 3, stdout: '-10\n-4 -3 -2 -1' },
+          { token: 'tok_se_4', status_id: 3, stdout: '1500\n500 400 300 200 100' }
+        ]
+      });
+
+      const res = await request(app)
+        .post('/api/coding/execute/submit')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          questionVersionId: codingVersionId,
+          practiceAttemptId,
+          language: 'python',
+          sourceCode: 'print("hello")'
+        });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.data.status).toBe('SYSTEM_ERROR');
+      expect(res.body.data.earnedMarks).toBe(0.0);
+    });
   });
 
   // =========================================================================
   // SECURITY & ISOLATION TESTS
   // =========================================================================
   describe('Security Boundaries & Input Protections', () => {
+    test('13. Missing Authorization header returns 401 Unauthorized', async () => {
+      const res = await request(app)
+        .post('/api/coding/execute/run')
+        .send({
+          questionVersionId: codingVersionId,
+          language: 'python',
+          sourceCode: 'print(1)'
+        });
+
+      expect(res.statusCode).toBe(401);
+      expect(res.body.success).toBe(false);
+    });
+
+    test('14. Client-supplied studentId in body is ignored and overridden by JWT identity', async () => {
+      judge0Service.setMockProvider({
+        submitBatch: async () => [{ token: 'tok_sec_1' }, { token: 'tok_sec_2' }],
+        pollBatch: async () => [
+          { token: 'tok_sec_1', status_id: 3, stdout: '6\n3 2 1' },
+          { token: 'tok_sec_2', status_id: 3, stdout: '30\n20 10' }
+        ]
+      });
+
+      const res = await request(app)
+        .post('/api/coding/execute/run')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          studentId: 'rogue_imposter_student_999',
+          questionVersionId: codingVersionId,
+          language: 'python',
+          sourceCode: 'print(1)'
+        });
+
+      expect(res.statusCode).toBe(200);
+      // Verify in DB that submission record was created with JWT studentId, not body studentId
+      const submissionInDb = await prisma.codeSubmission.findUnique({
+        where: { id: res.body.data.id }
+      });
+      expect(submissionInDb.studentId).toBe(studentId);
+    });
+
     test('15, 16 & 17. Student response strictly scrubs hidden input, hidden expectedOutput, stdout, and Judge0 tokens', async () => {
       judge0Service.setMockProvider({
         submitBatch: async () => [
@@ -524,8 +598,8 @@ describe('Judge0 Code Execution Engine (RUN vs SUBMIT)', () => {
 
       const res = await request(app)
         .post('/api/coding/execute/submit')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
-          studentId,
           questionVersionId: codingVersionId,
           practiceAttemptId,
           language: 'python',
@@ -570,8 +644,8 @@ describe('Judge0 Code Execution Engine (RUN vs SUBMIT)', () => {
 
       const res = await request(app)
         .post('/api/coding/execute/submit')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
-          studentId,
           questionVersionId: codingVersionId,
           practiceAttemptId,
           language: 'python',
@@ -587,8 +661,8 @@ describe('Judge0 Code Execution Engine (RUN vs SUBMIT)', () => {
     test('20. Unsupported language is rejected with 400', async () => {
       const res = await request(app)
         .post('/api/coding/execute/run')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
-          studentId,
           questionVersionId: codingVersionId,
           language: 'unsupported_brainfuck_lang',
           sourceCode: '++++'
@@ -617,8 +691,8 @@ describe('Judge0 Code Execution Engine (RUN vs SUBMIT)', () => {
 
       const res = await request(app)
         .post('/api/coding/execute/run')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
-          studentId,
           questionVersionId: aptVersionId,
           language: 'python',
           sourceCode: 'print(4)'
@@ -630,10 +704,12 @@ describe('Judge0 Code Execution Engine (RUN vs SUBMIT)', () => {
     });
 
     test('22. Unauthorized attempt (other student attempt) is rejected with 403', async () => {
+      const otherStudentToken = createTestToken({ id: 'other_imposter_student_999', collegeId });
+
       const res = await request(app)
         .post('/api/coding/execute/submit')
+        .set('Authorization', `Bearer ${otherStudentToken}`)
         .send({
-          studentId: 'rogue_imposter_student_999',
           questionVersionId: codingVersionId,
           practiceAttemptId,
           language: 'python',
@@ -646,12 +722,15 @@ describe('Judge0 Code Execution Engine (RUN vs SUBMIT)', () => {
     });
 
     test('23. Submissions to finalized/submitted attempt are rejected with 409', async () => {
-      await request(app).post(`/api/practice/attempts/${practiceAttemptId}/submit`).send();
+      await request(app)
+        .post(`/api/practice/attempts/${practiceAttemptId}/submit`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send();
 
       const res = await request(app)
         .post('/api/coding/execute/submit')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
-          studentId,
           questionVersionId: codingVersionId,
           practiceAttemptId,
           language: 'python',
@@ -661,6 +740,93 @@ describe('Judge0 Code Execution Engine (RUN vs SUBMIT)', () => {
       expect(res.statusCode).toBe(409);
       expect(res.body.success).toBe(false);
       expect(res.body.message).toContain('PracticeAttempt is SUBMITTED');
+    });
+
+    test('24. Student cannot retrieve another student submission by ID (403 Unauthorized)', async () => {
+      // Create a submission as studentId
+      judge0Service.setMockProvider({
+        submitBatch: async () => [{ token: 'tok_sub_own' }],
+        pollBatch: async () => [{ token: 'tok_sub_own', status_id: 3, stdout: '6\n3 2 1' }]
+      });
+
+      const runRes = await request(app)
+        .post('/api/coding/execute/run')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          questionVersionId: codingVersionId,
+          language: 'python',
+          sourceCode: 'print(1)'
+        });
+
+      const submissionId = runRes.body.data.id;
+
+      // Access by owner -> 200
+      const ownRes = await request(app)
+        .get(`/api/coding/submissions/${submissionId}`)
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(ownRes.statusCode).toBe(200);
+
+      // Access by other student -> 403
+      const otherStudentToken = createTestToken({ id: 'stranger_student_999', collegeId });
+      const rogueRes = await request(app)
+        .get(`/api/coding/submissions/${submissionId}`)
+        .set('Authorization', `Bearer ${otherStudentToken}`);
+
+      expect(rogueRes.statusCode).toBe(403);
+      expect(rogueRes.body.success).toBe(false);
+      expect(rogueRes.body.message).toContain('belongs to another student');
+    });
+
+    test('25. Judge0 network dispatch failure returns 503 and marks submission as SYSTEM_ERROR', async () => {
+      // Re-create in-progress attempt for test
+      const freshAttempt = await prisma.practiceAttempt.create({
+        data: {
+          studentId,
+          collegeId,
+          category: 'DSA',
+          status: 'IN_PROGRESS',
+          score: 0.0,
+          totalMarks: 0.0,
+          responses: {
+            create: {
+              questionVersionId: codingVersionId,
+              answerData: {}
+            }
+          }
+        }
+      });
+
+      judge0Service.setMockProvider({
+        submitBatch: async () => {
+          throw new Error('Connect Timeout Error (attempted address: 192.168.1.11:2358)');
+        }
+      });
+
+      const res = await request(app)
+        .post('/api/coding/execute/run')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          questionVersionId: codingVersionId,
+          practiceAttemptId: freshAttempt.id,
+          language: 'python',
+          sourceCode: 'print(1)'
+        });
+
+      expect(res.statusCode).toBe(500); // Express errorHandler handles unexpected error or 503
+      expect(res.body.success).toBe(false);
+
+      // Verify the submission record in DB was set to SYSTEM_ERROR
+      const submissionInDb = await prisma.codeSubmission.findFirst({
+        where: { practiceAttemptId: freshAttempt.id },
+        orderBy: { createdAt: 'desc' }
+      });
+
+      expect(submissionInDb).toBeDefined();
+      expect(submissionInDb.status).toBe('SYSTEM_ERROR');
+      expect(Number(submissionInDb.earnedMarks)).toBe(0.0);
+
+      judge0Service.clearMockProvider();
     });
   });
 

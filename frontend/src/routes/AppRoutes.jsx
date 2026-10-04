@@ -22,6 +22,21 @@ import { PeerMatchingPage } from "../pages/student/PeerMatchingPage";
 import { RecommendationsPage } from "../pages/student/RecommendationsPage";
 import { StudentJobsPage } from "../pages/student/StudentJobsPage";
 import { StudentProfilePage } from "../pages/student/StudentProfilePage";
+import { PracticeHubPage } from "../pages/student/PracticeHubPage";
+import { PracticeHistoryPage } from "../pages/student/PracticeHistoryPage";
+import { PracticeSessionPage } from "../pages/student/PracticeSessionPage";
+import { PracticeResultPage } from "../pages/student/PracticeResultPage";
+import { CodingQuestionListPage } from "../pages/student/CodingQuestionListPage";
+import { CodingArenaPage } from "../pages/student/CodingArenaPage";
+import { ContestListPage } from "../pages/student/ContestListPage";
+import { ContestDetailsPage } from "../pages/student/ContestDetailsPage";
+import { ContestWorkspacePage } from "../pages/student/ContestWorkspacePage";
+import { ContestResultPage } from "../pages/student/ContestResultPage";
+import { ContestLeaderboardPage } from "../pages/student/ContestLeaderboardPage";
+import { StudentAssessmentListPage } from "../pages/student/StudentAssessmentListPage";
+import { StudentAssessmentDetailsPage } from "../pages/student/StudentAssessmentDetailsPage";
+import { StudentAssessmentWorkspacePage } from "../pages/student/StudentAssessmentWorkspacePage";
+import { StudentAssessmentResultPage } from "../pages/student/StudentAssessmentResultPage";
 
 // Placement Cell Pages
 import { PlacementDashboard } from "../pages/placement/PlacementDashboard";
@@ -37,6 +52,10 @@ import { AdminStudentsPage } from "../pages/admin/AdminStudentsPage";
 import { AdminAnalyticsPage } from "../pages/admin/AdminAnalyticsPage";
 import { AdminSettingsPage } from "../pages/admin/AdminSettingsPage";
 import { CollegeProfilePage } from "../pages/admin/CollegeProfilePage";
+import { QuestionListPage } from "../pages/admin/QuestionListPage";
+import { QuestionDetailsPage } from "../pages/admin/QuestionDetailsPage";
+import { AssessmentListPage } from "../pages/admin/AssessmentListPage";
+import { AssessmentBuilderPage } from "../pages/admin/AssessmentBuilderPage";
 
 export function AppRoutes() {
   const { role, isAuthenticated } = useAuth();
@@ -46,8 +65,15 @@ export function AppRoutes() {
       {/* Public Marketing & Gateway Layer */}
       <Route path="/" element={<LandingPage />} />
 
-      {/* Public Login */}
+      {/* Public Login & Registration */}
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<Navigate to="/login" replace />} />
+
+      {/* Aliases for Canonical Dashboard and Student Routes */}
+      <Route path="/dashboard" element={<Navigate to="/student/dashboard" replace />} />
+      <Route path="/students" element={<Navigate to="/student/dashboard" replace />} />
+      <Route path="/students/dashboard" element={<Navigate to="/student/dashboard" replace />} />
+      <Route path="/students/*" element={<Navigate to="/student/dashboard" replace />} />
 
       {/* Public Student Career Profile */}
       <Route path="/u/:username" element={<PublicStudentProfilePage />} />
@@ -56,6 +82,23 @@ export function AppRoutes() {
       <Route element={<ProtectedRoute allowedRoles={["student"]} />}>
         <Route element={<DashboardLayout />}>
           <Route path="/student/dashboard" element={<StudentDashboard />} />
+          <Route path="/student/practice" element={<PracticeHubPage />} />
+          <Route path="/student/practice/history" element={<PracticeHistoryPage />} />
+          <Route path="/student/practice/coding" element={<CodingQuestionListPage />} />
+          <Route path="/student/practice/coding/:attemptId" element={<CodingArenaPage />} />
+          <Route path="/student/practice/attempt/:attemptId" element={<PracticeSessionPage />} />
+          <Route path="/student/practice/attempt/:attemptId/result" element={<PracticeResultPage />} />
+          <Route path="/student/contests" element={<ContestListPage />} />
+          <Route path="/student/contests/:contestId" element={<ContestDetailsPage />} />
+          <Route path="/student/contests/:contestId/leaderboard" element={<ContestLeaderboardPage />} />
+          <Route path="/student/contests/:contestId/attempt/:attemptId" element={<ContestWorkspacePage />} />
+          <Route path="/student/contests/:contestId/attempt/:attemptId/result" element={<ContestResultPage />} />
+          <Route path="/student/contests/:contestId/result/:attemptId" element={<ContestResultPage />} />
+          <Route path="/student/assessments" element={<StudentAssessmentListPage />} />
+          <Route path="/student/assessments/:assessmentId" element={<StudentAssessmentDetailsPage />} />
+          <Route path="/student/assessments/:assessmentId/attempt/:attemptId" element={<StudentAssessmentWorkspacePage />} />
+          <Route path="/student/assessments/:assessmentId/result/:attemptId" element={<StudentAssessmentResultPage />} />
+          <Route path="/student/assessments/:assessmentId/attempt/:attemptId/result" element={<StudentAssessmentResultPage />} />
           <Route path="/student/resume" element={<ResumeAnalysisPage />} />
           <Route path="/student/skills" element={<SkillGapPage />} />
           <Route path="/student/skill-analysis" element={<SkillGapPage />} />
@@ -79,6 +122,10 @@ export function AppRoutes() {
       <Route element={<ProtectedRoute allowedRoles={["placement"]} />}>
         <Route element={<DashboardLayout />}>
           <Route path="/placement/dashboard" element={<PlacementDashboard />} />
+          <Route path="/placement/assessments" element={<AssessmentListPage />} />
+          <Route path="/placement/assessments/:assessmentId" element={<AssessmentBuilderPage />} />
+          <Route path="/placement/questions" element={<QuestionListPage />} />
+          <Route path="/placement/questions/:questionId" element={<QuestionDetailsPage />} />
           <Route path="/placement/students" element={<StudentManagementPage />} />
           <Route path="/placement/jobs" element={<JobDescriptionsPage />} />
           <Route path="/placement/job-descriptions" element={<JobDescriptionsPage />} />
@@ -93,6 +140,10 @@ export function AppRoutes() {
       <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
         <Route element={<DashboardLayout />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/assessments" element={<AssessmentListPage />} />
+          <Route path="/admin/assessments/:assessmentId" element={<AssessmentBuilderPage />} />
+          <Route path="/admin/questions" element={<QuestionListPage />} />
+          <Route path="/admin/questions/:questionId" element={<QuestionDetailsPage />} />
           <Route path="/admin/users" element={<AdminUserManagementPage />} />
           <Route path="/admin/students" element={<AdminStudentsPage />} />
           <Route path="/admin/placement-cell" element={<AdminUserManagementPage />} />

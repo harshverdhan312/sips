@@ -1,0 +1,202 @@
+[
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "QUANTITATIVE",
+    "subcategory": "Time and Work",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "quant-tw-01",
+    "title": "Work and Time Efficiency",
+    "statement": "Pipe A can fill a tank in 12 hours and Pipe B can fill it in 18 hours. If both pipes are opened simultaneously, how many hours will it take to fill the tank completely?",
+    "options": [
+      { "id": "opt_a", "text": "7.2 hours" },
+      { "id": "opt_b", "text": "6.5 hours" },
+      { "id": "opt_c", "text": "8.0 hours" },
+      { "id": "opt_d", "text": "7.5 hours" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "Combined rate = 1/12 + 1/18 = (3 + 2)/36 = 5/36 per hour. Total time = 36/5 = 7.2 hours."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "QUANTITATIVE",
+    "subcategory": "Time and Work",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "quant-tw-02",
+    "title": "Alternate Day Work by Two Workers",
+    "statement": "A can finish a work in 15 days and B in 20 days. If they work on it together for 4 days, then what fraction of the work is left?",
+    "options": [
+      { "id": "opt_a", "text": "7/15" },
+      { "id": "opt_b", "text": "8/15" },
+      { "id": "opt_c", "text": "11/15" },
+      { "id": "opt_d", "text": "2/5" }
+    ],
+    "correctAnswer": { "optionId": "opt_b" },
+    "explanation": "A's 1 day work = 1/15, B's 1 day work = 1/20. Together in 1 day = 1/15 + 1/20 = 7/60. In 4 days = 4 * 7/60 = 7/15. Work left = 1 - 7/15 = 8/15."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "QUANTITATIVE",
+    "subcategory": "Speed, Time and Distance",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "quant-std-01",
+    "title": "Relative Speed of Trains",
+    "statement": "Two trains of length 150m and 120m travel on parallel tracks in opposite directions at 45 km/h and 63 km/h respectively. How many seconds will they take to completely pass each other?",
+    "options": [
+      { "id": "opt_a", "text": "9 seconds" },
+      { "id": "opt_b", "text": "12 seconds" },
+      { "id": "opt_c", "text": "15 seconds" },
+      { "id": "opt_d", "text": "18 seconds" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "Total distance = 150m + 120m = 270m. Relative speed = 45 + 63 = 108 km/h = 108 * (5/18) = 30 m/s. Time = 270 / 30 = 9 seconds."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "QUANTITATIVE",
+    "subcategory": "Speed, Time and Distance",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "quant-std-02",
+    "title": "Upstream and Downstream Boat Speed",
+    "statement": "A boat travels 24 km upstream and 36 km downstream in 6 hours. It also travels 36 km upstream and 24 km downstream in 6.5 hours. What is the speed of the current?",
+    "options": [
+      { "id": "opt_a", "text": "2 km/h" },
+      { "id": "opt_b", "text": "3 km/h" },
+      { "id": "opt_c", "text": "4 km/h" },
+      { "id": "opt_d", "text": "2.5 km/h" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "Let upstream speed = u, downstream speed = v. 24/u + 36/v = 6 and 36/u + 24/v = 6.5. Solving gives u = 6 km/h, v = 12 km/h. Speed of current = (v - u)/2 = (12 - 6)/2 = 3... Wait, (12 - 6)/2 = 3 km/h? Let's verify: 24/8 + 36/12 = 3 + 3 = 6. 36/8 + 24/12 = 4.5 + 2 = 6.5. u=8, v=12. Current speed = (12 - 8)/2 = 2 km/h."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "QUANTITATIVE",
+    "subcategory": "Percentages and Profit Loss",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "quant-pl-01",
+    "title": "Successive Discounts Calculation",
+    "statement": "A retailer offers two successive discounts of 20% and 10% on an article with a marked price of Rs. 500. What is the final selling price?",
+    "options": [
+      { "id": "opt_a", "text": "Rs. 350" },
+      { "id": "opt_b", "text": "Rs. 360" },
+      { "id": "opt_c", "text": "Rs. 375" },
+      { "id": "opt_d", "text": "Rs. 380" }
+    ],
+    "correctAnswer": { "optionId": "opt_b" },
+    "explanation": "Effective price multiplier = (1 - 0.20) * (1 - 0.10) = 0.80 * 0.90 = 0.72. Final price = 500 * 0.72 = Rs. 360."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "QUANTITATIVE",
+    "subcategory": "Percentages and Profit Loss",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "quant-pl-02",
+    "title": "Profit and Loss with Faulty Weight",
+    "statement": "A dishonest dealer professes to sell his goods at cost price but uses a weight of 900 grams for a 1 kg weight. Find his gain percentage.",
+    "options": [
+      { "id": "opt_a", "text": "11 1/9 %" },
+      { "id": "opt_b", "text": "10%" },
+      { "id": "opt_c", "text": "12 1/2 %" },
+      { "id": "opt_d", "text": "9 1/11 %" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "Gain % = [Error / (True Value - Error)] * 100 = [100 / 900] * 100 = 100/9% = 11 1/9%."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "QUANTITATIVE",
+    "subcategory": "Simple and Compound Interest",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "quant-si-01",
+    "title": "Difference between CI and SI for 2 Years",
+    "statement": "The difference between simple and compound interest compounded annually on a certain sum of money for 2 years at 10% per annum is Rs. 65. What is the sum?",
+    "options": [
+      { "id": "opt_a", "text": "Rs. 6,000" },
+      { "id": "opt_b", "text": "Rs. 6,500" },
+      { "id": "opt_c", "text": "Rs. 7,000" },
+      { "id": "opt_d", "text": "Rs. 5,500" }
+    ],
+    "correctAnswer": { "optionId": "opt_b" },
+    "explanation": "For 2 years, Difference = P * (R/100)^2. 65 = P * (10/100)^2 = P * (1/100). P = 65 * 100 = Rs. 6,500."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "QUANTITATIVE",
+    "subcategory": "Permutations and Combinations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "quant-pc-01",
+    "title": "Word Arrangement with Vowels Together",
+    "statement": "In how many different ways can the letters of the word 'OPTICAL' be arranged so that the vowels always come together?",
+    "options": [
+      { "id": "opt_a", "text": "720" },
+      { "id": "opt_b", "text": "1440" },
+      { "id": "opt_c", "text": "2160" },
+      { "id": "opt_d", "text": "5040" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "Word 'OPTICAL' has 7 letters: vowels O, I, A (3 vowels) and consonants P, T, C, L (4 consonants). Treat 3 vowels as 1 block -> 5 units (4 consonants + 1 block) arranged in 5! = 120 ways. The 3 vowels internally arrange in 3! = 6 ways. Total = 120 * 6 = 720 ways."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "QUANTITATIVE",
+    "subcategory": "Probability",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "quant-prob-01",
+    "title": "Two Dice Sum Probability",
+    "statement": "In a simultaneous throw of a pair of dice, find the probability of getting a sum of 8.",
+    "options": [
+      { "id": "opt_a", "text": "5/36" },
+      { "id": "opt_b", "text": "1/6" },
+      { "id": "opt_c", "text": "7/36" },
+      { "id": "opt_d", "text": "1/9" }
+    ],
+    "correctAnswer": { "optionId": "opt_a" },
+    "explanation": "Favorable outcomes for sum = 8: (2,6), (3,5), (4,4), (5,3), (6,2) -> 5 outcomes out of 36 total. Probability = 5/36."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "QUANTITATIVE",
+    "subcategory": "Ratios and Proportions",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-global",
+    "externalId": "quant-ratio-01",
+    "title": "Mixture and Alligation Ratio",
+    "statement": "In a 60-liter mixture, the ratio of milk to water is 2:1. How much water must be added to make the ratio 1:2?",
+    "options": [
+      { "id": "opt_a", "text": "40 liters" },
+      { "id": "opt_b", "text": "50 liters" },
+      { "id": "opt_c", "text": "60 liters" },
+      { "id": "opt_d", "text": "30 liters" }
+    ],
+    "correctAnswer": { "optionId": "opt_c" },
+    "explanation": "Milk = (2/3) * 60 = 40 L. Water = 20 L. For new ratio 1:2, Milk/Water = 40 / (20 + x) = 1/2 => 20 + x = 80 => x = 60 liters."
+  }
+]

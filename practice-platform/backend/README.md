@@ -193,17 +193,32 @@ cp .env.example .env
 
 ---
 
-## 6. Deferred Features & Boundaries
-- **Authentication / JWT**: Intentionally deferred; `studentId` and `collegeId` are accepted as scalar inputs.
-- **SIPS Integration**: Intentionally deferred; no direct MongoDB connection.
-- **Contest Engine**: Multi-section contest orchestration is deferred to Phase 5.
-- **Redis / BullMQ**: Asynchronous distributed execution queues are deferred to Phase 5+.
+## 6. Authentication & CORS (Phase 6C.1)
+
+### 6.1 SIPS JWT Authentication
+Practice student endpoints accept the standard SIPS JWT issued upon student login:
+```http
+Authorization: Bearer <sips_jwt>
+```
+
+- **Cryptographic Verification**: The Practice Platform backend cryptographically verifies the token using its server-side `JWT_SECRET` (HS256).
+- **Server-Derived Identity**: Identity claims (`id`, `collegeId`, `role`, `collegeSlug`) are extracted directly from the verified token payload.
+- **Client Identity Redaction**: The client does not send `studentId` or `collegeId` as trusted identity. Any client-supplied body overrides or spoofed headers (`x-student-id`, `x-college-id`) are ignored and stripped.
+- **Role Enforcement**: Student-facing endpoints verify `role === 'STUDENT'`. Non-student roles (e.g. `COLLEGE_ADMIN`) are rejected with `403 Forbidden`.
+- **Production Boundary**: In production (`NODE_ENV=production`), legacy development headers and colon-separated test tokens are strictly rejected.
+
+### 6.2 Configuration Variables
+| Variable | Description | Example / Default |
+| --- | --- | --- |
+| `JWT_SECRET` | Shared server-side SIPS JWT verification secret | `replace-with-the-same-sips-jwt-secret` |
+| `JWT_EXPIRES_IN` | Token expiration policy | `7d` |
+| `CORS_ORIGIN` | Allowed browser origins (comma-separated or single) | `http://localhost:5173,http://localhost:5174` |
 
 ---
 
 ## 7. Testing & Verification
 ```bash
-# Run all automated integration tests (all Judge0 calls are mocked)
+# Run all automated integration tests (11 test suites covering JWT, contests, coding, practice)
 npm test
 ```
 

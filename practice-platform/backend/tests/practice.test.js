@@ -1,7 +1,7 @@
 const request = require('supertest');
 const app = require('../src/app');
 const prisma = require('../src/utils/prisma');
-const { cleanDatabase } = require('./testHelper');
+const { cleanDatabase, createTestToken } = require('./testHelper');
 
 describe('Practice Session, Delivery, Responses & Scoring Engine', () => {
   let q1Id, q1v1Id;
@@ -9,9 +9,14 @@ describe('Practice Session, Delivery, Responses & Scoring Engine', () => {
   let codingQId, codingV1Id, codingProbId;
   let unrelatedQId, unrelatedV1Id;
   let attemptId;
+  let testStudentToken;
+  let testStudentId = 'student_harsh_001';
+  let testCollegeId = 'college_rvce_01';
 
   beforeAll(async () => {
     await cleanDatabase(prisma);
+    testStudentToken = createTestToken({ id: testStudentId, collegeId: testCollegeId });
+
     // 1. Create Question 1 (Aptitude MCQ)
     const q1 = await request(app)
       .post('/api/questions')
@@ -122,9 +127,8 @@ describe('Practice Session, Delivery, Responses & Scoring Engine', () => {
   test('18. Practice attempt can be created with selected question count', async () => {
     const res = await request(app)
       .post('/api/practice/attempts')
+      .set('Authorization', `Bearer ${testStudentToken}`)
       .send({
-        studentId: 'student_harsh_001',
-        collegeId: 'college_rvce_01',
         type: 'APTITUDE',
         category: 'QUANTITATIVE',
         questionCount: 5
@@ -140,7 +144,9 @@ describe('Practice Session, Delivery, Responses & Scoring Engine', () => {
   });
 
   test('19 & 20. Practice questions can be retrieved and only questions belonging to attempt are returned', async () => {
-    const res = await request(app).get(`/api/practice/attempts/${attemptId}/questions`);
+    const res = await request(app)
+      .get(`/api/practice/attempts/${attemptId}/questions`)
+      .set('Authorization', `Bearer ${testStudentToken}`);
 
     expect(res.statusCode).toBe(200);
     expect(res.body.success).toBe(true);
@@ -153,17 +159,20 @@ describe('Practice Session, Delivery, Responses & Scoring Engine', () => {
   });
 
   test('9, 10, 11 & 12. Security checks: Student delivery excludes correctAnswer, answer keys, and hidden test cases', async () => {
+    const secStudentToken = createTestToken({ id: 'student_audit_sec', collegeId: 'college_rvce_01' });
+
     // Create an attempt that includes the coding question and MCQ questions
     const mixedAttemptRes = await request(app)
       .post('/api/practice/attempts')
+      .set('Authorization', `Bearer ${secStudentToken}`)
       .send({
-        studentId: 'student_audit_sec',
-        collegeId: 'college_rvce_01',
         questionCount: 10
       });
 
     const mixedAttemptId = mixedAttemptRes.body.data.attemptId;
-    const questionsRes = await request(app).get(`/api/practice/attempts/${mixedAttemptId}/questions`);
+    const questionsRes = await request(app)
+      .get(`/api/practice/attempts/${mixedAttemptId}/questions`)
+      .set('Authorization', `Bearer ${secStudentToken}`);
 
     expect(questionsRes.statusCode).toBe(200);
     const questions = questionsRes.body.data.questions;
@@ -192,6 +201,7 @@ describe('Practice Session, Delivery, Responses & Scoring Engine', () => {
   test('21. Valid response can be submitted for a delivered question in the attempt', async () => {
     const res = await request(app)
       .post(`/api/practice/attempts/${attemptId}/responses`)
+      .set('Authorization', `Bearer ${testStudentToken}`)
       .send({
         questionVersionId: q1v1Id,
         answerData: { optionId: 'opt_6' }
@@ -205,6 +215,7 @@ describe('Practice Session, Delivery, Responses & Scoring Engine', () => {
   test('27. Response for an unrelated question not in the attempt is rejected with 404', async () => {
     const res = await request(app)
       .post(`/api/practice/attempts/${attemptId}/responses`)
+      .set('Authorization', `Bearer ${testStudentToken}`)
       .send({
         questionVersionId: unrelatedV1Id,
         answerData: { optionId: 'opt_perm' }
@@ -219,6 +230,7 @@ describe('Practice Session, Delivery, Responses & Scoring Engine', () => {
     // Attempt currently has q1v1 answered correctly ({ optionId: 'opt_6' })
     const submitRes = await request(app)
       .post(`/api/practice/attempts/${attemptId}/submit`)
+      .set('Authorization', `Bearer ${testStudentToken}`)
       .send();
 
     expect(submitRes.statusCode).toBe(200);
@@ -228,7 +240,10 @@ describe('Practice Session, Delivery, Responses & Scoring Engine', () => {
     expect(submitRes.body.data.submittedAt).toBeDefined();
 
     // Verify detailed results endpoint
-    const resultRes = await request(app).get(`/api/practice/attempts/${attemptId}/result`);
+    const resultRes = await request(app)
+      .get(`/api/practice/attempts/${attemptId}/result`)
+      .set('Authorization', `Bearer ${testStudentToken}`);
+
     expect(resultRes.statusCode).toBe(200);
     expect(resultRes.body.data.status).toBe('SUBMITTED');
     expect(resultRes.body.data.score).toBe(1.0);
@@ -244,6 +259,7 @@ describe('Practice Session, Delivery, Responses & Scoring Engine', () => {
   test('25. Duplicate submission of an already submitted attempt is rejected with 409', async () => {
     const res = await request(app)
       .post(`/api/practice/attempts/${attemptId}/submit`)
+      .set('Authorization', `Bearer ${testStudentToken}`)
       .send();
 
     expect(res.statusCode).toBe(409);
@@ -254,6 +270,7 @@ describe('Practice Session, Delivery, Responses & Scoring Engine', () => {
   test('26. Response submission after attempt is submitted is rejected with 409', async () => {
     const res = await request(app)
       .post(`/api/practice/attempts/${attemptId}/responses`)
+      .set('Authorization', `Bearer ${testStudentToken}`)
       .send({
         questionVersionId: q1v1Id,
         answerData: { optionId: 'opt_8' }
@@ -265,12 +282,13 @@ describe('Practice Session, Delivery, Responses & Scoring Engine', () => {
   });
 
   test('28. Historical QuestionVersion remains unchanged even after Question receives Version 2', async () => {
+    const vTestToken = createTestToken({ id: 'student_version_test', collegeId: 'college_rvce_01' });
+
     // 1. Create attempt with Question 2 Version 1
     const attempt2Res = await request(app)
       .post('/api/practice/attempts')
+      .set('Authorization', `Bearer ${vTestToken}`)
       .send({
-        studentId: 'student_version_test',
-        collegeId: 'college_rvce_01',
         type: 'TECHNICAL',
         questionCount: 10
       });
@@ -280,13 +298,17 @@ describe('Practice Session, Delivery, Responses & Scoring Engine', () => {
     // 2. Student submits true for Q2 v1
     await request(app)
       .post(`/api/practice/attempts/${attempt2Id}/responses`)
+      .set('Authorization', `Bearer ${vTestToken}`)
       .send({
         questionVersionId: q2v1Id,
         answerData: { value: true }
       });
 
     // 3. Submit attempt 2
-    await request(app).post(`/api/practice/attempts/${attempt2Id}/submit`).send();
+    await request(app)
+      .post(`/api/practice/attempts/${attempt2Id}/submit`)
+      .set('Authorization', `Bearer ${vTestToken}`)
+      .send();
 
     // 4. Later, an admin creates Version 2 for Question 2 with different answer
     const v2Res = await request(app)
@@ -300,7 +322,10 @@ describe('Practice Session, Delivery, Responses & Scoring Engine', () => {
     q2v2Id = v2Res.body.data.id;
 
     // 5. Verify that attempt 2 still retains historical QuestionVersion 1 and its original score
-    const resultRes = await request(app).get(`/api/practice/attempts/${attempt2Id}/result`);
+    const resultRes = await request(app)
+      .get(`/api/practice/attempts/${attempt2Id}/result`)
+      .set('Authorization', `Bearer ${vTestToken}`);
+
     expect(resultRes.statusCode).toBe(200);
 
     const q2Result = resultRes.body.data.breakdown.find((b) => b.questionVersionId === q2v1Id);
@@ -308,5 +333,86 @@ describe('Practice Session, Delivery, Responses & Scoring Engine', () => {
     expect(q2Result.questionVersionId).toBe(q2v1Id);
     expect(q2Result.isCorrect).toBe(true);
     expect(q2Result.explanation).toContain('all-or-nothing property');
+  });
+
+  test('29. Coding practice attempt can be created for a specific coding questionId (as done by CodingQuestionListPage)', async () => {
+    const res = await request(app)
+      .post('/api/practice/attempts')
+      .set('Authorization', `Bearer ${testStudentToken}`)
+      .send({
+        type: 'CODING',
+        questionId: codingQId,
+        questionCount: 1
+      });
+
+    expect(res.statusCode).toBe(201);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.attemptId).toBeDefined();
+
+    // Verify delivered questions contains the specific coding question version with public test cases
+    const deliveredRes = await request(app)
+      .get(`/api/practice/attempts/${res.body.data.attemptId}/questions`)
+      .set('Authorization', `Bearer ${testStudentToken}`);
+
+    expect(deliveredRes.statusCode).toBe(200);
+    expect(deliveredRes.body.data.questions).toHaveLength(1);
+    expect(deliveredRes.body.data.questions[0].id).toBe(codingV1Id);
+    expect(deliveredRes.body.data.questions[0].codingProblem).toBeDefined();
+    expect(deliveredRes.body.data.questions[0].codingProblem.testCases).toHaveLength(1);
+  });
+
+  test('30. Practice attempt returns 404 when no questions match the requested criteria', async () => {
+    const res = await request(app)
+      .post('/api/practice/attempts')
+      .set('Authorization', `Bearer ${testStudentToken}`)
+      .send({
+        type: 'CODING',
+        questionId: 'non_existent_question_id_99999',
+        questionCount: 1
+      });
+
+    expect(res.statusCode).toBe(404);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toBe('No questions available matching the requested criteria');
+  });
+
+  test('31. Another student cannot access an attempt result belonging to another student (403 Forbidden)', async () => {
+    const otherStudentToken = createTestToken({ id: 'student_attacker_99', collegeId: testCollegeId });
+    const res = await request(app)
+      .get(`/api/practice/attempts/${attemptId}/result`)
+      .set('Authorization', `Bearer ${otherStudentToken}`);
+
+    expect(res.statusCode).toBe(403);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toContain('Unauthorized: Practice attempt belongs to another student');
+  });
+
+  test('32. Nonexistent attempt ID on result endpoint returns 404', async () => {
+    const res = await request(app)
+      .get('/api/practice/attempts/non_existent_attempt_id_999/result')
+      .set('Authorization', `Bearer ${testStudentToken}`);
+
+    expect(res.statusCode).toBe(404);
+    expect(res.body.success).toBe(false);
+  });
+
+  test('33. In-progress attempt accessing result endpoint returns 400', async () => {
+    const activeAttemptRes = await request(app)
+      .post('/api/practice/attempts')
+      .set('Authorization', `Bearer ${testStudentToken}`)
+      .send({
+        type: 'APTITUDE',
+        questionCount: 1
+      });
+
+    const activeAttemptId = activeAttemptRes.body.data.attemptId;
+
+    const res = await request(app)
+      .get(`/api/practice/attempts/${activeAttemptId}/result`)
+      .set('Authorization', `Bearer ${testStudentToken}`);
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toContain('has not been submitted yet');
   });
 });

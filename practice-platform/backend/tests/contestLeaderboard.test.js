@@ -12,6 +12,7 @@ describe('Contest Leaderboard & Ranking Engine (Phase 5B.4)', () => {
   let contestIdB;
   let draftContestId;
   let cancelledContestId;
+  let questionVersionId;
 
   beforeAll(async () => {
     await cleanDatabase(prisma);
@@ -38,6 +39,7 @@ describe('Contest Leaderboard & Ranking Engine (Phase 5B.4)', () => {
         correctAnswer: { optionId: 'opt_1' }
       }
     });
+    questionVersionId = ver.id;
 
     // 2. Create and Publish Contest A (College A)
     const contestA = await contestService.createContest({
@@ -254,6 +256,126 @@ describe('Contest Leaderboard & Ranking Engine (Phase 5B.4)', () => {
       expect(entries[3].studentId).toBe('student_timed_out_80');
       expect(entries[3].totalScore).toBe(80);
       expect(entries[3].rank).toBe(4);
+    });
+
+    test('verifies standard competition ranking (100 -> rank 1, 90 -> rank 2, 90 -> rank 2, 80 -> rank 4, 0 -> rank 5)', async () => {
+      // Create isolated contest for 5-student ranking test
+      const contestTies = await contestService.createContest({
+        title: 'Tie Ranking Assessment',
+        sipsDriveId: 'sips_drive_ties_01',
+        collegeId: collegeA,
+        startAt: new Date(Date.now() - 600000).toISOString(),
+        endAt: new Date(Date.now() + 3600000).toISOString(),
+        durationMinutes: 60
+      });
+      await contestService.addContestQuestion(contestTies.id, {
+        questionVersionId,
+        section: 'APTITUDE',
+        marks: 100.0,
+        negativeMarks: 0.0,
+        order: 1
+      });
+      await contestService.publishContest(contestTies.id);
+      await contestService.markContestLive(contestTies.id);
+
+      const baseDate = new Date();
+      // Student A: 100
+      await prisma.contestAttempt.create({
+        data: {
+          contestId: contestTies.id,
+          studentId: 'student_A_100',
+          collegeId: collegeA,
+          status: 'SUBMITTED',
+          startedAt: new Date(baseDate.getTime() - 100000),
+          submittedAt: new Date(baseDate.getTime() - 50000),
+          totalScore: 100.0,
+          totalMarks: 100.0
+        }
+      });
+      // Student B: 90 (earlier)
+      await prisma.contestAttempt.create({
+        data: {
+          contestId: contestTies.id,
+          studentId: 'student_B_90',
+          collegeId: collegeA,
+          status: 'SUBMITTED',
+          startedAt: new Date(baseDate.getTime() - 100000),
+          submittedAt: new Date(baseDate.getTime() - 40000),
+          totalScore: 90.0,
+          totalMarks: 100.0
+        }
+      });
+      // Student C: 90 (later)
+      await prisma.contestAttempt.create({
+        data: {
+          contestId: contestTies.id,
+          studentId: 'student_C_90',
+          collegeId: collegeA,
+          status: 'SUBMITTED',
+          startedAt: new Date(baseDate.getTime() - 100000),
+          submittedAt: new Date(baseDate.getTime() - 30000),
+          totalScore: 90.0,
+          totalMarks: 100.0
+        }
+      });
+      // Student D: 80
+      await prisma.contestAttempt.create({
+        data: {
+          contestId: contestTies.id,
+          studentId: 'student_D_80',
+          collegeId: collegeA,
+          status: 'SUBMITTED',
+          startedAt: new Date(baseDate.getTime() - 100000),
+          submittedAt: new Date(baseDate.getTime() - 20000),
+          totalScore: 80.0,
+          totalMarks: 100.0
+        }
+      });
+      // Student E: 0
+      await prisma.contestAttempt.create({
+        data: {
+          contestId: contestTies.id,
+          studentId: 'student_E_0',
+          collegeId: collegeA,
+          status: 'SUBMITTED',
+          startedAt: new Date(baseDate.getTime() - 100000),
+          submittedAt: new Date(baseDate.getTime() - 10000),
+          totalScore: 0.0,
+          totalMarks: 100.0
+        }
+      });
+
+      const res = await request(app)
+        .get(`/api/contests/${contestTies.id}/leaderboard`)
+        .set('x-student-id', 'student_A_100')
+        .set('x-college-id', collegeA);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.entries.length).toBe(5);
+
+      const [sA, sB, sC, sD, sE] = res.body.data.entries;
+      expect(sA.studentId).toBe('student_A_100');
+      expect(sA.rank).toBe(1);
+
+      expect(sB.studentId).toBe('student_B_90');
+      expect(sB.rank).toBe(2);
+
+      expect(sC.studentId).toBe('student_C_90');
+      expect(sC.rank).toBe(2);
+
+      expect(sD.studentId).toBe('student_D_80');
+      expect(sD.rank).toBe(4);
+
+      expect(sE.studentId).toBe('student_E_0');
+      expect(sE.rank).toBe(5);
+    });
+  });
+
+  describe('2. Authentication & Authorization', () => {
+    test('rejects unauthenticated request without token/headers with 401', async () => {
+      const res = await request(app).get(`/api/contests/${contestIdA}/leaderboard`);
+      expect(res.status).toBe(401);
+      expect(res.body.success).toBe(false);
     });
   });
 

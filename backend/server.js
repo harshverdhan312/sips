@@ -132,6 +132,10 @@ const jdRoutes = require('./routes/jd');
 const notificationRoutes = require('./routes/notification');
 const adminRoutes = require('./routes/admin');
 const publicRoutes = require('./routes/public');
+const internalRoutes = require('./routes/internal');
+
+// Server-to-server internal routes
+app.use('/api/internal', internalRoutes);
 
 // Admin routes
 app.use('/api/admin', adminRoutes);

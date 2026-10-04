@@ -1,0 +1,3402 @@
+[
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-001",
+    "title": "ACID Atomicity vs Consistency #1",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-002",
+    "title": "Lossless Join Decomposition #2",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-003",
+    "title": "Two-Phase Locking (2PL) Protocol #3",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-004",
+    "title": "Clustered vs Non-Clustered Index #4",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-005",
+    "title": "ACID Atomicity vs Consistency #5",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-006",
+    "title": "Lossless Join Decomposition #6",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-007",
+    "title": "Two-Phase Locking (2PL) Protocol #7",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-008",
+    "title": "Clustered vs Non-Clustered Index #8",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-009",
+    "title": "ACID Atomicity vs Consistency #9",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-010",
+    "title": "Lossless Join Decomposition #10",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-011",
+    "title": "Two-Phase Locking (2PL) Protocol #11",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-012",
+    "title": "Clustered vs Non-Clustered Index #12",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-013",
+    "title": "ACID Atomicity vs Consistency #13",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-014",
+    "title": "Lossless Join Decomposition #14",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-015",
+    "title": "Two-Phase Locking (2PL) Protocol #15",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-016",
+    "title": "Clustered vs Non-Clustered Index #16",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-017",
+    "title": "ACID Atomicity vs Consistency #17",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-018",
+    "title": "Lossless Join Decomposition #18",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-019",
+    "title": "Two-Phase Locking (2PL) Protocol #19",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-020",
+    "title": "Clustered vs Non-Clustered Index #20",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-021",
+    "title": "ACID Atomicity vs Consistency #21",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-022",
+    "title": "Lossless Join Decomposition #22",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-023",
+    "title": "Two-Phase Locking (2PL) Protocol #23",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-024",
+    "title": "Clustered vs Non-Clustered Index #24",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-025",
+    "title": "ACID Atomicity vs Consistency #25",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-026",
+    "title": "Lossless Join Decomposition #26",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-027",
+    "title": "Two-Phase Locking (2PL) Protocol #27",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-028",
+    "title": "Clustered vs Non-Clustered Index #28",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-029",
+    "title": "ACID Atomicity vs Consistency #29",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-030",
+    "title": "Lossless Join Decomposition #30",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-031",
+    "title": "Two-Phase Locking (2PL) Protocol #31",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-032",
+    "title": "Clustered vs Non-Clustered Index #32",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-033",
+    "title": "ACID Atomicity vs Consistency #33",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-034",
+    "title": "Lossless Join Decomposition #34",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-035",
+    "title": "Two-Phase Locking (2PL) Protocol #35",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-036",
+    "title": "Clustered vs Non-Clustered Index #36",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-037",
+    "title": "ACID Atomicity vs Consistency #37",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-038",
+    "title": "Lossless Join Decomposition #38",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-039",
+    "title": "Two-Phase Locking (2PL) Protocol #39",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-040",
+    "title": "Clustered vs Non-Clustered Index #40",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-041",
+    "title": "ACID Atomicity vs Consistency #41",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-042",
+    "title": "Lossless Join Decomposition #42",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-043",
+    "title": "Two-Phase Locking (2PL) Protocol #43",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-044",
+    "title": "Clustered vs Non-Clustered Index #44",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-045",
+    "title": "ACID Atomicity vs Consistency #45",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-046",
+    "title": "Lossless Join Decomposition #46",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-047",
+    "title": "Two-Phase Locking (2PL) Protocol #47",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-048",
+    "title": "Clustered vs Non-Clustered Index #48",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-049",
+    "title": "ACID Atomicity vs Consistency #49",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-050",
+    "title": "Lossless Join Decomposition #50",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-051",
+    "title": "Two-Phase Locking (2PL) Protocol #51",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-052",
+    "title": "Clustered vs Non-Clustered Index #52",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-053",
+    "title": "ACID Atomicity vs Consistency #53",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-054",
+    "title": "Lossless Join Decomposition #54",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-055",
+    "title": "Two-Phase Locking (2PL) Protocol #55",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-056",
+    "title": "Clustered vs Non-Clustered Index #56",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-057",
+    "title": "ACID Atomicity vs Consistency #57",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-058",
+    "title": "Lossless Join Decomposition #58",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-059",
+    "title": "Two-Phase Locking (2PL) Protocol #59",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-060",
+    "title": "Clustered vs Non-Clustered Index #60",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-061",
+    "title": "ACID Atomicity vs Consistency #61",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-062",
+    "title": "Lossless Join Decomposition #62",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-063",
+    "title": "Two-Phase Locking (2PL) Protocol #63",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-064",
+    "title": "Clustered vs Non-Clustered Index #64",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-065",
+    "title": "ACID Atomicity vs Consistency #65",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-066",
+    "title": "Lossless Join Decomposition #66",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-067",
+    "title": "Two-Phase Locking (2PL) Protocol #67",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-068",
+    "title": "Clustered vs Non-Clustered Index #68",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-069",
+    "title": "ACID Atomicity vs Consistency #69",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-070",
+    "title": "Lossless Join Decomposition #70",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-071",
+    "title": "Two-Phase Locking (2PL) Protocol #71",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-072",
+    "title": "Clustered vs Non-Clustered Index #72",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-073",
+    "title": "ACID Atomicity vs Consistency #73",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-074",
+    "title": "Lossless Join Decomposition #74",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-075",
+    "title": "Two-Phase Locking (2PL) Protocol #75",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-076",
+    "title": "Clustered vs Non-Clustered Index #76",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-077",
+    "title": "ACID Atomicity vs Consistency #77",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-078",
+    "title": "Lossless Join Decomposition #78",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-079",
+    "title": "Two-Phase Locking (2PL) Protocol #79",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-080",
+    "title": "Clustered vs Non-Clustered Index #80",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-081",
+    "title": "ACID Atomicity vs Consistency #81",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-082",
+    "title": "Lossless Join Decomposition #82",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-083",
+    "title": "Two-Phase Locking (2PL) Protocol #83",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-084",
+    "title": "Clustered vs Non-Clustered Index #84",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-085",
+    "title": "ACID Atomicity vs Consistency #85",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-086",
+    "title": "Lossless Join Decomposition #86",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-087",
+    "title": "Two-Phase Locking (2PL) Protocol #87",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-088",
+    "title": "Clustered vs Non-Clustered Index #88",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-089",
+    "title": "ACID Atomicity vs Consistency #89",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-090",
+    "title": "Lossless Join Decomposition #90",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-091",
+    "title": "Two-Phase Locking (2PL) Protocol #91",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-092",
+    "title": "Clustered vs Non-Clustered Index #92",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-093",
+    "title": "ACID Atomicity vs Consistency #93",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-094",
+    "title": "Lossless Join Decomposition #94",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-095",
+    "title": "Two-Phase Locking (2PL) Protocol #95",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-096",
+    "title": "Clustered vs Non-Clustered Index #96",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-097",
+    "title": "ACID Atomicity vs Consistency #97",
+    "statement": "Which component of an RDBMS is primarily responsible for ensuring Atomicity during transaction failures?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Catalog Cache"
+      },
+      {
+        "id": "opt_b",
+        "text": "Concurrency Lock Manager"
+      },
+      {
+        "id": "opt_c",
+        "text": "Query Optimizer"
+      },
+      {
+        "id": "opt_d",
+        "text": "Recovery Manager via Write-Ahead Log (Undo/Redo)"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The Recovery Manager uses undo logs from WAL to rollback incomplete transaction state on abort/crash."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-098",
+    "title": "Lossless Join Decomposition #98",
+    "statement": "A decomposition of relation R into R1 and R2 is lossless if and only if (R1 ∩ R2) functionally determines:",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Both R1 and R2 simultaneously"
+      },
+      {
+        "id": "opt_b",
+        "text": "Either R1 or R2 (i.e. (R1 ∩ R2) is a superkey of R1 or R2)"
+      },
+      {
+        "id": "opt_c",
+        "text": "Neither R1 nor R2"
+      },
+      {
+        "id": "opt_d",
+        "text": "The entire universe of attributes"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Lossless join condition requires the shared intersection attribute (R1 ∩ R2) to be a superkey of at least one of the decomposed tables."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-099",
+    "title": "Two-Phase Locking (2PL) Protocol #99",
+    "statement": "What does Strict Two-Phase Locking (Strict 2PL) guarantee that basic 2PL does not?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Strict 2PL allows reading uncommitted data"
+      },
+      {
+        "id": "opt_b",
+        "text": "Strict 2PL eliminates all deadlocks"
+      },
+      {
+        "id": "opt_c",
+        "text": "Strict 2PL guarantees O(1) query execution"
+      },
+      {
+        "id": "opt_d",
+        "text": "Strict 2PL prevents cascading rollbacks by holding exclusive locks until transaction commit"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Strict 2PL holds exclusive locks until COMMIT/ABORT, preventing dirty reads and cascading aborts."
+  },
+  {
+    "type": "TECHNICAL",
+    "format": "SINGLE_CHOICE",
+    "category": "DBMS",
+    "subcategory": "Database Management Systems",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "tech-dbms-100",
+    "title": "Clustered vs Non-Clustered Index #100",
+    "statement": "How many Clustered Indexes can exist on a single database table in standard RDBMS like PostgreSQL or MySQL?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Equal to the number of columns"
+      },
+      {
+        "id": "opt_b",
+        "text": "Exactly 1, because the physical ordering of data rows on disk is unique"
+      },
+      {
+        "id": "opt_c",
+        "text": "Unlimited"
+      },
+      {
+        "id": "opt_d",
+        "text": "Up to 16"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "A clustered index determines the physical storage layout of data rows on disk, so only one can exist per table."
+  }
+]

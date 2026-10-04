@@ -1,0 +1,261 @@
+[
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-validation-canonical",
+      "url": null,
+      "attribution": "SIPS Assessment Core Team"
+    },
+    "externalId": "MIX-MULTI-001",
+    "status": "ACTIVE",
+    "tags": ["oop", "pillars", "multiple-choice"],
+    "question": {
+      "type": "TECHNICAL",
+      "format": "MULTIPLE_CHOICE",
+      "domain": "OOP",
+      "topic": "ABSTRACTION",
+      "difficulty": "EASY",
+      "title": "Fundamental Pillars of Object-Oriented Programming",
+      "statement": "Which of the following concepts constitute the core foundational pillars of Object-Oriented Programming (OOP)? (Select all that apply)",
+      "options": [
+        { "id": "A", "text": "Encapsulation" },
+        { "id": "B", "text": "Polymorphism" },
+        { "id": "C", "text": "Paging" },
+        { "id": "D", "text": "Inheritance" }
+      ],
+      "correctAnswer": { "optionIds": ["A", "B", "D"] },
+      "explanation": "The four classic pillars of OOP are Encapsulation, Abstraction, Inheritance, and Polymorphism. Paging is an Operating System virtual memory management concept."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-validation-canonical",
+      "url": null,
+      "attribution": "SIPS Assessment Core Team"
+    },
+    "externalId": "MIX-MULTI-002",
+    "status": "ACTIVE",
+    "tags": ["dbms", "transactions", "anomalies", "isolation"],
+    "question": {
+      "type": "TECHNICAL",
+      "format": "MULTIPLE_CHOICE",
+      "domain": "DBMS",
+      "topic": "CONCURRENCY",
+      "difficulty": "MEDIUM",
+      "title": "Read Phenomena Prevented by Serializable Isolation",
+      "statement": "Which of the following concurrency read anomalies are completely prevented under standard ANSI SQL Serializable isolation level? (Select all that apply)",
+      "options": [
+        { "id": "A", "text": "Dirty Reads (Read Uncommitted data)" },
+        { "id": "B", "text": "Non-Repeatable Reads (Fuzzy reads)" },
+        { "id": "C", "text": "Phantom Reads" },
+        { "id": "D", "text": "Hardware Disk Failures" }
+      ],
+      "correctAnswer": { "optionIds": ["A", "B", "C"] },
+      "explanation": "Serializable isolation is the highest ANSI SQL isolation level and eliminates Dirty Reads, Non-Repeatable Reads, and Phantom Reads. Hardware disk failures are addressed by Durability/storage replication, not concurrency control."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-validation-canonical",
+      "url": null,
+      "attribution": "SIPS Assessment Core Team"
+    },
+    "externalId": "MIX-MULTI-003",
+    "status": "ACTIVE",
+    "tags": ["primes", "number-systems", "multiple-choice"],
+    "question": {
+      "type": "APTITUDE",
+      "format": "MULTIPLE_CHOICE",
+      "domain": "QUANTITATIVE",
+      "topic": "NUMBER_SYSTEMS",
+      "difficulty": "EASY",
+      "title": "Prime Numbers in Specified Interval",
+      "statement": "Which of the following integers are prime numbers located strictly between 20 and 30? (Select all that apply)",
+      "options": [
+        { "id": "A", "text": "21" },
+        { "id": "B", "text": "23" },
+        { "id": "C", "text": "27" },
+        { "id": "D", "text": "29" }
+      ],
+      "correctAnswer": { "optionIds": ["B", "D"] },
+      "explanation": "Between 20 and 30: 21 is divisible by 3 and 7; 23 is prime; 27 is divisible by 3 and 9; 29 is prime. The prime numbers are 23 and 29."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-validation-canonical",
+      "url": null,
+      "attribution": "SIPS Assessment Core Team"
+    },
+    "externalId": "MIX-TF-001",
+    "status": "ACTIVE",
+    "tags": ["python", "mutability", "true-false"],
+    "question": {
+      "type": "TECHNICAL",
+      "format": "TRUE_FALSE",
+      "domain": "PROGRAMMING_CONCEPTS",
+      "topic": "PYTHON",
+      "difficulty": "EASY",
+      "title": "Python List Mutability",
+      "statement": "In standard CPython, built-in `list` objects are mutable data structures that can have elements modified, appended, or removed in-place without creating a new list object.",
+      "options": [
+        { "id": "true", "text": "True" },
+        { "id": "false", "text": "False" }
+      ],
+      "correctAnswer": { "value": true },
+      "explanation": "Python lists are mutable sequences. Operations like `append()`, `extend()`, `pop()`, and item assignment modify the existing list object in-place in memory."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-validation-canonical",
+      "url": null,
+      "attribution": "SIPS Assessment Core Team"
+    },
+    "externalId": "MIX-TF-002",
+    "status": "ACTIVE",
+    "tags": ["networks", "http", "multiplexing", "true-false"],
+    "question": {
+      "type": "TECHNICAL",
+      "format": "TRUE_FALSE",
+      "domain": "NETWORKS",
+      "topic": "HTTP",
+      "difficulty": "MEDIUM",
+      "title": "HTTP/1.1 Application-Layer Multiplexing Capability",
+      "statement": "HTTP/1.1 natively supports full concurrent request/response multiplexing over a single TCP connection without suffering from application-layer Head-of-Line (HoL) blocking.",
+      "options": [
+        { "id": "true", "text": "True" },
+        { "id": "false", "text": "False" }
+      ],
+      "correctAnswer": { "value": false },
+      "explanation": "HTTP/1.1 requires pipelined requests to be responded to in exact sequential arrival order, causing application-layer Head-of-Line blocking. True binary stream multiplexing over a single TCP connection was introduced in HTTP/2."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-validation-canonical",
+      "url": null,
+      "attribution": "SIPS Assessment Core Team"
+    },
+    "externalId": "MIX-TF-003",
+    "status": "ACTIVE",
+    "tags": ["calendar", "leap-year", "logic", "true-false"],
+    "question": {
+      "type": "APTITUDE",
+      "format": "TRUE_FALSE",
+      "domain": "LOGICAL",
+      "topic": "STATEMENT_CONCLUSION",
+      "difficulty": "EASY",
+      "title": "Gregorian Calendar Century Leap Year Rule",
+      "statement": "In the standard Gregorian calendar, century years (such as 1900, 2000, 2100) are leap years if and only if they are evenly divisible by 400.",
+      "options": [
+        { "id": "true", "text": "True" },
+        { "id": "false", "text": "False" }
+      ],
+      "correctAnswer": { "value": true },
+      "explanation": "Under the Gregorian calendar rule, a century year is a leap year only if it is divisible by 400. Thus, 2000 was a leap year, whereas 1900 and 2100 are not leap years."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-validation-canonical",
+      "url": null,
+      "attribution": "SIPS Assessment Core Team"
+    },
+    "externalId": "MIX-NUM-001",
+    "status": "ACTIVE",
+    "tags": ["simple-interest", "numerical", "finance"],
+    "question": {
+      "type": "APTITUDE",
+      "format": "NUMERICAL",
+      "domain": "QUANTITATIVE",
+      "topic": "SIMPLE_INTEREST",
+      "difficulty": "EASY",
+      "title": "Simple Interest Accrual Calculation",
+      "statement": "Calculate the total Simple Interest (in dollars) accrued on a principal investment of $1,000 at an annual interest rate of 5% over a period of exactly 3 years.",
+      "options": null,
+      "correctAnswer": { "value": 150, "tolerance": 0 },
+      "explanation": "Simple Interest SI = (Principal * Rate * Time) / 100 = (1000 * 5 * 3) / 100 = 15000 / 100 = 150."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-validation-canonical",
+      "url": null,
+      "attribution": "SIPS Assessment Core Team"
+    },
+    "externalId": "MIX-NUM-002",
+    "status": "ACTIVE",
+    "tags": ["geometry", "pythagoras", "numerical"],
+    "question": {
+      "type": "APTITUDE",
+      "format": "NUMERICAL",
+      "domain": "QUANTITATIVE",
+      "topic": "GEOMETRY",
+      "difficulty": "EASY",
+      "title": "Right Triangle Hypotenuse Length",
+      "statement": "In a Euclidean right-angled triangle, the lengths of the two perpendicular legs are 6 cm and 8 cm. What is the length of the hypotenuse in centimeters?",
+      "options": null,
+      "correctAnswer": { "value": 10, "tolerance": 0 },
+      "explanation": "According to the Pythagorean theorem: Hypotenuse = sqrt(a² + b²) = sqrt(6² + 8²) = sqrt(36 + 64) = sqrt(100) = 10 cm."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-validation-canonical",
+      "url": null,
+      "attribution": "SIPS Assessment Core Team"
+    },
+    "externalId": "MIX-NUM-003",
+    "status": "ACTIVE",
+    "tags": ["dsa", "binary-trees", "catalan-numbers", "numerical"],
+    "question": {
+      "type": "TECHNICAL",
+      "format": "NUMERICAL",
+      "domain": "DSA",
+      "topic": "TREES",
+      "difficulty": "MEDIUM",
+      "title": "Count of Structurally Unique Binary Trees for N Nodes",
+      "statement": "How many structurally unique binary search trees (BSTs) can be constructed using exactly 3 distinct keys?",
+      "options": null,
+      "correctAnswer": { "value": 5, "tolerance": 0 },
+      "explanation": "The number of structurally unique BSTs that can be formed with n distinct nodes is given by the nth Catalan Number C_n = (2n)! / ((n + 1)! * n!). For n = 3: C_3 = (6)! / (4! * 3!) = 720 / (24 * 6) = 720 / 144 = 5."
+    }
+  },
+  {
+    "source": {
+      "type": "ORIGINAL",
+      "namespace": "sips-validation-canonical",
+      "url": null,
+      "attribution": "SIPS Technical Curriculum Panel"
+    },
+    "externalId": "MIX-EDGE-001",
+    "status": "ACTIVE",
+    "tags": ["sql", "null-semantics", "three-valued-logic"],
+    "question": {
+      "type": "TECHNICAL",
+      "format": "SINGLE_CHOICE",
+      "domain": "DBMS",
+      "topic": "SQL",
+      "difficulty": "HARD",
+      "title": "ANSI SQL Three-Valued Logic NULL Equality Evaluation",
+      "statement": "In standard ANSI SQL, what is the resulting boolean truth value of evaluating the predicate expression `NULL = NULL` in a WHERE filter?",
+      "options": [
+        { "id": "A", "text": "TRUE" },
+        { "id": "B", "text": "FALSE" },
+        { "id": "C", "text": "UNKNOWN (evaluates to non-true, filtering out rows)" },
+        { "id": "D", "text": "Causes a compile-time syntax error" }
+      ],
+      "correctAnswer": { "optionId": "C" },
+      "explanation": "SQL operates on Three-Valued Logic (TRUE, FALSE, UNKNOWN). A NULL represents an unknown missing value, so comparing any value (even another NULL) using '=' yields UNKNOWN. In WHERE clauses, only predicates that evaluate strictly to TRUE are retained; UNKNOWN evaluates to falsey for filtering. To test for NULL, `IS NULL` must be used."
+    }
+  }
+]

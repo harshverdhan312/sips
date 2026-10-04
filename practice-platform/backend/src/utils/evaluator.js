@@ -58,7 +58,7 @@ function evaluateResponse(format, correctAnswer, candidateAnswer) {
         : String(correctAnswer);
 
       const candidateId = typeof candidateAnswer === 'object' && candidateAnswer !== null
-        ? candidateAnswer.optionId || candidateAnswer.id
+        ? candidateAnswer.optionId || candidateAnswer.selectedOptionId || candidateAnswer.id
         : String(candidateAnswer);
 
       if (!correctId || !candidateId) return false;
@@ -76,6 +76,8 @@ function evaluateResponse(format, correctAnswer, candidateAnswer) {
         ? candidateAnswer
         : Array.isArray(candidateAnswer.optionIds)
         ? candidateAnswer.optionIds
+        : Array.isArray(candidateAnswer.selectedOptionIds)
+        ? candidateAnswer.selectedOptionIds
         : [];
 
       if (!correctIds.length || !candidateIds.length) return false;
@@ -97,7 +99,15 @@ function evaluateResponse(format, correctAnswer, candidateAnswer) {
 
       let candidateVal;
       if (typeof candidateAnswer === 'object' && candidateAnswer !== null) {
-        candidateVal = candidateAnswer.value !== undefined ? candidateAnswer.value : candidateAnswer.answer;
+        if (candidateAnswer.value !== undefined) {
+          candidateVal = candidateAnswer.value;
+        } else if (candidateAnswer.answer !== undefined) {
+          candidateVal = candidateAnswer.answer;
+        } else if (candidateAnswer.optionId !== undefined) {
+          candidateVal = candidateAnswer.optionId;
+        } else if (candidateAnswer.selectedOptionId !== undefined) {
+          candidateVal = candidateAnswer.selectedOptionId;
+        }
       } else {
         candidateVal = candidateAnswer;
       }
@@ -125,7 +135,12 @@ function evaluateResponse(format, correctAnswer, candidateAnswer) {
 
       let candidateNum;
       if (typeof candidateAnswer === 'object' && candidateAnswer !== null) {
-        candidateNum = Number(candidateAnswer.value !== undefined ? candidateAnswer.value : candidateAnswer.answer);
+        const raw = candidateAnswer.value !== undefined
+          ? candidateAnswer.value
+          : candidateAnswer.answer !== undefined
+          ? candidateAnswer.answer
+          : candidateAnswer.inputValue;
+        candidateNum = Number(raw);
       } else {
         candidateNum = Number(candidateAnswer);
       }

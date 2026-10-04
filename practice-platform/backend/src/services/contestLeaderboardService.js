@@ -45,6 +45,12 @@ async function validateContestForLeaderboard(contestId, collegeId) {
     });
   }
 
+  if (!ALLOWED_LIFECYCLE_STATUSES.includes(contest.status)) {
+    throw new AppError(`Contest is ${contest.status.toLowerCase()}. Leaderboard unavailable.`, 400, {
+      code: 'CONTEST_NOT_ACTIVE'
+    });
+  }
+
   return contest;
 }
 

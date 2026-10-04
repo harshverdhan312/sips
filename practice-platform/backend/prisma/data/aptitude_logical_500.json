@@ -1,0 +1,5102 @@
+[
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-001",
+    "title": "Geometric Number Sequence #1",
+    "statement": "Find the next number in the following sequence: 3, 6, 12, 24, 48, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "58"
+      },
+      {
+        "id": "opt_b",
+        "text": "93"
+      },
+      {
+        "id": "opt_c",
+        "text": "96"
+      },
+      {
+        "id": "opt_d",
+        "text": "102"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 48 * 2 = 96."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-002",
+    "title": "Geometric Number Sequence #2",
+    "statement": "Find the next number in the following sequence: 4, 8, 16, 32, 64, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "74"
+      },
+      {
+        "id": "opt_b",
+        "text": "124"
+      },
+      {
+        "id": "opt_c",
+        "text": "128"
+      },
+      {
+        "id": "opt_d",
+        "text": "136"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 64 * 2 = 128."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-003",
+    "title": "Geometric Number Sequence #3",
+    "statement": "Find the next number in the following sequence: 5, 10, 20, 40, 80, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "90"
+      },
+      {
+        "id": "opt_b",
+        "text": "155"
+      },
+      {
+        "id": "opt_c",
+        "text": "160"
+      },
+      {
+        "id": "opt_d",
+        "text": "170"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 80 * 2 = 160."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-004",
+    "title": "Geometric Number Sequence #4",
+    "statement": "Find the next number in the following sequence: 6, 12, 24, 48, 96, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "106"
+      },
+      {
+        "id": "opt_b",
+        "text": "186"
+      },
+      {
+        "id": "opt_c",
+        "text": "192"
+      },
+      {
+        "id": "opt_d",
+        "text": "204"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 96 * 2 = 192."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-005",
+    "title": "Geometric Number Sequence #5",
+    "statement": "Find the next number in the following sequence: 7, 14, 28, 56, 112, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "122"
+      },
+      {
+        "id": "opt_b",
+        "text": "217"
+      },
+      {
+        "id": "opt_c",
+        "text": "224"
+      },
+      {
+        "id": "opt_d",
+        "text": "238"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 112 * 2 = 224."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-006",
+    "title": "Geometric Number Sequence #6",
+    "statement": "Find the next number in the following sequence: 2, 4, 8, 16, 32, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "42"
+      },
+      {
+        "id": "opt_b",
+        "text": "62"
+      },
+      {
+        "id": "opt_c",
+        "text": "64"
+      },
+      {
+        "id": "opt_d",
+        "text": "68"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 32 * 2 = 64."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-007",
+    "title": "Geometric Number Sequence #7",
+    "statement": "Find the next number in the following sequence: 3, 6, 12, 24, 48, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "58"
+      },
+      {
+        "id": "opt_b",
+        "text": "93"
+      },
+      {
+        "id": "opt_c",
+        "text": "96"
+      },
+      {
+        "id": "opt_d",
+        "text": "102"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 48 * 2 = 96."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-008",
+    "title": "Geometric Number Sequence #8",
+    "statement": "Find the next number in the following sequence: 4, 8, 16, 32, 64, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "74"
+      },
+      {
+        "id": "opt_b",
+        "text": "124"
+      },
+      {
+        "id": "opt_c",
+        "text": "128"
+      },
+      {
+        "id": "opt_d",
+        "text": "136"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 64 * 2 = 128."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-009",
+    "title": "Geometric Number Sequence #9",
+    "statement": "Find the next number in the following sequence: 5, 10, 20, 40, 80, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "90"
+      },
+      {
+        "id": "opt_b",
+        "text": "155"
+      },
+      {
+        "id": "opt_c",
+        "text": "160"
+      },
+      {
+        "id": "opt_d",
+        "text": "170"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 80 * 2 = 160."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-010",
+    "title": "Geometric Number Sequence #10",
+    "statement": "Find the next number in the following sequence: 6, 12, 24, 48, 96, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "106"
+      },
+      {
+        "id": "opt_b",
+        "text": "186"
+      },
+      {
+        "id": "opt_c",
+        "text": "192"
+      },
+      {
+        "id": "opt_d",
+        "text": "204"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 96 * 2 = 192."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-011",
+    "title": "Geometric Number Sequence #11",
+    "statement": "Find the next number in the following sequence: 7, 14, 28, 56, 112, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "122"
+      },
+      {
+        "id": "opt_b",
+        "text": "217"
+      },
+      {
+        "id": "opt_c",
+        "text": "224"
+      },
+      {
+        "id": "opt_d",
+        "text": "238"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 112 * 2 = 224."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-012",
+    "title": "Geometric Number Sequence #12",
+    "statement": "Find the next number in the following sequence: 2, 4, 8, 16, 32, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "42"
+      },
+      {
+        "id": "opt_b",
+        "text": "62"
+      },
+      {
+        "id": "opt_c",
+        "text": "64"
+      },
+      {
+        "id": "opt_d",
+        "text": "68"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 32 * 2 = 64."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-013",
+    "title": "Geometric Number Sequence #13",
+    "statement": "Find the next number in the following sequence: 3, 6, 12, 24, 48, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "58"
+      },
+      {
+        "id": "opt_b",
+        "text": "93"
+      },
+      {
+        "id": "opt_c",
+        "text": "96"
+      },
+      {
+        "id": "opt_d",
+        "text": "102"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 48 * 2 = 96."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-014",
+    "title": "Geometric Number Sequence #14",
+    "statement": "Find the next number in the following sequence: 4, 8, 16, 32, 64, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "74"
+      },
+      {
+        "id": "opt_b",
+        "text": "124"
+      },
+      {
+        "id": "opt_c",
+        "text": "128"
+      },
+      {
+        "id": "opt_d",
+        "text": "136"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 64 * 2 = 128."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-015",
+    "title": "Geometric Number Sequence #15",
+    "statement": "Find the next number in the following sequence: 5, 10, 20, 40, 80, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "90"
+      },
+      {
+        "id": "opt_b",
+        "text": "155"
+      },
+      {
+        "id": "opt_c",
+        "text": "160"
+      },
+      {
+        "id": "opt_d",
+        "text": "170"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 80 * 2 = 160."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-016",
+    "title": "Geometric Number Sequence #16",
+    "statement": "Find the next number in the following sequence: 6, 12, 24, 48, 96, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "106"
+      },
+      {
+        "id": "opt_b",
+        "text": "186"
+      },
+      {
+        "id": "opt_c",
+        "text": "192"
+      },
+      {
+        "id": "opt_d",
+        "text": "204"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 96 * 2 = 192."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-017",
+    "title": "Geometric Number Sequence #17",
+    "statement": "Find the next number in the following sequence: 7, 14, 28, 56, 112, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "122"
+      },
+      {
+        "id": "opt_b",
+        "text": "217"
+      },
+      {
+        "id": "opt_c",
+        "text": "224"
+      },
+      {
+        "id": "opt_d",
+        "text": "238"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 112 * 2 = 224."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-018",
+    "title": "Geometric Number Sequence #18",
+    "statement": "Find the next number in the following sequence: 2, 4, 8, 16, 32, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "42"
+      },
+      {
+        "id": "opt_b",
+        "text": "62"
+      },
+      {
+        "id": "opt_c",
+        "text": "64"
+      },
+      {
+        "id": "opt_d",
+        "text": "68"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 32 * 2 = 64."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-019",
+    "title": "Geometric Number Sequence #19",
+    "statement": "Find the next number in the following sequence: 3, 6, 12, 24, 48, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "58"
+      },
+      {
+        "id": "opt_b",
+        "text": "93"
+      },
+      {
+        "id": "opt_c",
+        "text": "96"
+      },
+      {
+        "id": "opt_d",
+        "text": "102"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 48 * 2 = 96."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-020",
+    "title": "Geometric Number Sequence #20",
+    "statement": "Find the next number in the following sequence: 4, 8, 16, 32, 64, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "74"
+      },
+      {
+        "id": "opt_b",
+        "text": "124"
+      },
+      {
+        "id": "opt_c",
+        "text": "128"
+      },
+      {
+        "id": "opt_d",
+        "text": "136"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 64 * 2 = 128."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-021",
+    "title": "Geometric Number Sequence #21",
+    "statement": "Find the next number in the following sequence: 5, 10, 20, 40, 80, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "90"
+      },
+      {
+        "id": "opt_b",
+        "text": "155"
+      },
+      {
+        "id": "opt_c",
+        "text": "160"
+      },
+      {
+        "id": "opt_d",
+        "text": "170"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 80 * 2 = 160."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-022",
+    "title": "Geometric Number Sequence #22",
+    "statement": "Find the next number in the following sequence: 6, 12, 24, 48, 96, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "106"
+      },
+      {
+        "id": "opt_b",
+        "text": "186"
+      },
+      {
+        "id": "opt_c",
+        "text": "192"
+      },
+      {
+        "id": "opt_d",
+        "text": "204"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 96 * 2 = 192."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-023",
+    "title": "Geometric Number Sequence #23",
+    "statement": "Find the next number in the following sequence: 7, 14, 28, 56, 112, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "122"
+      },
+      {
+        "id": "opt_b",
+        "text": "217"
+      },
+      {
+        "id": "opt_c",
+        "text": "224"
+      },
+      {
+        "id": "opt_d",
+        "text": "238"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 112 * 2 = 224."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-024",
+    "title": "Geometric Number Sequence #24",
+    "statement": "Find the next number in the following sequence: 2, 4, 8, 16, 32, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "42"
+      },
+      {
+        "id": "opt_b",
+        "text": "62"
+      },
+      {
+        "id": "opt_c",
+        "text": "64"
+      },
+      {
+        "id": "opt_d",
+        "text": "68"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 32 * 2 = 64."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-025",
+    "title": "Geometric Number Sequence #25",
+    "statement": "Find the next number in the following sequence: 3, 6, 12, 24, 48, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "58"
+      },
+      {
+        "id": "opt_b",
+        "text": "93"
+      },
+      {
+        "id": "opt_c",
+        "text": "96"
+      },
+      {
+        "id": "opt_d",
+        "text": "102"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 48 * 2 = 96."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-026",
+    "title": "Geometric Number Sequence #26",
+    "statement": "Find the next number in the following sequence: 4, 8, 16, 32, 64, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "74"
+      },
+      {
+        "id": "opt_b",
+        "text": "124"
+      },
+      {
+        "id": "opt_c",
+        "text": "128"
+      },
+      {
+        "id": "opt_d",
+        "text": "136"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 64 * 2 = 128."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-027",
+    "title": "Geometric Number Sequence #27",
+    "statement": "Find the next number in the following sequence: 5, 10, 20, 40, 80, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "90"
+      },
+      {
+        "id": "opt_b",
+        "text": "155"
+      },
+      {
+        "id": "opt_c",
+        "text": "160"
+      },
+      {
+        "id": "opt_d",
+        "text": "170"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 80 * 2 = 160."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-028",
+    "title": "Geometric Number Sequence #28",
+    "statement": "Find the next number in the following sequence: 6, 12, 24, 48, 96, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "106"
+      },
+      {
+        "id": "opt_b",
+        "text": "186"
+      },
+      {
+        "id": "opt_c",
+        "text": "192"
+      },
+      {
+        "id": "opt_d",
+        "text": "204"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 96 * 2 = 192."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-029",
+    "title": "Geometric Number Sequence #29",
+    "statement": "Find the next number in the following sequence: 7, 14, 28, 56, 112, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "122"
+      },
+      {
+        "id": "opt_b",
+        "text": "217"
+      },
+      {
+        "id": "opt_c",
+        "text": "224"
+      },
+      {
+        "id": "opt_d",
+        "text": "238"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 112 * 2 = 224."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Series Completion",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-ser-030",
+    "title": "Geometric Number Sequence #30",
+    "statement": "Find the next number in the following sequence: 2, 4, 8, 16, 32, ___?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "42"
+      },
+      {
+        "id": "opt_b",
+        "text": "62"
+      },
+      {
+        "id": "opt_c",
+        "text": "64"
+      },
+      {
+        "id": "opt_d",
+        "text": "68"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Each consecutive term is obtained by multiplying the previous term by 2. Next term = 32 * 2 = 64."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-031",
+    "title": "Family Relation Tree #1",
+    "statement": "A is B's sister. C is B's mother. D is C's father. E is D's mother. How is A related to D?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Granddaughter"
+      },
+      {
+        "id": "opt_d",
+        "text": "Mother"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A is female child of C, who is child of D. Hence A is Granddaughter of D."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-032",
+    "title": "Family Relation Tree #2",
+    "statement": "Pointing to a photograph, a woman says, \"His mother's only daughter is my mother.\" How is the woman related to the man?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Mother"
+      },
+      {
+        "id": "opt_d",
+        "text": "Niece"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "His mother's only daughter is his sister. The woman is the daughter of his sister, hence his Niece."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-033",
+    "title": "Family Relation Tree #3",
+    "statement": "Introducing a man, a lady said, \"The father of his brother is the only son of my grandfather.\" How is the lady related to the man?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Mother"
+      },
+      {
+        "id": "opt_d",
+        "text": "Sister"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Father of his brother = his father. Only son of grandfather = father. Hence lady and man have same father -> Sister."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-034",
+    "title": "Family Relation Tree #4",
+    "statement": "P is the brother of Q and R. S is R's mother. T is P's father. Which of the following statements cannot be definitely true?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Mother"
+      },
+      {
+        "id": "opt_d",
+        "text": "Q is T's son"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The gender of Q is not explicitly given, so Q could be daughter or son."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-035",
+    "title": "Family Relation Tree #5",
+    "statement": "A is father of C and D is son of B. E is brother of A. If C is sister of D, how is B related to E?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Mother"
+      },
+      {
+        "id": "opt_d",
+        "text": "Sister-in-law"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "A is father of C and D. Since D is son of B, B is mother of C and D (wife of A). E is brother of A, so B is Sister-in-law of E."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-036",
+    "title": "Family Relation Tree #6",
+    "statement": "A is B's sister. C is B's mother. D is C's father. E is D's mother. How is A related to D?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Granddaughter"
+      },
+      {
+        "id": "opt_d",
+        "text": "Mother"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A is female child of C, who is child of D. Hence A is Granddaughter of D."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-037",
+    "title": "Family Relation Tree #7",
+    "statement": "Pointing to a photograph, a woman says, \"His mother's only daughter is my mother.\" How is the woman related to the man?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Mother"
+      },
+      {
+        "id": "opt_d",
+        "text": "Niece"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "His mother's only daughter is his sister. The woman is the daughter of his sister, hence his Niece."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-038",
+    "title": "Family Relation Tree #8",
+    "statement": "Introducing a man, a lady said, \"The father of his brother is the only son of my grandfather.\" How is the lady related to the man?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Mother"
+      },
+      {
+        "id": "opt_d",
+        "text": "Sister"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Father of his brother = his father. Only son of grandfather = father. Hence lady and man have same father -> Sister."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-039",
+    "title": "Family Relation Tree #9",
+    "statement": "P is the brother of Q and R. S is R's mother. T is P's father. Which of the following statements cannot be definitely true?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Mother"
+      },
+      {
+        "id": "opt_d",
+        "text": "Q is T's son"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The gender of Q is not explicitly given, so Q could be daughter or son."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-040",
+    "title": "Family Relation Tree #10",
+    "statement": "A is father of C and D is son of B. E is brother of A. If C is sister of D, how is B related to E?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Mother"
+      },
+      {
+        "id": "opt_d",
+        "text": "Sister-in-law"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "A is father of C and D. Since D is son of B, B is mother of C and D (wife of A). E is brother of A, so B is Sister-in-law of E."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-041",
+    "title": "Family Relation Tree #11",
+    "statement": "A is B's sister. C is B's mother. D is C's father. E is D's mother. How is A related to D?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Granddaughter"
+      },
+      {
+        "id": "opt_d",
+        "text": "Mother"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A is female child of C, who is child of D. Hence A is Granddaughter of D."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-042",
+    "title": "Family Relation Tree #12",
+    "statement": "Pointing to a photograph, a woman says, \"His mother's only daughter is my mother.\" How is the woman related to the man?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Mother"
+      },
+      {
+        "id": "opt_d",
+        "text": "Niece"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "His mother's only daughter is his sister. The woman is the daughter of his sister, hence his Niece."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-043",
+    "title": "Family Relation Tree #13",
+    "statement": "Introducing a man, a lady said, \"The father of his brother is the only son of my grandfather.\" How is the lady related to the man?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Mother"
+      },
+      {
+        "id": "opt_d",
+        "text": "Sister"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Father of his brother = his father. Only son of grandfather = father. Hence lady and man have same father -> Sister."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-044",
+    "title": "Family Relation Tree #14",
+    "statement": "P is the brother of Q and R. S is R's mother. T is P's father. Which of the following statements cannot be definitely true?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Mother"
+      },
+      {
+        "id": "opt_d",
+        "text": "Q is T's son"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The gender of Q is not explicitly given, so Q could be daughter or son."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-045",
+    "title": "Family Relation Tree #15",
+    "statement": "A is father of C and D is son of B. E is brother of A. If C is sister of D, how is B related to E?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Mother"
+      },
+      {
+        "id": "opt_d",
+        "text": "Sister-in-law"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "A is father of C and D. Since D is son of B, B is mother of C and D (wife of A). E is brother of A, so B is Sister-in-law of E."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-046",
+    "title": "Family Relation Tree #16",
+    "statement": "A is B's sister. C is B's mother. D is C's father. E is D's mother. How is A related to D?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Granddaughter"
+      },
+      {
+        "id": "opt_d",
+        "text": "Mother"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A is female child of C, who is child of D. Hence A is Granddaughter of D."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-047",
+    "title": "Family Relation Tree #17",
+    "statement": "Pointing to a photograph, a woman says, \"His mother's only daughter is my mother.\" How is the woman related to the man?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Mother"
+      },
+      {
+        "id": "opt_d",
+        "text": "Niece"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "His mother's only daughter is his sister. The woman is the daughter of his sister, hence his Niece."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-048",
+    "title": "Family Relation Tree #18",
+    "statement": "Introducing a man, a lady said, \"The father of his brother is the only son of my grandfather.\" How is the lady related to the man?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Mother"
+      },
+      {
+        "id": "opt_d",
+        "text": "Sister"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Father of his brother = his father. Only son of grandfather = father. Hence lady and man have same father -> Sister."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-049",
+    "title": "Family Relation Tree #19",
+    "statement": "P is the brother of Q and R. S is R's mother. T is P's father. Which of the following statements cannot be definitely true?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Mother"
+      },
+      {
+        "id": "opt_d",
+        "text": "Q is T's son"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The gender of Q is not explicitly given, so Q could be daughter or son."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-050",
+    "title": "Family Relation Tree #20",
+    "statement": "A is father of C and D is son of B. E is brother of A. If C is sister of D, how is B related to E?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Mother"
+      },
+      {
+        "id": "opt_d",
+        "text": "Sister-in-law"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "A is father of C and D. Since D is son of B, B is mother of C and D (wife of A). E is brother of A, so B is Sister-in-law of E."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-051",
+    "title": "Family Relation Tree #21",
+    "statement": "A is B's sister. C is B's mother. D is C's father. E is D's mother. How is A related to D?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Granddaughter"
+      },
+      {
+        "id": "opt_d",
+        "text": "Mother"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "A is female child of C, who is child of D. Hence A is Granddaughter of D."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-052",
+    "title": "Family Relation Tree #22",
+    "statement": "Pointing to a photograph, a woman says, \"His mother's only daughter is my mother.\" How is the woman related to the man?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Mother"
+      },
+      {
+        "id": "opt_d",
+        "text": "Niece"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "His mother's only daughter is his sister. The woman is the daughter of his sister, hence his Niece."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-053",
+    "title": "Family Relation Tree #23",
+    "statement": "Introducing a man, a lady said, \"The father of his brother is the only son of my grandfather.\" How is the lady related to the man?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Mother"
+      },
+      {
+        "id": "opt_d",
+        "text": "Sister"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Father of his brother = his father. Only son of grandfather = father. Hence lady and man have same father -> Sister."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-054",
+    "title": "Family Relation Tree #24",
+    "statement": "P is the brother of Q and R. S is R's mother. T is P's father. Which of the following statements cannot be definitely true?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Mother"
+      },
+      {
+        "id": "opt_d",
+        "text": "Q is T's son"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "The gender of Q is not explicitly given, so Q could be daughter or son."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Blood Relations",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-br-055",
+    "title": "Family Relation Tree #25",
+    "statement": "A is father of C and D is son of B. E is brother of A. If C is sister of D, how is B related to E?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Aunt"
+      },
+      {
+        "id": "opt_b",
+        "text": "Cousin"
+      },
+      {
+        "id": "opt_c",
+        "text": "Mother"
+      },
+      {
+        "id": "opt_d",
+        "text": "Sister-in-law"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "A is father of C and D. Since D is son of B, B is mother of C and D (wife of A). E is brother of A, so B is Sister-in-law of E."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-056",
+    "title": "Categorical Syllogism #1",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-057",
+    "title": "Categorical Syllogism #2",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-058",
+    "title": "Categorical Syllogism #3",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-059",
+    "title": "Categorical Syllogism #4",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-060",
+    "title": "Categorical Syllogism #5",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-061",
+    "title": "Categorical Syllogism #6",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-062",
+    "title": "Categorical Syllogism #7",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-063",
+    "title": "Categorical Syllogism #8",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-064",
+    "title": "Categorical Syllogism #9",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-065",
+    "title": "Categorical Syllogism #10",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-066",
+    "title": "Categorical Syllogism #11",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-067",
+    "title": "Categorical Syllogism #12",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-068",
+    "title": "Categorical Syllogism #13",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-069",
+    "title": "Categorical Syllogism #14",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-070",
+    "title": "Categorical Syllogism #15",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-071",
+    "title": "Categorical Syllogism #16",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-072",
+    "title": "Categorical Syllogism #17",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-073",
+    "title": "Categorical Syllogism #18",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-074",
+    "title": "Categorical Syllogism #19",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-075",
+    "title": "Categorical Syllogism #20",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-076",
+    "title": "Categorical Syllogism #21",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-077",
+    "title": "Categorical Syllogism #22",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-078",
+    "title": "Categorical Syllogism #23",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-079",
+    "title": "Categorical Syllogism #24",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Syllogisms",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-syl-080",
+    "title": "Categorical Syllogism #25",
+    "statement": "Statements: (1) All cats are felines. (2) All felines are mammals.\nConclusions:\nI. All cats are mammals.\nII. Some mammals are cats.",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "Only conclusion I follows"
+      },
+      {
+        "id": "opt_b",
+        "text": "Only conclusion II follows"
+      },
+      {
+        "id": "opt_c",
+        "text": "Both conclusions I and II follow"
+      },
+      {
+        "id": "opt_d",
+        "text": "Neither conclusion follows"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Since Cats ⊂ Felines ⊂ Mammals, all cats are mammals (I) and some mammals are cats (II) both logically hold."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-081",
+    "title": "Displacement & Direction Vector #1",
+    "statement": "A delivery agent travels 5 km North, turns right and travels 4 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "1 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "6.4 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "8.4 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "9 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Shortest distance = sqrt(5^2 + 4^2) = sqrt(41) = 6.4 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-082",
+    "title": "Displacement & Direction Vector #2",
+    "statement": "A delivery agent travels 6 km North, turns right and travels 5 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "1 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "11 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "7.8 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "9.8 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Shortest distance = sqrt(6^2 + 5^2) = sqrt(61) = 7.8 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-083",
+    "title": "Displacement & Direction Vector #3",
+    "statement": "A delivery agent travels 7 km North, turns right and travels 6 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "1 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "11.2 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "13 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "9.2 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Shortest distance = sqrt(7^2 + 6^2) = sqrt(85) = 9.2 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-084",
+    "title": "Displacement & Direction Vector #4",
+    "statement": "A delivery agent travels 8 km North, turns right and travels 3 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "10.5 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "11 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "5 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "8.5 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Shortest distance = sqrt(8^2 + 3^2) = sqrt(73) = 8.5 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-085",
+    "title": "Displacement & Direction Vector #5",
+    "statement": "A delivery agent travels 4 km North, turns right and travels 4 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "0 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "5.7 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "7.7 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "8 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Shortest distance = sqrt(4^2 + 4^2) = sqrt(32) = 5.7 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-086",
+    "title": "Displacement & Direction Vector #6",
+    "statement": "A delivery agent travels 5 km North, turns right and travels 5 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "0 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "10 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "7.1 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "9.1 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Shortest distance = sqrt(5^2 + 5^2) = sqrt(50) = 7.1 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-087",
+    "title": "Displacement & Direction Vector #7",
+    "statement": "A delivery agent travels 6 km North, turns right and travels 6 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "0 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "10.5 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "12 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "8.5 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Shortest distance = sqrt(6^2 + 6^2) = sqrt(72) = 8.5 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-088",
+    "title": "Displacement & Direction Vector #8",
+    "statement": "A delivery agent travels 7 km North, turns right and travels 3 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "10 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "4 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "7.6 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "9.6 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Shortest distance = sqrt(7^2 + 3^2) = sqrt(58) = 7.6 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-089",
+    "title": "Displacement & Direction Vector #9",
+    "statement": "A delivery agent travels 8 km North, turns right and travels 4 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "10.9 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "12 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "4 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "8.9 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Shortest distance = sqrt(8^2 + 4^2) = sqrt(80) = 8.9 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-090",
+    "title": "Displacement & Direction Vector #10",
+    "statement": "A delivery agent travels 4 km North, turns right and travels 5 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "1 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "6.4 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "8.4 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "9 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Shortest distance = sqrt(4^2 + 5^2) = sqrt(41) = 6.4 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-091",
+    "title": "Displacement & Direction Vector #11",
+    "statement": "A delivery agent travels 5 km North, turns right and travels 6 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "1 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "11 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "7.8 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "9.8 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Shortest distance = sqrt(5^2 + 6^2) = sqrt(61) = 7.8 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-092",
+    "title": "Displacement & Direction Vector #12",
+    "statement": "A delivery agent travels 6 km North, turns right and travels 3 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "3 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "6.7 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "8.7 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "9 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Shortest distance = sqrt(6^2 + 3^2) = sqrt(45) = 6.7 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-093",
+    "title": "Displacement & Direction Vector #13",
+    "statement": "A delivery agent travels 7 km North, turns right and travels 4 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "10.1 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "11 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "3 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "8.1 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Shortest distance = sqrt(7^2 + 4^2) = sqrt(65) = 8.1 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-094",
+    "title": "Displacement & Direction Vector #14",
+    "statement": "A delivery agent travels 8 km North, turns right and travels 5 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "11.4 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "13 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "3 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "9.4 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Shortest distance = sqrt(8^2 + 5^2) = sqrt(89) = 9.4 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-095",
+    "title": "Displacement & Direction Vector #15",
+    "statement": "A delivery agent travels 4 km North, turns right and travels 6 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "10 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "2 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "7.2 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "9.2 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Shortest distance = sqrt(4^2 + 6^2) = sqrt(52) = 7.2 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-096",
+    "title": "Displacement & Direction Vector #16",
+    "statement": "A delivery agent travels 5 km North, turns right and travels 3 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "2 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "5.8 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "7.8 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "8 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Shortest distance = sqrt(5^2 + 3^2) = sqrt(34) = 5.8 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-097",
+    "title": "Displacement & Direction Vector #17",
+    "statement": "A delivery agent travels 6 km North, turns right and travels 4 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "10 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "2 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "7.2 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "9.2 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Shortest distance = sqrt(6^2 + 4^2) = sqrt(52) = 7.2 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-098",
+    "title": "Displacement & Direction Vector #18",
+    "statement": "A delivery agent travels 7 km North, turns right and travels 5 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "10.6 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "12 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "2 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "8.6 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Shortest distance = sqrt(7^2 + 5^2) = sqrt(74) = 8.6 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-099",
+    "title": "Displacement & Direction Vector #19",
+    "statement": "A delivery agent travels 8 km North, turns right and travels 6 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "10.0 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "12 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "14 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "2 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Shortest distance = sqrt(8^2 + 6^2) = sqrt(100) = 10.0 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-100",
+    "title": "Displacement & Direction Vector #20",
+    "statement": "A delivery agent travels 4 km North, turns right and travels 3 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "1 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "5.0 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "7 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "7 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Shortest distance = sqrt(4^2 + 3^2) = sqrt(25) = 5.0 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-101",
+    "title": "Displacement & Direction Vector #21",
+    "statement": "A delivery agent travels 5 km North, turns right and travels 4 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "1 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "6.4 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "8.4 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "9 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Shortest distance = sqrt(5^2 + 4^2) = sqrt(41) = 6.4 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-102",
+    "title": "Displacement & Direction Vector #22",
+    "statement": "A delivery agent travels 6 km North, turns right and travels 5 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "1 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "11 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "7.8 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "9.8 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_c"
+    },
+    "explanation": "Shortest distance = sqrt(6^2 + 5^2) = sqrt(61) = 7.8 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-103",
+    "title": "Displacement & Direction Vector #23",
+    "statement": "A delivery agent travels 7 km North, turns right and travels 6 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "1 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "11.2 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "13 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "9.2 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Shortest distance = sqrt(7^2 + 6^2) = sqrt(85) = 9.2 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-104",
+    "title": "Displacement & Direction Vector #24",
+    "statement": "A delivery agent travels 8 km North, turns right and travels 3 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "10.5 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "11 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "5 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "8.5 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_d"
+    },
+    "explanation": "Shortest distance = sqrt(8^2 + 3^2) = sqrt(73) = 8.5 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Direction Sense",
+    "difficulty": "EASY",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-dir-105",
+    "title": "Displacement & Direction Vector #25",
+    "statement": "A delivery agent travels 4 km North, turns right and travels 4 km East. What is the shortest straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "0 km"
+      },
+      {
+        "id": "opt_b",
+        "text": "5.7 km"
+      },
+      {
+        "id": "opt_c",
+        "text": "7.7 km"
+      },
+      {
+        "id": "opt_d",
+        "text": "8 km"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Shortest distance = sqrt(4^2 + 4^2) = sqrt(32) = 5.7 km (North-East)."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-106",
+    "title": "Circular Arrangement Analysis #1",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-107",
+    "title": "Circular Arrangement Analysis #2",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-108",
+    "title": "Circular Arrangement Analysis #3",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-109",
+    "title": "Circular Arrangement Analysis #4",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-110",
+    "title": "Circular Arrangement Analysis #5",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-111",
+    "title": "Circular Arrangement Analysis #6",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-112",
+    "title": "Circular Arrangement Analysis #7",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-113",
+    "title": "Circular Arrangement Analysis #8",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-114",
+    "title": "Circular Arrangement Analysis #9",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-115",
+    "title": "Circular Arrangement Analysis #10",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-116",
+    "title": "Circular Arrangement Analysis #11",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-117",
+    "title": "Circular Arrangement Analysis #12",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-118",
+    "title": "Circular Arrangement Analysis #13",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-119",
+    "title": "Circular Arrangement Analysis #14",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-120",
+    "title": "Circular Arrangement Analysis #15",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-121",
+    "title": "Circular Arrangement Analysis #16",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-122",
+    "title": "Circular Arrangement Analysis #17",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-123",
+    "title": "Circular Arrangement Analysis #18",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-124",
+    "title": "Circular Arrangement Analysis #19",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-125",
+    "title": "Circular Arrangement Analysis #20",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-126",
+    "title": "Circular Arrangement Analysis #21",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-127",
+    "title": "Circular Arrangement Analysis #22",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-128",
+    "title": "Circular Arrangement Analysis #23",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-129",
+    "title": "Circular Arrangement Analysis #24",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Seating Arrangement",
+    "difficulty": "HARD",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-seat-130",
+    "title": "Circular Arrangement Analysis #25",
+    "statement": "Eight executives A, B, C, D, E, F, G, and H sit around a circular table facing the center. A sits third to the right of B. C sits second to the left of A. Who sits opposite to B?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "E"
+      },
+      {
+        "id": "opt_b",
+        "text": "F"
+      },
+      {
+        "id": "opt_c",
+        "text": "H"
+      },
+      {
+        "id": "opt_d",
+        "text": "G"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_b"
+    },
+    "explanation": "Plotting the 8 positions in circular symmetry places F directly opposite B across the table."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Clocks and Calendars",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-clk-131",
+    "title": "Clock Hands Angle Calculation #1",
+    "statement": "What is the angle between the hour hand and the minute hand of a clock at 3:30?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "75 degrees"
+      },
+      {
+        "id": "opt_b",
+        "text": "80 degrees"
+      },
+      {
+        "id": "opt_c",
+        "text": "70 degrees"
+      },
+      {
+        "id": "opt_d",
+        "text": "90 degrees"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Angle = |30 * H - 5.5 * M| = |30 * 3 - 5.5 * 30| = |90 - 165| = 75 degrees."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Clocks and Calendars",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-clk-132",
+    "title": "Clock Hands Angle Calculation #2",
+    "statement": "What is the angle between the hour hand and the minute hand of a clock at 3:30?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "75 degrees"
+      },
+      {
+        "id": "opt_b",
+        "text": "80 degrees"
+      },
+      {
+        "id": "opt_c",
+        "text": "70 degrees"
+      },
+      {
+        "id": "opt_d",
+        "text": "90 degrees"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Angle = |30 * H - 5.5 * M| = |30 * 3 - 5.5 * 30| = |90 - 165| = 75 degrees."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Clocks and Calendars",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-clk-133",
+    "title": "Clock Hands Angle Calculation #3",
+    "statement": "What is the angle between the hour hand and the minute hand of a clock at 3:30?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "75 degrees"
+      },
+      {
+        "id": "opt_b",
+        "text": "80 degrees"
+      },
+      {
+        "id": "opt_c",
+        "text": "70 degrees"
+      },
+      {
+        "id": "opt_d",
+        "text": "90 degrees"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Angle = |30 * H - 5.5 * M| = |30 * 3 - 5.5 * 30| = |90 - 165| = 75 degrees."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Clocks and Calendars",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-clk-134",
+    "title": "Clock Hands Angle Calculation #4",
+    "statement": "What is the angle between the hour hand and the minute hand of a clock at 3:30?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "75 degrees"
+      },
+      {
+        "id": "opt_b",
+        "text": "80 degrees"
+      },
+      {
+        "id": "opt_c",
+        "text": "70 degrees"
+      },
+      {
+        "id": "opt_d",
+        "text": "90 degrees"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Angle = |30 * H - 5.5 * M| = |30 * 3 - 5.5 * 30| = |90 - 165| = 75 degrees."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Clocks and Calendars",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-clk-135",
+    "title": "Clock Hands Angle Calculation #5",
+    "statement": "What is the angle between the hour hand and the minute hand of a clock at 3:30?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "75 degrees"
+      },
+      {
+        "id": "opt_b",
+        "text": "80 degrees"
+      },
+      {
+        "id": "opt_c",
+        "text": "70 degrees"
+      },
+      {
+        "id": "opt_d",
+        "text": "90 degrees"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Angle = |30 * H - 5.5 * M| = |30 * 3 - 5.5 * 30| = |90 - 165| = 75 degrees."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Clocks and Calendars",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-clk-136",
+    "title": "Clock Hands Angle Calculation #6",
+    "statement": "What is the angle between the hour hand and the minute hand of a clock at 3:30?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "75 degrees"
+      },
+      {
+        "id": "opt_b",
+        "text": "80 degrees"
+      },
+      {
+        "id": "opt_c",
+        "text": "70 degrees"
+      },
+      {
+        "id": "opt_d",
+        "text": "90 degrees"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Angle = |30 * H - 5.5 * M| = |30 * 3 - 5.5 * 30| = |90 - 165| = 75 degrees."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Clocks and Calendars",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-clk-137",
+    "title": "Clock Hands Angle Calculation #7",
+    "statement": "What is the angle between the hour hand and the minute hand of a clock at 3:30?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "75 degrees"
+      },
+      {
+        "id": "opt_b",
+        "text": "80 degrees"
+      },
+      {
+        "id": "opt_c",
+        "text": "70 degrees"
+      },
+      {
+        "id": "opt_d",
+        "text": "90 degrees"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Angle = |30 * H - 5.5 * M| = |30 * 3 - 5.5 * 30| = |90 - 165| = 75 degrees."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Clocks and Calendars",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-clk-138",
+    "title": "Clock Hands Angle Calculation #8",
+    "statement": "What is the angle between the hour hand and the minute hand of a clock at 3:30?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "75 degrees"
+      },
+      {
+        "id": "opt_b",
+        "text": "80 degrees"
+      },
+      {
+        "id": "opt_c",
+        "text": "70 degrees"
+      },
+      {
+        "id": "opt_d",
+        "text": "90 degrees"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Angle = |30 * H - 5.5 * M| = |30 * 3 - 5.5 * 30| = |90 - 165| = 75 degrees."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Clocks and Calendars",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-clk-139",
+    "title": "Clock Hands Angle Calculation #9",
+    "statement": "What is the angle between the hour hand and the minute hand of a clock at 3:30?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "75 degrees"
+      },
+      {
+        "id": "opt_b",
+        "text": "80 degrees"
+      },
+      {
+        "id": "opt_c",
+        "text": "70 degrees"
+      },
+      {
+        "id": "opt_d",
+        "text": "90 degrees"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Angle = |30 * H - 5.5 * M| = |30 * 3 - 5.5 * 30| = |90 - 165| = 75 degrees."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Clocks and Calendars",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-clk-140",
+    "title": "Clock Hands Angle Calculation #10",
+    "statement": "What is the angle between the hour hand and the minute hand of a clock at 3:30?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "75 degrees"
+      },
+      {
+        "id": "opt_b",
+        "text": "80 degrees"
+      },
+      {
+        "id": "opt_c",
+        "text": "70 degrees"
+      },
+      {
+        "id": "opt_d",
+        "text": "90 degrees"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Angle = |30 * H - 5.5 * M| = |30 * 3 - 5.5 * 30| = |90 - 165| = 75 degrees."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Clocks and Calendars",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-clk-141",
+    "title": "Clock Hands Angle Calculation #11",
+    "statement": "What is the angle between the hour hand and the minute hand of a clock at 3:30?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "75 degrees"
+      },
+      {
+        "id": "opt_b",
+        "text": "80 degrees"
+      },
+      {
+        "id": "opt_c",
+        "text": "70 degrees"
+      },
+      {
+        "id": "opt_d",
+        "text": "90 degrees"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Angle = |30 * H - 5.5 * M| = |30 * 3 - 5.5 * 30| = |90 - 165| = 75 degrees."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Clocks and Calendars",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-clk-142",
+    "title": "Clock Hands Angle Calculation #12",
+    "statement": "What is the angle between the hour hand and the minute hand of a clock at 3:30?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "75 degrees"
+      },
+      {
+        "id": "opt_b",
+        "text": "80 degrees"
+      },
+      {
+        "id": "opt_c",
+        "text": "70 degrees"
+      },
+      {
+        "id": "opt_d",
+        "text": "90 degrees"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Angle = |30 * H - 5.5 * M| = |30 * 3 - 5.5 * 30| = |90 - 165| = 75 degrees."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Clocks and Calendars",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-clk-143",
+    "title": "Clock Hands Angle Calculation #13",
+    "statement": "What is the angle between the hour hand and the minute hand of a clock at 3:30?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "75 degrees"
+      },
+      {
+        "id": "opt_b",
+        "text": "80 degrees"
+      },
+      {
+        "id": "opt_c",
+        "text": "70 degrees"
+      },
+      {
+        "id": "opt_d",
+        "text": "90 degrees"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Angle = |30 * H - 5.5 * M| = |30 * 3 - 5.5 * 30| = |90 - 165| = 75 degrees."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Clocks and Calendars",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-clk-144",
+    "title": "Clock Hands Angle Calculation #14",
+    "statement": "What is the angle between the hour hand and the minute hand of a clock at 3:30?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "75 degrees"
+      },
+      {
+        "id": "opt_b",
+        "text": "80 degrees"
+      },
+      {
+        "id": "opt_c",
+        "text": "70 degrees"
+      },
+      {
+        "id": "opt_d",
+        "text": "90 degrees"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Angle = |30 * H - 5.5 * M| = |30 * 3 - 5.5 * 30| = |90 - 165| = 75 degrees."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Clocks and Calendars",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-clk-145",
+    "title": "Clock Hands Angle Calculation #15",
+    "statement": "What is the angle between the hour hand and the minute hand of a clock at 3:30?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "75 degrees"
+      },
+      {
+        "id": "opt_b",
+        "text": "80 degrees"
+      },
+      {
+        "id": "opt_c",
+        "text": "70 degrees"
+      },
+      {
+        "id": "opt_d",
+        "text": "90 degrees"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Angle = |30 * H - 5.5 * M| = |30 * 3 - 5.5 * 30| = |90 - 165| = 75 degrees."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Clocks and Calendars",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-clk-146",
+    "title": "Clock Hands Angle Calculation #16",
+    "statement": "What is the angle between the hour hand and the minute hand of a clock at 3:30?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "75 degrees"
+      },
+      {
+        "id": "opt_b",
+        "text": "80 degrees"
+      },
+      {
+        "id": "opt_c",
+        "text": "70 degrees"
+      },
+      {
+        "id": "opt_d",
+        "text": "90 degrees"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Angle = |30 * H - 5.5 * M| = |30 * 3 - 5.5 * 30| = |90 - 165| = 75 degrees."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Clocks and Calendars",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-clk-147",
+    "title": "Clock Hands Angle Calculation #17",
+    "statement": "What is the angle between the hour hand and the minute hand of a clock at 3:30?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "75 degrees"
+      },
+      {
+        "id": "opt_b",
+        "text": "80 degrees"
+      },
+      {
+        "id": "opt_c",
+        "text": "70 degrees"
+      },
+      {
+        "id": "opt_d",
+        "text": "90 degrees"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Angle = |30 * H - 5.5 * M| = |30 * 3 - 5.5 * 30| = |90 - 165| = 75 degrees."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Clocks and Calendars",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-clk-148",
+    "title": "Clock Hands Angle Calculation #18",
+    "statement": "What is the angle between the hour hand and the minute hand of a clock at 3:30?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "75 degrees"
+      },
+      {
+        "id": "opt_b",
+        "text": "80 degrees"
+      },
+      {
+        "id": "opt_c",
+        "text": "70 degrees"
+      },
+      {
+        "id": "opt_d",
+        "text": "90 degrees"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Angle = |30 * H - 5.5 * M| = |30 * 3 - 5.5 * 30| = |90 - 165| = 75 degrees."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Clocks and Calendars",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-clk-149",
+    "title": "Clock Hands Angle Calculation #19",
+    "statement": "What is the angle between the hour hand and the minute hand of a clock at 3:30?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "75 degrees"
+      },
+      {
+        "id": "opt_b",
+        "text": "80 degrees"
+      },
+      {
+        "id": "opt_c",
+        "text": "70 degrees"
+      },
+      {
+        "id": "opt_d",
+        "text": "90 degrees"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Angle = |30 * H - 5.5 * M| = |30 * 3 - 5.5 * 30| = |90 - 165| = 75 degrees."
+  },
+  {
+    "type": "APTITUDE",
+    "format": "SINGLE_CHOICE",
+    "category": "LOGICAL",
+    "subcategory": "Clocks and Calendars",
+    "difficulty": "MEDIUM",
+    "sourceType": "CURATED",
+    "sourceNamespace": "sips-bank-1000",
+    "externalId": "logic-clk-150",
+    "title": "Clock Hands Angle Calculation #20",
+    "statement": "What is the angle between the hour hand and the minute hand of a clock at 3:30?",
+    "options": [
+      {
+        "id": "opt_a",
+        "text": "75 degrees"
+      },
+      {
+        "id": "opt_b",
+        "text": "80 degrees"
+      },
+      {
+        "id": "opt_c",
+        "text": "70 degrees"
+      },
+      {
+        "id": "opt_d",
+        "text": "90 degrees"
+      }
+    ],
+    "correctAnswer": {
+      "optionId": "opt_a"
+    },
+    "explanation": "Angle = |30 * H - 5.5 * M| = |30 * 3 - 5.5 * 30| = |90 - 165| = 75 degrees."
+  }
+]
