@@ -131,6 +131,7 @@ const studentRoutes = require('./routes/student');
 const jdRoutes = require('./routes/jd');
 const notificationRoutes = require('./routes/notification');
 const adminRoutes = require('./routes/admin');
+const publicRoutes = require('./routes/public');
 const internalRoutes = require('./routes/internal');
 const institutionRoutes = require('./routes/institution');
 
