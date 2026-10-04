@@ -57,7 +57,7 @@ export function Sidebar({ isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen
     { to: "/placement/jobs", label: "Job Descriptions", icon: Briefcase, badge: "Match" },
     { to: "/placement/analytics", label: "Placement Analytics", icon: BarChart3 },
     { to: "/placement/reports", label: "Institutional Reports", icon: FileSpreadsheet },
-    { to: "/placement/profile", label: "College Profile", icon: Building2 }
+    { to: "/placement/profile", label: "Department Profile", icon: Building2 }
   ];
 
   const adminLinks = [
@@ -67,12 +67,24 @@ export function Sidebar({ isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen
     { to: "/admin/users", label: "User Management", icon: Users },
     { to: "/admin/students", label: "Student Records", icon: GraduationCap },
     { to: "/admin/analytics", label: "Platform Analytics", icon: BarChart3 },
-    { to: "/admin/profile", label: "College Profile", icon: Building2 },
+    { to: "/admin/profile", label: "Department Profile", icon: Building2 },
     { to: "/admin/settings", label: "System Settings", icon: Settings }
   ];
 
+  const universityAdminLinks = [
+    { to: "/institution/dashboard", label: "Overview", icon: LayoutDashboard },
+    { to: "/institution/profile", label: "College Profile", icon: Building2 },
+    { to: "/institution/departments", label: "Departments", icon: Layers, badge: "Units" }
+  ];
+
   const links =
-    role === "placement" ? placementLinks : role === "admin" ? adminLinks : studentLinks;
+    role === "university_admin"
+      ? universityAdminLinks
+      : role === "placement"
+      ? placementLinks
+      : role === "admin"
+      ? adminLinks
+      : studentLinks;
 
   const handleLogout = () => {
     logout();
@@ -136,7 +148,9 @@ export function Sidebar({ isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen
         <div className="flex-1 py-4 px-3 space-y-1 overflow-y-auto no-scrollbar">
           {!isCollapsed && (
             <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              {role === "placement"
+              {role === "university_admin"
+                ? "University Admin Portal"
+                : role === "placement"
                 ? "Placement Portal"
                 : role === "admin"
                 ? "System Portal"
@@ -207,18 +221,20 @@ export function Sidebar({ isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen
           >
             <Avatar
               src={user?.profileImageUrl || user?.logoUrl || user?.avatar}
-              name={user?.name || (user?.role === "placement" ? user?.collegeName : "Student")}
-              isCollege={user?.role === "placement" || user?.role === "admin"}
+              name={user?.name || (user?.role === "placement" ? user?.collegeName : user?.role === "university_admin" ? user?.institutionName : "Student")}
+              isCollege={user?.role === "placement" || user?.role === "admin" || user?.role === "university_admin"}
               size="sm"
               className="border border-slate-200 shrink-0"
             />
             {!isCollapsed && (
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-bold text-slate-900 truncate">
-                  {user?.name || "Student"}
+                  {user?.name || (user?.role === "university_admin" ? user?.institutionName : "Student")}
                 </p>
                 <p className="text-[11px] text-slate-400 capitalize truncate">
-                  {user?.role === "placement"
+                  {user?.role === "university_admin"
+                    ? "University Admin"
+                    : user?.role === "placement"
                     ? "Placement Officer"
                     : user?.role === "admin"
                     ? "System Admin"

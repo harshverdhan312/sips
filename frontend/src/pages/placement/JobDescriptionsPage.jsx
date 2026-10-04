@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Briefcase,
   Plus,
@@ -18,6 +18,7 @@ import {
   Download
 } from "lucide-react";
 import { placementService } from "../../services/placementService";
+import { institutionService } from "../../services/institutionService";
 import { Card, CardHeader } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
@@ -47,6 +48,11 @@ export function JobDescriptionsPage() {
   const [activeStudent, setActiveStudent] = useState(null);
   const [studentModalOpen, setStudentModalOpen] = useState(false);
   const [driveStatusFilter, setDriveStatusFilter] = useState("all"); // "all" | "active" | "closed"
+  const [batchFilter, setBatchFilter] = useState("all");
+
+  // Delete Job state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deletingJob, setDeletingJob] = useState(false);
 
   // New JD Modal State
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -58,18 +64,32 @@ export function JobDescriptionsPage() {
     department: "Software Development",
     location: "Bengaluru, India",
     ctc: "18 LPA - 22 LPA",
+    targetBatch: "",
     minCgpa: "7.5",
-    deadline: "2025-05-20",
+    deadline: new Date().toISOString().split('T')[0],
     requiredSkills: "Python, React, SQL, Algorithms",
-    description: "Seeking energetic software engineers with passion for scalable products."
+    description: "Seeking energetic software engineers with passion for scalable products.",
+    jobType: "Full-time",
+    targetCourse: "",
+    targetBranch: []
   });
+
+  const [departments, setDepartments] = useState([]);
 
   // Load jobs on mount
   useEffect(() => {
     async function load() {
       try {
-        const data = await placementService.getJobs();
+        const [data, deptsResponse] = await Promise.all([
+          placementService.getJobs(),
+          institutionService.getDepartments().catch(() => [])
+        ]);
         setJobs(data);
+        
+        // deptsResponse might be { success: true, departments: [...] } or an array if it failed
+        const deptsArray = deptsResponse?.departments || (Array.isArray(deptsResponse) ? deptsResponse : []);
+        setDepartments(deptsArray);
+        
         if (data.length > 0) {
           setSelectedJob(data[0]);
         }
@@ -86,9 +106,41 @@ export function JobDescriptionsPage() {
   const activeJobsCount = jobs.filter((j) => j.isActive).length;
   const closedJobsCount = jobs.length - activeJobsCount;
 
+  const availablePrograms = useMemo(() => {
+    const progMap = {};
+    departments.forEach(dept => {
+      if (Array.isArray(dept.programs)) {
+        dept.programs.forEach(p => {
+          if (p && p.name) {
+            if (!progMap[p.name]) progMap[p.name] = { name: p.name, branches: new Set() };
+            if (Array.isArray(p.branches)) {
+              p.branches.forEach(b => progMap[p.name].branches.add(b));
+            }
+          }
+        });
+      }
+    });
+    return Object.values(progMap).map(p => ({ name: p.name, branches: Array.from(p.branches) }));
+  }, [departments]);
+
+  const availableBatches = useMemo(() => {
+    const batchSet = new Set();
+    jobs.forEach((j) => {
+      const b = j.targetBatch || j.batch;
+      if (b && String(b).trim()) {
+        batchSet.add(String(b).trim());
+      }
+    });
+    return Array.from(batchSet).sort();
+  }, [jobs]);
+
   const displayedJobs = jobs.filter((job) => {
-    if (driveStatusFilter === "active") return Boolean(job.isActive);
-    if (driveStatusFilter === "closed") return !job.isActive;
+    if (driveStatusFilter === "active" && !job.isActive) return false;
+    if (driveStatusFilter === "closed" && job.isActive) return false;
+    if (batchFilter !== "all") {
+      const jb = String(job.targetBatch || job.batch || "").trim();
+      if (jb !== batchFilter) return false;
+    }
     return true;
   });
 
@@ -183,6 +235,10 @@ export function JobDescriptionsPage() {
       newErrors.role = "Job title / role is required.";
     }
 
+    if (!newJob.targetBatch || !newJob.targetBatch.trim()) {
+      newErrors.targetBatch = "Target batch is required (e.g. 2026, 2027).";
+    }
+
     if (!newJob.description.trim()) {
       newErrors.description = "Job description is required.";
     }
@@ -206,8 +262,18 @@ export function JobDescriptionsPage() {
     setSubmitting(true);
     try {
       const skillsArray = newJob.requiredSkills.split(",").map((s) => s.trim()).filter(Boolean);
+      const batchTrimmed = newJob.targetBatch.trim();
+      
+      let finalTargetBranch = newJob.targetBranch;
+      if (newJob.targetCourse && Array.isArray(newJob.targetBranch) && newJob.targetBranch.length === 0) {
+        finalTargetBranch = ["__NONE__"];
+      }
+
       const created = await placementService.createJob({
         ...newJob,
+        targetBatch: batchTrimmed,
+        batch: batchTrimmed,
+        targetBranch: finalTargetBranch,
         requiredSkills: skillsArray
       });
       setJobs((prev) => [created, ...prev]);
@@ -221,6 +287,23 @@ export function JobDescriptionsPage() {
       showError(msg);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleDeleteJob = async () => {
+    if (!selectedJob || deletingJob) return;
+    const jobId = selectedJob._id || selectedJob.id;
+    setDeletingJob(true);
+    try {
+      await placementService.deleteJob(jobId);
+      showSuccess(`Recruitment drive for ${selectedJob.company} deleted.`);
+      setJobs((prev) => prev.filter((j) => (j._id || j.id) !== jobId));
+      setSelectedJob(null);
+      setDeleteModalOpen(false);
+    } catch (err) {
+      showError(err.message || "Failed to delete recruitment drive.");
+    } finally {
+      setDeletingJob(false);
     }
   };
 
@@ -304,41 +387,54 @@ export function JobDescriptionsPage() {
               </span>
             </div>
 
-            {/* Status Filter Buttons */}
-            <div className="inline-flex p-0.5 bg-slate-100 rounded-lg border border-slate-200 text-xs">
-              <button
-                type="button"
-                onClick={() => setDriveStatusFilter("all")}
-                className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all ${
-                  driveStatusFilter === "all"
-                    ? "bg-white text-indigo-700 shadow-xs"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
+            {/* Status and Batch Filter Controls */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <select
+                value={batchFilter}
+                onChange={(e) => setBatchFilter(e.target.value)}
+                className="px-2 py-1 rounded-md text-[11px] font-semibold bg-white border border-slate-200 text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               >
-                All ({jobs.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => setDriveStatusFilter("active")}
-                className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all ${
-                  driveStatusFilter === "active"
-                    ? "bg-white text-emerald-700 shadow-xs"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
-              >
-                Active ({activeJobsCount})
-              </button>
-              <button
-                type="button"
-                onClick={() => setDriveStatusFilter("closed")}
-                className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all ${
-                  driveStatusFilter === "closed"
-                    ? "bg-white text-amber-700 shadow-xs"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
-              >
-                Closed ({closedJobsCount})
-              </button>
+                <option value="all">All Batches</option>
+                {availableBatches.map((b) => (
+                  <option key={b} value={b}>Batch {b}</option>
+                ))}
+              </select>
+
+              <div className="inline-flex p-0.5 bg-slate-100 rounded-lg border border-slate-200 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setDriveStatusFilter("all")}
+                  className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all ${
+                    driveStatusFilter === "all"
+                      ? "bg-white text-indigo-700 shadow-xs"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  All ({jobs.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDriveStatusFilter("active")}
+                  className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all ${
+                    driveStatusFilter === "active"
+                      ? "bg-white text-emerald-700 shadow-xs"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  Active ({activeJobsCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDriveStatusFilter("closed")}
+                  className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all ${
+                    driveStatusFilter === "closed"
+                      ? "bg-white text-amber-700 shadow-xs"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  Closed ({closedJobsCount})
+                </button>
+              </div>
             </div>
           </div>
 
@@ -372,10 +468,20 @@ export function JobDescriptionsPage() {
                         {job.company ? job.company.charAt(0) : "J"}
                       </div>
                       <div>
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           <h4 className="font-bold text-slate-900 text-sm">
                             {job.company}
                           </h4>
+                          {(job.targetBatch || job.batch) && (
+                            <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200">
+                              Batch {job.targetBatch || job.batch}
+                            </span>
+                          )}
+                          {job.type && job.type !== "Full-time" && (
+                            <span className="text-[10px] font-bold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">
+                              {job.type}
+                            </span>
+                          )}
                           {isExpired ? (
                             <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
                               Expired
@@ -438,20 +544,34 @@ export function JobDescriptionsPage() {
                     {selectedJob.role}
                   </p>
                   <p className="text-xs text-slate-500 mt-1">
-                    {selectedJob.location} • Min CGPA: {selectedJob.minCgpa} • Package: {selectedJob.ctc}
+                    {selectedJob.location} • Type: <strong>{selectedJob.type || "Full-time"}</strong> • Target Batch: <strong className="text-indigo-700 font-bold">{selectedJob.targetBatch || selectedJob.batch || "All"}</strong> • Min CGPA: {selectedJob.minCgpa} • Package: {selectedJob.ctc}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Target Course: <strong>{(selectedJob.allowedCourses || []).join(", ") || "All"}</strong> • Target Branch: <strong>{(selectedJob.allowedBranches || []).join(", ") || "All"}</strong>
                   </p>
                 </div>
 
-                <div className="p-3 rounded-2xl bg-indigo-50 border border-indigo-100 text-center shrink-0">
-                  <span className="text-[10px] font-bold text-indigo-900 uppercase">
-                    Ranked Matches
-                  </span>
-                  <div className="text-2xl font-black text-indigo-600">
-                    {matches.length}
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="outline"
+                    size="xs"
+                    onClick={() => setDeleteModalOpen(true)}
+                    className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200"
+                  >
+                    Delete Drive
+                  </Button>
+
+                  <div className="p-3 rounded-2xl bg-indigo-50 border border-indigo-100 text-center shrink-0">
+                    <span className="text-[10px] font-bold text-indigo-900 uppercase">
+                      Ranked Matches
+                    </span>
+                    <div className="text-2xl font-black text-indigo-600">
+                      {matches.length}
+                    </div>
+                    <span className="text-[10px] text-emerald-700 font-semibold">
+                      {matches.length > 0 ? "Candidates Evaluated" : "Awaiting Candidates"}
+                    </span>
                   </div>
-                  <span className="text-[10px] text-emerald-700 font-semibold">
-                    {matches.length > 0 ? "Candidates Evaluated" : "Awaiting Candidates"}
-                  </span>
                 </div>
               </div>
 
@@ -958,7 +1078,7 @@ export function JobDescriptionsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
                 CTC Package
@@ -971,6 +1091,36 @@ export function JobDescriptionsPage() {
                 placeholder="e.g. 16 LPA - 20 LPA"
                 className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm font-medium"
               />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                Target Batch *
+              </label>
+              <input
+                type="text"
+                required
+                disabled={submitting}
+                value={newJob.targetBatch}
+                onChange={(e) => {
+                  setNewJob({ ...newJob, targetBatch: e.target.value });
+                  if (jobErrors.targetBatch || jobErrors.general) {
+                    setJobErrors((prev) => ({ ...prev, targetBatch: "", general: "" }));
+                  }
+                }}
+                placeholder="e.g. 2026, 2027"
+                className={`w-full px-3.5 py-2 rounded-xl border text-sm font-medium ${
+                  jobErrors.targetBatch
+                    ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                    : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                }`}
+              />
+              {jobErrors.targetBatch && (
+                <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  {jobErrors.targetBatch}
+                </p>
+              )}
             </div>
 
             <div>
@@ -1017,6 +1167,86 @@ export function JobDescriptionsPage() {
                 className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm font-medium"
               />
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                Job Type
+              </label>
+              <select
+                disabled={submitting}
+                value={newJob.jobType}
+                onChange={(e) => setNewJob({ ...newJob, jobType: e.target.value })}
+                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm font-medium"
+              >
+                <option value="Full-time">Full-time</option>
+                <option value="Internship">Internship</option>
+                <option value="Contract">Contract</option>
+              </select>
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                Target Course
+              </label>
+              <select
+                disabled={submitting}
+                value={newJob.targetCourse}
+                onChange={(e) => {
+                  const courseName = e.target.value;
+                  const prog = availablePrograms.find(p => p.name === courseName);
+                  setNewJob({ 
+                    ...newJob, 
+                    targetCourse: courseName, 
+                    targetBranch: prog ? [...prog.branches] : [] 
+                  });
+                }}
+                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm font-medium"
+              >
+                <option value="">All Courses / Open to All</option>
+                {availablePrograms.map(p => (
+                  <option key={p.name} value={p.name}>{p.name}</option>
+                ))}
+              </select>
+            </div>
+            
+            {newJob.targetCourse && (
+              <div className="col-span-1 sm:col-span-3 mt-1">
+                <label className="block text-[11px] font-bold text-slate-700 uppercase mb-2">
+                  Target Branches (Deselect to exclude)
+                </label>
+                <div className="flex flex-wrap gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                  {(() => {
+                    const prog = availablePrograms.find(p => p.name === newJob.targetCourse);
+                    if (!prog || !prog.branches || prog.branches.length === 0) {
+                      return <span className="text-xs text-slate-500">No branches found for this course.</span>;
+                    }
+                    return prog.branches.map(branch => {
+                      const isChecked = Array.isArray(newJob.targetBranch) && newJob.targetBranch.includes(branch);
+                      return (
+                        <label key={branch} className="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm hover:border-indigo-300">
+                          <input 
+                            type="checkbox" 
+                            className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+                            checked={isChecked}
+                            onChange={(e) => {
+                              let currentBranches = Array.isArray(newJob.targetBranch) ? [...newJob.targetBranch] : [];
+                              if (e.target.checked) {
+                                if (!currentBranches.includes(branch)) currentBranches.push(branch);
+                              } else {
+                                currentBranches = currentBranches.filter(b => b !== branch);
+                              }
+                              setNewJob({ ...newJob, targetBranch: currentBranches });
+                            }}
+                          />
+                          <span className="text-xs font-semibold text-slate-700">{branch}</span>
+                        </label>
+                      );
+                    });
+                  })()}
+                </div>
+              </div>
+            )}
           </div>
 
           <div>
@@ -1092,6 +1322,39 @@ export function JobDescriptionsPage() {
             </Button>
           </div>
         </form>
+      </Modal>
+      {/* Delete Job Modal */}
+      <Modal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        maxWidth="max-w-md"
+        title="Delete Recruitment Drive"
+        subtitle={selectedJob ? `${selectedJob.company} - ${selectedJob.role}` : ""}
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-slate-600">
+            Are you sure you want to delete this recruitment drive? This will permanently remove the job description and associated applications/matches.
+          </p>
+          <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={deletingJob}
+              onClick={() => setDeleteModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              loading={deletingJob}
+              disabled={deletingJob}
+              onClick={handleDeleteJob}
+            >
+              {deletingJob ? "Deleting..." : "Permanently Delete"}
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

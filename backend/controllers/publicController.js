@@ -132,11 +132,13 @@ exports.getPublicStudentProfile = async (req, res, next) => {
             cleanStats.problemsSolved = rawStats.problemsSolved;
           }
           if (rawStats.difficultyBreakdown && typeof rawStats.difficultyBreakdown === 'object') {
-            cleanStats.difficultyBreakdown = {
-              easy: typeof rawStats.difficultyBreakdown.easy === 'number' ? rawStats.difficultyBreakdown.easy : 0,
-              medium: typeof rawStats.difficultyBreakdown.medium === 'number' ? rawStats.difficultyBreakdown.medium : 0,
-              hard: typeof rawStats.difficultyBreakdown.hard === 'number' ? rawStats.difficultyBreakdown.hard : 0
-            };
+            const diff = {};
+            if (typeof rawStats.difficultyBreakdown.easy === 'number') diff.easy = rawStats.difficultyBreakdown.easy;
+            if (typeof rawStats.difficultyBreakdown.medium === 'number') diff.medium = rawStats.difficultyBreakdown.medium;
+            if (typeof rawStats.difficultyBreakdown.hard === 'number') diff.hard = rawStats.difficultyBreakdown.hard;
+            if (Object.keys(diff).length > 0) {
+              cleanStats.difficultyBreakdown = diff;
+            }
           }
           if (typeof rawStats.currentRating === 'number') {
             cleanStats.currentRating = rawStats.currentRating;

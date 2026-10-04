@@ -131,8 +131,8 @@ const studentRoutes = require('./routes/student');
 const jdRoutes = require('./routes/jd');
 const notificationRoutes = require('./routes/notification');
 const adminRoutes = require('./routes/admin');
-const publicRoutes = require('./routes/public');
 const internalRoutes = require('./routes/internal');
+const institutionRoutes = require('./routes/institution');
 
 // Server-to-server internal routes
 app.use('/api/internal', internalRoutes);
@@ -140,6 +140,10 @@ app.use('/api/internal', internalRoutes);
 // Admin routes
 app.use('/api/admin', adminRoutes);
 app.use('/admin', adminRoutes);
+
+// Institution routes
+app.use('/api/institution', institutionRoutes);
+app.use('/institution', institutionRoutes);
 
 // Public routes (unauthenticated shareable profile routes)
 app.use('/api/public', publicRoutes);

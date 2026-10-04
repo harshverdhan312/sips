@@ -31,7 +31,16 @@ exports.getStudents = async (req, res) => {
     } = req.query;
 
     if (!memoryDb.isMongoConnected()) {
-      const allStudents = memoryDb.getStudents(req.collegeId, { search, branch, status, readiness, accountStatus });
+      const finalBatch = batch || req.query.passingYear;
+      const allStudents = memoryDb.getStudents(req.collegeId, {
+        search,
+        branch,
+        batch: finalBatch,
+        passingYear: finalBatch,
+        status,
+        readiness,
+        accountStatus
+      });
       return res.json({
         success: true,
         students: allStudents,
@@ -255,7 +264,17 @@ exports.updateStudent = async (req, res) => {
     if (rollNo !== undefined) student.rollNo = rollNo.trim();
     if (usn !== undefined) student.usn = usn.trim();
     if (branch !== undefined) student.branch = branch.trim();
-    if (batch !== undefined) student.batch = batch.trim();
+    if (batch !== undefined) {
+      student.batch = batch.trim();
+      student.passingYear = batch.trim();
+    }
+    if (req.body.passingYear !== undefined) {
+      student.passingYear = req.body.passingYear.trim();
+      student.batch = req.body.passingYear.trim();
+    }
+    if (req.body.applicationEligibilityStatus !== undefined) {
+      student.applicationEligibilityStatus = req.body.applicationEligibilityStatus;
+    }
     if (cgpa !== undefined) student.cgpa = Math.max(0, Math.min(10, parseFloat(cgpa) || 0));
     if (placementStatus !== undefined) {
       student.placementStatus = placementStatus.toUpperCase();
@@ -311,6 +330,165 @@ exports.updateStudent = async (req, res) => {
   } catch (error) {
     console.error('Admin updateStudent error:', error);
     res.status(500).json({ message: 'Server error updating student' });
+  }
+};
+
+/**
+ * PATCH /api/admin/students/:id/debar
+ * Debar or restore application eligibility for a student
+ */
+exports.debarStudent = async (req, res) => {
+  try {
+    const { debarred, debar, status, applicationEligibilityStatus } = req.body;
+    const isDebarred = debar !== undefined
+      ? Boolean(debar)
+      : debarred !== undefined
+      ? Boolean(debarred)
+      : (status === 'DEBARRED' || applicationEligibilityStatus === 'DEBARRED');
+    const newStatus = isDebarred ? 'DEBARRED' : 'ELIGIBLE';
+
+    if (!memoryDb.isMongoConnected()) {
+      const student = memoryDb.findStudentById(req.params.id);
+      if (!student || String(student.collegeId) !== String(req.collegeId)) {
+        return res.status(404).json({ success: false, message: 'Student not found' });
+      }
+      student.applicationEligibilityStatus = newStatus;
+      student.updatedAt = new Date();
+
+      if (memoryDb.isMongoConnected()) {
+        AuditLog.create({
+          collegeId: req.collegeId,
+          action: isDebarred ? 'DEBAR_STUDENT' : 'ALLOW_APPLICATIONS',
+          actor: req.user?.email || 'Admin',
+          target: `${student.name} (${student.email})`
+        }).catch(err => console.error('AuditLog error:', err));
+      }
+
+      return res.json({
+        success: true,
+        message: isDebarred ? 'Student debarred from placement applications' : 'Student application eligibility restored',
+        student: {
+          _id: student._id,
+          name: student.name,
+          applicationEligibilityStatus: student.applicationEligibilityStatus
+        }
+      });
+    }
+
+    const student = await Student.findOne({
+      _id: req.params.id,
+      collegeId: req.collegeId
+    });
+
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student not found' });
+    }
+
+    student.applicationEligibilityStatus = newStatus;
+    await student.save();
+
+    await AuditLog.create({
+      collegeId: req.collegeId,
+      action: isDebarred ? 'DEBAR_STUDENT' : 'ALLOW_APPLICATIONS',
+      actor: req.user?.email || 'Admin',
+      target: `${student.name} (${student.email})`
+    }).catch(err => console.error('AuditLog error:', err));
+
+    return res.json({
+      success: true,
+      message: isDebarred ? 'Student debarred from placement applications' : 'Student application eligibility restored',
+      student: {
+        _id: student._id,
+        name: student.name,
+        applicationEligibilityStatus: student.applicationEligibilityStatus
+      }
+    });
+  } catch (error) {
+    console.error('debarStudent error:', error);
+    res.status(500).json({ success: false, message: 'Server error updating student eligibility' });
+  }
+};
+
+/**
+ * PATCH /api/admin/students/:id/placement-status
+ * Mark student as PLACED or update placement details
+ */
+exports.updatePlacementStatus = async (req, res) => {
+  try {
+    const { placementStatus, companyPlaced, packageOffered } = req.body;
+    const finalStatus = (placementStatus || 'PLACED').toUpperCase().trim();
+
+    if (!memoryDb.isMongoConnected()) {
+      const student = memoryDb.findStudentById(req.params.id);
+      if (!student || String(student.collegeId) !== String(req.collegeId)) {
+        return res.status(404).json({ success: false, message: 'Student not found' });
+      }
+      student.placementStatus = finalStatus;
+      if (finalStatus === 'PLACED') {
+        if (companyPlaced !== undefined) student.companyPlaced = companyPlaced.trim();
+        if (packageOffered !== undefined) student.packageOffered = parseFloat(packageOffered) || 0;
+      }
+      student.updatedAt = new Date();
+
+      if (memoryDb.isMongoConnected()) {
+        AuditLog.create({
+          collegeId: req.collegeId,
+          action: 'MARK_PLACED',
+          actor: req.user?.email || 'Admin',
+          target: `${student.name} (${student.email})`
+        }).catch(err => console.error('AuditLog error:', err));
+      }
+
+      return res.json({
+        success: true,
+        message: `Student marked as ${finalStatus}`,
+        student: {
+          _id: student._id,
+          name: student.name,
+          placementStatus: student.placementStatus,
+          companyPlaced: student.companyPlaced,
+          packageOffered: student.packageOffered
+        }
+      });
+    }
+
+    const student = await Student.findOne({
+      _id: req.params.id,
+      collegeId: req.collegeId
+    });
+
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student not found' });
+    }
+
+    student.placementStatus = finalStatus;
+    if (finalStatus === 'PLACED') {
+      if (companyPlaced !== undefined) student.companyPlaced = companyPlaced.trim();
+      if (packageOffered !== undefined) student.packageOffered = parseFloat(packageOffered) || 0;
+    }
+    await student.save();
+
+    await AuditLog.create({
+      collegeId: req.collegeId,
+      action: 'MARK_PLACED',
+      actor: req.user?.email || 'Admin',
+      target: `${student.name} (${student.email})`
+    }).catch(err => console.error('AuditLog error:', err));
+
+    return res.json({
+      success: true,
+      message: `Student marked as ${finalStatus}`,
+      student: {
+        _id: student._id,
+        name: student.name,
+        placementStatus: student.placementStatus,
+        companyPlaced: student.companyPlaced,
+        packageOffered: student.packageOffered
+      }
+    });
+  } catch (error) {
+    console.error('updatePlacementStatus error:', error);
+    res.status(500).json({ success: false, message: 'Server error updating placement status' });
   }
 };
 
@@ -650,6 +828,12 @@ exports.uploadStudentsCSV = async (req, res) => {
         const existing = memoryDb.findStudentByEmail(cleanEmail, req.collegeId) ||
           memoryDb.findStudentByRollNo(cleanRoll, req.collegeId);
 
+        if (!s.branch || !(s.batch || s.passingYear)) {
+          results.failed++;
+          results.errors.push(`${s.email} / ${s.rollNo}: Branch and Graduation Year (Batch) are required.`);
+          continue;
+        }
+
         if (existing) {
           results.failed++;
           results.errors.push(`${s.email} / ${s.rollNo}: Student already exists`);
@@ -716,6 +900,12 @@ exports.uploadStudentsCSV = async (req, res) => {
             { rollNo: s.rollNo, collegeId: req.collegeId }
           ]
         });
+
+        if (!s.branch || !(s.batch || s.passingYear)) {
+          results.failed++;
+          results.errors.push(`${s.email} / ${s.rollNo}: Branch and Graduation Year (Batch) are required.`);
+          continue;
+        }
 
         if (existing) {
           results.failed++;
@@ -793,16 +983,21 @@ exports.uploadStudentsCSV = async (req, res) => {
 exports.exportStudentsCSV = async (req, res) => {
   try {
     const { branch, batch, status } = req.query;
-    const query = { collegeId: req.collegeId };
 
-    if (branch && branch !== 'All') query.branch = new RegExp(`^${branch.trim()}$`, 'i');
-    if (batch && batch !== 'All') query.batch = batch.trim();
-    if (status && status !== 'All') query.placementStatus = status.trim().toUpperCase();
+    let students = [];
+    if (!memoryDb.isMongoConnected()) {
+      students = memoryDb.getStudents(req.collegeId, { branch, batch, status });
+    } else {
+      const query = { collegeId: req.collegeId };
+      if (branch && branch !== 'All') query.branch = new RegExp(`^${branch.trim()}$`, 'i');
+      if (batch && batch !== 'All') query.batch = batch.trim();
+      if (status && status !== 'All') query.placementStatus = status.trim().toUpperCase();
 
-    const students = await Student.find(query)
-      .select('name rollNo usn email branch batch cgpa placementStatus companyPlaced packageOffered readinessScore skills')
-      .sort({ name: 1 })
-      .lean();
+      students = await Student.find(query)
+        .select('name rollNo usn email branch batch passingYear cgpa placementStatus applicationEligibilityStatus companyPlaced packageOffered readinessScore skills')
+        .sort({ name: 1 })
+        .lean();
+    }
 
     const headers = ['Name', 'Roll No', 'USN', 'Email', 'Branch', 'Batch', 'CGPA', 'Placement Status', 'Company Placed', 'Package Offered (LPA)', 'Readiness Score', 'Skills'];
     const rows = students.map(s => [
@@ -811,7 +1006,7 @@ exports.exportStudentsCSV = async (req, res) => {
       `"${(s.usn || s.rollNo || '').replace(/"/g, '""')}"`,
       `"${(s.email || '').replace(/"/g, '""')}"`,
       `"${(s.branch || '').replace(/"/g, '""')}"`,
-      `"${(s.batch || '').replace(/"/g, '""')}"`,
+      `"${(s.batch || s.passingYear || '').replace(/"/g, '""')}"`,
       s.cgpa !== undefined ? s.cgpa : '',
       `"${(s.placementStatus || 'UNPLACED').replace(/"/g, '""')}"`,
       `"${(s.companyPlaced || '').replace(/"/g, '""')}"`,
@@ -851,9 +1046,9 @@ exports.createStudent = async (req, res) => {
       skills
     } = req.body;
 
-    if (!name || !email || (!rollNo && !usn)) {
+    if (!name || !email || (!rollNo && !usn) || !branch || !(batch || req.body.passingYear)) {
       return res.status(400).json({
-        message: 'Name, email, and roll number (or USN) are required'
+        message: 'Name, email, roll number, branch, and graduation year (batch) are required'
       });
     }
 
@@ -907,7 +1102,8 @@ exports.createStudent = async (req, res) => {
         course: (course || '').trim(),
         branch: (branch || 'Computer Science & Engineering').trim(),
         section: (section || '').trim(),
-        batch: (batch ? String(batch) : '').trim(),
+        batch: (batch ? String(batch) : (req.body.passingYear ? String(req.body.passingYear) : '')).trim(),
+        passingYear: (req.body.passingYear ? String(req.body.passingYear) : (batch ? String(batch) : '')).trim(),
         cgpa: (cgpa !== undefined && cgpa !== '' && cgpa !== null && !isNaN(Number(cgpa))) ? Math.max(0, Math.min(10, parseFloat(cgpa))) : 0,
         skills: Array.isArray(skills) ? skills.map(s => s.trim()).filter(Boolean) : [],
         placementStatus: 'UNPLACED',
@@ -931,6 +1127,7 @@ exports.createStudent = async (req, res) => {
           branch: student.branch,
           section: student.section || '',
           batch: student.batch,
+          passingYear: student.passingYear || student.batch,
           cgpa: student.cgpa,
           placementStatus: student.placementStatus,
           readinessScore: student.readinessScore || 0,
@@ -973,7 +1170,8 @@ exports.createStudent = async (req, res) => {
       course: (course || '').trim(),
       branch: (branch || 'Computer Science & Engineering').trim(),
       section: (section || '').trim(),
-      batch: (batch ? String(batch) : '').trim(),
+      batch: (batch ? String(batch) : (req.body.passingYear ? String(req.body.passingYear) : '')).trim(),
+      passingYear: (req.body.passingYear ? String(req.body.passingYear) : (batch ? String(batch) : '')).trim(),
       cgpa: (cgpa !== undefined && cgpa !== '' && cgpa !== null && !isNaN(Number(cgpa))) ? Math.max(0, Math.min(10, parseFloat(cgpa))) : 0,
       skills: Array.isArray(skills) ? skills.map(s => s.trim()).filter(Boolean) : [],
       placementStatus: 'UNPLACED',

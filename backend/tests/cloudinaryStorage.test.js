@@ -78,6 +78,7 @@ describe('Cloudinary Native Configuration & Secure Upload Pipeline', () => {
     });
 
     it('sanitizes status report without exposing api_secret', async () => {
+      const pingSpy = jest.spyOn(cloudinary.api, 'ping').mockResolvedValue({ status: 'ok' });
       process.env.CLOUDINARY_URL = 'cloudinary://757373323224156:mockSecretKey123@dylls4r88';
       const status = await cloudinaryService.getCloudinaryStatus();
       expect(status.isConfigured).toBe(true);
@@ -86,6 +87,7 @@ describe('Cloudinary Native Configuration & Secure Upload Pipeline', () => {
       expect(status.hasApiSecret).toBe(true);
       expect(status).not.toHaveProperty('apiSecret');
       expect(status).not.toHaveProperty('api_secret');
+      pingSpy.mockRestore();
     });
   });
 

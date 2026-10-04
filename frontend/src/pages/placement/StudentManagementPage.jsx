@@ -35,6 +35,7 @@ export function StudentManagementPage() {
   const [selectedBranch, setSelectedBranch] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [selectedAccountStatus, setSelectedAccountStatus] = useState("All");
+  const [selectedBatch, setSelectedBatch] = useState("All");
 
   // Multi-select state for bulk actions
   const [selectedStudentIds, setSelectedStudentIds] = useState([]);
@@ -49,6 +50,12 @@ export function StudentManagementPage() {
   const [activeStudent, setActiveStudent] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [counselingComingSoon, setCounselingComingSoon] = useState(false);
+  const [placementForm, setPlacementForm] = useState({
+    placementStatus: "UNPLACED",
+    companyPlaced: "",
+    packageOffered: ""
+  });
+  const [savingPlacement, setSavingPlacement] = useState(false);
 
   // Student Account Lifecycle Modals
   const [statusModalOpen, setStatusModalOpen] = useState(false);
@@ -155,6 +162,18 @@ export function StudentManagementPage() {
     return Array.from(branchSet).sort();
   }, [students, academicStructure]);
 
+  // Compute all unique available passing-year batches dynamically
+  const filterBatchList = useMemo(() => {
+    const batchSet = new Set();
+    students.forEach((s) => {
+      const b = s.batch || s.passingYear;
+      if (b && String(b).trim()) {
+        batchSet.add(String(b).trim());
+      }
+    });
+    return Array.from(batchSet).sort();
+  }, [students]);
+
   // Compute filtered students list combining branch and status filters
   const filteredStudents = useMemo(() => {
     return students.filter((st) => {
@@ -209,9 +228,15 @@ export function StudentManagementPage() {
         if ((selAcc === "debarred" || selAcc === "deactivated") && (sAcc !== "debarred" && sAcc !== "deactivated")) return false;
       }
 
+      // Batch / Passing Year filter
+      if (selectedBatch && selectedBatch !== "All") {
+        const sBatch = String(st.batch || st.passingYear || "").trim();
+        if (sBatch !== selectedBatch.trim()) return false;
+      }
+
       return true;
     });
-  }, [students, selectedBranch, selectedStatus, selectedAccountStatus]);
+  }, [students, selectedBranch, selectedStatus, selectedAccountStatus, selectedBatch]);
 
   // Derived academic structure helper lists
   const allBranches = Array.from(
@@ -300,6 +325,14 @@ export function StudentManagementPage() {
 
     if (!newStudent.rollNo.trim()) {
       newErrors.rollNo = "Roll No / USN is required.";
+    }
+
+    if (!newStudent.course?.trim()) {
+      newErrors.course = "Course / Program is required.";
+    }
+
+    if (!newStudent.branch?.trim()) {
+      newErrors.branch = "Branch is required.";
     }
 
     const cgpaVal = parseFloat(newStudent.cgpa);
@@ -428,7 +461,43 @@ export function StudentManagementPage() {
 
   const handleViewStudent = (student) => {
     setActiveStudent(student);
+    setPlacementForm({
+      placementStatus: student.placementStatus || "UNPLACED",
+      companyPlaced: student.companyPlaced || "",
+      packageOffered: student.packageOffered || ""
+    });
     setModalOpen(true);
+  };
+
+  const handleSavePlacementStatus = async (e) => {
+    e.preventDefault();
+    if (!activeStudent) return;
+    const studentId = activeStudent.id || activeStudent._id;
+    setSavingPlacement(true);
+    try {
+      await adminService.updatePlacementStatus(studentId, {
+        placementStatus: placementForm.placementStatus,
+        companyPlaced: placementForm.companyPlaced,
+        packageOffered: placementForm.packageOffered ? parseFloat(placementForm.packageOffered) : null
+      });
+      showSuccess("Placement record updated successfully.");
+      setActiveStudent(prev => ({
+        ...prev,
+        placementStatus: placementForm.placementStatus,
+        companyPlaced: placementForm.companyPlaced,
+        packageOffered: placementForm.packageOffered
+      }));
+      setStudents(prev => prev.map(s => (s.id === studentId || s._id === studentId) ? {
+        ...s,
+        placementStatus: placementForm.placementStatus,
+        companyPlaced: placementForm.companyPlaced,
+        packageOffered: placementForm.packageOffered
+      } : s));
+    } catch (err) {
+      showError(err.message || "Failed to update placement record");
+    } finally {
+      setSavingPlacement(false);
+    }
   };
 
   const handleCopyProfileLink = (username) => {
@@ -650,6 +719,16 @@ export function StudentManagementPage() {
             </p>
           )}
         </div>
+      )
+    },
+    {
+      title: "Batch",
+      key: "batch",
+      sortable: true,
+      render: (row) => (
+        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
+          {row.batch || row.passingYear || "—"}
+        </span>
       )
     },
     {
@@ -1024,13 +1103,25 @@ export function StudentManagementPage() {
               <option value="Debarred">Debarred</option>
             </select>
 
-            {(selectedBranch !== "All" || selectedStatus !== "All" || selectedAccountStatus !== "All") && (
+            <select
+              value={selectedBatch}
+              onChange={(e) => setSelectedBatch(e.target.value)}
+              className="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            >
+              <option value="All">All Batches</option>
+              {filterBatchList.map((b) => (
+                <option key={b} value={b}>Batch {b}</option>
+              ))}
+            </select>
+
+            {(selectedBranch !== "All" || selectedStatus !== "All" || selectedAccountStatus !== "All" || selectedBatch !== "All") && (
               <button
                 type="button"
                 onClick={() => {
                   setSelectedBranch("All");
                   setSelectedStatus("All");
                   setSelectedAccountStatus("All");
+                  setSelectedBatch("All");
                 }}
                 className="px-2 py-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
               >
@@ -1187,6 +1278,76 @@ export function StudentManagementPage() {
                   </p>
                 )}
               </div>
+            </div>
+
+            {/* Placement Status & Campus Offer Management */}
+            <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <GraduationCap className="w-4 h-4 text-indigo-600" />
+                  <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider">Placement Status & Campus Offer</h4>
+                </div>
+                <Badge variant={activeStudent.placementStatus === "PLACED" ? "success" : "neutral"} size="sm">
+                  {activeStudent.placementStatus || "UNPLACED"}
+                </Badge>
+              </div>
+
+              <form onSubmit={handleSavePlacementStatus} className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Placement Status
+                  </label>
+                  <select
+                    value={placementForm.placementStatus}
+                    onChange={(e) => setPlacementForm({ ...placementForm, placementStatus: e.target.value })}
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  >
+                    <option value="UNPLACED">UNPLACED</option>
+                    <option value="PLACED">PLACED</option>
+                    <option value="OFFER_ACCEPTED">OFFER_ACCEPTED</option>
+                    <option value="IN_PROCESS">IN_PROCESS</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Company Placed
+                  </label>
+                  <input
+                    type="text"
+                    value={placementForm.companyPlaced}
+                    onChange={(e) => setPlacementForm({ ...placementForm, companyPlaced: e.target.value })}
+                    placeholder="e.g. Google, Cisco"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="flex-1">
+                    <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                      Package (LPA)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={placementForm.packageOffered}
+                      onChange={(e) => setPlacementForm({ ...placementForm, packageOffered: e.target.value })}
+                      placeholder="e.g. 14.5"
+                      className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    size="sm"
+                    loading={savingPlacement}
+                    disabled={savingPlacement}
+                    className="mb-0.5"
+                  >
+                    Save
+                  </Button>
+                </div>
+              </form>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-100">
@@ -1470,16 +1631,59 @@ export function StudentManagementPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                  Department / Branch
+                  Department / Course
                 </label>
                 <input
                   type="text"
                   disabled={savingStudent}
-                  placeholder="e.g. Computer Science & Engineering"
-                  value={newStudent.branch}
-                  onChange={(e) => setNewStudent({ ...newStudent, branch: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  placeholder="e.g. B.Tech, M.Tech, BCA"
+                  value={newStudent.course}
+                  onChange={(e) => {
+                    setNewStudent({ ...newStudent, course: e.target.value });
+                    if (addStudentErrors.course || addStudentErrors.general) {
+                      setAddStudentErrors((prev) => ({ ...prev, course: "", general: "" }));
+                    }
+                  }}
+                  className={`w-full px-3 py-2 rounded-xl border text-xs font-medium focus:outline-none focus:ring-2 ${
+                    addStudentErrors.course
+                      ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                      : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                  }`}
                 />
+                {addStudentErrors.course && (
+                  <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    {addStudentErrors.course}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                  Branch
+                </label>
+                <input
+                  type="text"
+                  disabled={savingStudent}
+                  placeholder="e.g. Computer Science"
+                  value={newStudent.branch}
+                  onChange={(e) => {
+                    setNewStudent({ ...newStudent, branch: e.target.value });
+                    if (addStudentErrors.branch || addStudentErrors.general) {
+                      setAddStudentErrors((prev) => ({ ...prev, branch: "", general: "" }));
+                    }
+                  }}
+                  className={`w-full px-3 py-2 rounded-xl border text-xs font-medium focus:outline-none focus:ring-2 ${
+                    addStudentErrors.branch
+                      ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                      : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                  }`}
+                />
+                {addStudentErrors.branch && (
+                  <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    {addStudentErrors.branch}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">

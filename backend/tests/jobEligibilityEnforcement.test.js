@@ -76,7 +76,7 @@ describe('Job Eligibility Enforcement & Admin Applied Students Verification', ()
       const job = { minCgpa: 7.0, allowedBranches: [] };
       const reasons = checkJobEligibility(student, job);
       expect(reasons).toHaveLength(1);
-      expect(reasons[0]).toBe('Minimum CGPA required: 7. Your CGPA: 6.9');
+      expect(reasons[0]).toBe('Minimum CGPA required is 7. Your CGPA is 6.9.');
     });
 
     test('3. Ineligible branch returns failure reason with allowed branches', () => {
@@ -92,7 +92,7 @@ describe('Job Eligibility Enforcement & Admin Applied Students Verification', ()
       const job = { minCgpa: 7.5, allowedBranches: ['CSE', 'IT'] };
       const reasons = checkJobEligibility(student, job);
       expect(reasons).toHaveLength(2);
-      expect(reasons).toContain('Minimum CGPA required: 7.5. Your CGPA: 6.9');
+      expect(reasons).toContain('Minimum CGPA required is 7.5. Your CGPA is 6.9.');
       expect(reasons).toContain('Allowed branches: CSE, IT');
     });
   });
@@ -182,7 +182,7 @@ describe('Job Eligibility Enforcement & Admin Applied Students Verification', ()
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.body.success).toBe(false);
-      expect(res.body.reasons).toEqual(['Minimum CGPA required: 7.5. Your CGPA: 6.8']);
+      expect(res.body.reasons).toEqual(['Minimum CGPA required is 7.5. Your CGPA is 6.8.']);
       expect(saveSpy).not.toHaveBeenCalled();
     });
 

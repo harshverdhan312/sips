@@ -5,12 +5,37 @@ import { api } from './api';
  */
 export const authService = {
   /**
-   * Log in with institutional email or Roll No / USN and password
+   * General login with institutional email or Roll No / USN and password
    */
   async login(identifier, password) {
     const data = await api.post('/api/auth/login', {
       email: identifier,
       identifier: identifier,
+      password
+    });
+    return data;
+  },
+
+  /**
+   * Student-only login
+   */
+  async studentLogin(identifier, password) {
+    const data = await api.post('/api/auth/student-login', {
+      identifier: identifier.trim(),
+      email: identifier.trim(),
+      password
+    });
+    return data;
+  },
+
+  /**
+   * University Admin and Department Admin login
+   */
+  async institutionLogin(identifier, password) {
+    const data = await api.post('/api/auth/institution-login', {
+      identifier: identifier.trim(),
+      username: identifier.trim(),
+      email: identifier.trim(),
       password
     });
     return data;

@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 
 const studentSchema = new mongoose.Schema({
   collegeId: { type: mongoose.Schema.Types.ObjectId, ref: 'College', required: true },
+  institutionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Institution', default: null, index: true },
+  departmentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Department', default: null, index: true },
   name: { type: String, required: true, trim: true },
   rollNo: { type: String, required: true, trim: true },
   usn: { type: String, trim: true },
@@ -12,11 +14,17 @@ const studentSchema = new mongoose.Schema({
   branch: { type: String, trim: true, default: 'Computer Science & Engineering' },
   section: { type: String, trim: true, default: '' },
   batch: { type: String, trim: true, default: '' },
+  passingYear: { type: String, trim: true, default: '' },
   cgpa: { type: Number, default: 0, min: 0, max: 10 },
   placementStatus: {
     type: String,
     enum: ['UNPLACED', 'PLACED', 'IN_PROCESS', 'OPTED_OUT'],
     default: 'UNPLACED'
+  },
+  applicationEligibilityStatus: {
+    type: String,
+    enum: ['ELIGIBLE', 'DEBARRED'],
+    default: 'ELIGIBLE'
   },
   accountStatus: {
     type: String,
@@ -177,6 +185,11 @@ studentSchema.methods.comparePassword = async function(password) {
 studentSchema.pre('save', function(next) {
   if (!this.usn) {
     this.usn = this.rollNo;
+  }
+  if (this.passingYear && !this.batch) {
+    this.batch = this.passingYear;
+  } else if (this.batch && !this.passingYear) {
+    this.passingYear = this.batch;
   }
   // Auto-calculate readiness score if not manually set but component scores exist
   if (!this.readinessScore && (this.technicalScore || this.softSkillScore || this.resumeScore)) {

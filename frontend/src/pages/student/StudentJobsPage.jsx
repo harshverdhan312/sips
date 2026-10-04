@@ -298,13 +298,21 @@ export function StudentJobsPage() {
                           {job.company}
                         </h3>
                         <p className="text-xs font-semibold text-indigo-600">{job.role}</p>
-                        <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
+                        <div className="flex items-center gap-2 mt-1 text-xs text-slate-500 flex-wrap">
                           <span className="flex items-center gap-1">
                             <MapPin className="w-3.5 h-3.5 text-slate-400" />
                             {job.location}
                           </span>
                           <span>•</span>
                           <span className="font-medium text-slate-600">{job.type}</span>
+                          {(job.targetBatch || job.batch) && (
+                            <>
+                              <span>•</span>
+                              <span className="font-semibold text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded text-[11px] border border-indigo-200">
+                                Batch {job.targetBatch || job.batch}
+                              </span>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>

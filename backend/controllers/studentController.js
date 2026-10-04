@@ -359,7 +359,10 @@ exports.updateProfile = async (req, res) => {
       if (sanitizedHostel !== undefined) updates.hostel = sanitizedHostel;
       if (sanitizedHistoryOfBacklogs !== undefined) updates.historyOfBacklogs = sanitizedHistoryOfBacklogs;
       if (sanitizedCgpa !== undefined) updates.cgpa = sanitizedCgpa;
-      if (sanitizedBatch !== undefined) updates.batch = sanitizedBatch;
+      if (sanitizedBatch !== undefined) {
+        updates.batch = sanitizedBatch;
+        updates.passingYear = sanitizedBatch;
+      }
       if (sanitizedBranch !== undefined) updates.branch = sanitizedBranch;
       if (pwd) {
         const salt = await bcrypt.genSalt(10);
@@ -418,6 +421,7 @@ exports.updateProfile = async (req, res) => {
     }
     if (sanitizedBatch !== undefined) {
       student.batch = sanitizedBatch;
+      student.passingYear = sanitizedBatch;
     }
     if (sanitizedBranch !== undefined) {
       student.branch = sanitizedBranch;
@@ -526,7 +530,7 @@ exports.uploadResume = async (req, res) => {
     // ----------------------------------------------------
     // Resilient In-Memory Mode
     // ----------------------------------------------------
-    if (!memoryDb.isMongoConnected()) {
+    if (!memoryDb.isMongoConnected() && !Student.findOne?.mock) {
       const student = memoryDb.findStudentById(req.user.id);
       if (!student) {
         safeDeleteUploadFile(req.file.filename);
@@ -1118,8 +1122,17 @@ exports.deleteProfileImage = async (req, res) => {
 exports.getJobs = async (req, res) => {
   try {
     if (!memoryDb.isMongoConnected()) {
-      const jds = memoryDb.getJobs(req.collegeId);
+      let jds = memoryDb.getJobs(req.collegeId);
       const student = memoryDb.findStudentById(req.user.id);
+      if (student) {
+        const studentBatch = String(student.batch || student.passingYear || '').trim();
+        if (studentBatch) {
+          jds = jds.filter(jd => {
+            const jBatch = String(jd.targetBatch || jd.batch || '').trim();
+            return !jBatch || jBatch === studentBatch;
+          });
+        }
+      }
       const studentApps = memoryDb.getStudentApplications(req.collegeId, req.user.id);
       const appMap = {};
       studentApps.forEach(a => { appMap[String(a.jobId)] = a; });
@@ -1142,13 +1155,32 @@ exports.getJobs = async (req, res) => {
       return res.json(jobsWithScores);
     }
 
-    const jds = await JobDescription.find({ collegeId: req.collegeId })
-      .sort({ createdAt: -1 });
-
     const student = await Student.findOne({ 
       _id: req.user.id, 
       collegeId: req.collegeId 
     });
+
+    const query = { collegeId: req.collegeId };
+    if (student) {
+      const studentBatch = String(student.batch || student.passingYear || '').trim();
+      if (studentBatch) {
+        const batchNum = parseInt(studentBatch, 10);
+        query.$and = query.$and || [];
+        query.$and.push({
+          $or: [
+            { targetBatch: studentBatch },
+            { batch: studentBatch },
+            ...(isNaN(batchNum) ? [] : [{ targetBatch: batchNum }, { batch: batchNum }]),
+            { targetBatch: { $exists: false } },
+            { targetBatch: null },
+            { targetBatch: '' }
+          ]
+        });
+      }
+    }
+
+    const jds = await JobDescription.find(query)
+      .sort({ createdAt: -1 });
 
     // Get matches for this student
     const matches = student ? await Match.find({ 
@@ -1196,8 +1228,17 @@ exports.getJobs = async (req, res) => {
 exports.getPreferredJobs = async (req, res) => {
   try {
     if (!memoryDb.isMongoConnected()) {
-      const jds = memoryDb.getJobs(req.collegeId);
+      let jds = memoryDb.getJobs(req.collegeId);
       const student = memoryDb.findStudentById(req.user.id);
+      if (student) {
+        const studentBatch = String(student.batch || student.passingYear || '').trim();
+        if (studentBatch) {
+          jds = jds.filter(jd => {
+            const jBatch = String(jd.targetBatch || jd.batch || '').trim();
+            return !jBatch || jBatch === studentBatch;
+          });
+        }
+      }
       const studentApps = memoryDb.getStudentApplications(req.collegeId, req.user.id);
       const appMap = {};
       studentApps.forEach(a => { appMap[String(a.jobId)] = a; });
@@ -1229,6 +1270,8 @@ exports.getPreferredJobs = async (req, res) => {
       return res.json([]);
     }
 
+    const studentBatch = String(student.batch || student.passingYear || '').trim();
+
     const matches = await Match.find({ 
       studentId: student._id, 
       collegeId: req.collegeId,
@@ -1245,7 +1288,15 @@ exports.getPreferredJobs = async (req, res) => {
     applications.forEach(a => { appMap[a.jobId.toString()] = a; });
 
     const preferredJobs = matches
-      .filter(m => m.jdId)
+      .filter(m => {
+        if (!m.jdId) return false;
+        if (studentBatch) {
+          const jdObj = m.jdId.toObject ? m.jdId.toObject() : m.jdId;
+          const jBatch = String(jdObj.targetBatch || jdObj.batch || '').trim();
+          if (jBatch && jBatch !== studentBatch) return false;
+        }
+        return true;
+      })
       .map(m => {
         const jdObj = m.jdId.toObject ? m.jdId.toObject() : m.jdId;
         const app = appMap[jdObj._id.toString()];
@@ -1303,17 +1354,32 @@ exports.applyToJob = async (req, res) => {
         return res.status(404).json({ success: false, message: 'Student profile not found' });
       }
 
-      const accountStatus = (student.accountStatus || 'ACTIVE').toUpperCase();
-      if (accountStatus === 'DEBARRED') {
+      const isDebarred = student.applicationEligibilityStatus === 'DEBARRED' ||
+        student.isDebarred === true ||
+        (student.accountStatus && String(student.accountStatus).toUpperCase() === 'DEBARRED');
+      if (isDebarred) {
         return res.status(403).json({
           success: false,
           message: 'You have been debarred from applying to placement drives. Please contact your Placement Cell.'
         });
       }
+
+      const accountStatus = (student.accountStatus || 'ACTIVE').toUpperCase();
       if (accountStatus === 'PASSOUT' || accountStatus === 'DEACTIVATED') {
         return res.status(403).json({
           success: false,
           message: 'You are not permitted to apply for placement drives.'
+        });
+      }
+
+      // Enforce batch restriction
+      const jobBatch = String(job.targetBatch || job.batch || '').trim();
+      const studentBatch = String(student.batch || student.passingYear || '').trim();
+      if (jobBatch && studentBatch && jobBatch !== studentBatch) {
+        return res.status(400).json({
+          success: false,
+          message: `This placement drive is available only to the ${jobBatch} batch.`,
+          reasons: [`This placement drive is available only to the ${jobBatch} batch.`]
         });
       }
 
@@ -1390,17 +1456,32 @@ exports.applyToJob = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Student profile not found' });
     }
 
-    const mongoAccountStatus = (student.accountStatus || 'ACTIVE').toUpperCase();
-    if (mongoAccountStatus === 'DEBARRED') {
+    const isDebarred = student.applicationEligibilityStatus === 'DEBARRED' ||
+      student.isDebarred === true ||
+      (student.accountStatus && String(student.accountStatus).toUpperCase() === 'DEBARRED');
+    if (isDebarred) {
       return res.status(403).json({
         success: false,
         message: 'You have been debarred from applying to placement drives. Please contact your Placement Cell.'
       });
     }
+
+    const mongoAccountStatus = (student.accountStatus || 'ACTIVE').toUpperCase();
     if (mongoAccountStatus === 'PASSOUT' || mongoAccountStatus === 'DEACTIVATED') {
       return res.status(403).json({
         success: false,
         message: 'You are not permitted to apply for placement drives.'
+      });
+    }
+
+    // Enforce batch restriction
+    const jobBatch = String(job.targetBatch || job.batch || '').trim();
+    const studentBatch = String(student.batch || student.passingYear || '').trim();
+    if (jobBatch && studentBatch && jobBatch !== studentBatch) {
+      return res.status(400).json({
+        success: false,
+        message: `This placement drive is available only to the ${jobBatch} batch.`,
+        reasons: [`This placement drive is available only to the ${jobBatch} batch.`]
       });
     }
 

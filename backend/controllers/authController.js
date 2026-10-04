@@ -1,8 +1,16 @@
 const College = require('../models/College');
 const Student = require('../models/Student');
+const Institution = require('../models/Institution');
+const Department = require('../models/Department');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const memoryDb = require('../utils/memoryDb');
+
+const isModelQueryable = (model) => {
+  return require('mongoose').connection.readyState === 1 ||
+    typeof model?.findOne?.mockImplementation === 'function' ||
+    typeof model?.findOne?.mockResolvedValue === 'function';
+};
 
 const config = require('../config');
 
@@ -34,6 +42,12 @@ const checkStudentAccountStatus = (student) => {
  * Domain-based authentication for both admin and student
  */
 exports.login = async (req, res) => {
+  if (req.body.loginType === 'student') {
+    return exports.studentLogin(req, res);
+  }
+  if (req.body.loginType === 'institution' || req.body.loginType === 'university' || req.body.loginType === 'department') {
+    return exports.institutionLogin(req, res);
+  }
   try {
     const { email, identifier, password, collegeSlug } = req.body;
     const loginId = (email || identifier || '').toLowerCase().trim();
@@ -54,6 +68,66 @@ exports.login = async (req, res) => {
     // Resilient In-Memory Mode (when MongoDB is offline)
     // ----------------------------------------------------
     if (!memoryDb.isMongoConnected()) {
+      // 1. Check Department Admin by username (In-Memory)
+      const memDept = memoryDb.findDepartmentByUsername(loginId);
+      if (memDept) {
+        if (memDept.status === 'INACTIVE') {
+          return res.status(403).json({ message: 'Department account is inactive. Please contact your University Administrator.' });
+        }
+        const isMatch = await bcrypt.compare(password, memDept.passwordHash);
+        if (!isMatch) {
+          return res.status(401).json({ message: 'Invalid credentials' });
+        }
+        const parentInst = memoryDb.findInstitutionById(memDept.institutionId);
+        const token = generateToken({
+          id: memDept._id,
+          role: 'DEPARTMENT_ADMIN',
+          institutionId: memDept.institutionId,
+          institutionName: parentInst ? parentInst.name : 'University',
+          departmentId: memDept._id,
+          departmentName: memDept.name,
+          departmentCode: memDept.code,
+          collegeId: memDept._id,
+          username: memDept.username
+        });
+        return res.json({
+          token,
+          role: 'DEPARTMENT_ADMIN',
+          departmentId: memDept._id,
+          departmentName: memDept.name,
+          collegeName: memDept.name,
+          collegeSlug: memDept.username,
+          institutionId: memDept.institutionId,
+          institutionName: parentInst ? parentInst.name : 'University',
+          userId: memDept._id,
+          username: memDept.username
+        });
+      }
+
+      // 2. Check Main University Admin (In-Memory)
+      const memInst = memoryDb.findInstitutionByMainAdminUsername(loginId) || memoryDb.findInstitutionByEmail(loginId);
+      if (memInst) {
+        const isMatch = await bcrypt.compare(password, memInst.mainAdmin.passwordHash);
+        if (!isMatch) {
+          return res.status(401).json({ message: 'Invalid credentials' });
+        }
+        const token = generateToken({
+          id: memInst._id,
+          role: 'MAIN_UNIVERSITY_ADMIN',
+          institutionId: memInst._id,
+          institutionName: memInst.name,
+          username: memInst.mainAdmin.username,
+          email: memInst.officialEmail
+        });
+        return res.json({
+          token,
+          role: 'MAIN_UNIVERSITY_ADMIN',
+          institutionId: memInst._id,
+          institutionName: memInst.name,
+          userId: memInst._id,
+          username: memInst.mainAdmin.username
+        });
+      }
       if (loginId.includes('@')) {
         if (!emailRegex.test(loginId)) {
           return res.status(400).json({ message: 'Invalid email format' });
@@ -164,6 +238,82 @@ exports.login = async (req, res) => {
         collegeName: studentCollege ? studentCollege.name : 'College',
         userId: student._id,
         studentName: student.name
+      });
+    }
+
+    // Check Department Admin (MongoDB)
+    const dept = isModelQueryable(Department)
+      ? await Department.findOne({
+          $or: [{ username: loginId }, { contactEmail: loginId }]
+        })
+      : null;
+    if (dept) {
+      if (dept.status === 'INACTIVE') {
+        return res.status(403).json({ message: 'Department account is inactive. Please contact your University Administrator.' });
+      }
+      const isMatch = await bcrypt.compare(password, dept.passwordHash);
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+      const institution = await Institution.findById(dept.institutionId);
+      const token = generateToken({
+        id: dept._id,
+        role: 'DEPARTMENT_ADMIN',
+        institutionId: dept.institutionId,
+        institutionName: institution ? institution.name : 'University',
+        departmentId: dept._id,
+        departmentName: dept.name,
+        departmentCode: dept.code,
+        collegeId: dept._id,
+        username: dept.username
+      });
+      return res.json({
+        token,
+        role: 'DEPARTMENT_ADMIN',
+        departmentId: dept._id,
+        departmentName: dept.name,
+        collegeName: dept.name,
+        collegeSlug: dept.username,
+        institutionId: dept.institutionId,
+        institutionName: institution ? institution.name : 'University',
+        userId: dept._id,
+        username: dept.username
+      });
+    }
+
+    // Check Main University Admin (MongoDB)
+    const inst = isModelQueryable(Institution)
+      ? await Institution.findOne({
+          $or: [
+            { 'mainAdmin.username': loginId },
+            { 'mainAdmin.email': loginId },
+            { officialEmail: loginId }
+          ]
+        })
+      : null;
+    if (inst) {
+      if (inst.status === 'INACTIVE') {
+        return res.status(403).json({ message: 'Institution account is inactive.' });
+      }
+      const isMatch = await bcrypt.compare(password, inst.mainAdmin.passwordHash);
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+      const token = generateToken({
+        id: inst._id,
+        role: 'MAIN_UNIVERSITY_ADMIN',
+        institutionId: inst._id,
+        institutionName: inst.name,
+        username: inst.mainAdmin.username,
+        email: inst.officialEmail
+      });
+      return res.json({
+        token,
+        role: 'MAIN_UNIVERSITY_ADMIN',
+        institutionId: inst._id,
+        institutionName: inst.name,
+        userId: inst._id,
+        username: inst.mainAdmin.username
       });
     }
 
@@ -316,5 +466,427 @@ exports.register = async (req, res) => {
 };
 
 exports.registerStudent = exports.register;
+
+/**
+ * POST /api/auth/student-login
+ * Dedicated student authentication portal.
+ * Explicitly rejects University and Department administrator credentials.
+ */
+exports.studentLogin = async (req, res) => {
+  try {
+    const { email, identifier, password, collegeSlug } = req.body;
+    const loginId = (email || identifier || '').toLowerCase().trim();
+
+    if (!loginId && !password) {
+      return res.status(400).json({ message: 'Email/ID and password are required' });
+    }
+    if (!loginId) {
+      return res.status(400).json({ message: 'Please enter your email or ID.' });
+    }
+    if (!password) {
+      return res.status(400).json({ message: 'Please enter your password.' });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // Check if credentials belong to University Admin or Department Admin -> reject
+    if (!memoryDb.isMongoConnected()) {
+      const isDept = memoryDb.findDepartmentByUsername(loginId);
+      const isInst = memoryDb.findInstitutionByMainAdminUsername(loginId) || memoryDb.findInstitutionByEmail(loginId);
+      if (isDept || isInst) {
+        return res.status(401).json({
+          message: 'University and Department administrators must sign in through the University / Department Sign In portal.'
+        });
+      }
+    } else {
+      const isDept = isModelQueryable(Department)
+        ? await Department.findOne({ $or: [{ username: loginId }, { contactEmail: loginId }] })
+        : null;
+      const isInst = isModelQueryable(Institution)
+        ? await Institution.findOne({
+            $or: [
+              { 'mainAdmin.username': loginId },
+              { 'mainAdmin.email': loginId },
+              { officialEmail: loginId }
+            ]
+          })
+        : null;
+      if (isDept || isInst) {
+        return res.status(401).json({
+          message: 'University and Department administrators must sign in through the University / Department Sign In portal.'
+        });
+      }
+    }
+
+    // Resilient In-Memory Mode
+    if (!memoryDb.isMongoConnected()) {
+      if (loginId.includes('@')) {
+        if (!emailRegex.test(loginId)) {
+          return res.status(400).json({ message: 'Invalid email format' });
+        }
+        const parts = loginId.split('@');
+        const domain = parts[1];
+        let college = memoryDb.findCollegeByDomain(domain) || (collegeSlug ? memoryDb.findCollegeBySlug(collegeSlug) : null);
+        if (!college) {
+          college = memoryDb.findCollegeByAdminEmail(loginId);
+        }
+
+        if (!college) {
+          return res.status(401).json({ message: 'This email domain is not registered with any college.' });
+        }
+
+        const student = memoryDb.findStudentByEmail(loginId, college._id);
+        if (!student) {
+          return res.status(401).json({ message: 'Student account not found in your institution. Please contact your Placement Cell.' });
+        }
+
+        const isMatch = await bcrypt.compare(password, student.passwordHash);
+        if (!isMatch) {
+          return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        const statusCheck = checkStudentAccountStatus(student);
+        if (!statusCheck.allowed) {
+          return res.status(statusCheck.status).json({ message: statusCheck.message });
+        }
+
+        const token = generateToken({
+          id: student._id,
+          role: 'STUDENT',
+          collegeId: college._id,
+          collegeSlug: college.slug
+        });
+
+        return res.json({
+          token,
+          role: 'STUDENT',
+          collegeSlug: college.slug,
+          collegeName: college.name,
+          userId: student._id,
+          studentName: student.name
+        });
+      }
+
+      // Roll No / USN login
+      const college = collegeSlug ? memoryDb.findCollegeBySlug(collegeSlug) : null;
+      const student = memoryDb.findStudentByRollNo(loginId, college ? college._id : null);
+      if (!student) {
+        return res.status(401).json({ message: 'No student found with this Roll Number or USN. Please contact your Placement Cell.' });
+      }
+
+      const isMatch = await bcrypt.compare(password, student.passwordHash);
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+
+      const statusCheck = checkStudentAccountStatus(student);
+      if (!statusCheck.allowed) {
+        return res.status(statusCheck.status).json({ message: statusCheck.message });
+      }
+
+      const studentCollege = memoryDb.findCollegeById(student.collegeId) || college;
+      const token = generateToken({
+        id: student._id,
+        role: 'STUDENT',
+        collegeId: student.collegeId,
+        collegeSlug: studentCollege ? studentCollege.slug : ''
+      });
+
+      return res.json({
+        token,
+        role: 'STUDENT',
+        collegeSlug: studentCollege ? studentCollege.slug : '',
+        collegeName: studentCollege ? studentCollege.name : 'College',
+        userId: student._id,
+        studentName: student.name
+      });
+    }
+
+    // MongoDB Mode
+    if (loginId.includes('@')) {
+      if (!emailRegex.test(loginId)) {
+        return res.status(400).json({ message: 'Invalid email format' });
+      }
+      const parts = loginId.split('@');
+      const domain = parts[1];
+
+      let college = await College.findOne({ acceptedDomains: domain });
+      if (!college) {
+        college = await College.findOne({ adminEmail: loginId });
+      }
+      if (!college) {
+        return res.status(401).json({ message: 'This email domain is not registered with any college.' });
+      }
+
+      const student = await Student.findOne({ email: loginId, collegeId: college._id });
+      if (!student) {
+        return res.status(401).json({ message: 'Student account not found in your institution. Please contact your Placement Cell.' });
+      }
+
+      const isMatch = await student.comparePassword(password);
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+
+      const statusCheck = checkStudentAccountStatus(student);
+      if (!statusCheck.allowed) {
+        return res.status(statusCheck.status).json({ message: statusCheck.message });
+      }
+
+      const token = generateToken({
+        id: student._id,
+        role: 'STUDENT',
+        collegeId: college._id,
+        collegeSlug: college.slug
+      });
+
+      return res.json({
+        token,
+        role: 'STUDENT',
+        collegeSlug: college.slug,
+        collegeName: college.name,
+        userId: student._id,
+        studentName: student.name
+      });
+    }
+
+    // Roll No / USN in MongoDB
+    const studentQuery = {
+      $or: [
+        { rollNo: new RegExp(`^${loginId}$`, 'i') },
+        { usn: new RegExp(`^${loginId}$`, 'i') }
+      ]
+    };
+    if (collegeSlug) {
+      const col = await College.findOne({ slug: collegeSlug.toLowerCase().trim() });
+      if (col) studentQuery.collegeId = col._id;
+    }
+
+    const student = await Student.findOne(studentQuery);
+    if (!student) {
+      return res.status(401).json({ message: 'No student found with this Roll Number or USN. Please contact your Placement Cell.' });
+    }
+
+    const isMatch = await student.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    const statusCheck = checkStudentAccountStatus(student);
+    if (!statusCheck.allowed) {
+      return res.status(statusCheck.status).json({ message: statusCheck.message });
+    }
+
+    const college = await College.findById(student.collegeId);
+    const token = generateToken({
+      id: student._id,
+      role: 'STUDENT',
+      collegeId: student.collegeId,
+      collegeSlug: college ? college.slug : ''
+    });
+
+    return res.json({
+      token,
+      role: 'STUDENT',
+      collegeSlug: college ? college.slug : '',
+      collegeName: college ? college.name : 'College',
+      userId: student._id,
+      studentName: student.name
+    });
+  } catch (error) {
+    console.error('Student login error:', error);
+    res.status(500).json({ message: 'Something went wrong on the server. Please try again later.' });
+  }
+};
+
+/**
+ * POST /api/auth/institution-login
+ * Dedicated University & Department Administrator authentication portal.
+ * Explicitly rejects Student credentials.
+ */
+exports.institutionLogin = async (req, res) => {
+  try {
+    const { username, identifier, email, password } = req.body;
+    const loginId = (username || identifier || email || '').toLowerCase().trim();
+
+    if (!loginId && !password) {
+      return res.status(400).json({ message: 'Username and password are required' });
+    }
+    if (!loginId) {
+      return res.status(400).json({ message: 'Please enter your username.' });
+    }
+    if (!password) {
+      return res.status(400).json({ message: 'Please enter your password.' });
+    }
+
+    // 1. In-Memory Mode
+    if (!memoryDb.isMongoConnected()) {
+      // Check Department Admin
+      const memDept = memoryDb.findDepartmentByUsername(loginId);
+      if (memDept) {
+        if (memDept.status === 'INACTIVE') {
+          return res.status(403).json({ message: 'Department account is inactive. Please contact your University Administrator.' });
+        }
+        const isMatch = await bcrypt.compare(password, memDept.passwordHash);
+        if (!isMatch) {
+          return res.status(401).json({ message: 'Invalid credentials' });
+        }
+        const parentInst = memoryDb.findInstitutionById(memDept.institutionId);
+        const token = generateToken({
+          id: memDept._id,
+          role: 'DEPARTMENT_ADMIN',
+          institutionId: memDept.institutionId,
+          institutionName: parentInst ? parentInst.name : 'University',
+          departmentId: memDept._id,
+          departmentName: memDept.name,
+          departmentCode: memDept.code,
+          collegeId: memDept._id,
+          username: memDept.username
+        });
+        return res.json({
+          token,
+          role: 'DEPARTMENT_ADMIN',
+          departmentId: memDept._id,
+          departmentName: memDept.name,
+          collegeName: memDept.name,
+          collegeSlug: memDept.username,
+          institutionId: memDept.institutionId,
+          institutionName: parentInst ? parentInst.name : 'University',
+          userId: memDept._id,
+          username: memDept.username
+        });
+      }
+
+      // Check Main University Admin
+      const memInst = memoryDb.findInstitutionByMainAdminUsername(loginId) || memoryDb.findInstitutionByEmail(loginId);
+      if (memInst) {
+        const isMatch = await bcrypt.compare(password, memInst.mainAdmin.passwordHash);
+        if (!isMatch) {
+          return res.status(401).json({ message: 'Invalid credentials' });
+        }
+        const token = generateToken({
+          id: memInst._id,
+          role: 'MAIN_UNIVERSITY_ADMIN',
+          institutionId: memInst._id,
+          institutionName: memInst.name,
+          username: memInst.mainAdmin.username,
+          email: memInst.officialEmail
+        });
+        return res.json({
+          token,
+          role: 'MAIN_UNIVERSITY_ADMIN',
+          institutionId: memInst._id,
+          institutionName: memInst.name,
+          userId: memInst._id,
+          username: memInst.mainAdmin.username
+        });
+      }
+
+      // Check if user attempted with a student email or roll number
+      const isStudent = memoryDb.findStudentByEmail(loginId) || memoryDb.findStudentByRollNo(loginId);
+      if (isStudent) {
+        return res.status(401).json({
+          message: 'Student candidates must sign in through the Student Sign In portal.'
+        });
+      }
+
+      return res.status(401).json({ message: 'Invalid credentials. Please verify your username and password.' });
+    }
+
+    // 2. MongoDB Mode
+    // Check Department Admin
+    const dept = isModelQueryable(Department)
+      ? await Department.findOne({
+          $or: [{ username: loginId }, { contactEmail: loginId }]
+        })
+      : null;
+    if (dept) {
+      if (dept.status === 'INACTIVE') {
+        return res.status(403).json({ message: 'Department account is inactive. Please contact your University Administrator.' });
+      }
+      const isMatch = await bcrypt.compare(password, dept.passwordHash);
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+      const institution = await Institution.findById(dept.institutionId);
+      const token = generateToken({
+        id: dept._id,
+        role: 'DEPARTMENT_ADMIN',
+        institutionId: dept.institutionId,
+        institutionName: institution ? institution.name : 'University',
+        departmentId: dept._id,
+        departmentName: dept.name,
+        departmentCode: dept.code,
+        collegeId: dept._id,
+        username: dept.username
+      });
+      return res.json({
+        token,
+        role: 'DEPARTMENT_ADMIN',
+        departmentId: dept._id,
+        departmentName: dept.name,
+        collegeName: dept.name,
+        collegeSlug: dept.username,
+        institutionId: dept.institutionId,
+        institutionName: institution ? institution.name : 'University',
+        userId: dept._id,
+        username: dept.username
+      });
+    }
+
+    // Check Main University Admin
+    const inst = isModelQueryable(Institution)
+      ? await Institution.findOne({
+          $or: [
+            { 'mainAdmin.username': loginId },
+            { 'mainAdmin.email': loginId },
+            { officialEmail: loginId }
+          ]
+        })
+      : null;
+    if (inst) {
+      if (inst.status === 'INACTIVE') {
+        return res.status(403).json({ message: 'Institution account is inactive.' });
+      }
+      const isMatch = await bcrypt.compare(password, inst.mainAdmin.passwordHash);
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+      const token = generateToken({
+        id: inst._id,
+        role: 'MAIN_UNIVERSITY_ADMIN',
+        institutionId: inst._id,
+        institutionName: inst.name,
+        username: inst.mainAdmin.username,
+        email: inst.officialEmail
+      });
+      return res.json({
+        token,
+        role: 'MAIN_UNIVERSITY_ADMIN',
+        institutionId: inst._id,
+        institutionName: inst.name,
+        userId: inst._id,
+        username: inst.mainAdmin.username
+      });
+    }
+
+    // Check if matches student account
+    const student = isModelQueryable(Student)
+      ? await Student.findOne({
+          $or: [{ email: loginId }, { rollNo: loginId }, { usn: loginId }]
+        })
+      : null;
+    if (student) {
+      return res.status(401).json({
+        message: 'Student candidates must sign in through the Student Sign In portal.'
+      });
+    }
+
+    return res.status(401).json({ message: 'Invalid credentials. Please verify your username and password.' });
+  } catch (error) {
+    console.error('Institution login error:', error);
+    res.status(500).json({ message: 'Something went wrong on the server. Please try again later.' });
+  }
+};
 
 
