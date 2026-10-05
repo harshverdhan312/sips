@@ -135,7 +135,15 @@ export function LoginPage({ initialRegisterMode = false }) {
     try {
       const result = await studentLogin(trimmedId, studentPassword);
       showSuccess(`Login successful. Welcome back, ${result.user?.name || "Student"}!`);
-      navigate("/student/dashboard");
+      if (result.role === "super_admin" || result.user?.isSuperAdmin) {
+        navigate("/super-admin/dashboard");
+      } else if (result.role === "university_admin") {
+        navigate("/institution/dashboard");
+      } else if (result.role === "placement") {
+        navigate("/placement/dashboard");
+      } else {
+        navigate("/student/dashboard");
+      }
     } catch (err) {
       const msg = err.message || "Invalid credentials. Please verify your ID/Email and password.";
       setStudentErrors({ general: msg });
@@ -173,7 +181,10 @@ export function LoginPage({ initialRegisterMode = false }) {
       const result = await institutionLogin(trimmedUser, deptPassword);
       showSuccess(`Login successful. Welcome back, ${result.user?.name || trimmedUser}!`);
 
-      if (result.role === "university_admin" || result.user?.backendRole === "MAIN_UNIVERSITY_ADMIN" || result.user?.backendRole === "UNIVERSITY_ADMIN") {
+      if (result.role === "super_admin" || result.user?.isSuperAdmin || result.user?.backendRole === "SUPERADMIN" || result.user?.backendRole === "SUPER_ADMIN") {
+        // Super Admin logged in -> Master Super Admin Console
+        navigate("/super-admin/dashboard");
+      } else if (result.role === "university_admin" || result.user?.backendRole === "MAIN_UNIVERSITY_ADMIN" || result.user?.backendRole === "UNIVERSITY_ADMIN") {
         // Main University Admin logged in -> University Admin Dashboard
         navigate("/institution/dashboard");
       } else {
