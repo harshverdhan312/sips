@@ -11,21 +11,14 @@ class ApiConfig {
   static const String onboardingKey = 'sips_has_seen_onboarding';
   static const String serverUrlKey = 'sips_custom_server_url';
 
+  static const String productionBaseUrl = 'https://sips-mb97.onrender.com';
   static const String _envBaseUrl = String.fromEnvironment('API_BASE_URL');
 
   static String get defaultBaseUrl {
     if (_envBaseUrl.isNotEmpty) {
       return _envBaseUrl;
     }
-    if (kIsWeb) {
-      return 'http://127.0.0.1:5000';
-    }
-    try {
-      if (Platform.isAndroid) {
-        return 'http://10.0.2.2:5000';
-      }
-    } catch (_) {}
-    return 'http://127.0.0.1:5000';
+    return productionBaseUrl;
   }
 
   static String baseUrl = defaultBaseUrl;
@@ -34,10 +27,13 @@ class ApiConfig {
     try {
       final prefs = await SharedPreferences.getInstance();
       final custom = prefs.getString(serverUrlKey);
-      if (custom != null && custom.trim().isNotEmpty) {
+      if (custom != null && custom.trim().isNotEmpty && !custom.contains('10.0.2.2')) {
         baseUrl = custom.trim();
       } else {
         baseUrl = defaultBaseUrl;
+        if (custom != null && custom.contains('10.0.2.2')) {
+          await prefs.remove(serverUrlKey);
+        }
       }
     } catch (_) {}
   }
@@ -58,21 +54,14 @@ class ApiConfig {
 }
 
 class PracticeApiConfig {
+  static const String productionPracticeUrl = 'https://sips-mb97.onrender.com';
   static const String _envPracticeUrl = String.fromEnvironment('PRACTICE_API_BASE_URL');
 
   static String get defaultBaseUrl {
     if (_envPracticeUrl.isNotEmpty) {
       return _envPracticeUrl;
     }
-    if (kIsWeb) {
-      return 'http://127.0.0.1:5050';
-    }
-    try {
-      if (Platform.isAndroid) {
-        return 'http://10.0.2.2:5050';
-      }
-    } catch (_) {}
-    return 'http://127.0.0.1:5050';
+    return productionPracticeUrl;
   }
 
   static String baseUrl = defaultBaseUrl;
