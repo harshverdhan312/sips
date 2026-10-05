@@ -16,7 +16,9 @@ import {
   Mail,
   Phone,
   Info,
-  X
+  X,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { useNotifications } from "../../context/NotificationContext";
 import { institutionService } from "../../services/institutionService";
@@ -46,6 +48,7 @@ export function DepartmentsPage() {
     contactPhone: ""
   });
   const [createErrors, setCreateErrors] = useState({});
+  const [showCreatePassword, setShowCreatePassword] = useState(false);
 
   // Edit Modal State
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -59,6 +62,7 @@ export function DepartmentsPage() {
     contactPhone: "",
     newPassword: ""
   });
+  const [showEditPassword, setShowEditPassword] = useState(false);
 
   // Delete Modal State
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -511,18 +515,29 @@ export function DepartmentsPage() {
             <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
               Initial Password * (For department sign-in)
             </label>
-            <input
-              type="password"
-              required
-              value={createForm.password}
-              onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
-              placeholder="••••••••"
-              className={`w-full px-3 py-2 rounded-xl border text-xs font-medium focus:outline-none focus:ring-2 ${
-                createErrors.password
-                  ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
-                  : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
-              }`}
-            />
+            <div className="relative">
+              <input
+                type={showCreatePassword ? "text" : "password"}
+                required
+                value={createForm.password}
+                onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
+                placeholder="••••••••"
+                className={`w-full pl-3 pr-9 py-2 rounded-xl border text-xs font-medium focus:outline-none focus:ring-2 ${
+                  createErrors.password
+                    ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
+                    : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowCreatePassword(!showCreatePassword)}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                tabIndex={-1}
+                aria-label={showCreatePassword ? "Hide password" : "Show password"}
+              >
+                {showCreatePassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+              </button>
+            </div>
             {createErrors.password && <p className="text-[11px] text-rose-600 mt-1">{createErrors.password}</p>}
           </div>
 
@@ -818,13 +833,24 @@ export function DepartmentsPage() {
             <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
               Reset Password (leave blank to keep current password)
             </label>
-            <input
-              type="password"
-              value={editForm.newPassword}
-              onChange={(e) => setEditForm({ ...editForm, newPassword: e.target.value })}
-              placeholder="••••••••"
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
-            />
+            <div className="relative">
+              <input
+                type={showEditPassword ? "text" : "password"}
+                value={editForm.newPassword}
+                onChange={(e) => setEditForm({ ...editForm, newPassword: e.target.value })}
+                placeholder="••••••••"
+                className="w-full pl-3 pr-9 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+              />
+              <button
+                type="button"
+                onClick={() => setShowEditPassword(!showEditPassword)}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                tabIndex={-1}
+                aria-label={showEditPassword ? "Hide password" : "Show password"}
+              >
+                {showEditPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+              </button>
+            </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">

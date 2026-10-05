@@ -4,6 +4,7 @@ import {
   Download,
   Upload,
   Eye,
+  EyeOff,
   UserPlus,
   KeyRound,
   FileSpreadsheet,
@@ -85,6 +86,7 @@ export function StudentManagementPage() {
     cgpa: "",
     password: ""
   });
+  const [showNewStudentPassword, setShowNewStudentPassword] = useState(false);
 
   // Bulk CSV Import Modal State
   const [importModalOpen, setImportModalOpen] = useState(false);
@@ -1705,14 +1707,25 @@ export function StudentManagementPage() {
             <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
               Initial Password (Optional - Defaults to Roll No)
             </label>
-            <input
-              type="password"
-              disabled={savingStudent}
-              value={newStudent.password}
-              onChange={(e) => setNewStudent({ ...newStudent, password: e.target.value })}
-              placeholder="Leave blank to use Roll No as password"
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-            />
+            <div className="relative">
+              <input
+                type={showNewStudentPassword ? "text" : "password"}
+                disabled={savingStudent}
+                value={newStudent.password}
+                onChange={(e) => setNewStudent({ ...newStudent, password: e.target.value })}
+                placeholder="Leave blank to use Roll No as password"
+                className="w-full pl-3.5 pr-10 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewStudentPassword(!showNewStudentPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                tabIndex={-1}
+                aria-label={showNewStudentPassword ? "Hide password" : "Show password"}
+              >
+                {showNewStudentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">

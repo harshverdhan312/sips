@@ -159,7 +159,7 @@ export function SkillGapPage() {
               <Button
                 variant="primary"
                 size="sm"
-                onClick={() => navigate(student.resumeUrl ? "/student/profile" : "/student/resume")}
+                onClick={() => navigate("/student/profile")}
               >
                 {student.resumeUrl ? "Manage Skills" : "Upload Resume"}
               </Button>
@@ -185,7 +185,7 @@ export function SkillGapPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => navigate("/student/resume")}
+                onClick={() => navigate("/student/profile")}
               >
                 Upload Resume
               </Button>
