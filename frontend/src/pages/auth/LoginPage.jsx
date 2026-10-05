@@ -153,7 +153,7 @@ export function LoginPage({ initialRegisterMode = false }) {
         navigate("/student/dashboard");
       }
     } catch (err) {
-      const msg = err.message || "Invalid credentials. Please verify your ID/Email and password.";
+      const msg = err.message || "Invalid email or password.";
       setStudentErrors({ general: msg });
       setStudentPassword("");
       showError(msg);
@@ -200,7 +200,7 @@ export function LoginPage({ initialRegisterMode = false }) {
         navigate("/placement/dashboard");
       }
     } catch (err) {
-      const msg = err.message || "Invalid credentials. Please verify your username and password.";
+      const msg = err.message || "Invalid email or password.";
       setDeptErrors({ general: msg });
       setDeptPassword("");
       showError(msg);

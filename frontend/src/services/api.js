@@ -3,7 +3,7 @@
  * Handles JWT token injection, response parsing, and error normalization
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+const API_BASE_URL = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL) || '';
 
 /**
  * Resolves a backend-hosted asset path (e.g. /uploads/profile-123.jpg)
@@ -74,23 +74,41 @@ const sanitizeErrorMessage = (msg, status) => {
   ];
   if (sensitivePatterns.some(pattern => lower.includes(pattern))) {
     if (status >= 500) {
-      return 'An internal error occurred. Please try again later.';
+      return 'Something went wrong. Please try again.';
     }
     return 'Invalid request. Please check your information.';
   }
   return msg;
 };
 
+export const isAuthEndpoint = (endpoint, options = {}) => {
+  if (options.isAuthRequest !== undefined) {
+    return Boolean(options.isAuthRequest);
+  }
+  if (options.auth === false) {
+    return true;
+  }
+  if (!endpoint || typeof endpoint !== 'string') return false;
+  const path = endpoint.toLowerCase();
+  return (
+    path.includes('/auth/') ||
+    path.includes('/login') ||
+    path.includes('/onboard') ||
+    path.includes('/register')
+  );
+};
+
 async function request(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
   const token = getAuthToken();
+  const isAuth = isAuthEndpoint(endpoint, options);
 
   const headers = {
     ...options.headers
   };
 
-  // Attach bearer token if authenticated
-  if (token && !headers['Authorization']) {
+  // Attach bearer token only for authenticated requests, never for login/public auth
+  if (token && !isAuth && !headers['Authorization']) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
@@ -108,15 +126,15 @@ async function request(endpoint, options = {}) {
       headers
     });
   } catch (networkError) {
-    const err = new Error('Unable to connect to the server. Please check your connection and try again.');
+    const err = new Error('Unable to connect to the server. Please try again.');
     err.status = 0;
     err.isNetworkError = true;
     err.originalError = networkError;
     throw err;
   }
 
-  // Handle 401 Unauthorized
-  if (response.status === 401 && !endpoint.includes('/auth/login')) {
+  // Handle 401 Unauthorized: ONLY for authenticated requests, NEVER for login requests
+  if (response.status === 401 && !isAuth) {
     try {
       localStorage.removeItem('sips_token');
       localStorage.removeItem('sips_auth_user');
@@ -126,10 +144,15 @@ async function request(endpoint, options = {}) {
 
     if (typeof window !== 'undefined') {
       const currentPath = window.location.pathname;
-      const isPublicRoute = currentPath === '/' || currentPath === '' || currentPath === '/login';
+      const isPublicRoute =
+        currentPath === '/' ||
+        currentPath === '' ||
+        currentPath === '/login' ||
+        currentPath === '/onboard' ||
+        currentPath === '/register';
 
       // Only redirect if accessing a protected route with an expired/invalid session
-      // Never redirect from the public Landing Page or Login page
+      // Never redirect from public routes
       if (!isPublicRoute && token) {
         window.location.href = '/login';
       }
@@ -158,10 +181,17 @@ async function request(endpoint, options = {}) {
     let safeMsg = sanitizeErrorMessage(rawMsg, response.status);
 
     if (response.status === 401) {
-      if (endpoint.includes('/auth/login')) {
-        safeMsg = safeMsg || 'Invalid credentials. Please check your login details.';
+      if (isAuth) {
+        // Login / auth failure:
+        // Preserve specific portal redirection notice if present;
+        // otherwise return uniform generic error to prevent account enumeration and avoid session-expired warnings
+        if (rawMsg && typeof rawMsg === 'string' && rawMsg.toLowerCase().includes('portal')) {
+          safeMsg = rawMsg;
+        } else {
+          safeMsg = 'Invalid email or password.';
+        }
       } else {
-        safeMsg = 'Your session has expired. Please log in again.';
+        safeMsg = 'Your session has expired. Please sign in again.';
       }
     } else if (response.status === 403) {
       safeMsg = safeMsg || 'You do not have permission to perform this action.';
@@ -172,9 +202,9 @@ async function request(endpoint, options = {}) {
     } else if (response.status === 422) {
       safeMsg = safeMsg || 'Please check the entered information.';
     } else if (response.status >= 502 && response.status <= 504) {
-      safeMsg = safeMsg || 'Server is currently unavailable. Please try again later.';
+      safeMsg = 'Server is currently unavailable. Please try again.';
     } else if (response.status >= 500) {
-      safeMsg = safeMsg || 'Something went wrong on the server. Please try again later.';
+      safeMsg = 'Something went wrong. Please try again.';
     } else if (!safeMsg) {
       safeMsg = 'Request failed. Please try again.';
     }
@@ -215,14 +245,38 @@ export const api = {
         headers
       });
     } catch (networkError) {
-      const err = new Error('Unable to connect to the server. Please check your connection and try again.');
+      const err = new Error('Unable to connect to the server. Please try again.');
       err.status = 0;
       err.isNetworkError = true;
       throw err;
     }
 
+    if (response.status === 401) {
+      try {
+        localStorage.removeItem('sips_token');
+        localStorage.removeItem('sips_auth_user');
+      } catch (e) {
+        // ignore
+      }
+      if (typeof window !== 'undefined') {
+        const currentPath = window.location.pathname;
+        const isPublicRoute =
+          currentPath === '/' ||
+          currentPath === '' ||
+          currentPath === '/login' ||
+          currentPath === '/onboard' ||
+          currentPath === '/register';
+        if (!isPublicRoute && token) {
+          window.location.href = '/login';
+        }
+      }
+      const err = new Error('Your session has expired. Please sign in again.');
+      err.status = 401;
+      throw err;
+    }
+
     if (!response.ok) {
-      let safeMsg = 'Failed to download file.';
+      let safeMsg = response.status >= 500 ? 'Something went wrong. Please try again.' : 'Failed to download file.';
       try {
         const errorData = await response.json();
         safeMsg = errorData.message || safeMsg;
