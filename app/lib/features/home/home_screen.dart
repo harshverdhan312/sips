@@ -196,52 +196,7 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ),
 
-                // Daily MCQ Practice & Streak Launch Card
-                SipsCard(
-                  onTap: () => context.push('/practice'),
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: const Icon(Icons.quiz_rounded, color: AppColors.primary, size: 24),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  'Daily MCQ Practice',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.onSurface,
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                const Text('🔥', style: TextStyle(fontSize: 14)),
-                              ],
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              'Aptitude, Reasoning & Core CS speed tests',
-                              style: GoogleFonts.inter(fontSize: 12, color: AppColors.onSurfaceVariant),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.outline),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 16),
 
                 // AI Mock Interview Launch Card
                 SipsCard(

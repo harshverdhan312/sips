@@ -6,6 +6,7 @@ import 'core/network/api_client.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ApiConfig.init();
+  await PracticeApiConfig.init();
   runApp(
     const ProviderScope(
       child: SipsApp(),
