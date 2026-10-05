@@ -2,7 +2,17 @@ const jwt = require('jsonwebtoken');
 const config = require('../config');
 const AppError = require('../utils/appError');
 
-const ALLOWED_ADMIN_ROLES = ['ADMIN', 'COLLEGE_ADMIN', 'SUPERADMIN', 'SUPER_ADMIN', 'PLACEMENT', 'STAFF'];
+const ALLOWED_ADMIN_ROLES = [
+  'ADMIN',
+  'COLLEGE_ADMIN',
+  'DEPARTMENT_ADMIN',
+  'MAIN_UNIVERSITY_ADMIN',
+  'UNIVERSITY_ADMIN',
+  'SUPERADMIN',
+  'SUPER_ADMIN',
+  'PLACEMENT',
+  'STAFF'
+];
 
 /**
  * Admin Authentication Middleware
@@ -50,7 +60,9 @@ function adminAuth(req, res, next) {
 
         const userId = decoded.id || decoded.userId || decoded.sub;
         const role = (decoded.role || '').toUpperCase();
-        const collegeId = decoded.collegeId || null;
+        const collegeId = decoded.collegeId || decoded.institutionId || decoded.departmentId || null;
+        const departmentId = decoded.departmentId || null;
+        const institutionId = decoded.institutionId || null;
         const collegeSlug = decoded.collegeSlug || '';
 
         if (!userId || typeof userId !== 'string' || !userId.trim()) {
@@ -72,6 +84,8 @@ function adminAuth(req, res, next) {
         req.user = {
           id: userId.trim(),
           collegeId: collegeId ? collegeId.trim() : null,
+          departmentId: departmentId ? departmentId.trim() : null,
+          institutionId: institutionId ? institutionId.trim() : null,
           role,
           collegeSlug: collegeSlug.trim()
         };
@@ -99,6 +113,7 @@ function adminAuth(req, res, next) {
       const devUserId = parts[0];
       const devRole = (parts[1] || req.headers['x-user-role'] || 'ADMIN').toUpperCase();
       const devCollegeId = parts[2] || req.headers['x-college-id'] || null;
+      const devDeptId = req.headers['x-department-id'] || null;
 
       if (!ALLOWED_ADMIN_ROLES.includes(devRole)) {
         return next(
@@ -111,6 +126,8 @@ function adminAuth(req, res, next) {
       req.user = {
         id: devUserId.trim(),
         collegeId: devCollegeId ? devCollegeId.trim() : null,
+        departmentId: devDeptId ? devDeptId.trim() : null,
+        institutionId: null,
         role: devRole,
         collegeSlug: ''
       };
@@ -124,11 +141,14 @@ function adminAuth(req, res, next) {
     const adminId = req.headers['x-admin-id'] || req.headers['x-user-id'];
     const role = (req.headers['x-user-role'] || (req.headers['x-admin-id'] ? 'ADMIN' : '')).toUpperCase();
     const collegeId = req.headers['x-college-id'] || null;
+    const departmentId = req.headers['x-department-id'] || null;
 
     if (adminId && ALLOWED_ADMIN_ROLES.includes(role)) {
       req.user = {
         id: adminId.trim(),
         collegeId: collegeId ? collegeId.trim() : null,
+        departmentId: departmentId ? departmentId.trim() : null,
+        institutionId: null,
         role,
         collegeSlug: ''
       };

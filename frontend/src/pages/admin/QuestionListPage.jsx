@@ -99,7 +99,7 @@ const SAMPLE_CODING_JSON = [
 export function QuestionListPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const basePath = location.pathname.startsWith("/placement") ? "/placement" : "/admin";
+  const basePath = location.pathname.startsWith("/placement") ? "/placement" : location.pathname.startsWith("/institution") ? "/institution" : "/admin";
   const { addToast } = useNotifications();
 
   // Filter States
@@ -593,7 +593,7 @@ export function QuestionListPage() {
                     {/* Question Title */}
                     <td className="px-5 py-4 align-middle max-w-md">
                       <div
-                        onClick={() => navigate(`/admin/questions/${q.id}`)}
+                        onClick={() => navigate(`${basePath}/questions/${q.id}`)}
                         className="font-semibold text-slate-900 hover:text-indigo-600 transition-colors cursor-pointer truncate"
                         title={q.title}
                       >

@@ -12,7 +12,8 @@ function checkCollegeAccess(question, user) {
   const isSuper = ALLOWED_SUPER_ROLES.includes((user.role || '').toUpperCase()) && !user.collegeId;
   if (isSuper) return; // Superadmin has universal access
 
-  if (question.collegeId && user.collegeId && question.collegeId !== user.collegeId) {
+  const userScopes = [user.collegeId, user.departmentId, user.institutionId].filter(Boolean);
+  if (question.collegeId && userScopes.length > 0 && !userScopes.includes(question.collegeId)) {
     throw new AppError('Access denied: You cannot manage questions belonging to another institution.', 403, {
       code: 'FORBIDDEN_COLLEGE_ACCESS'
     });

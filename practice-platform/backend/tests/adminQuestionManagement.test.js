@@ -369,5 +369,61 @@ describe('Phase 7E — Admin Question Management Test Suite', () => {
       expect(res.status).toBe(200);
       expect(res.body.data.status).toBe('ARCHIVED');
     });
+
+    test('Department Admin can access question bank and create assessments', async () => {
+      const deptAdminToken = jwt.sign(
+        {
+          id: 'dept-admin-cs',
+          role: 'DEPARTMENT_ADMIN',
+          departmentId: 'dept_cs_01',
+          institutionId: 'inst_rvce_01',
+          collegeId: 'dept_cs_01'
+        },
+        config.jwtSecret,
+        { algorithm: 'HS256' }
+      );
+
+      // 1. Get Questions
+      const qRes = await request(app)
+        .get('/api/admin/questions')
+        .set('Authorization', `Bearer ${deptAdminToken}`);
+
+      expect(qRes.status).toBe(200);
+      expect(qRes.body.success).toBe(true);
+
+      // 2. Create Assessment
+      const aRes = await request(app)
+        .post('/api/admin/assessments')
+        .set('Authorization', `Bearer ${deptAdminToken}`)
+        .send({
+          title: 'CS Dept Technical MCQ Assessment',
+          type: 'PRACTICE_SET',
+          durationMinutes: 45
+        });
+
+      expect(aRes.status).toBe(201);
+      expect(aRes.body.data.title).toBe('CS Dept Technical MCQ Assessment');
+      expect(aRes.body.data.collegeId).toBe('dept_cs_01');
+    });
+
+    test('Main University Admin can access question bank and list assessments', async () => {
+      const uniAdminToken = jwt.sign(
+        {
+          id: 'uni-admin-root',
+          role: 'MAIN_UNIVERSITY_ADMIN',
+          institutionId: 'inst_rvce_01',
+          collegeId: 'inst_rvce_01'
+        },
+        config.jwtSecret,
+        { algorithm: 'HS256' }
+      );
+
+      const res = await request(app)
+        .get('/api/admin/assessments')
+        .set('Authorization', `Bearer ${uniAdminToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+    });
   });
 });

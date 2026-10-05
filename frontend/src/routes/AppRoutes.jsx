@@ -90,6 +90,11 @@ export function AppRoutes() {
       <Route element={<ProtectedRoute allowedRoles={["university_admin", "admin"]} />}>
         <Route element={<DashboardLayout />}>
           <Route path="/institution/dashboard" element={<InstitutionDashboard />} />
+          <Route path="/institution/assessments" element={<AssessmentListPage />} />
+          <Route path="/institution/assessments/:assessmentId" element={<AssessmentBuilderPage />} />
+          <Route path="/institution/assessments/:assessmentId/results" element={<AssessmentResultsPage />} />
+          <Route path="/institution/questions" element={<QuestionListPage />} />
+          <Route path="/institution/questions/:questionId" element={<QuestionDetailsPage />} />
           <Route path="/institution/profile" element={<CollegeProfilePage />} />
           <Route path="/institution/departments" element={<DepartmentsPage />} />
           <Route path="/university_admin/dashboard" element={<InstitutionDashboard />} />

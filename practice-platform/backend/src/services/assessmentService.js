@@ -13,7 +13,8 @@ function checkAssessmentCollegeAccess(assessment, user) {
   const isSuper = ALLOWED_SUPER_ROLES.includes((user.role || '').toUpperCase()) && !user.collegeId;
   if (isSuper) return; // Superadmin has universal access
 
-  if (assessment.collegeId && user.collegeId && assessment.collegeId !== user.collegeId) {
+  const userScopes = [user.collegeId, user.departmentId, user.institutionId].filter(Boolean);
+  if (assessment.collegeId && userScopes.length > 0 && !userScopes.includes(assessment.collegeId)) {
     throw new AppError('Access denied: You cannot manage assessments belonging to another institution.', 403, {
       code: 'FORBIDDEN_COLLEGE_ACCESS'
     });

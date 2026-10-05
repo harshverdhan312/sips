@@ -33,7 +33,7 @@ export function QuestionDetailsPage() {
   const { questionId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const basePath = location.pathname.startsWith("/placement") ? "/placement" : "/admin";
+  const basePath = location.pathname.startsWith("/placement") ? "/placement" : location.pathname.startsWith("/institution") ? "/institution" : "/admin";
   const { addToast } = useNotifications();
 
   const [question, setQuestion] = useState(null);
@@ -135,7 +135,7 @@ export function QuestionDetailsPage() {
         <AlertCircle className="w-12 h-12 text-rose-500 mx-auto" />
         <h2 className="text-lg font-bold text-slate-900">Question Not Found</h2>
         <p className="text-sm text-slate-500">{error || "The requested question does not exist."}</p>
-        <Button variant="outline" size="sm" onClick={() => navigate("/admin/questions")}>
+        <Button variant="outline" size="sm" onClick={() => navigate(`${basePath}/questions`)}>
           Back to Question Bank
         </Button>
       </div>
