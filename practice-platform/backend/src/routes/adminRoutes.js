@@ -11,6 +11,7 @@ router.use(adminAuth);
 router.post('/questions/bulk-import', adminQuestionController.bulkImport);
 
 // Question Management
+router.post('/questions', adminQuestionController.createQuestion);
 router.get('/questions', adminQuestionController.getQuestions);
 router.get('/questions/:questionId', adminQuestionController.getQuestionById);
 router.get('/questions/:questionId/versions/:versionId', adminQuestionController.getQuestionVersion);

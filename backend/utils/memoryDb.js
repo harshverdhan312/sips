@@ -159,7 +159,12 @@ class MemoryDatabase {
         email: (data.mainAdmin?.email || '').toLowerCase().trim(),
         passwordHash: data.mainAdmin?.passwordHash || ''
       },
-      status: data.status || 'ACTIVE',
+      status: data.status || 'PENDING_APPROVAL',
+      approvalStatus: data.approvalStatus || (data.status === 'ACTIVE' ? 'APPROVED' : 'PENDING'),
+      approvalRemarks: data.approvalRemarks || '',
+      approvedAt: data.approvedAt || (data.status === 'ACTIVE' ? new Date() : null),
+      approvedBy: data.approvedBy || null,
+      needsPasswordReset: data.needsPasswordReset !== undefined ? data.needsPasswordReset : true,
       createdAt: new Date(),
       updatedAt: new Date()
     };

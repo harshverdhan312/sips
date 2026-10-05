@@ -13,7 +13,10 @@ import {
   Phone,
   CheckCircle2,
   RefreshCw,
-  ExternalLink
+  ExternalLink,
+  Key,
+  Lock,
+  AlertTriangle
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/NotificationContext";
@@ -21,6 +24,7 @@ import { institutionService } from "../../services/institutionService";
 import { Card, CardHeader } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
+import { PasswordChangeModal } from "../../components/common/PasswordChangeModal";
 
 export function InstitutionDashboard() {
   const { user } = useAuth();
@@ -30,6 +34,7 @@ export function InstitutionDashboard() {
   const [departments, setDepartments] = useState([]);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(Boolean(user?.needsPasswordReset));
 
   const loadData = async () => {
     try {
@@ -57,6 +62,32 @@ export function InstitutionDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Temporary Password Security Banner */}
+      {user?.needsPasswordReset && (
+        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-300 text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fadeIn">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-amber-700 shrink-0">
+              <Lock className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-amber-900">Account Security: Temporary Password in Use</p>
+              <p className="text-[11px] text-amber-800">
+                You are currently signed in with a temporary generated password. Please establish a permanent password.
+              </p>
+            </div>
+          </div>
+          <Button
+            variant="primary"
+            size="xs"
+            icon={Key}
+            onClick={() => setIsPasswordModalOpen(true)}
+            className="bg-amber-600 hover:bg-amber-700 text-white shrink-0"
+          >
+            Set Permanent Password
+          </Button>
+        </div>
+      )}
+
       {/* Header Banner */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-8 shadow-xl">
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -74,7 +105,15 @@ export function InstitutionDashboard() {
           </div>
 
           <div className="flex items-center gap-3">
-
+            <Button
+              variant="outline"
+              size="sm"
+              icon={Key}
+              onClick={() => setIsPasswordModalOpen(true)}
+              className="border-slate-700 text-slate-200 hover:bg-slate-800"
+            >
+              Change Password
+            </Button>
             <Button
               variant="primary"
               size="sm"
@@ -86,6 +125,12 @@ export function InstitutionDashboard() {
           </div>
         </div>
       </div>
+
+      <PasswordChangeModal
+        isOpen={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
+        isForceChange={Boolean(user?.needsPasswordReset)}
+      />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

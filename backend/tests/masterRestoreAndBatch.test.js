@@ -85,10 +85,20 @@ describe('SIPS Master Restore & Additive Batch Enhancement Test Suite', () => {
       expect(onboardRes.statusCode).toBe(201);
       expect(onboardRes.body.institution).toBeDefined();
       expect(onboardRes.body.institution.name).toBe('ABC University');
-      expect(onboardRes.body.token).toBeDefined();
+      expect(onboardRes.body.pendingApproval).toBe(true);
 
-      institutionId = onboardRes.body.institution.id;
-      univAdminToken = onboardRes.body.token;
+      institutionId = onboardRes.body.institution.id || onboardRes.body.institutionId;
+
+      // Super Admin approves the onboarding request
+      const superAdminController = require('../controllers/superAdminController');
+      const approveReq = createMockReq({
+        params: { id: institutionId },
+        body: { tempPassword: 'Password123!' },
+        user: { role: 'SUPERADMIN', username: 'superadmin' }
+      });
+      const approveRes = createMockRes();
+      await superAdminController.approveCollege(approveReq, approveRes);
+      expect(approveRes.statusCode).toBe(200);
 
       // University Admin login via institutionLogin
       const loginReq = createMockReq({
@@ -100,6 +110,9 @@ describe('SIPS Master Restore & Additive Batch Enhancement Test Suite', () => {
       expect(loginRes.statusCode).toBe(200);
       expect(loginRes.body.role).toBe('MAIN_UNIVERSITY_ADMIN');
       expect(loginRes.body.institutionId).toBe(institutionId);
+      expect(loginRes.body.token).toBeDefined();
+
+      univAdminToken = loginRes.body.token;
     });
 
     test('3. University Admin creates multiple Departments (BBA, BCA, MBA) with credentials', async () => {

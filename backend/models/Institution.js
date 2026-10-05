@@ -36,9 +36,18 @@ const institutionSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['ACTIVE', 'INACTIVE'],
-    default: 'ACTIVE'
+    enum: ['PENDING_APPROVAL', 'ACTIVE', 'INACTIVE', 'REJECTED'],
+    default: 'PENDING_APPROVAL'
   },
+  approvalStatus: {
+    type: String,
+    enum: ['PENDING', 'APPROVED', 'REJECTED'],
+    default: 'PENDING'
+  },
+  approvalRemarks: { type: String, default: '' },
+  approvedAt: { type: Date, default: null },
+  approvedBy: { type: String, default: null },
+  needsPasswordReset: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

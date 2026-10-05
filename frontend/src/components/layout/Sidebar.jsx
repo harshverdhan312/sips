@@ -79,8 +79,17 @@ export function Sidebar({ isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen
     { to: "/institution/profile", label: "College Profile", icon: Building2 }
   ];
 
+  const superAdminLinks = [
+    { to: "/super-admin/dashboard", label: "Overview", icon: LayoutDashboard },
+    { to: "/super-admin/approvals", label: "College Approvals", icon: Building2, badge: "Review" },
+    { to: "/super-admin/institutions", label: "Institutions Directory", icon: Users },
+    { to: "/super-admin/questions", label: "Global Question Bank", icon: BookOpen, badge: "Global" }
+  ];
+
   const links =
-    role === "university_admin"
+    role === "super_admin"
+      ? superAdminLinks
+      : role === "university_admin"
       ? universityAdminLinks
       : role === "placement"
       ? placementLinks

@@ -43,7 +43,19 @@ export function AuthProvider({ children }) {
     let mappedRole = "student";
     let userData = {};
 
-    if (data.role === "MAIN_UNIVERSITY_ADMIN") {
+    if (data.role === "SUPERADMIN" || data.role === "SUPER_ADMIN" || data.isSuperAdmin) {
+      mappedRole = "super_admin";
+      userData = {
+        id: data.userId || "super_admin_root",
+        name: data.name || "System Super Administrator",
+        email: data.email || (identifier.includes("@") ? identifier : "superadmin@sips.edu"),
+        username: data.username || "superadmin",
+        role: "super_admin",
+        backendRole: data.role || "SUPERADMIN",
+        isSuperAdmin: true,
+        status: "Active"
+      };
+    } else if (data.role === "MAIN_UNIVERSITY_ADMIN") {
       mappedRole = "university_admin";
       userData = {
         id: data.userId,
@@ -54,6 +66,7 @@ export function AuthProvider({ children }) {
         backendRole: data.role,
         institutionId: data.institutionId,
         institutionName: data.institutionName,
+        needsPasswordReset: Boolean(data.needsPasswordReset),
         status: "Active"
       };
     } else if (data.role === "DEPARTMENT_ADMIN" || data.role === "COLLEGE_ADMIN") {
@@ -124,10 +137,22 @@ export function AuthProvider({ children }) {
   };
 
   /**
+   * Change password for logged-in user
+   */
+  const changePassword = async (currentPassword, newPassword) => {
+    const res = await authService.changePassword(currentPassword, newPassword);
+    updateUser({ needsPasswordReset: false });
+    return res;
+  };
+
+  /**
    * Onboard a new University Root
    */
   const onboardUniversity = async (institutionData) => {
     const data = await institutionService.onboard(institutionData);
+    if (data?.pendingApproval || data?.status === 'PENDING_APPROVAL' || !data?.token) {
+      return data;
+    }
     return applyLoginResponse(data, institutionData.adminUsername || institutionData.officialEmail);
   };
 
@@ -192,6 +217,7 @@ export function AuthProvider({ children }) {
         login,
         studentLogin,
         institutionLogin,
+        changePassword,
         onboardUniversity,
         registerCollege,
         updateUser,
