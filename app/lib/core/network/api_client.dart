@@ -9,6 +9,7 @@ import 'api_exception.dart';
 class ApiConfig {
   static const String tokenKey = 'sips_auth_token';
   static const String onboardingKey = 'sips_has_seen_onboarding';
+  static const String serverUrlKey = 'sips_custom_server_url';
 
   static const String _envBaseUrl = String.fromEnvironment('API_BASE_URL');
 
@@ -28,6 +29,32 @@ class ApiConfig {
   }
 
   static String baseUrl = defaultBaseUrl;
+
+  static Future<void> init() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final custom = prefs.getString(serverUrlKey);
+      if (custom != null && custom.trim().isNotEmpty) {
+        baseUrl = custom.trim();
+      } else {
+        baseUrl = defaultBaseUrl;
+      }
+    } catch (_) {}
+  }
+
+  static Future<void> setCustomBaseUrl(String url) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final trimmed = url.trim();
+      if (trimmed.isEmpty) {
+        await prefs.remove(serverUrlKey);
+        baseUrl = defaultBaseUrl;
+      } else {
+        await prefs.setString(serverUrlKey, trimmed);
+        baseUrl = trimmed;
+      }
+    } catch (_) {}
+  }
 }
 
 class PracticeApiConfig {

@@ -241,6 +241,67 @@ class HomeScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
+                const SizedBox(height: 10),
+
+                // AI Mock Interview Launch Card
+                SipsCard(
+                  onTap: () => context.push('/mock-interview'),
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.secondary.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: const Icon(Icons.mic_external_on_rounded, color: AppColors.secondary, size: 24),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  'AI Mock Interview',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.onSurface,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.secondary.withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    'AI',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppColors.secondary,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              'Timed behavioral & technical simulation drill',
+                              style: GoogleFonts.inter(fontSize: 12, color: AppColors.onSurfaceVariant),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.outline),
+                    ],
+                  ),
+                ),
 
                 const SizedBox(height: 20),
 

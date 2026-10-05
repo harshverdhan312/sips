@@ -57,12 +57,17 @@ exports.createNotification = async (req, res) => {
 exports.getNotifications = async (req, res) => {
   try {
     const isStudent = req.user && req.user.role === 'STUDENT';
+    const isSuperAdmin = req.user && (req.user.role === 'SUPERADMIN' || req.user.role === 'SUPER_ADMIN' || req.user.isSuperAdmin);
+
+    if (isSuperAdmin && !req.collegeId) {
+      return res.json([]);
+    }
 
     if (!memoryDb.isMongoConnected()) {
       const notifications = isStudent
         ? memoryDb.getNotifications(req.collegeId, { studentId: req.user.id })
         : memoryDb.getNotifications(req.collegeId);
-      return res.json(notifications);
+      return res.json(notifications || []);
     }
 
     const query = { collegeId: req.collegeId };

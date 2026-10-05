@@ -10,7 +10,6 @@ import '../../features/interview/interview_diagnostic_screen.dart';
 import '../../features/interview/mock_interview_screen.dart';
 import '../../features/opportunities/job_detail_screen.dart';
 import '../../features/opportunities/opportunities_screen.dart';
-import '../../features/peers/peer_matching_screen.dart';
 import '../../features/practice/presentation/practice_history_screen.dart';
 import '../../features/practice/presentation/practice_hub_screen.dart';
 import '../../features/practice/presentation/practice_result_screen.dart';
@@ -116,27 +115,6 @@ class AppRouter {
         path: '/interview-diagnostic',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const InterviewDiagnosticScreen(),
-      ),
-      GoRoute(
-        path: '/peer-matching',
-        parentNavigatorKey: _rootNavigatorKey,
-        redirect: (context, state) => '/home',
-        builder: (context, state) => const PeerMatchingScreen(),
-      ),
-      GoRoute(
-        path: '/resume',
-        parentNavigatorKey: _rootNavigatorKey,
-        redirect: (context, state) => '/home',
-      ),
-      GoRoute(
-        path: '/star',
-        parentNavigatorKey: _rootNavigatorKey,
-        redirect: (context, state) => '/home',
-      ),
-      GoRoute(
-        path: '/recommendations',
-        parentNavigatorKey: _rootNavigatorKey,
-        redirect: (context, state) => '/home',
       ),
       GoRoute(
         path: '/alerts',

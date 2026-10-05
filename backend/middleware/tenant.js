@@ -10,6 +10,14 @@ module.exports = (req, res, next) => {
     return res.status(401).json({ message: 'Authentication required' });
   }
 
+  // Allow SUPERADMIN (global administrator)
+  if (req.user.role === 'SUPERADMIN' || req.user.role === 'SUPER_ADMIN' || req.user.isSuperAdmin === true) {
+    req.institutionId = req.user.institutionId || null;
+    req.departmentId = req.user.departmentId || null;
+    req.collegeId = req.user.collegeId || null;
+    return next();
+  }
+
   // Allow MAIN_UNIVERSITY_ADMIN with institution context
   if (req.user.role === 'MAIN_UNIVERSITY_ADMIN') {
     if (!req.user.institutionId) {

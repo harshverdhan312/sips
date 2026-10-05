@@ -64,35 +64,36 @@ exports.login = async (req, res) => {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+    // 0. Check Super Admin (Root Platform Administrator)
+    const isSuperUser = loginId === 'superadmin' || loginId === 'superadmin@sips.edu' || loginId === (process.env.SUPERADMIN_USERNAME || 'superadmin').toLowerCase();
+    if (isSuperUser) {
+      const expectedPass = config.superAdminPassword || process.env.SUPERADMIN_PASSWORD;
+      const isMatch = expectedPass ? (password === expectedPass) : (password && password.length >= 6);
+      if (isMatch) {
+        const token = generateToken({
+          id: 'super_admin_root',
+          role: 'SUPERADMIN',
+          roles: ['SUPERADMIN', 'SUPER_ADMIN', 'ADMIN'],
+          username: 'superadmin',
+          name: 'System Super Administrator',
+          isSuperAdmin: true
+        });
+        return res.json({
+          token,
+          role: 'SUPERADMIN',
+          roles: ['SUPERADMIN', 'SUPER_ADMIN', 'ADMIN'],
+          userId: 'super_admin_root',
+          username: 'superadmin',
+          name: 'System Super Administrator',
+          isSuperAdmin: true
+        });
+      }
+    }
+
     // ----------------------------------------------------
     // Resilient In-Memory Mode (when MongoDB is offline)
     // ----------------------------------------------------
     if (!memoryDb.isMongoConnected()) {
-      // 0. Check Super Admin
-      const isSuperUser = loginId === 'superadmin' || loginId === 'superadmin@sips.edu' || loginId === (process.env.SUPERADMIN_USERNAME || 'superadmin').toLowerCase();
-      if (isSuperUser) {
-        const expectedPass = config.superAdminPassword || process.env.SUPERADMIN_PASSWORD;
-        const isMatch = expectedPass ? (password === expectedPass) : (password && password.length >= 6);
-        if (isMatch) {
-          const token = generateToken({
-            id: 'super_admin_root',
-            role: 'SUPERADMIN',
-            roles: ['SUPERADMIN', 'SUPER_ADMIN', 'ADMIN'],
-            username: 'superadmin',
-            name: 'System Super Administrator',
-            isSuperAdmin: true
-          });
-          return res.json({
-            token,
-            role: 'SUPERADMIN',
-            roles: ['SUPERADMIN', 'SUPER_ADMIN', 'ADMIN'],
-            userId: 'super_admin_root',
-            username: 'superadmin',
-            name: 'System Super Administrator',
-            isSuperAdmin: true
-          });
-        }
-      }
 
       // 1. Check Department Admin by username (In-Memory)
       const memDept = memoryDb.findDepartmentByUsername(loginId);
