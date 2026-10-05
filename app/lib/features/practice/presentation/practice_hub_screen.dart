@@ -212,25 +212,6 @@ class _PracticeHubScreenState extends ConsumerState<PracticeHubScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.surface,
-        elevation: 0,
-        title: Text(
-          'Practice & Skills Hub',
-          style: GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.onSurface,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.history_rounded, color: AppColors.onSurface),
-            tooltip: 'Practice History',
-            onPressed: () => context.push('/practice/history'),
-          ),
-        ],
-      ),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(practiceProgressProvider);
@@ -241,6 +222,42 @@ class _PracticeHubScreenState extends ConsumerState<PracticeHubScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Screen Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Practice & Skills Hub',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.onSurface,
+                          letterSpacing: -0.4,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'MCQ Drills, Aptitude & Core CS',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12,
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.history_rounded, size: 22),
+                    color: AppColors.onSurface,
+                    tooltip: 'Practice History',
+                    onPressed: () => context.push('/practice/history'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
               // 1. Streak & Progress Hero Card
               progressAsync.when(
                 loading: () => const SipsCard(

@@ -153,37 +153,57 @@ SIPS Super Administration Team
   }
 
   /**
-   * Internal dispatcher for real SMTP email delivery (via nodemailer if available)
+   * Internal dispatcher for real SMTP email delivery (via nodemailer)
    */
   async _dispatchSmtpEmail({ to, subject, text, html }) {
     const smtpUser = process.env.SMTP_USER;
     const smtpPass = process.env.SMTP_PASS;
 
     if (!smtpUser || !smtpPass) {
-      return; // Simulated mode
+      logger.info(`[EmailService] SMTP_USER or SMTP_PASS not set in environment. Running in simulated mode (email logged in sentEmails).`);
+      return { success: false, simulated: true, reason: 'SMTP credentials not configured' };
     }
 
     try {
       let nodemailer;
       try {
         nodemailer = require('nodemailer');
-      } catch (_) {
-        return; // Nodemailer not installed
+      } catch (e) {
+        logger.warn(`[EmailService] nodemailer package is not installed. Please run 'npm install nodemailer'.`);
+        return { success: false, reason: 'nodemailer not installed' };
       }
 
-      const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST || 'smtp.gmail.com',
-        port: parseInt(process.env.SMTP_PORT, 10) || 587,
-        secure: process.env.SMTP_PORT === '465',
-        auth: {
-          user: smtpUser,
-          pass: smtpPass
-        }
-      });
+      const isGmail = (process.env.SMTP_HOST || '').includes('gmail') || (!process.env.SMTP_HOST && smtpUser.includes('@gmail.com'));
+      
+      const transportConfig = isGmail
+        ? {
+            service: 'gmail',
+            auth: {
+              user: smtpUser,
+              pass: smtpPass
+            },
+            tls: {
+              rejectUnauthorized: false
+            }
+          }
+        : {
+            host: process.env.SMTP_HOST || 'smtp.gmail.com',
+            port: parseInt(process.env.SMTP_PORT, 10) || 587,
+            secure: process.env.SMTP_PORT === '465',
+            auth: {
+              user: smtpUser,
+              pass: smtpPass
+            },
+            tls: {
+              rejectUnauthorized: false
+            }
+          };
+
+      const transporter = nodemailer.createTransport(transportConfig);
 
       const fromAddress = process.env.SMTP_FROM || `SIPS Administration <${smtpUser}>`;
 
-      await transporter.sendMail({
+      const info = await transporter.sendMail({
         from: fromAddress,
         to,
         subject,
@@ -191,9 +211,14 @@ SIPS Super Administration Team
         html: html || undefined
       });
 
-      logger.info(`[EmailService] Live SMTP email successfully delivered to ${to}`);
+      logger.info(`[EmailService] Live SMTP email successfully delivered to ${to} (MessageId: ${info?.messageId})`);
+      return { success: true, messageId: info?.messageId };
     } catch (err) {
-      logger.warn(`[EmailService] SMTP delivery failed: ${err.message}`);
+      logger.error(`[EmailService] SMTP delivery failed to ${to}: ${err.message}`, {
+        code: err.code,
+        response: err.response
+      });
+      return { success: false, error: err.message, code: err.code };
     }
   }
 

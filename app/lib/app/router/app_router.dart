@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/alerts/alerts_screen.dart';
 import '../../features/auth/auth_screen.dart';
-import '../../features/growth/daily_growth_screen.dart';
 import '../../features/growth/roadmap_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/interview/interview_diagnostic_screen.dart';
@@ -74,14 +73,20 @@ class AppRouter {
             builder: (context, state) => const OpportunitiesScreen(),
           ),
           GoRoute(
-            path: '/growth',
-            builder: (context, state) => const DailyGrowthScreen(),
+            path: '/practice',
+            builder: (context, state) => const PracticeHubScreen(),
           ),
           GoRoute(
             path: '/profile',
             builder: (context, state) => const ProfileScreen(),
           ),
         ],
+      ),
+
+      // Redirect legacy growth route to practice
+      GoRoute(
+        path: '/growth',
+        redirect: (context, state) => '/practice',
       ),
 
       // Contextual Feature Sub-Routes
@@ -120,11 +125,6 @@ class AppRouter {
         path: '/alerts',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const AlertsScreen(),
-      ),
-      GoRoute(
-        path: '/practice',
-        parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const PracticeHubScreen(),
       ),
       GoRoute(
         path: '/practice/session/:id',

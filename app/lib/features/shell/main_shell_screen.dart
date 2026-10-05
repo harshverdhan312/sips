@@ -20,7 +20,7 @@ class MainShellScreen extends ConsumerWidget {
     if (location.startsWith('/home')) return 0;
     if (location.startsWith('/skills')) return 1;
     if (location.startsWith('/opportunities')) return 2;
-    if (location.startsWith('/growth') || location.startsWith('/roadmap')) return 3;
+    if (location.startsWith('/practice') || location.startsWith('/growth') || location.startsWith('/roadmap')) return 3;
     if (location.startsWith('/profile')) return 4;
     return 0;
   }
@@ -37,7 +37,7 @@ class MainShellScreen extends ConsumerWidget {
         context.go('/opportunities');
         break;
       case 3:
-        context.go('/growth');
+        context.go('/practice');
         break;
       case 4:
         context.go('/profile');
@@ -217,8 +217,8 @@ class MainShellScreen extends ConsumerWidget {
                 _buildNavItem(
                   index: 3,
                   isSelected: selectedIndex == 3,
-                  icon: Icons.trending_up_rounded,
-                  label: 'GROWTH',
+                  icon: Icons.quiz_rounded,
+                  label: 'PRACTICE',
                   onTap: () => _onItemTapped(3, context),
                 ),
                 _buildNavItem(

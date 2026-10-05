@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -54,7 +53,8 @@ class ApiConfig {
 }
 
 class PracticeApiConfig {
-  static const String productionPracticeUrl = 'https://sips-mb97.onrender.com';
+  static const String practiceServerUrlKey = 'sips_custom_practice_server_url';
+  static const String productionPracticeUrl = 'https://sips-practice-service.onrender.com';
   static const String _envPracticeUrl = String.fromEnvironment('PRACTICE_API_BASE_URL');
 
   static String get defaultBaseUrl {
@@ -65,6 +65,35 @@ class PracticeApiConfig {
   }
 
   static String baseUrl = defaultBaseUrl;
+
+  static Future<void> init() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final custom = prefs.getString(practiceServerUrlKey);
+      if (custom != null && custom.trim().isNotEmpty && !custom.contains('10.0.2.2')) {
+        baseUrl = custom.trim();
+      } else {
+        baseUrl = defaultBaseUrl;
+        if (custom != null && custom.contains('10.0.2.2')) {
+          await prefs.remove(practiceServerUrlKey);
+        }
+      }
+    } catch (_) {}
+  }
+
+  static Future<void> setCustomPracticeUrl(String url) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final trimmed = url.trim();
+      if (trimmed.isEmpty) {
+        await prefs.remove(practiceServerUrlKey);
+        baseUrl = defaultBaseUrl;
+      } else {
+        await prefs.setString(practiceServerUrlKey, trimmed);
+        baseUrl = trimmed;
+      }
+    } catch (_) {}
+  }
 }
 
 class ApiClient {
