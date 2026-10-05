@@ -120,7 +120,23 @@ class AppRouter {
       GoRoute(
         path: '/peer-matching',
         parentNavigatorKey: _rootNavigatorKey,
+        redirect: (context, state) => '/home',
         builder: (context, state) => const PeerMatchingScreen(),
+      ),
+      GoRoute(
+        path: '/resume',
+        parentNavigatorKey: _rootNavigatorKey,
+        redirect: (context, state) => '/home',
+      ),
+      GoRoute(
+        path: '/star',
+        parentNavigatorKey: _rootNavigatorKey,
+        redirect: (context, state) => '/home',
+      ),
+      GoRoute(
+        path: '/recommendations',
+        parentNavigatorKey: _rootNavigatorKey,
+        redirect: (context, state) => '/home',
       ),
       GoRoute(
         path: '/alerts',

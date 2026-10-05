@@ -139,21 +139,21 @@ export function AppRoutes() {
           <Route path="/student/assessments/:assessmentId/attempt/:attemptId" element={<StudentAssessmentWorkspacePage />} />
           <Route path="/student/assessments/:assessmentId/result/:attemptId" element={<StudentAssessmentResultPage />} />
           <Route path="/student/assessments/:assessmentId/attempt/:attemptId/result" element={<StudentAssessmentResultPage />} />
-          <Route path="/student/resume" element={<ResumeAnalysisPage />} />
+          <Route path="/student/resume" element={<Navigate to="/student/dashboard" replace />} />
           <Route path="/student/skills" element={<SkillGapPage />} />
           <Route path="/student/skill-analysis" element={<SkillGapPage />} />
           <Route path="/student/readiness" element={<PlacementReadinessPage />} />
           <Route path="/student/placement-readiness" element={<PlacementReadinessPage />} />
           <Route path="/student/interview" element={<MockInterviewPage />} />
           <Route path="/student/mock-interview" element={<MockInterviewPage />} />
-          <Route path="/student/star" element={<StarTrackerPage />} />
-          <Route path="/student/star-tracker" element={<StarTrackerPage />} />
+          <Route path="/student/star" element={<Navigate to="/student/dashboard" replace />} />
+          <Route path="/student/star-tracker" element={<Navigate to="/student/dashboard" replace />} />
           <Route path="/student/tasks" element={<BehavioralTasksPage />} />
           <Route path="/student/behavioral-tasks" element={<BehavioralTasksPage />} />
-          <Route path="/student/peers" element={<PeerMatchingPage />} />
-          <Route path="/student/peer-matching" element={<PeerMatchingPage />} />
+          <Route path="/student/peers" element={<Navigate to="/student/dashboard" replace />} />
+          <Route path="/student/peer-matching" element={<Navigate to="/student/dashboard" replace />} />
           <Route path="/student/jobs" element={<StudentJobsPage />} />
-          <Route path="/student/recommendations" element={<RecommendationsPage />} />
+          <Route path="/student/recommendations" element={<Navigate to="/student/dashboard" replace />} />
           <Route path="/student/profile" element={<StudentProfilePage />} />
         </Route>
       </Route>

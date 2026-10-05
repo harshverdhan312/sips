@@ -37,15 +37,11 @@ export function Sidebar({ isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen
     { to: "/student/dashboard", label: "Overview", icon: LayoutDashboard },
     { to: "/student/practice", label: "Practice", icon: Code2 },
     { to: "/student/assessments", label: "Assessments", icon: BookOpen },
-    { to: "/student/resume", label: "Resume Intelligence", icon: FileText, badge: "ATS" },
     { to: "/student/skills", label: "Skill Gap Analysis", icon: Target },
     { to: "/student/readiness", label: "Placement Readiness", icon: GraduationCap },
     { to: "/student/interview", label: "AI Mock Interview", icon: Mic, badge: "AI" },
-    { to: "/student/star", label: "STAR Tracker", icon: Award },
     { to: "/student/tasks", label: "Daily Behavioral", icon: CheckSquare, badge: "Streak" },
-    { to: "/student/peers", label: "Peer Matching", icon: Users },
     { to: "/student/jobs", label: "Job Opportunities", icon: Briefcase, badge: "Drives" },
-    { to: "/student/recommendations", label: "Recommendations", icon: Sparkles },
     { to: "/student/profile", label: "My Profile", icon: User }
   ];
 

@@ -352,7 +352,7 @@ export function StudentDashboard() {
                 onClick={() => {
                   if (currentStudent.resumeUrl) navigate("/student/profile");
                   else if (fileInputRef.current) fileInputRef.current.click();
-                  else navigate("/student/resume");
+                  else navigate("/student/profile");
                 }}
                 disabled={uploadingResume}
               >

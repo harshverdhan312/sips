@@ -28,13 +28,13 @@ export const notificationService = {
           } else if (msg.includes('skill') || msg.includes('gap') || msg.includes('radar')) {
             link = '/student/skills';
           } else if (msg.includes('resume') || msg.includes('cv') || msg.includes('ats')) {
-            link = '/student/resume';
+            link = '/student/profile';
           } else if (msg.includes('star') || msg.includes('behavior')) {
-            link = '/student/star';
+            link = '/student/tasks';
           } else if (msg.includes('task') || msg.includes('growth')) {
             link = '/student/tasks';
           } else if (msg.includes('peer') || msg.includes('matching')) {
-            link = '/student/peers';
+            link = '/student/dashboard';
           } else if (msg.includes('profile') || msg.includes('account')) {
             link = '/student/profile';
           } else if (msg.includes('readiness') || msg.includes('score')) {

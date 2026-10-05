@@ -19,7 +19,9 @@ import {
   ChevronRight,
   ShieldCheck,
   Phone,
-  MapPin
+  MapPin,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/NotificationContext";
@@ -44,12 +46,14 @@ export function LoginPage({ initialRegisterMode = false }) {
   // Student Sign In states
   const [studentId, setStudentId] = useState("");
   const [studentPassword, setStudentPassword] = useState("");
+  const [showStudentPassword, setShowStudentPassword] = useState(false);
   const [studentRemember, setStudentRemember] = useState(true);
   const [studentErrors, setStudentErrors] = useState({});
 
   // University / Department Sign In states
   const [deptUsername, setDeptUsername] = useState("");
   const [deptPassword, setDeptPassword] = useState("");
+  const [showDeptPassword, setShowDeptPassword] = useState(false);
   const [deptRemember, setDeptRemember] = useState(true);
   const [deptErrors, setDeptErrors] = useState({});
 
@@ -76,6 +80,8 @@ export function LoginPage({ initialRegisterMode = false }) {
     confirmPassword: ""
   });
   const [univErrors, setUnivErrors] = useState({});
+  const [showUnivPassword, setShowUnivPassword] = useState(false);
+  const [showUnivConfirmPassword, setShowUnivConfirmPassword] = useState(false);
 
   // Legacy College Register states (preserved for backward compatibility)
   const [regStep, setRegStep] = useState(1);
@@ -84,6 +90,8 @@ export function LoginPage({ initialRegisterMode = false }) {
   const [regAdminEmail, setRegAdminEmail] = useState("");
   const [regMasterPassword, setRegMasterPassword] = useState("");
   const [regConfirmMasterPassword, setRegConfirmMasterPassword] = useState("");
+  const [showRegPassword, setShowRegPassword] = useState(false);
+  const [showRegConfirmPassword, setShowRegConfirmPassword] = useState(false);
   const [regAcceptedDomains, setRegAcceptedDomains] = useState("");
   const [regErrors, setRegErrors] = useState({});
   const [regCourses, setRegCourses] = useState([
@@ -488,9 +496,9 @@ export function LoginPage({ initialRegisterMode = false }) {
                       Password *
                     </label>
                     <div className="relative">
-                      <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                       <input
-                        type="password"
+                        type={showStudentPassword ? "text" : "password"}
                         required
                         disabled={loading}
                         value={studentPassword}
@@ -501,12 +509,21 @@ export function LoginPage({ initialRegisterMode = false }) {
                           }
                         }}
                         placeholder="••••••••"
-                        className={`w-full pl-9 pr-3.5 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 ${
+                        className={`w-full pl-9 pr-10 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 ${
                           studentErrors.password
                             ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
                             : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
                         } ${loading ? "opacity-60 bg-slate-50 cursor-not-allowed" : ""}`}
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowStudentPassword(!showStudentPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                        tabIndex={-1}
+                        aria-label={showStudentPassword ? "Hide password" : "Show password"}
+                      >
+                        {showStudentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
                     </div>
                     {studentErrors.password && (
                       <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
@@ -607,9 +624,9 @@ export function LoginPage({ initialRegisterMode = false }) {
                       Password *
                     </label>
                     <div className="relative">
-                      <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                       <input
-                        type="password"
+                        type={showDeptPassword ? "text" : "password"}
                         required
                         disabled={loading}
                         value={deptPassword}
@@ -620,12 +637,21 @@ export function LoginPage({ initialRegisterMode = false }) {
                           }
                         }}
                         placeholder="••••••••"
-                        className={`w-full pl-9 pr-3.5 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 ${
+                        className={`w-full pl-9 pr-10 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 ${
                           deptErrors.password
                             ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500"
                             : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-600"
                         } ${loading ? "opacity-60 bg-slate-50 cursor-not-allowed" : ""}`}
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowDeptPassword(!showDeptPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                        tabIndex={-1}
+                        aria-label={showDeptPassword ? "Hide password" : "Show password"}
+                      >
+                        {showDeptPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
                     </div>
                     {deptErrors.password && (
                       <p className="text-[11px] font-medium text-rose-600 mt-1 flex items-center gap-1">
@@ -905,15 +931,26 @@ export function LoginPage({ initialRegisterMode = false }) {
                     <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
                       Password *
                     </label>
-                    <input
-                      type="password"
-                      required
-                      minLength={4}
-                      placeholder="••••••••"
-                      value={univForm.adminPassword}
-                      onChange={(e) => setUnivForm({ ...univForm, adminPassword: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showUnivPassword ? "text" : "password"}
+                        required
+                        minLength={4}
+                        placeholder="••••••••"
+                        value={univForm.adminPassword}
+                        onChange={(e) => setUnivForm({ ...univForm, adminPassword: e.target.value })}
+                        className="w-full pl-3 pr-9 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowUnivPassword(!showUnivPassword)}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                        tabIndex={-1}
+                        aria-label={showUnivPassword ? "Hide password" : "Show password"}
+                      >
+                        {showUnivPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
                     {univErrors.adminPassword && (
                       <p className="text-[11px] font-medium text-rose-600 mt-0.5">{univErrors.adminPassword}</p>
                     )}
@@ -923,15 +960,26 @@ export function LoginPage({ initialRegisterMode = false }) {
                     <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
                       Confirm Password *
                     </label>
-                    <input
-                      type="password"
-                      required
-                      minLength={4}
-                      placeholder="••••••••"
-                      value={univForm.confirmPassword}
-                      onChange={(e) => setUnivForm({ ...univForm, confirmPassword: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showUnivConfirmPassword ? "text" : "password"}
+                        required
+                        minLength={4}
+                        placeholder="••••••••"
+                        value={univForm.confirmPassword}
+                        onChange={(e) => setUnivForm({ ...univForm, confirmPassword: e.target.value })}
+                        className="w-full pl-3 pr-9 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowUnivConfirmPassword(!showUnivConfirmPassword)}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                        tabIndex={-1}
+                        aria-label={showUnivConfirmPassword ? "Hide password" : "Show password"}
+                      >
+                        {showUnivConfirmPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
                     {univErrors.confirmPassword && (
                       <p className="text-[11px] font-medium text-rose-600 mt-0.5">{univErrors.confirmPassword}</p>
                     )}
@@ -1056,25 +1104,47 @@ export function LoginPage({ initialRegisterMode = false }) {
                       <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
                         Password *
                       </label>
-                      <input
-                        type="password"
-                        required
-                        value={regMasterPassword}
-                        onChange={(e) => setRegMasterPassword(e.target.value)}
-                        className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
-                      />
+                      <div className="relative">
+                        <input
+                          type={showRegPassword ? "text" : "password"}
+                          required
+                          value={regMasterPassword}
+                          onChange={(e) => setRegMasterPassword(e.target.value)}
+                          className="w-full pl-3 pr-9 py-2 rounded-xl border border-slate-200 text-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowRegPassword(!showRegPassword)}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                          tabIndex={-1}
+                          aria-label={showRegPassword ? "Hide password" : "Show password"}
+                        >
+                          {showRegPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
                     </div>
                     <div>
                       <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
                         Confirm *
                       </label>
-                      <input
-                        type="password"
-                        required
-                        value={regConfirmMasterPassword}
-                        onChange={(e) => setRegConfirmMasterPassword(e.target.value)}
-                        className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
-                      />
+                      <div className="relative">
+                        <input
+                          type={showRegConfirmPassword ? "text" : "password"}
+                          required
+                          value={regConfirmMasterPassword}
+                          onChange={(e) => setRegConfirmMasterPassword(e.target.value)}
+                          className="w-full pl-3 pr-9 py-2 rounded-xl border border-slate-200 text-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowRegConfirmPassword(!showRegConfirmPassword)}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                          tabIndex={-1}
+                          aria-label={showRegConfirmPassword ? "Hide password" : "Show password"}
+                        >
+                          {showRegConfirmPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
                     </div>
                   </div>
                   <Button type="submit" className="w-full py-2.5 mt-2">
