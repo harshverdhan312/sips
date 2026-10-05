@@ -90,6 +90,14 @@ SIPS Super Administration Team
     this.sentEmails.push(emailRecord);
     logger.info(`[EmailService] College approval email dispatched to ${to} (${collegeName}) with username '${username}'`);
 
+    // Try sending real email via nodemailer if configured
+    await this._dispatchSmtpEmail({
+      to,
+      subject,
+      text: textBody,
+      html: htmlBody
+    });
+
     return {
       success: true,
       messageId: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
@@ -130,11 +138,63 @@ SIPS Super Administration Team
     this.sentEmails.push(emailRecord);
     logger.info(`[EmailService] College rejection notice sent to ${to} (${collegeName})`);
 
+    // Try sending real email via nodemailer if configured
+    await this._dispatchSmtpEmail({
+      to,
+      subject,
+      text: textBody
+    });
+
     return {
       success: true,
       to,
       subject
     };
+  }
+
+  /**
+   * Internal dispatcher for real SMTP email delivery (via nodemailer if available)
+   */
+  async _dispatchSmtpEmail({ to, subject, text, html }) {
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+
+    if (!smtpUser || !smtpPass) {
+      return; // Simulated mode
+    }
+
+    try {
+      let nodemailer;
+      try {
+        nodemailer = require('nodemailer');
+      } catch (_) {
+        return; // Nodemailer not installed
+      }
+
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port: parseInt(process.env.SMTP_PORT, 10) || 587,
+        secure: process.env.SMTP_PORT === '465',
+        auth: {
+          user: smtpUser,
+          pass: smtpPass
+        }
+      });
+
+      const fromAddress = process.env.SMTP_FROM || `SIPS Administration <${smtpUser}>`;
+
+      await transporter.sendMail({
+        from: fromAddress,
+        to,
+        subject,
+        text,
+        html: html || undefined
+      });
+
+      logger.info(`[EmailService] Live SMTP email successfully delivered to ${to}`);
+    } catch (err) {
+      logger.warn(`[EmailService] SMTP delivery failed: ${err.message}`);
+    }
   }
 
   /**

@@ -99,7 +99,12 @@ export function AppRoutes() {
           <Route path="/super-admin/approvals" element={<CollegeApprovalsPage />} />
           <Route path="/super-admin/institutions" element={<InstitutionsDirectoryPage />} />
           <Route path="/super-admin/questions" element={<GlobalQuestionBankPage />} />
+          <Route path="/super_admin/dashboard" element={<SuperAdminDashboard />} />
+          <Route path="/super_admin/approvals" element={<CollegeApprovalsPage />} />
+          <Route path="/super_admin/institutions" element={<InstitutionsDirectoryPage />} />
+          <Route path="/super_admin/questions" element={<GlobalQuestionBankPage />} />
           <Route path="/superadmin/*" element={<Navigate to="/super-admin/dashboard" replace />} />
+          <Route path="/super_admin/*" element={<Navigate to="/super-admin/dashboard" replace />} />
         </Route>
       </Route>
 
