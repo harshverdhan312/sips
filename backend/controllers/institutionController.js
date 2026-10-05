@@ -87,23 +87,16 @@ exports.onboardInstitution = async (req, res) => {
           email: cleanEmail,
           passwordHash,
           role: 'MAIN_UNIVERSITY_ADMIN'
-        }
-      });
-
-      const token = generateToken({
-        id: inst._id,
-        role: 'MAIN_UNIVERSITY_ADMIN',
-        institutionId: inst._id,
-        institutionName: inst.name,
-        username: inst.mainAdmin.username,
-        email: inst.officialEmail
+        },
+        status: 'PENDING_APPROVAL',
+        approvalStatus: 'PENDING',
+        needsPasswordReset: true
       });
 
       return res.status(201).json({
         success: true,
-        message: 'University onboarded successfully',
-        token,
-        role: 'MAIN_UNIVERSITY_ADMIN',
+        pendingApproval: true,
+        message: 'Institution registration submitted successfully! Your college registration request is pending review and approval by the Super Administrator. Once approved, you will receive confirmation and your login credentials via email.',
         institutionId: inst._id,
         institutionName: inst.name,
         institution: {
@@ -113,6 +106,8 @@ exports.onboardInstitution = async (req, res) => {
           slug: inst.slug || cleanSlug,
           code: inst.code,
           officialEmail: inst.officialEmail,
+          status: 'PENDING_APPROVAL',
+          approvalStatus: 'PENDING',
           address: inst.address
         }
       });
@@ -161,7 +156,9 @@ exports.onboardInstitution = async (req, res) => {
         passwordHash,
         role: 'MAIN_UNIVERSITY_ADMIN'
       },
-      status: 'ACTIVE'
+      status: 'PENDING_APPROVAL',
+      approvalStatus: 'PENDING',
+      needsPasswordReset: true
     });
 
     await newInst.save();
@@ -184,20 +181,10 @@ exports.onboardInstitution = async (req, res) => {
       // Ignore college sync duplicate if exists
     }
 
-    const token = generateToken({
-      id: newInst._id,
-      role: 'MAIN_UNIVERSITY_ADMIN',
-      institutionId: newInst._id,
-      institutionName: newInst.name,
-      username: newInst.mainAdmin.username,
-      email: newInst.officialEmail
-    });
-
     return res.status(201).json({
       success: true,
-      message: 'University onboarded successfully',
-      token,
-      role: 'MAIN_UNIVERSITY_ADMIN',
+      pendingApproval: true,
+      message: 'Institution registration submitted successfully! Your college registration request is pending review and approval by the Super Administrator. Once approved, you will receive confirmation and your login credentials via email.',
       institutionId: newInst._id,
       institutionName: newInst.name,
       institution: {
@@ -205,6 +192,8 @@ exports.onboardInstitution = async (req, res) => {
         name: newInst.name,
         code: newInst.code,
         officialEmail: newInst.officialEmail,
+        status: 'PENDING_APPROVAL',
+        approvalStatus: 'PENDING',
         address: newInst.address
       }
     });

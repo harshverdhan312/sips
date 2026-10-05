@@ -62,6 +62,12 @@ import { AssessmentResultsPage } from "../pages/admin/AssessmentResultsPage";
 import { InstitutionDashboard } from "../pages/institution/InstitutionDashboard";
 import { DepartmentsPage } from "../pages/institution/DepartmentsPage";
 
+// Super Admin Pages
+import { SuperAdminDashboard } from "../pages/superadmin/SuperAdminDashboard";
+import { CollegeApprovalsPage } from "../pages/superadmin/CollegeApprovalsPage";
+import { InstitutionsDirectoryPage } from "../pages/superadmin/InstitutionsDirectoryPage";
+import { GlobalQuestionBankPage } from "../pages/superadmin/GlobalQuestionBankPage";
+
 import { DepartmentProfilePage } from "../pages/admin/DepartmentProfilePage";
 
 export function AppRoutes() {
@@ -85,6 +91,17 @@ export function AppRoutes() {
 
       {/* Public Student Career Profile */}
       <Route path="/u/:username" element={<PublicStudentProfilePage />} />
+
+      {/* Super Admin Portal Routes */}
+      <Route element={<ProtectedRoute allowedRoles={["super_admin"]} />}>
+        <Route element={<DashboardLayout />}>
+          <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
+          <Route path="/super-admin/approvals" element={<CollegeApprovalsPage />} />
+          <Route path="/super-admin/institutions" element={<InstitutionsDirectoryPage />} />
+          <Route path="/super-admin/questions" element={<GlobalQuestionBankPage />} />
+          <Route path="/superadmin/*" element={<Navigate to="/super-admin/dashboard" replace />} />
+        </Route>
+      </Route>
 
       {/* University / Institution Admin Portal Routes */}
       <Route element={<ProtectedRoute allowedRoles={["university_admin", "admin"]} />}>

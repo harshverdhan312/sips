@@ -109,7 +109,27 @@ async function archiveQuestion(req, res, next) {
   }
 }
 
+/**
+ * POST /api/admin/questions
+ * Create a new question (single question creation)
+ */
+async function createQuestion(req, res, next) {
+  try {
+    const isSuper = ['SUPERADMIN', 'SUPER_ADMIN', 'ADMIN'].includes((req.user?.role || '').toUpperCase()) && !req.user?.collegeId;
+    const data = {
+      ...req.body,
+      collegeId: isSuper ? (req.body.isGlobal ? null : (req.body.collegeId || null)) : (req.user?.collegeId || null),
+      createdBy: req.user?.id || req.user?.username || 'admin'
+    };
+    const question = await questionService.createQuestion(data);
+    return success(res, question, 'Question created successfully', 201);
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
+  createQuestion,
   bulkImport,
   getQuestions,
   getQuestionById,

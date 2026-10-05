@@ -134,9 +134,14 @@ const adminRoutes = require('./routes/admin');
 const publicRoutes = require('./routes/public');
 const internalRoutes = require('./routes/internal');
 const institutionRoutes = require('./routes/institution');
+const superAdminRoutes = require('./routes/superAdmin');
 
 // Server-to-server internal routes
 app.use('/api/internal', internalRoutes);
+
+// Super Admin routes
+app.use('/api/super-admin', superAdminRoutes);
+app.use('/super-admin', superAdminRoutes);
 
 // Admin routes
 app.use('/api/admin', adminRoutes);

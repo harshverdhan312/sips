@@ -47,5 +47,16 @@ export const authService = {
   async registerCollege(collegeData) {
     const data = await api.post('/api/auth/register-college', collegeData);
     return data;
+  },
+
+  /**
+   * Change password for authenticated user
+   */
+  async changePassword(currentPassword, newPassword) {
+    const data = await api.post('/api/auth/change-password', {
+      currentPassword,
+      newPassword
+    });
+    return data;
   }
 };
