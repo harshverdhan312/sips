@@ -3,6 +3,7 @@ const AppError = require('../utils/appError');
 const { validateCreatePracticeAttempt, validateSubmitResponse } = require('../validators/practiceValidator');
 const { serializeStudentQuestionVersion } = require('../utils/serializers');
 const { evaluateResponse } = require('../utils/evaluator');
+const { shuffleArray } = require('../utils/shuffle');
 
 /**
  * Practice Service
@@ -34,10 +35,11 @@ function getDayDiff(dateStr1, dateStr2) {
   return Math.round(diffMs / (1000 * 60 * 60 * 24));
 }
 
-async function createPracticeAttempt(data) {
+async function createPracticeAttempt(data, options = {}) {
   validateCreatePracticeAttempt(data);
 
-  const { studentId, collegeId, type, category, questionCount = 10, questionId } = data;
+  const { studentId, collegeId, type, category, difficulty, questionCount = 10, questionId } = data;
+  const randomFn = (options && typeof options.randomFn === 'function') ? options.randomFn : Math.random;
 
   const where = {
     status: 'ACTIVE'
@@ -54,14 +56,35 @@ async function createPracticeAttempt(data) {
   if (category) {
     where.category = { contains: category, mode: 'insensitive' };
   }
+  if (difficulty) {
+    const upperDiff = String(difficulty).toUpperCase();
+    if (['EASY', 'MEDIUM', 'HARD'].includes(upperDiff)) {
+      where.difficulty = upperDiff;
+    }
+  }
   if (collegeId) {
     where.OR = [{ collegeId }, { collegeId: null }];
   }
 
-  // Find eligible questions
+  // Count total eligible active questions matching filters
+  const totalEligible = await prisma.practiceQuestion.count({ where });
+
+  if (!totalEligible) {
+    throw new AppError('No questions available matching the requested criteria', 404);
+  }
+
+  // Determine candidate pool size (e.g. 50-100 questions, or all eligible if pool is smaller)
+  const targetPoolSize = Math.max(questionCount, 100);
+  const poolSize = Math.min(totalEligible, targetPoolSize);
+  const maxSkip = Math.max(0, totalEligible - poolSize);
+  const skip = maxSkip > 0 ? Math.floor(randomFn() * (maxSkip + 1)) : 0;
+
+  // Fetch candidate pool with latest version and coding details
   const questions = await prisma.practiceQuestion.findMany({
     where,
-    take: questionCount,
+    skip,
+    take: poolSize,
+    orderBy: { id: 'asc' },
     include: {
       versions: {
         orderBy: { versionNumber: 'desc' },
@@ -74,22 +97,26 @@ async function createPracticeAttempt(data) {
           }
         }
       }
-    },
-    orderBy: { createdAt: 'desc' }
+    }
   });
 
   if (!questions.length) {
     throw new AppError('No questions available matching the requested criteria', 404);
   }
 
-  // Select the latest version for each question to lock into this attempt
-  const selectedVersions = questions
-    .filter((q) => q.versions.length > 0)
-    .map((q) => q.versions[0]);
+  // Filter questions that have valid latest versions
+  const validQuestions = questions.filter((q) => q.versions && q.versions.length > 0);
 
-  if (!selectedVersions.length) {
+  if (!validQuestions.length) {
     throw new AppError('No usable question versions found', 404);
   }
+
+  // Randomize the candidate pool in application memory using unbiased Fisher-Yates shuffle
+  shuffleArray(validQuestions, randomFn);
+
+  // Select exactly requested questionCount (or all available if fewer exist)
+  const selectedQuestions = validQuestions.slice(0, questionCount);
+  const selectedVersions = selectedQuestions.map((q) => q.versions[0]);
 
   // Transactionally create practice attempt and question response placeholders
   const attempt = await prisma.$transaction(async (tx) => {
@@ -817,5 +844,6 @@ module.exports = {
   getPracticeResult,
   getPracticeHistory,
   getPracticeProgress,
-  getPracticeStreak
+  getPracticeStreak,
+  shuffleArray
 };
