@@ -35,6 +35,37 @@ function getDayDiff(dateStr1, dateStr2) {
   return Math.round(diffMs / (1000 * 60 * 60 * 24));
 }
 
+/**
+ * Canonical Topic Name Normalizer
+ * Normalizes minor naming variations (e.g., snake_case, pluralization, casing)
+ * so questions from equivalent subcategories are placed into the same topic bucket.
+ */
+function normalizeTopicName(topic) {
+  if (!topic) return 'GENERAL';
+  const clean = String(topic)
+    .trim()
+    .toUpperCase()
+    .replace(/[_\s-]+/g, ' ')
+    .trim();
+
+  // Canonical alias mapping for common aptitude topic naming variations
+  if (clean === 'DIRECTIONS' || clean === 'DIRECTION SENSE' || clean === 'DIRECTION') return 'DIRECTION SENSE';
+  if (clean === 'SYLLOGISM' || clean === 'SYLLOGISMS') return 'SYLLOGISMS';
+  if (clean === 'SEATING ARRANGEMENT' || clean === 'SEATING ARRANGEMENTS') return 'SEATING ARRANGEMENT';
+  if (clean === 'TIME AND WORK' || clean === 'TIME & WORK') return 'TIME AND WORK';
+  if (clean === 'SPEED TIME DISTANCE' || clean === 'SPEED, TIME AND DISTANCE' || clean === 'SPEED TIME AND DISTANCE') return 'SPEED TIME DISTANCE';
+  if (clean === 'RATIO PROPORTION' || clean === 'RATIOS AND PROPORTIONS' || clean === 'RATIO & PROPORTION') return 'RATIO AND PROPORTION';
+  if (clean === 'PERMUTATION COMBINATION' || clean === 'PERMUTATIONS AND COMBINATIONS') return 'PERMUTATIONS AND COMBINATIONS';
+  if (clean === 'SIMPLE INTEREST' || clean === 'COMPOUND INTEREST' || clean === 'SIMPLE AND COMPOUND INTEREST') return 'INTEREST';
+  if (clean === 'PERCENTAGES' || clean === 'PERCENTAGES AND PROFIT LOSS' || clean === 'PROFIT LOSS') return 'PERCENTAGES AND PROFIT LOSS';
+  if (clean === 'IDIOMS' || clean === 'IDIOMS PHRASES' || clean === 'IDIOMS AND PHRASES') return 'IDIOMS AND PHRASES';
+  if (clean === 'SENTENCE CORRECTION' || clean === 'SENTENCE COMPLETION') return 'SENTENCE CORRECTION';
+  if (clean === 'SYNONYMS ANTONYMS' || clean === 'ANTONYMS & SYNONYMS') return 'SYNONYMS AND ANTONYMS';
+  if (clean === 'SERIES COMPLETION' || clean === 'NUMBER SERIES') return 'NUMBER SERIES';
+
+  return clean;
+}
+
 async function createPracticeAttempt(data, options = {}) {
   validateCreatePracticeAttempt(data);
 
@@ -54,7 +85,12 @@ async function createPracticeAttempt(data, options = {}) {
     }
   }
   if (category) {
-    where.category = { contains: category, mode: 'insensitive' };
+    const upperCat = String(category).toUpperCase();
+    if (upperCat === 'APTITUDE') {
+      where.type = 'APTITUDE';
+    } else {
+      where.category = { contains: category, mode: 'insensitive' };
+    }
   }
   if (difficulty) {
     const upperDiff = String(difficulty).toUpperCase();
@@ -73,16 +109,9 @@ async function createPracticeAttempt(data, options = {}) {
     throw new AppError('No questions available matching the requested criteria', 404);
   }
 
-  // 1. Expand the Pool: Fetch larger pool (e.g., 50–200 questions, or 5× the requested count)
-  const targetPoolSize = Math.min(Math.max(questionCount * 5, 50), 200);
-  const poolSize = Math.min(totalEligible, targetPoolSize);
-  const maxSkip = Math.max(0, totalEligible - poolSize);
-  const skip = maxSkip > 0 ? Math.floor(randomFn() * (maxSkip + 1)) : 0;
-
+  // 1. Fetch all eligible questions matching filters across all topics (eliminates contiguous slice clustering)
   const pool = await prisma.practiceQuestion.findMany({
     where,
-    skip,
-    take: poolSize,
     orderBy: { id: 'asc' },
     include: {
       versions: {
@@ -99,7 +128,7 @@ async function createPracticeAttempt(data, options = {}) {
     }
   });
 
-  if (!pool.length) {
+  if (!pool || !pool.length) {
     throw new AppError('No questions available matching the requested criteria', 404);
   }
 
@@ -109,7 +138,7 @@ async function createPracticeAttempt(data, options = {}) {
     throw new AppError('No usable question versions found', 404);
   }
 
-  // 7. Exclude Recent Questions: Filter out questionVersionIds delivered in student's last 5 attempts
+  // 7. Exclude Recent Questions: Filter out questions delivered in student's recent attempts (up to last 10 attempts)
   let candidatePool = usable;
   if (studentId) {
     try {
@@ -119,7 +148,7 @@ async function createPracticeAttempt(data, options = {}) {
           status: { in: ['SUBMITTED', 'IN_PROGRESS'] }
         },
         orderBy: { createdAt: 'desc' },
-        take: 5,
+        take: 10,
         select: {
           questionVersionIds: true,
           responses: {
@@ -127,23 +156,25 @@ async function createPracticeAttempt(data, options = {}) {
           }
         }
       });
-      const recentIds = recentAttempts.flatMap((a) => {
-        if (Array.isArray(a.questionVersionIds) && a.questionVersionIds.length > 0) {
-          return a.questionVersionIds;
+      const recentVersionIds = new Set();
+      recentAttempts.forEach((a) => {
+        if (Array.isArray(a.questionVersionIds)) {
+          a.questionVersionIds.forEach((id) => recentVersionIds.add(id));
         }
-        if (Array.isArray(a.responses) && a.responses.length > 0) {
-          return a.responses.map((r) => r.questionVersionId);
+        if (Array.isArray(a.responses)) {
+          a.responses.forEach((r) => {
+            if (r.questionVersionId) recentVersionIds.add(r.questionVersionId);
+          });
         }
-        return [];
       });
 
-      if (recentIds.length > 0) {
-        const recentSet = new Set(recentIds);
-        const unseen = usable.filter((q) => !recentSet.has(q.versions[0].id));
+      if (recentVersionIds.size > 0) {
+        const unseen = usable.filter((q) => !recentVersionIds.has(q.versions[0].id) && !recentVersionIds.has(q.id));
         if (unseen.length >= questionCount) {
           candidatePool = unseen;
         } else if (unseen.length > 0) {
-          const seen = usable.filter((q) => recentSet.has(q.versions[0].id));
+          // If student has practiced almost all questions, use all unseen first, then fill from seen
+          const seen = usable.filter((q) => recentVersionIds.has(q.versions[0].id) || recentVersionIds.has(q.id));
           shuffleArray(seen, randomFn);
           candidatePool = [...unseen, ...seen];
         }
@@ -153,12 +184,16 @@ async function createPracticeAttempt(data, options = {}) {
     }
   }
 
-  // 2. Group by Topic (Subcategory with category as fallback)
+  // 2. Group by Topic (Canonical normalized subcategory, partitioned by category for general Aptitude)
+  const isGeneralAptitude = !category || String(category).toUpperCase() === 'APTITUDE';
   const byTopic = {};
   for (const q of candidatePool) {
-    const topic = q.subcategory || q.category || 'General';
-    if (!byTopic[topic]) byTopic[topic] = [];
-    byTopic[topic].push(q);
+    const rawTopic = q.subcategory || q.category || 'General';
+    const normalizedTopic = normalizeTopicName(rawTopic);
+    // In general Aptitude, namespace by category to ensure cross-category round-robin distribution
+    const topicKey = isGeneralAptitude ? `${q.category}: ${normalizedTopic}` : normalizedTopic;
+    if (!byTopic[topicKey]) byTopic[topicKey] = [];
+    byTopic[topicKey].push(q);
   }
 
   // 3. Shuffle Within Each Topic (Fisher-Yates)
@@ -210,10 +245,13 @@ async function createPracticeAttempt(data, options = {}) {
   // 5. Handle Edge Cases: If topics run out before hitting count, pick randomly from remaining unused questions in pool
   if (selectedQuestions.length < questionCount) {
     const selectedSet = new Set(selectedQuestions.map((q) => q.id));
-    const remaining = usable.filter((q) => !selectedSet.has(q.id));
+    const remaining = candidatePool.filter((q) => !selectedSet.has(q.id));
     shuffleArray(remaining, randomFn);
     selectedQuestions.push(...remaining.slice(0, questionCount - selectedQuestions.length));
   }
+
+  // Final shuffle of selected questions so the session doesn't strictly present topics in pick order
+  shuffleArray(selectedQuestions, randomFn);
 
   // 9. Lock versions & create attempt
   const selectedVersions = selectedQuestions.map((q) => q.versions[0]);
