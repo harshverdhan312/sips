@@ -24,6 +24,7 @@ import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
 import { Modal } from "../../components/common/Modal";
 import { ProblemStatement } from "../../components/common/ProblemStatement";
+import { CodeEditor } from "../../components/common/CodeEditor";
 import { practiceService } from "../../services/practiceService";
 
 const STARTER_TEMPLATES = {
@@ -628,31 +629,13 @@ export function CodingArenaPage() {
               </div>
             </div>
 
-            {/* Code Textarea with Line Numbers */}
-            <div className="relative flex bg-slate-950 font-mono text-xs sm:text-sm h-[420px] overflow-hidden">
-              {/* Line Numbers Gutter */}
-              <div
-                ref={lineNumbersRef}
-                className="w-12 py-3 bg-slate-900/60 text-slate-500 text-right pr-3 select-none overflow-hidden font-mono text-xs border-r border-slate-800/80 leading-6"
-              >
-                {lineNumbers.map((n) => (
-                  <div key={n}>{n}</div>
-                ))}
-              </div>
-
-              {/* Code Textarea */}
-              <textarea
-                ref={textareaRef}
+            {/* Monaco Code Editor */}
+            <div className="relative w-full h-[440px] bg-slate-950 overflow-hidden">
+              <CodeEditor
                 value={currentSourceCode}
-                onChange={(e) => handleSourceCodeChange(e.target.value)}
-                onScroll={handleScroll}
-                onKeyDown={handleKeyDown}
-                spellCheck="false"
-                autoCapitalize="none"
-                autoComplete="off"
-                autoCorrect="off"
-                className="flex-1 py-3 px-4 bg-transparent text-slate-100 placeholder-slate-600 focus:outline-none resize-none font-mono leading-6 overflow-y-auto whitespace-pre tab-4"
-                placeholder="Write your solution here..."
+                onChange={handleSourceCodeChange}
+                language={language}
+                height="440px"
               />
             </div>
 

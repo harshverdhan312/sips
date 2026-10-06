@@ -29,6 +29,7 @@ import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
 import { Modal } from "../../components/common/Modal";
+import { CodeEditor } from "../../components/common/CodeEditor";
 import { practiceService } from "../../services/practiceService";
 import { practiceApi } from "../../services/practiceApi";
 import { cn } from "../../utils/cn";
@@ -766,14 +767,14 @@ export function StudentAssessmentWorkspacePage() {
                     </div>
                   </div>
 
-                  {/* Code Editor Textarea */}
-                  <div className="flex-1 min-h-[280px]">
-                    <textarea
+                  {/* Monaco Code Editor */}
+                  <div className="flex-1 min-h-[320px] rounded-b-xl overflow-hidden">
+                    <CodeEditor
                       value={currentCodingState.sourceCode || ""}
-                      onChange={(e) => handleCodeChange(e.target.value)}
-                      placeholder="Write your solution code here..."
-                      spellCheck="false"
-                      className="w-full h-full min-h-[280px] p-4 bg-slate-950 text-slate-100 font-mono text-xs rounded-b-xl border border-slate-900 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 leading-relaxed resize-y"
+                      onChange={handleCodeChange}
+                      language={currentCodingLang}
+                      height="320px"
+                      readOnly={isExpired || submitting}
                     />
                   </div>
 

@@ -29,6 +29,7 @@ import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
 import { Modal } from "../../components/common/Modal";
+import { CodeEditor } from "../../components/common/CodeEditor";
 import { practiceService } from "../../services/practiceService";
 import { cn } from "../../utils/cn";
 
@@ -950,27 +951,14 @@ export function ContestWorkspacePage() {
                   </div>
                 </div>
 
-                {/* Editor Textarea with Line Numbers */}
-                <div className="relative flex bg-slate-950 font-mono text-xs sm:text-sm h-[380px] overflow-hidden">
-                  <div
-                    ref={lineNumbersRef}
-                    className="w-12 py-3 bg-slate-900/60 text-slate-500 text-right pr-3 select-none overflow-hidden font-mono text-xs border-r border-slate-800/80 leading-6 shrink-0"
-                  >
-                    {lineNumbers.map((n) => (
-                      <div key={n}>{n}</div>
-                    ))}
-                  </div>
-
-                  <textarea
-                    ref={textareaRef}
+                {/* Monaco Code Editor */}
+                <div className="relative w-full h-[400px] bg-slate-950 overflow-hidden">
+                  <CodeEditor
                     value={currentSourceCode}
-                    onChange={(e) => handleSourceCodeChange(e.target.value)}
-                    onScroll={handleScroll}
-                    onKeyDown={handleKeyDown}
-                    disabled={isExpired || submitting}
-                    spellCheck={false}
-                    className="flex-1 p-3 bg-transparent text-slate-100 font-mono text-xs sm:text-sm resize-none focus:outline-none leading-6 overflow-y-auto whitespace-pre tab-4"
-                    placeholder="Write your code here..."
+                    onChange={handleSourceCodeChange}
+                    language={currentCodingLang}
+                    height="400px"
+                    readOnly={isExpired || submitting}
                   />
                 </div>
 
