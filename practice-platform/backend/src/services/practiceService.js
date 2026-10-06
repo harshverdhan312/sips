@@ -73,8 +73,8 @@ async function createPracticeAttempt(data, options = {}) {
     throw new AppError('No questions available matching the requested criteria', 404);
   }
 
-  // 1. Fetch LARGER pool (e.g., 5x requested count, max 200)
-  const targetPoolSize = Math.min(Math.max(questionCount * 5, 20), 200);
+  // 1. Expand the Pool: Fetch larger pool (e.g., 50–200 questions, or 5× the requested count)
+  const targetPoolSize = Math.min(Math.max(questionCount * 5, 50), 200);
   const poolSize = Math.min(totalEligible, targetPoolSize);
   const maxSkip = Math.max(0, totalEligible - poolSize);
   const skip = maxSkip > 0 ? Math.floor(randomFn() * (maxSkip + 1)) : 0;
@@ -103,13 +103,13 @@ async function createPracticeAttempt(data, options = {}) {
     throw new AppError('No questions available matching the requested criteria', 404);
   }
 
-  // 2. Filter to questions with valid latest versions
+  // Filter to questions with valid latest versions
   const usable = pool.filter((q) => q.versions && q.versions.length > 0);
   if (!usable.length) {
     throw new AppError('No usable question versions found', 404);
   }
 
-  // 3. Exclude questions student saw in last 5 attempts (if enough unseen questions exist)
+  // 7. Exclude Recent Questions: Filter out questionVersionIds delivered in student's last 5 attempts
   let candidatePool = usable;
   if (studentId) {
     try {
@@ -120,9 +120,23 @@ async function createPracticeAttempt(data, options = {}) {
         },
         orderBy: { createdAt: 'desc' },
         take: 5,
-        select: { questionVersionIds: true }
+        select: {
+          questionVersionIds: true,
+          responses: {
+            select: { questionVersionId: true }
+          }
+        }
       });
-      const recentIds = recentAttempts.flatMap((a) => a.questionVersionIds || []);
+      const recentIds = recentAttempts.flatMap((a) => {
+        if (Array.isArray(a.questionVersionIds) && a.questionVersionIds.length > 0) {
+          return a.questionVersionIds;
+        }
+        if (Array.isArray(a.responses) && a.responses.length > 0) {
+          return a.responses.map((r) => r.questionVersionId);
+        }
+        return [];
+      });
+
       if (recentIds.length > 0) {
         const recentSet = new Set(recentIds);
         const unseen = usable.filter((q) => !recentSet.has(q.versions[0].id));
@@ -130,6 +144,7 @@ async function createPracticeAttempt(data, options = {}) {
           candidatePool = unseen;
         } else if (unseen.length > 0) {
           const seen = usable.filter((q) => recentSet.has(q.versions[0].id));
+          shuffleArray(seen, randomFn);
           candidatePool = [...unseen, ...seen];
         }
       }
@@ -138,7 +153,7 @@ async function createPracticeAttempt(data, options = {}) {
     }
   }
 
-  // 4. Group by subcategory (topic) for balanced selection
+  // 2. Group by Topic (Subcategory with category as fallback)
   const byTopic = {};
   for (const q of candidatePool) {
     const topic = q.subcategory || q.category || 'General';
@@ -146,10 +161,10 @@ async function createPracticeAttempt(data, options = {}) {
     byTopic[topic].push(q);
   }
 
-  // 5. Shuffle each topic's array (Fisher-Yates)
+  // 3. Shuffle Within Each Topic (Fisher-Yates)
   Object.values(byTopic).forEach((arr) => shuffleArray(arr, randomFn));
 
-  // 6. Target difficulty distribution (30% EASY, 50% MEDIUM, 20% HARD if difficulty is not explicitly requested)
+  // 6. Balance Difficulty (~30% Easy, ~50% Medium, ~20% Hard) if difficulty not explicitly requested
   const isExplicitDifficulty = Boolean(difficulty && ['EASY', 'MEDIUM', 'HARD'].includes(String(difficulty).toUpperCase()));
   const targetDist = { EASY: 0.3, MEDIUM: 0.5, HARD: 0.2 };
   const targetCounts = isExplicitDifficulty
@@ -161,15 +176,16 @@ async function createPracticeAttempt(data, options = {}) {
       };
   const currentDist = { EASY: 0, MEDIUM: 0, HARD: 0 };
 
-  // 7. Round-robin pick from topics with difficulty balancing until we have questionCount
+  // 4. Round-Robin Selection: Cycle through topics until required count is reached
   const selectedQuestions = [];
   const topics = Object.keys(byTopic);
+  shuffleArray(topics, randomFn);
   let topicIdx = 0;
 
   while (selectedQuestions.length < questionCount && topics.length > 0) {
     const topic = topics[topicIdx % topics.length];
     const arr = byTopic[topic];
-    if (arr.length > 0) {
+    if (arr && arr.length > 0) {
       let pickIdx = -1;
       if (!isExplicitDifficulty) {
         pickIdx = arr.findIndex((q) => (currentDist[q.difficulty] || 0) < (targetCounts[q.difficulty] || 0));
@@ -191,7 +207,7 @@ async function createPracticeAttempt(data, options = {}) {
     topicIdx++;
   }
 
-  // 8. If still short (fewer topics/questions in candidatePool than count), fill from remaining usable pool
+  // 5. Handle Edge Cases: If topics run out before hitting count, pick randomly from remaining unused questions in pool
   if (selectedQuestions.length < questionCount) {
     const selectedSet = new Set(selectedQuestions.map((q) => q.id));
     const remaining = usable.filter((q) => !selectedSet.has(q.id));

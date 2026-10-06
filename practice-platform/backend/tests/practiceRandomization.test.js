@@ -17,7 +17,8 @@ jest.mock('../src/utils/prisma', () => {
     },
     practiceAttempt: {
       create: jest.fn(),
-      findUnique: jest.fn()
+      findUnique: jest.fn(),
+      findMany: jest.fn()
     },
     questionResponse: {
       create: jest.fn()
@@ -36,14 +37,24 @@ describe('Practice Question Randomization & Category Selection Engine', () => {
   // Generate a mock bank of 30 questions
   const mockQuestionBank = [];
 
-  // 15 Logical Reasoning (Active)
+  // 15 Logical Reasoning (Active) with distinct subcategories & balanced difficulties
+  const lrDifficulties = [
+    // Number Series (i=1..5)
+    'EASY', 'EASY', 'MEDIUM', 'MEDIUM', 'HARD',
+    // Blood Relations (i=6..10)
+    'EASY', 'EASY', 'MEDIUM', 'MEDIUM', 'HARD',
+    // Coding Decoding (i=11..15)
+    'EASY', 'EASY', 'EASY', 'MEDIUM', 'HARD'
+  ];
+
   for (let i = 1; i <= 15; i++) {
     mockQuestionBank.push({
       id: `q_lr_${i}`,
       type: 'APTITUDE',
       format: 'SINGLE_CHOICE',
       category: 'LOGICAL_REASONING',
-      difficulty: i <= 10 ? 'EASY' : 'MEDIUM',
+      subcategory: i <= 5 ? 'Number Series' : i <= 10 ? 'Blood Relations' : 'Coding Decoding',
+      difficulty: lrDifficulties[i - 1],
       status: 'ACTIVE',
       collegeId: null,
       createdAt: new Date(2026, 0, i),
@@ -218,6 +229,17 @@ describe('Practice Question Randomization & Category Selection Engine', () => {
         return { ...attempt, responses: enriched };
       }
       return attempt;
+    });
+
+    prisma.practiceAttempt.findMany.mockImplementation(async ({ where = {}, take, select }) => {
+      const all = Array.from(attemptsStore.values())
+        .filter((a) => (!where.studentId || a.studentId === where.studentId))
+        .slice(0, take || undefined);
+      return all.map((a) => {
+        const res = {};
+        if (select && select.questionVersionIds) res.questionVersionIds = a.questionVersionIds || [];
+        return res;
+      });
     });
   });
 
@@ -471,6 +493,79 @@ describe('Practice Question Randomization & Category Selection Engine', () => {
       expect(attempt).toHaveProperty('status', 'IN_PROGRESS');
       expect(attempt).toHaveProperty('questionCount', 5);
       expect(attempt).toHaveProperty('startedAt');
+    });
+
+    test('Topic subcategory round-robin selection distributes questions across available topics', async () => {
+      const attempt = await practiceService.createPracticeAttempt({
+        studentId: testStudentId,
+        collegeId: testCollegeId,
+        category: 'LOGICAL_REASONING',
+        questionCount: 6
+      });
+
+      const delivered = await practiceService.getDeliveredQuestions(attempt.attemptId);
+      expect(delivered.questions.length).toBe(6);
+
+      // Collect topics (subcategories) of delivered questions
+      const deliveredTopics = delivered.questions.map((q) => q.subcategory);
+      const uniqueTopics = new Set(deliveredTopics);
+
+      // Since mock bank has 3 topics ('Number Series', 'Blood Relations', 'Coding Decoding'),
+      // a round-robin of 6 questions must touch all 3 topics
+      expect(uniqueTopics.size).toBe(3);
+    });
+
+    test('Target difficulty distribution (approx 30% EASY, 50% MEDIUM, 20% HARD) is applied when difficulty unspecified', async () => {
+      const attempt = await practiceService.createPracticeAttempt({
+        studentId: 'student_difficulty_test',
+        collegeId: testCollegeId,
+        category: 'LOGICAL_REASONING',
+        questionCount: 10
+      });
+
+      const delivered = await practiceService.getDeliveredQuestions(attempt.attemptId);
+      expect(delivered.questions.length).toBe(10);
+
+      const difficulties = delivered.questions.map((q) => q.difficulty);
+      const easyCount = difficulties.filter((d) => d === 'EASY').length;
+      const medCount = difficulties.filter((d) => d === 'MEDIUM').length;
+      const hardCount = difficulties.filter((d) => d === 'HARD').length;
+
+      // Aimed mix: ~30% EASY (3-4), ~50% MEDIUM (4-5), ~20% HARD (2)
+      expect(easyCount).toBeGreaterThanOrEqual(3);
+      expect(easyCount).toBeLessThanOrEqual(4);
+      expect(medCount).toBeGreaterThanOrEqual(4);
+      expect(medCount).toBeLessThanOrEqual(5);
+      expect(hardCount).toBe(2);
+      expect(easyCount + medCount + hardCount).toBe(10);
+    });
+
+    test('Recent questions from student last 5 attempts are excluded from new attempts', async () => {
+      const studentRecencyId = 'student_recency_tester';
+
+      // 1. Create first attempt with 5 questions
+      const attempt1 = await practiceService.createPracticeAttempt({
+        studentId: studentRecencyId,
+        collegeId: testCollegeId,
+        category: 'LOGICAL_REASONING',
+        questionCount: 5
+      });
+      const delivered1 = await practiceService.getDeliveredQuestions(attempt1.attemptId);
+      const delivered1Ids = delivered1.questions.map((q) => q.id);
+
+      // 2. Create second attempt with 5 questions for same student
+      const attempt2 = await practiceService.createPracticeAttempt({
+        studentId: studentRecencyId,
+        collegeId: testCollegeId,
+        category: 'LOGICAL_REASONING',
+        questionCount: 5
+      });
+      const delivered2 = await practiceService.getDeliveredQuestions(attempt2.attemptId);
+      const delivered2Ids = delivered2.questions.map((q) => q.id);
+
+      // Since there are 15 total eligible questions and attempt1 took 5, attempt2 should exclude those 5
+      const overlap = delivered2Ids.filter((id) => delivered1Ids.includes(id));
+      expect(overlap.length).toBe(0);
     });
   });
 
