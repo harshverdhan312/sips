@@ -387,7 +387,7 @@ export function CodingArenaPage() {
             <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
               <span>{question.category}</span>
               {question.subcategory && <span>• {question.subcategory}</span>}
-              <span>• Max Marks: <strong className="text-indigo-600 font-bold">{codingProblem.maxMarks || 100} pts</strong></span>
+              <span>• Max Marks: <strong className="text-indigo-600 font-bold">{codingProblem.maxMarks !== undefined ? codingProblem.maxMarks : (question.difficulty === 'HARD' ? 100 : question.difficulty === 'MEDIUM' ? 50 : 20)} pts</strong></span>
             </div>
           </div>
         </div>
@@ -730,7 +730,7 @@ export function CodingArenaPage() {
                   </div>
                   {executionResult.mode === "SUBMIT" && (
                     <div className="text-indigo-600 font-extrabold bg-indigo-50 px-2.5 py-1 rounded-md">
-                      Score: {executionResult.earnedMarks} / {codingProblem.maxMarks || 100} pts
+                      Score: {executionResult.earnedMarks} / {codingProblem.maxMarks !== undefined ? codingProblem.maxMarks : (question.difficulty === 'HARD' ? 100 : question.difficulty === 'MEDIUM' ? 50 : 20)} pts
                     </div>
                   )}
                   {executionResult.executionTimeMs !== undefined && (

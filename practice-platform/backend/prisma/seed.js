@@ -178,6 +178,9 @@ async function seed() {
           const versionId = newQ.versions[0].id;
           const cp = q.codingProblem;
 
+          const defaultMarks = q.difficulty === 'HARD' ? 100.0 : q.difficulty === 'MEDIUM' ? 50.0 : 20.0;
+          const assignedMaxMarks = cp.maxMarks ? Number(cp.maxMarks) : defaultMarks;
+
           await tx.codingProblem.create({
             data: {
               questionVersionId: versionId,
@@ -186,12 +189,12 @@ async function seed() {
               constraints: cp.constraints || null,
               timeLimitMs: cp.timeLimitMs || 2000,
               memoryLimitKb: cp.memoryLimitKb || 128000,
-              maxMarks: cp.maxMarks || 100.0,
+              maxMarks: assignedMaxMarks,
               testCases: {
                 create: (cp.testCases || []).map((tc, idx) => ({
                   input: tc.input || '',
                   expectedOutput: tc.expectedOutput || '',
-                  weight: tc.weight !== undefined ? tc.weight : 25.0,
+                  weight: tc.weight !== undefined ? tc.weight : (assignedMaxMarks / Math.max(1, (cp.testCases || []).length)),
                   isHidden: Boolean(tc.isHidden),
                   order: tc.order || idx + 1
                 }))

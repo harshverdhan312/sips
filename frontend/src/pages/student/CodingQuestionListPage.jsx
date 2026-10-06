@@ -313,7 +313,7 @@ export function CodingQuestionListPage() {
                     </div>
                     <span className="text-xs font-extrabold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md flex items-center gap-1">
                       <Award className="w-3.5 h-3.5" />
-                      100 pts
+                      {(q.difficulty === 'HARD' ? 100 : q.difficulty === 'MEDIUM' ? 50 : 20)} pts
                     </span>
                   </div>
 
