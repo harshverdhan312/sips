@@ -22,8 +22,9 @@ describe('Phase 7C — Real MCQ Question Bank Ingestion Suite', () => {
     { algorithm: 'HS256' }
   );
 
-  // Load the 3 canonical dataset files
-  const aptitudePath = path.join(__dirname, '../data/question-bank/aptitude/aptitude_questions.json');
+  const aptitudePath = fs.existsSync(path.join(__dirname, '../data/question-bank/aptitude/aptitude_questions.json'))
+    ? path.join(__dirname, '../data/question-bank/aptitude/aptitude_questions.json')
+    : path.join(__dirname, '../data/question-bank/aptitude/quants/aptitude_questions.json');
   const technicalPath = path.join(__dirname, '../data/question-bank/technical/technical_questions.json');
   const mixedPath = path.join(__dirname, '../data/question-bank/mixed/validation_batch_mixed.json');
 
@@ -63,14 +64,14 @@ describe('Phase 7C — Real MCQ Question Bank Ingestion Suite', () => {
   });
 
   describe('1. Dataset Integrity & Schema Compliance', () => {
-    test('Dataset contains exactly 30 questions (10 Aptitude, 10 Technical, 10 Mixed)', () => {
-      expect(aptitudeQuestions.length).toBe(10);
+    test('Dataset contains expected question counts (505 Aptitude, 10 Technical, 10 Mixed)', () => {
+      expect(aptitudeQuestions.length).toBe(505);
       expect(technicalQuestions.length).toBe(10);
       expect(mixedQuestions.length).toBe(10);
-      expect(all30Questions.length).toBe(30);
+      expect(all30Questions.length).toBe(525);
     });
 
-    test('All 30 questions pass the bulk-import validator without errors', () => {
+    test('All questions pass the bulk-import validator without errors', () => {
       all30Questions.forEach((item, idx) => {
         const validation = validateImportItem(item, idx);
         expect(validation.isValid).toBe(true);
@@ -79,7 +80,7 @@ describe('Phase 7C — Real MCQ Question Bank Ingestion Suite', () => {
       });
     });
 
-    test('All 30 questions have unique external IDs and valid provenance', () => {
+    test('All questions have unique external IDs and valid provenance', () => {
       const externalIdSet = new Set();
       all30Questions.forEach(q => {
         expect(q.externalId).toBeDefined();
@@ -90,12 +91,12 @@ describe('Phase 7C — Real MCQ Question Bank Ingestion Suite', () => {
         expect(q.source.type).toBeDefined();
         expect(q.source.namespace).toBeDefined();
       });
-      expect(externalIdSet.size).toBe(30);
+      expect(externalIdSet.size).toBe(all30Questions.length);
     });
   });
 
-  describe('2. Canonical Batch Ingestion (30 Questions)', () => {
-    test('Initial bulk import successfully inserts all 30 questions', async () => {
+  describe('2. Canonical Batch Ingestion', () => {
+    test('Initial bulk import successfully inserts all canonical questions', async () => {
       const res = await request(app)
         .post('/api/admin/questions/bulk-import')
         .set('Authorization', `Bearer ${adminToken}`)
@@ -103,22 +104,22 @@ describe('Phase 7C — Real MCQ Question Bank Ingestion Suite', () => {
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
-      expect(res.body.data.total).toBe(30);
-      expect(res.body.data.inserted).toBe(30);
+      expect(res.body.data.total).toBe(all30Questions.length);
+      expect(res.body.data.inserted).toBe(all30Questions.length);
       expect(res.body.data.versioned).toBe(0);
       expect(res.body.data.skipped).toBe(0);
       expect(res.body.data.failed).toBe(0);
       expect(res.body.data.errors.length).toBe(0);
-    });
+    }, 60000);
 
-    test('Database confirms 30 active questions created with version 1', async () => {
+    test('Database confirms active questions created with version 1', async () => {
       const externalIds = all30Questions.map(q => q.externalId);
       const dbQuestions = await prisma.practiceQuestion.findMany({
         where: { externalId: { in: externalIds } },
         include: { versions: true }
       });
 
-      expect(dbQuestions.length).toBe(30);
+      expect(dbQuestions.length).toBe(all30Questions.length);
       dbQuestions.forEach(q => {
         expect(q.status).toBe('ACTIVE');
         expect(q.versions.length).toBe(1);
@@ -128,7 +129,7 @@ describe('Phase 7C — Real MCQ Question Bank Ingestion Suite', () => {
   });
 
   describe('3. Idempotency & Replay Protection', () => {
-    test('Re-importing the exact same 30-question dataset produces 0 insertions and 30 skips', async () => {
+    test('Re-importing the exact same dataset produces 0 insertions and expected skips', async () => {
       const res = await request(app)
         .post('/api/admin/questions/bulk-import')
         .set('Authorization', `Bearer ${adminToken}`)
@@ -136,12 +137,12 @@ describe('Phase 7C — Real MCQ Question Bank Ingestion Suite', () => {
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
-      expect(res.body.data.total).toBe(30);
+      expect(res.body.data.total).toBe(all30Questions.length);
       expect(res.body.data.inserted).toBe(0);
       expect(res.body.data.versioned).toBe(0);
-      expect(res.body.data.skipped).toBe(30);
+      expect(res.body.data.skipped).toBe(all30Questions.length);
       expect(res.body.data.failed).toBe(0);
-    });
+    }, 60000);
   });
 
   describe('4. Immutable Version Creation on Content Modification', () => {

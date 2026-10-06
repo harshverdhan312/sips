@@ -73,14 +73,13 @@ async function createPracticeAttempt(data, options = {}) {
     throw new AppError('No questions available matching the requested criteria', 404);
   }
 
-  // Determine candidate pool size (e.g. 50-100 questions, or all eligible if pool is smaller)
-  const targetPoolSize = Math.max(questionCount, 100);
+  // 1. Fetch LARGER pool (e.g., 5x requested count, max 200)
+  const targetPoolSize = Math.min(Math.max(questionCount * 5, 20), 200);
   const poolSize = Math.min(totalEligible, targetPoolSize);
   const maxSkip = Math.max(0, totalEligible - poolSize);
   const skip = maxSkip > 0 ? Math.floor(randomFn() * (maxSkip + 1)) : 0;
 
-  // Fetch candidate pool with latest version and coding details
-  const questions = await prisma.practiceQuestion.findMany({
+  const pool = await prisma.practiceQuestion.findMany({
     where,
     skip,
     take: poolSize,
@@ -100,25 +99,110 @@ async function createPracticeAttempt(data, options = {}) {
     }
   });
 
-  if (!questions.length) {
+  if (!pool.length) {
     throw new AppError('No questions available matching the requested criteria', 404);
   }
 
-  // Filter questions that have valid latest versions
-  const validQuestions = questions.filter((q) => q.versions && q.versions.length > 0);
-
-  if (!validQuestions.length) {
+  // 2. Filter to questions with valid latest versions
+  const usable = pool.filter((q) => q.versions && q.versions.length > 0);
+  if (!usable.length) {
     throw new AppError('No usable question versions found', 404);
   }
 
-  // Randomize the candidate pool in application memory using unbiased Fisher-Yates shuffle
-  shuffleArray(validQuestions, randomFn);
+  // 3. Exclude questions student saw in last 5 attempts (if enough unseen questions exist)
+  let candidatePool = usable;
+  if (studentId) {
+    try {
+      const recentAttempts = await prisma.practiceAttempt.findMany({
+        where: {
+          studentId: studentId.trim(),
+          status: { in: ['SUBMITTED', 'IN_PROGRESS'] }
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        select: { questionVersionIds: true }
+      });
+      const recentIds = recentAttempts.flatMap((a) => a.questionVersionIds || []);
+      if (recentIds.length > 0) {
+        const recentSet = new Set(recentIds);
+        const unseen = usable.filter((q) => !recentSet.has(q.versions[0].id));
+        if (unseen.length >= questionCount) {
+          candidatePool = unseen;
+        } else if (unseen.length > 0) {
+          const seen = usable.filter((q) => recentSet.has(q.versions[0].id));
+          candidatePool = [...unseen, ...seen];
+        }
+      }
+    } catch (e) {
+      // Graceful fallback if recent query fails
+    }
+  }
 
-  // Select exactly requested questionCount (or all available if fewer exist)
-  const selectedQuestions = validQuestions.slice(0, questionCount);
+  // 4. Group by subcategory (topic) for balanced selection
+  const byTopic = {};
+  for (const q of candidatePool) {
+    const topic = q.subcategory || q.category || 'General';
+    if (!byTopic[topic]) byTopic[topic] = [];
+    byTopic[topic].push(q);
+  }
+
+  // 5. Shuffle each topic's array (Fisher-Yates)
+  Object.values(byTopic).forEach((arr) => shuffleArray(arr, randomFn));
+
+  // 6. Target difficulty distribution (30% EASY, 50% MEDIUM, 20% HARD if difficulty is not explicitly requested)
+  const isExplicitDifficulty = Boolean(difficulty && ['EASY', 'MEDIUM', 'HARD'].includes(String(difficulty).toUpperCase()));
+  const targetDist = { EASY: 0.3, MEDIUM: 0.5, HARD: 0.2 };
+  const targetCounts = isExplicitDifficulty
+    ? { [String(difficulty).toUpperCase()]: questionCount }
+    : {
+        EASY: Math.round(questionCount * targetDist.EASY),
+        HARD: Math.round(questionCount * targetDist.HARD),
+        MEDIUM: Math.max(0, questionCount - Math.round(questionCount * targetDist.EASY) - Math.round(questionCount * targetDist.HARD))
+      };
+  const currentDist = { EASY: 0, MEDIUM: 0, HARD: 0 };
+
+  // 7. Round-robin pick from topics with difficulty balancing until we have questionCount
+  const selectedQuestions = [];
+  const topics = Object.keys(byTopic);
+  let topicIdx = 0;
+
+  while (selectedQuestions.length < questionCount && topics.length > 0) {
+    const topic = topics[topicIdx % topics.length];
+    const arr = byTopic[topic];
+    if (arr.length > 0) {
+      let pickIdx = -1;
+      if (!isExplicitDifficulty) {
+        pickIdx = arr.findIndex((q) => (currentDist[q.difficulty] || 0) < (targetCounts[q.difficulty] || 0));
+      }
+      if (pickIdx === -1) {
+        pickIdx = 0;
+      }
+      const [picked] = arr.splice(pickIdx, 1);
+      selectedQuestions.push(picked);
+      currentDist[picked.difficulty] = (currentDist[picked.difficulty] || 0) + 1;
+    } else {
+      // Topic exhausted, remove from rotation
+      const removeIndex = topics.indexOf(topic);
+      if (removeIndex !== -1) {
+        topics.splice(removeIndex, 1);
+      }
+      continue;
+    }
+    topicIdx++;
+  }
+
+  // 8. If still short (fewer topics/questions in candidatePool than count), fill from remaining usable pool
+  if (selectedQuestions.length < questionCount) {
+    const selectedSet = new Set(selectedQuestions.map((q) => q.id));
+    const remaining = usable.filter((q) => !selectedSet.has(q.id));
+    shuffleArray(remaining, randomFn);
+    selectedQuestions.push(...remaining.slice(0, questionCount - selectedQuestions.length));
+  }
+
+  // 9. Lock versions & create attempt
   const selectedVersions = selectedQuestions.map((q) => q.versions[0]);
+  const deliveredVersionIds = selectedVersions.map((v) => v.id);
 
-  // Transactionally create practice attempt and question response placeholders
   const attempt = await prisma.$transaction(async (tx) => {
     const newAttempt = await tx.practiceAttempt.create({
       data: {
@@ -127,16 +211,16 @@ async function createPracticeAttempt(data, options = {}) {
         category: category || type || 'GENERAL',
         status: 'IN_PROGRESS',
         score: 0.0,
-        totalMarks: 0.0
+        totalMarks: 0.0,
+        questionVersionIds: deliveredVersionIds
       }
     });
 
-    // Create a QuestionResponse record for each delivered question
     for (const version of selectedVersions) {
       await tx.questionResponse.create({
         data: {
           practiceAttemptId: newAttempt.id,
-          contestAttemptId: null, // Strictly null for practice
+          contestAttemptId: null,
           questionVersionId: version.id,
           answerData: {},
           isCorrect: null,
