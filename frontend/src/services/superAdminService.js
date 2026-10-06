@@ -83,7 +83,35 @@ export const superAdminService = {
   },
 
   /**
-   * Archive / Delete a global question
+   * Hard Delete a global question
+   */
+  async deleteGlobalQuestion(questionId) {
+    return api.delete(`/api/super-admin/questions/${questionId}`);
+  },
+
+  /**
+   * Bulk Hard Delete global questions
+   */
+  async bulkDeleteGlobalQuestions(ids) {
+    return api.post('/api/super-admin/questions/bulk-delete', { ids });
+  },
+
+  /**
+   * Bulk Activate / Publish global questions to practice hub
+   */
+  async bulkActivateGlobalQuestions(ids) {
+    return api.post('/api/super-admin/questions/bulk-activate', { ids });
+  },
+
+  /**
+   * Bulk Archive global questions
+   */
+  async bulkArchiveGlobalQuestions(ids) {
+    return api.post('/api/super-admin/questions/bulk-archive', { ids });
+  },
+
+  /**
+   * Archive / Inactive a global question
    */
   async archiveGlobalQuestion(questionId) {
     return api.post(`/api/super-admin/questions/${questionId}/archive`);

@@ -110,19 +110,56 @@ async function archiveQuestion(req, res, next) {
 }
 
 /**
- * POST /api/admin/questions
- * Create a new question (single question creation)
+ * DELETE /api/admin/questions/:questionId
+ * Delete a question and cascade child records
  */
-async function createQuestion(req, res, next) {
+async function deleteQuestion(req, res, next) {
   try {
-    const isSuper = ['SUPERADMIN', 'SUPER_ADMIN', 'ADMIN'].includes((req.user?.role || '').toUpperCase()) && !req.user?.collegeId;
-    const data = {
-      ...req.body,
-      collegeId: isSuper ? (req.body.isGlobal ? null : (req.body.collegeId || null)) : (req.user?.collegeId || null),
-      createdBy: req.user?.id || req.user?.username || 'admin'
-    };
-    const question = await questionService.createQuestion(data);
-    return success(res, question, 'Question created successfully', 201);
+    const { questionId } = req.params;
+    const result = await adminQuestionService.deleteQuestion(questionId, req.user);
+    return success(res, null, result.message, 200);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * POST /api/admin/questions/bulk-delete
+ * Bulk delete questions
+ */
+async function bulkDelete(req, res, next) {
+  try {
+    const { ids } = req.body;
+    const result = await adminQuestionService.bulkDeleteQuestions(ids, req.user);
+    return success(res, result, result.message, 200);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * POST /api/admin/questions/bulk-activate
+ * Bulk activate questions
+ */
+async function bulkActivate(req, res, next) {
+  try {
+    const { ids } = req.body;
+    const result = await adminQuestionService.bulkActivateQuestions(ids, req.user);
+    return success(res, result, result.message, 200);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * POST /api/admin/questions/bulk-archive
+ * Bulk archive questions
+ */
+async function bulkArchive(req, res, next) {
+  try {
+    const { ids } = req.body;
+    const result = await adminQuestionService.bulkArchiveQuestions(ids, req.user);
+    return success(res, result, result.message, 200);
   } catch (error) {
     next(error);
   }
@@ -135,5 +172,9 @@ module.exports = {
   getQuestionById,
   getQuestionVersion,
   activateQuestion,
-  archiveQuestion
+  archiveQuestion,
+  deleteQuestion,
+  bulkDelete,
+  bulkActivate,
+  bulkArchive
 };

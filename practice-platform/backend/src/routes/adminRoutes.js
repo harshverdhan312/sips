@@ -17,6 +17,10 @@ router.get('/questions/:questionId', adminQuestionController.getQuestionById);
 router.get('/questions/:questionId/versions/:versionId', adminQuestionController.getQuestionVersion);
 router.post('/questions/:questionId/activate', adminQuestionController.activateQuestion);
 router.post('/questions/:questionId/archive', adminQuestionController.archiveQuestion);
+router.delete('/questions/:questionId', adminQuestionController.deleteQuestion);
+router.post('/questions/bulk-delete', adminQuestionController.bulkDelete);
+router.post('/questions/bulk-activate', adminQuestionController.bulkActivate);
+router.post('/questions/bulk-archive', adminQuestionController.bulkArchive);
 
 // Reusable Assessments & Question Set Assembly
 router.post('/assessments', adminAssessmentController.createAssessment);

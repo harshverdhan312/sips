@@ -69,7 +69,7 @@ async function seed() {
           await tx.assessmentQuestion.deleteMany({ where: { questionVersionId: { in: vIds } } });
         }
         if (cpIds.length > 0) {
-          await tx.testCase.deleteMany({ where: { codingProblemId: { in: cpIds } } });
+          await tx.codingTestCase.deleteMany({ where: { codingProblemId: { in: cpIds } } });
           await tx.codingProblem.deleteMany({ where: { id: { in: cpIds } } });
         }
         if (vIds.length > 0) {

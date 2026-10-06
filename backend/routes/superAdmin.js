@@ -21,8 +21,12 @@ router.post('/colleges/:id/toggle-status', superAdminController.toggleCollegeSta
 // Global Question Bank Management
 router.get('/questions', superAdminController.getGlobalQuestions);
 router.post('/questions', superAdminController.createGlobalQuestion);
+router.delete('/questions/:id', superAdminController.deleteGlobalQuestion);
 router.post('/questions/:id/archive', superAdminController.archiveGlobalQuestion);
 router.post('/questions/:id/activate', superAdminController.activateGlobalQuestion);
+router.post('/questions/bulk-delete', superAdminController.bulkDeleteGlobalQuestions);
+router.post('/questions/bulk-activate', superAdminController.bulkActivateGlobalQuestions);
+router.post('/questions/bulk-archive', superAdminController.bulkArchiveGlobalQuestions);
 
 // Diagnostic SMTP status check
 router.get('/email-status', superAdminController.getEmailStatus);

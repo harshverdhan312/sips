@@ -390,10 +390,176 @@ async function archiveQuestion(questionId, user = {}) {
   };
 }
 
+/**
+ * Delete a question and cascade all related versions, test cases, and responses
+ */
+async function deleteQuestion(questionId, user = {}) {
+  const question = await prisma.practiceQuestion.findUnique({
+    where: { id: questionId },
+    include: {
+      versions: {
+        select: {
+          id: true,
+          codingProblem: {
+            select: { id: true }
+          }
+        }
+      }
+    }
+  });
+
+  if (!question) {
+    throw new AppError(`Question not found with id: ${questionId}`, 404);
+  }
+
+  checkCollegeAccess(question, user);
+
+  const vIds = question.versions.map((v) => v.id);
+  const cpIds = question.versions.map((v) => v.codingProblem?.id).filter(Boolean);
+
+  await prisma.$transaction(async (tx) => {
+    if (vIds.length > 0) {
+      await tx.questionResponse.deleteMany({ where: { questionVersionId: { in: vIds } } });
+      await tx.assessmentResponse.deleteMany({ where: { questionVersionId: { in: vIds } } });
+      await tx.codeSubmission.deleteMany({ where: { questionVersionId: { in: vIds } } });
+      await tx.contestQuestion.deleteMany({ where: { questionVersionId: { in: vIds } } });
+      await tx.assessmentQuestion.deleteMany({ where: { questionVersionId: { in: vIds } } });
+    }
+    if (cpIds.length > 0) {
+      await tx.codingTestCase.deleteMany({ where: { codingProblemId: { in: cpIds } } });
+      await tx.codingProblem.deleteMany({ where: { id: { in: cpIds } } });
+    }
+    if (vIds.length > 0) {
+      await tx.questionVersion.deleteMany({ where: { id: { in: vIds } } });
+    }
+    await tx.practiceQuestion.delete({ where: { id: questionId } });
+  });
+
+  return {
+    success: true,
+    message: `Question '${question.externalId || question.id}' and its related resources were deleted successfully.`
+  };
+}
+
+/**
+ * Bulk delete multiple questions
+ */
+async function bulkDeleteQuestions(questionIds = [], user = {}) {
+  if (!Array.isArray(questionIds) || questionIds.length === 0) {
+    throw new AppError('An array of question IDs is required for bulk deletion.', 400);
+  }
+
+  const questions = await prisma.practiceQuestion.findMany({
+    where: { id: { in: questionIds } },
+    include: {
+      versions: {
+        select: {
+          id: true,
+          codingProblem: {
+            select: { id: true }
+          }
+        }
+      }
+    }
+  });
+
+  for (const q of questions) {
+    checkCollegeAccess(q, user);
+  }
+
+  const qIds = questions.map((q) => q.id);
+  const vIds = questions.flatMap((q) => q.versions.map((v) => v.id));
+  const cpIds = questions.flatMap((q) => q.versions.map((v) => v.codingProblem?.id).filter(Boolean));
+
+  await prisma.$transaction(async (tx) => {
+    if (vIds.length > 0) {
+      await tx.questionResponse.deleteMany({ where: { questionVersionId: { in: vIds } } });
+      await tx.assessmentResponse.deleteMany({ where: { questionVersionId: { in: vIds } } });
+      await tx.codeSubmission.deleteMany({ where: { questionVersionId: { in: vIds } } });
+      await tx.contestQuestion.deleteMany({ where: { questionVersionId: { in: vIds } } });
+      await tx.assessmentQuestion.deleteMany({ where: { questionVersionId: { in: vIds } } });
+    }
+    if (cpIds.length > 0) {
+      await tx.codingTestCase.deleteMany({ where: { codingProblemId: { in: cpIds } } });
+      await tx.codingProblem.deleteMany({ where: { id: { in: cpIds } } });
+    }
+    if (vIds.length > 0) {
+      await tx.questionVersion.deleteMany({ where: { id: { in: vIds } } });
+    }
+    await tx.practiceQuestion.deleteMany({ where: { id: { in: qIds } } });
+  });
+
+  return {
+    success: true,
+    deletedCount: qIds.length,
+    message: `Successfully deleted ${qIds.length} question(s).`
+  };
+}
+
+/**
+ * Bulk activate multiple questions (DRAFT -> ACTIVE)
+ */
+async function bulkActivateQuestions(questionIds = [], user = {}) {
+  if (!Array.isArray(questionIds) || questionIds.length === 0) {
+    throw new AppError('An array of question IDs is required.', 400);
+  }
+
+  const questions = await prisma.practiceQuestion.findMany({
+    where: { id: { in: questionIds } }
+  });
+
+  for (const q of questions) {
+    checkCollegeAccess(q, user);
+  }
+
+  const res = await prisma.practiceQuestion.updateMany({
+    where: { id: { in: questionIds } },
+    data: { status: 'ACTIVE' }
+  });
+
+  return {
+    success: true,
+    activatedCount: res.count,
+    message: `Successfully activated ${res.count} question(s) to the Practice Hub.`
+  };
+}
+
+/**
+ * Bulk archive multiple questions (ACTIVE -> ARCHIVED)
+ */
+async function bulkArchiveQuestions(questionIds = [], user = {}) {
+  if (!Array.isArray(questionIds) || questionIds.length === 0) {
+    throw new AppError('An array of question IDs is required.', 400);
+  }
+
+  const questions = await prisma.practiceQuestion.findMany({
+    where: { id: { in: questionIds } }
+  });
+
+  for (const q of questions) {
+    checkCollegeAccess(q, user);
+  }
+
+  const res = await prisma.practiceQuestion.updateMany({
+    where: { id: { in: questionIds } },
+    data: { status: 'ARCHIVED' }
+  });
+
+  return {
+    success: true,
+    archivedCount: res.count,
+    message: `Successfully archived ${res.count} question(s).`
+  };
+}
+
 module.exports = {
   getAdminQuestions,
   getAdminQuestionById,
   getAdminQuestionVersion,
   activateQuestion,
-  archiveQuestion
+  archiveQuestion,
+  deleteQuestion,
+  bulkDeleteQuestions,
+  bulkActivateQuestions,
+  bulkArchiveQuestions
 };
