@@ -7,7 +7,8 @@ import {
   Mic,
   Award,
   ArrowRight,
-  Sparkles,
+  Activity,
+  Code,
   CheckCircle2,
   AlertTriangle,
   Clock,
@@ -167,15 +168,15 @@ export function StudentDashboard() {
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-900 via-indigo-800 to-indigo-950 p-6 sm:p-8 text-white shadow-lg">
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-indigo-900 via-indigo-800 to-indigo-950 p-6 sm:p-8 text-white shadow-md">
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-indigo-200 border border-white/10">
-              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-indigo-200 border border-white/10 font-mono">
+              <Activity className="w-3.5 h-3.5 text-emerald-400" />
               Campus Placement Portal Active
             </div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight">
-              Welcome back, {currentStudent.name ? currentStudent.name.split(" ")[0] : "Student"} 👋
+              Welcome back, {currentStudent.name ? currentStudent.name.split(" ")[0] : "Student"}
             </h1>
             <p className="text-sm sm:text-base text-indigo-200 max-w-xl">
               {currentStudent.branch ? `${currentStudent.branch} • ${currentStudent.semester || "Candidate"}` : "Live student placement dashboard"}
@@ -225,7 +226,7 @@ export function StudentDashboard() {
         <StatCard
           title="Technical Score"
           value={currentStudent.resumeUrl && (metrics.technicalScore || 0) > 0 ? `${metrics.technicalScore}/100` : "Not evaluated"}
-          icon={Sparkles}
+          icon={Code}
           iconBg="bg-blue-50 text-blue-600"
         />
         <StatCard

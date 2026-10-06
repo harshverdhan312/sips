@@ -9,7 +9,7 @@ import {
   ShieldCheck,
   ExternalLink,
   Eye,
-  Sparkles,
+  Code2,
   Trash2,
   Plus,
   X
@@ -356,8 +356,8 @@ export function ResumeAnalysisPage() {
             <div className="pt-3 border-t border-slate-100">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-indigo-600" />
-                  AI-Extracted Technical Skills ({uploadedResume.mlAnalysis.extracted_skills.length})
+                  <Code2 className="w-4 h-4 text-indigo-600" />
+                  Extracted Technical Skills ({uploadedResume.mlAnalysis.extracted_skills.length})
                 </span>
                 <Badge variant="primary" size="sm">
                   FastAPI ML Verified

@@ -28,7 +28,7 @@ export function StarTrackerPage() {
 
       {/* Honest Unavailable State Card */}
       <Card className="p-12 text-center max-w-xl mx-auto border-slate-200 shadow-sm">
-        <div className="w-16 h-16 rounded-3xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-4">
           <Award className="w-8 h-8" />
         </div>
         <h3 className="text-xl font-extrabold text-slate-900 mb-2">

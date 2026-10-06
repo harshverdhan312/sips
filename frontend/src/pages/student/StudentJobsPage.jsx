@@ -593,9 +593,9 @@ export function StudentJobsPage() {
             <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-indigo-600" />
+                  <Target className="w-4 h-4 text-indigo-600" />
                   <span className="font-bold text-slate-900 text-xs sm:text-sm">
-                    AI Match Intelligence (FastAPI ML)
+                    Match Intelligence Engine
                   </span>
                 </div>
                 <Button

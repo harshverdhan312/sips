@@ -1,5 +1,5 @@
 import React from "react";
-import { Sparkles } from "lucide-react";
+import { Clock } from "lucide-react";
 import { Modal } from "./Modal";
 import { Button } from "./Button";
 
@@ -17,8 +17,8 @@ export function ComingSoonModal({
       title={title}
     >
       <div className="text-center py-2 space-y-4">
-        <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center mx-auto shadow-xs">
-          <Sparkles className="w-6 h-6 text-indigo-600" />
+        <div className="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center mx-auto shadow-xs">
+          <Clock className="w-6 h-6 text-indigo-600" />
         </div>
         <p className="text-sm text-slate-600 leading-relaxed max-w-sm mx-auto">
           {body}

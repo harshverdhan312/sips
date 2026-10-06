@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
   Legend
 } from "recharts";
+import { TrendingUp } from "lucide-react";
 
 export function ReadinessTrendChart({ data, height = 280 }) {
   const chartData = Array.isArray(data) ? data : [];
@@ -16,8 +17,8 @@ export function ReadinessTrendChart({ data, height = 280 }) {
   if (chartData.length === 0) {
     return (
       <div style={{ width: "100%", height }} className="flex flex-col items-center justify-center text-slate-400 text-xs py-10">
-        <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 font-bold mb-2">
-          📈
+        <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 mb-2">
+          <TrendingUp className="w-5 h-5" />
         </div>
         <span>No historical placement trends recorded yet</span>
       </div>

@@ -29,9 +29,6 @@ export function SplashScreen({ minDuration = 1100, onComplete }) {
       }`}
       aria-label="SIPS Loading Splash"
     >
-      {/* Ambient background glow */}
-      <div className="absolute top-1/3 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-
       <div className="relative flex flex-col items-center px-4">
         <img
           src="/branding/sips-logo-full.png"

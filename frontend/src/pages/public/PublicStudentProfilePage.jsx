@@ -174,11 +174,7 @@ export function PublicStudentProfilePage() {
       {/* Main Container */}
       <main className="max-w-5xl mx-auto px-4 sm:px-8 py-10 space-y-10">
         {/* Profile Hero Section */}
-        <section className="relative overflow-hidden rounded-3xl bg-white border border-slate-200/80 p-6 sm:p-10 shadow-sm">
-          {/* Subtle Ambient Glow */}
-          <div className="absolute top-0 right-0 -mt-16 -mr-16 w-80 h-80 rounded-full bg-indigo-50/70 blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 -mb-16 -ml-16 w-80 h-80 rounded-full bg-blue-50/60 blur-3xl pointer-events-none" />
-
+        <section className="relative overflow-hidden rounded-xl bg-white border border-slate-200/80 p-6 sm:p-10 shadow-sm">
           <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8 text-center md:text-left">
             {/* Avatar */}
             <div className="relative shrink-0">
@@ -186,11 +182,11 @@ export function PublicStudentProfilePage() {
                 <img
                   src={avatarUrl}
                   alt={profile.name}
-                  className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl object-cover border-2 border-slate-100 shadow-md"
+                  className="w-28 h-28 sm:w-32 sm:h-32 rounded-xl object-cover border-2 border-slate-100 shadow-sm"
                   onError={() => setImageError(true)}
                 />
               ) : (
-                <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-indigo-400 flex items-center justify-center font-bold text-3xl sm:text-4xl text-white shadow-md shadow-indigo-600/20 border-2 border-indigo-100">
+                <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 flex items-center justify-center font-bold text-3xl sm:text-4xl text-white shadow-sm border-2 border-indigo-100">
                   {initials}
                 </div>
               )}
@@ -631,7 +627,7 @@ export function PublicStudentProfilePage() {
       <footer className="mt-16 border-t border-slate-200/80 bg-white py-8 px-4 text-center">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <div className="flex items-center gap-2 font-medium">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+            <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />
             <span>Powered by <strong>SIPS</strong> — Skill Intelligence Placement System</span>
           </div>
           <div>
