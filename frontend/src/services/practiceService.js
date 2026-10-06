@@ -1,10 +1,124 @@
 import { practiceApi } from './practiceApi';
 
 /**
+ * Practice Platform In-Memory SWR Cache Store
+ * Eliminates 1-2 second roundtrips and blank loading flickers on navigation.
+ */
+const cacheStore = new Map();
+const inFlightRequests = new Map();
+const DEFAULT_TTL = 3 * 60 * 1000; // 3 minutes
+
+function getCached(key, maxAge = DEFAULT_TTL) {
+  const entry = cacheStore.get(key);
+  if (!entry) return null;
+  const isExpired = Date.now() - entry.timestamp > maxAge;
+  if (isExpired) return null;
+  return entry.data;
+}
+
+function setCached(key, data) {
+  cacheStore.set(key, {
+    data,
+    timestamp: Date.now()
+  });
+}
+
+function invalidateCache(pattern) {
+  if (!pattern) {
+    cacheStore.clear();
+    return;
+  }
+  for (const key of cacheStore.keys()) {
+    if (typeof pattern === 'string' && key.includes(pattern)) {
+      cacheStore.delete(key);
+    } else if (pattern instanceof RegExp && pattern.test(key)) {
+      cacheStore.delete(key);
+    }
+  }
+}
+
+async function cachedFetch(key, fetcher, { forceRefresh = false, ttl = DEFAULT_TTL } = {}) {
+  if (!forceRefresh) {
+    const cached = getCached(key, ttl);
+    if (cached !== null) {
+      return cached;
+    }
+  }
+
+  // Deduplicate concurrent in-flight requests for identical key
+  if (inFlightRequests.has(key)) {
+    return inFlightRequests.get(key);
+  }
+
+  const promise = (async () => {
+    try {
+      const result = await fetcher();
+      setCached(key, result);
+      return result;
+    } finally {
+      inFlightRequests.delete(key);
+    }
+  })();
+
+  inFlightRequests.set(key, promise);
+  return promise;
+}
+
+/**
  * Practice Platform Service
  * Encapsulates all communication with the Practice backend for student features.
  */
 export const practiceService = {
+  // Synchronous cache accessors for instant, 0ms component initialization
+  getCachedCodingQuestions(filters = {}) {
+    const params = new URLSearchParams();
+    params.set('type', 'CODING');
+    if (filters.category && filters.category !== 'ALL') params.set('category', filters.category);
+    if (filters.difficulty && filters.difficulty !== 'ALL') params.set('difficulty', filters.difficulty);
+    return getCached(`coding_questions_${params.toString()}`);
+  },
+
+  getCachedCodingSolveStatus() {
+    return getCached('coding_solve_status');
+  },
+
+  getCachedDeliveredQuestions(attemptId) {
+    if (!attemptId) return null;
+    return getCached(`delivered_questions_${attemptId}`);
+  },
+
+  getCachedAvailableContests() {
+    return getCached('available_contests');
+  },
+
+  getCachedAvailableAssessments() {
+    return getCached('available_assessments');
+  },
+
+  getCachedPracticeProgress() {
+    return getCached('practice_progress');
+  },
+
+  getCachedPracticeStreak() {
+    return getCached('practice_streak');
+  },
+
+  invalidateSolveStatus() {
+    invalidateCache('coding_solve_status');
+    invalidateCache('practice_progress');
+    invalidateCache('practice_streak');
+  },
+
+  invalidateAttempt(attemptId) {
+    if (attemptId) {
+      invalidateCache(`delivered_questions_${attemptId}`);
+    }
+  },
+
+  clearCache() {
+    invalidateCache();
+  },
+
   /**
    * Health probe / verification check
    */
@@ -15,9 +129,15 @@ export const practiceService = {
   /**
    * Discover available assessments / contests for the authenticated student's college
    */
-  async getAvailableContests() {
-    const res = await practiceApi.get('/api/contests/available');
-    return res?.data || res || [];
+  async getAvailableContests(options = {}) {
+    return cachedFetch(
+      'available_contests',
+      async () => {
+        const res = await practiceApi.get('/api/contests/available');
+        return res?.data || res || [];
+      },
+      options
+    );
   },
 
   /**
@@ -79,6 +199,7 @@ export const practiceService = {
    */
   async submitContest(contestId, attemptId) {
     const res = await practiceApi.post(`/api/contests/${contestId}/attempts/${attemptId}/submit`);
+    invalidateCache('available_contests');
     return res?.data || res;
   },
 
@@ -89,6 +210,7 @@ export const practiceService = {
    */
   async finalizeContest(contestId, attemptId) {
     const res = await practiceApi.post(`/api/contests/${contestId}/attempts/${attemptId}/finalize`);
+    invalidateCache('available_contests');
     return res?.data || res;
   },
 
@@ -133,25 +255,59 @@ export const practiceService = {
   },
 
   /**
-   * Discover available coding questions
+   * Discover available coding questions (cached with instant SWR)
    * @param {object} filters - { category, difficulty }
+   * @param {object} options - { forceRefresh }
    */
-  async getCodingQuestions(filters = {}) {
+  async getCodingQuestions(filters = {}, options = {}) {
     const params = new URLSearchParams();
     params.set('type', 'CODING');
     if (filters.category && filters.category !== 'ALL') params.set('category', filters.category);
     if (filters.difficulty && filters.difficulty !== 'ALL') params.set('difficulty', filters.difficulty);
     const queryString = params.toString();
-    const res = await practiceApi.get(`/api/questions?${queryString}`);
-    return res?.data || res || [];
+    const cacheKey = `coding_questions_${queryString}`;
+
+    return cachedFetch(
+      cacheKey,
+      async () => {
+        const res = await practiceApi.get(`/api/questions?${queryString}`);
+        return res?.data || res || [];
+      },
+      options
+    );
+  },
+
+  /**
+   * Get student's solved and attempted coding question IDs (cached)
+   */
+  async getCodingSolveStatus(options = {}) {
+    return cachedFetch(
+      'coding_solve_status',
+      async () => {
+        try {
+          const res = await practiceApi.get('/api/practice/coding-status');
+          return res?.data || res || { solvedQuestionIds: [], attemptedQuestionIds: [], totalSolved: 0, totalAttempted: 0 };
+        } catch (e) {
+          console.warn('Could not fetch coding solve status:', e);
+          return { solvedQuestionIds: [], attemptedQuestionIds: [], totalSolved: 0, totalAttempted: 0 };
+        }
+      },
+      options
+    );
   },
 
   /**
    * Get question details by ID (includes versions)
    */
-  async getQuestionDetails(questionId) {
-    const res = await practiceApi.get(`/api/questions/${questionId}`);
-    return res?.data || res;
+  async getQuestionDetails(questionId, options = {}) {
+    return cachedFetch(
+      `question_details_${questionId}`,
+      async () => {
+        const res = await practiceApi.get(`/api/questions/${questionId}`);
+        return res?.data || res;
+      },
+      options
+    );
   },
 
   /**
@@ -175,6 +331,13 @@ export const practiceService = {
     if (practiceAttemptId) payload.practiceAttemptId = practiceAttemptId;
     if (contestAttemptId) payload.contestAttemptId = contestAttemptId;
     const res = await practiceApi.post('/api/coding/execute/submit', payload);
+    // Invalidate solving progress & attempt question cache after submission
+    invalidateCache('coding_solve_status');
+    invalidateCache('practice_progress');
+    invalidateCache('practice_streak');
+    if (practiceAttemptId) {
+      invalidateCache(`delivered_questions_${practiceAttemptId}`);
+    }
     return res?.data || res;
   },
 
@@ -197,9 +360,15 @@ export const practiceService = {
   /**
    * Retrieve delivered questions for an active practice attempt (Student-safe DTO)
    */
-  async getDeliveredQuestions(attemptId) {
-    const res = await practiceApi.get(`/api/practice/attempts/${attemptId}/questions`);
-    return res?.data || res;
+  async getDeliveredQuestions(attemptId, options = {}) {
+    return cachedFetch(
+      `delivered_questions_${attemptId}`,
+      async () => {
+        const res = await practiceApi.get(`/api/practice/attempts/${attemptId}/questions`);
+        return res?.data || res;
+      },
+      options
+    );
   },
 
   /**
@@ -210,6 +379,9 @@ export const practiceService = {
       questionVersionId,
       answerData
     });
+    if (attemptId) {
+      invalidateCache(`delivered_questions_${attemptId}`);
+    }
     return res?.data || res;
   },
 
@@ -218,6 +390,12 @@ export const practiceService = {
    */
   async submitPracticeAttempt(attemptId) {
     const res = await practiceApi.post(`/api/practice/attempts/${attemptId}/submit`);
+    invalidateCache('coding_solve_status');
+    invalidateCache('practice_progress');
+    invalidateCache('practice_streak');
+    if (attemptId) {
+      invalidateCache(`delivered_questions_${attemptId}`);
+    }
     return res?.data || res;
   },
 
@@ -247,17 +425,29 @@ export const practiceService = {
   /**
    * Retrieve aggregated practice progress analytics for the authenticated student
    */
-  async getPracticeProgress() {
-    const res = await practiceApi.get('/api/practice/progress');
-    return res?.data || res;
+  async getPracticeProgress(options = {}) {
+    return cachedFetch(
+      'practice_progress',
+      async () => {
+        const res = await practiceApi.get('/api/practice/progress');
+        return res?.data || res;
+      },
+      options
+    );
   },
 
   /**
    * Retrieve daily practice streak metrics for the authenticated student
    */
-  async getPracticeStreak() {
-    const res = await practiceApi.get('/api/practice/streak');
-    return res?.data || res;
+  async getPracticeStreak(options = {}) {
+    return cachedFetch(
+      'practice_streak',
+      async () => {
+        const res = await practiceApi.get('/api/practice/streak');
+        return res?.data || res;
+      },
+      options
+    );
   },
 
   /**
@@ -436,9 +626,15 @@ export const practiceService = {
   /**
    * Discover published assessments available to student
    */
-  async getAvailableAssessments() {
-    const res = await practiceApi.get('/api/assessments/available');
-    return res?.data || res || [];
+  async getAvailableAssessments(options = {}) {
+    return cachedFetch(
+      'available_assessments',
+      async () => {
+        const res = await practiceApi.get('/api/assessments/available');
+        return res?.data || res || [];
+      },
+      options
+    );
   },
 
   /**
@@ -501,6 +697,7 @@ export const practiceService = {
    */
   async submitAssessment(assessmentId, attemptId) {
     const res = await practiceApi.post(`/api/assessments/${assessmentId}/attempts/${attemptId}/submit`);
+    invalidateCache('available_assessments');
     return res?.data || res;
   },
 
@@ -509,6 +706,7 @@ export const practiceService = {
    */
   async finalizeAssessment(assessmentId, attemptId) {
     const res = await practiceApi.post(`/api/assessments/${assessmentId}/attempts/${attemptId}/finalize`);
+    invalidateCache('available_assessments');
     return res?.data || res;
   },
 

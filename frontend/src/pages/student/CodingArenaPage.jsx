@@ -23,6 +23,8 @@ import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
 import { Modal } from "../../components/common/Modal";
+import { ProblemStatement } from "../../components/common/ProblemStatement";
+import { CodeEditor } from "../../components/common/CodeEditor";
 import { practiceService } from "../../services/practiceService";
 
 const STARTER_TEMPLATES = {
@@ -101,14 +103,32 @@ export function CodingArenaPage() {
   const { attemptId } = useParams();
   const navigate = useNavigate();
 
+  // Instant in-memory cache hydration for 0ms initial render
+  const cachedData = practiceService.getCachedDeliveredQuestions(attemptId);
+  const cachedQuestion = cachedData?.questions?.[0] || null;
+
   // Attempt & Problem State
-  const [loading, setLoading] = useState(true);
+  const [question, setQuestion] = useState(cachedQuestion);
+  const [loading, setLoading] = useState(!cachedQuestion);
   const [error, setError] = useState(null);
-  const [question, setQuestion] = useState(null);
 
   // Editor State
-  const [language, setLanguage] = useState("python");
-  const [sourceCodeByLang, setSourceCodeByLang] = useState(STARTER_TEMPLATES);
+  const [language, setLanguage] = useState(() => {
+    if (cachedQuestion?.currentAnswer?.language) {
+      return cachedQuestion.currentAnswer.language;
+    }
+    return "python";
+  });
+  const [sourceCodeByLang, setSourceCodeByLang] = useState(() => {
+    if (cachedQuestion?.currentAnswer?.sourceCode) {
+      const lang = cachedQuestion.currentAnswer.language || "python";
+      return {
+        ...STARTER_TEMPLATES,
+        [lang]: cachedQuestion.currentAnswer.sourceCode
+      };
+    }
+    return STARTER_TEMPLATES;
+  });
   const [copiedInputIndex, setCopiedInputIndex] = useState(null);
   const [showResetModal, setShowResetModal] = useState(false);
 
@@ -134,7 +154,9 @@ export function CodingArenaPage() {
 
   // Load Attempt and Delivered Question
   const loadArena = useCallback(async () => {
-    setLoading(true);
+    if (!question) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const data = await practiceService.getDeliveredQuestions(attemptId);
@@ -156,11 +178,13 @@ export function CodingArenaPage() {
       }
     } catch (err) {
       console.error("Failed to load coding arena:", err);
-      setError(err.message || "Failed to load coding challenge.");
+      if (!question) {
+        setError(err.message || "Failed to load coding challenge.");
+      }
     } finally {
       setLoading(false);
     }
-  }, [attemptId]);
+  }, [attemptId, question]);
 
   useEffect(() => {
     loadArena();
@@ -360,6 +384,7 @@ export function CodingArenaPage() {
 
   const codingProblem = question.codingProblem || {};
   const publicTestCases = codingProblem.testCases || [];
+  const problemMaxMarks = (question.difficulty === "HARD" ? 100 : question.difficulty === "MEDIUM" ? 50 : 20);
 
   return (
     <div className="space-y-4 animate-in fade-in duration-300">
@@ -386,7 +411,7 @@ export function CodingArenaPage() {
             <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
               <span>{question.category}</span>
               {question.subcategory && <span>• {question.subcategory}</span>}
-              <span>• Max Marks: <strong className="text-indigo-600 font-bold">{codingProblem.maxMarks || 100} pts</strong></span>
+              <span>• Max Marks: <strong className="text-indigo-600 font-bold">{problemMaxMarks} pts</strong></span>
             </div>
           </div>
         </div>
@@ -443,18 +468,16 @@ export function CodingArenaPage() {
             {/* TAB 1: Problem Details */}
             {activeLeftTab === "problem" && (
               <div className="overflow-y-auto pr-1 space-y-5 flex-1 max-h-[600px]">
-                {/* Statement */}
+                {/* Rich Problem Statement & Formatted Sections */}
                 <div>
                   <h4 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-2">
-                    Description
+                    Description & Specifications
                   </h4>
-                  <div className="text-xs sm:text-sm text-slate-700 whitespace-pre-line leading-relaxed font-normal">
-                    {question.statement}
-                  </div>
+                  <ProblemStatement statement={question.statement} />
                 </div>
 
-                {/* Input Format */}
-                {codingProblem.inputFormat && (
+                {/* Additional Input Format if custom */}
+                {codingProblem.inputFormat && !codingProblem.inputFormat.toLowerCase().includes("standard input via stdin") && (
                   <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
                     <h5 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                       <Terminal className="w-3.5 h-3.5 text-indigo-600" />
@@ -466,8 +489,8 @@ export function CodingArenaPage() {
                   </div>
                 )}
 
-                {/* Output Format */}
-                {codingProblem.outputFormat && (
+                {/* Additional Output Format if custom */}
+                {codingProblem.outputFormat && !codingProblem.outputFormat.toLowerCase().includes("standard output via stdout") && (
                   <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
                     <h5 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                       <Code2 className="w-3.5 h-3.5 text-indigo-600" />
@@ -629,31 +652,13 @@ export function CodingArenaPage() {
               </div>
             </div>
 
-            {/* Code Textarea with Line Numbers */}
-            <div className="relative flex bg-slate-950 font-mono text-xs sm:text-sm h-[420px] overflow-hidden">
-              {/* Line Numbers Gutter */}
-              <div
-                ref={lineNumbersRef}
-                className="w-12 py-3 bg-slate-900/60 text-slate-500 text-right pr-3 select-none overflow-hidden font-mono text-xs border-r border-slate-800/80 leading-6"
-              >
-                {lineNumbers.map((n) => (
-                  <div key={n}>{n}</div>
-                ))}
-              </div>
-
-              {/* Code Textarea */}
-              <textarea
-                ref={textareaRef}
+            {/* Monaco Code Editor */}
+            <div className="relative w-full h-[440px] bg-slate-950 overflow-hidden">
+              <CodeEditor
                 value={currentSourceCode}
-                onChange={(e) => handleSourceCodeChange(e.target.value)}
-                onScroll={handleScroll}
-                onKeyDown={handleKeyDown}
-                spellCheck="false"
-                autoCapitalize="none"
-                autoComplete="off"
-                autoCorrect="off"
-                className="flex-1 py-3 px-4 bg-transparent text-slate-100 placeholder-slate-600 focus:outline-none resize-none font-mono leading-6 overflow-y-auto whitespace-pre tab-4"
-                placeholder="Write your solution here..."
+                onChange={handleSourceCodeChange}
+                language={language}
+                height="440px"
               />
             </div>
 
@@ -731,7 +736,7 @@ export function CodingArenaPage() {
                   </div>
                   {executionResult.mode === "SUBMIT" && (
                     <div className="text-indigo-600 font-extrabold bg-indigo-50 px-2.5 py-1 rounded-md">
-                      Score: {executionResult.earnedMarks} / {codingProblem.maxMarks || 100} pts
+                      Score: {executionResult.earnedMarks} / {problemMaxMarks} pts
                     </div>
                   )}
                   {executionResult.executionTimeMs !== undefined && (

@@ -167,7 +167,8 @@ exports.login = async (req, res) => {
           institutionId: memInst._id,
           institutionName: memInst.name,
           userId: memInst._id,
-          username: memInst.mainAdmin.username
+          username: memInst.mainAdmin.username,
+          needsPasswordReset: Boolean(memInst.needsPasswordReset)
         });
       }
       if (loginId.includes('@')) {
@@ -367,7 +368,8 @@ exports.login = async (req, res) => {
         institutionId: inst._id,
         institutionName: inst.name,
         userId: inst._id,
-        username: inst.mainAdmin.username
+        username: inst.mainAdmin.username,
+        needsPasswordReset: Boolean(inst.needsPasswordReset)
       });
     }
 
@@ -1113,6 +1115,38 @@ exports.changePassword = async (req, res) => {
       dept.updatedAt = new Date();
       await dept.save();
       return res.json({ success: true, message: 'Password changed successfully.' });
+    }
+
+    if (role === 'COLLEGE_ADMIN') {
+      const col = await College.findById(userId);
+      if (col) {
+        if (currentPassword) {
+          const isMatch = await bcrypt.compare(currentPassword, col.masterPasswordHash);
+          if (!isMatch) {
+            return res.status(400).json({ success: false, message: 'Current password is incorrect.' });
+          }
+        }
+        col.masterPasswordHash = newPasswordHash;
+        col.updatedAt = new Date();
+        await col.save();
+        return res.json({ success: true, message: 'Password changed successfully.' });
+      }
+    }
+
+    if (role === 'STUDENT') {
+      const student = await Student.findById(userId);
+      if (student) {
+        if (currentPassword) {
+          const isMatch = await bcrypt.compare(currentPassword, student.passwordHash);
+          if (!isMatch) {
+            return res.status(400).json({ success: false, message: 'Current password is incorrect.' });
+          }
+        }
+        student.passwordHash = newPasswordHash;
+        student.updatedAt = new Date();
+        await student.save();
+        return res.json({ success: true, message: 'Password changed successfully.' });
+      }
     }
 
     return res.json({ success: true, message: 'Password changed successfully.' });

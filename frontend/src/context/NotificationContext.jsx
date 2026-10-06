@@ -5,12 +5,7 @@ import { useAuth } from "./AuthContext";
 const NotificationContext = createContext(null);
 
 export function NotificationProvider({ children }) {
-  let authContext = null;
-  try {
-    authContext = useAuth();
-  } catch (e) {
-    // Graceful fallback if used outside AuthProvider in isolated tests
-  }
+  const authContext = useAuth();
   const isAuthenticated = authContext?.isAuthenticated ?? false;
 
   const [notifications, setNotifications] = useState([]);

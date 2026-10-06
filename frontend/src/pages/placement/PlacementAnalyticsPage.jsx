@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  Sparkles,
+  Activity,
   Clock,
   BrainCircuit,
   Zap,
@@ -11,15 +11,12 @@ export function PlacementAnalyticsPage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Coming Soon Announcement Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900 text-white p-8 sm:p-12 shadow-xl border border-indigo-700/50">
-        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute right-1/3 -top-10 w-48 h-48 bg-purple-500/20 rounded-full blur-2xl pointer-events-none" />
-        
+      <div className="relative overflow-hidden rounded-xl bg-slate-900 text-white p-8 sm:p-12 shadow-lg border border-slate-800">
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
           <div className="space-y-4 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/30 border border-indigo-400/30 text-indigo-200 text-xs font-bold tracking-wide uppercase">
-              <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
-              <span>Coming Soon • Advanced Intelligence Suite</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-bold font-mono tracking-wide uppercase">
+              <Activity className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Pipeline Stage • Advanced Intelligence Suite</span>
             </div>
             
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">

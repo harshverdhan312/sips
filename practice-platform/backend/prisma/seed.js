@@ -31,6 +31,108 @@ function loadDataFiles() {
 
 async function seed() {
   console.log('--- Seeding SIPS Practice Questions & Coding Banks ---');
+
+  // 1. Purge legacy NeetCode 150 questions if present in database
+  try {
+    const neetcodeQuestions = await prisma.practiceQuestion.findMany({
+      where: {
+        OR: [
+          { sourceNamespace: 'neetcode-150' },
+          { externalId: { startsWith: 'nc-' } },
+          { sourceUrl: { contains: 'neetcode' } }
+        ]
+      },
+      select: {
+        id: true,
+        versions: {
+          select: {
+            id: true,
+            codingProblem: {
+              select: { id: true }
+            }
+          }
+        }
+      }
+    });
+
+    if (neetcodeQuestions.length > 0) {
+      const qIds = neetcodeQuestions.map(q => q.id);
+      const vIds = neetcodeQuestions.flatMap(q => q.versions.map(v => v.id));
+      const cpIds = neetcodeQuestions.flatMap(q => q.versions.map(v => v.codingProblem?.id).filter(Boolean));
+
+      await prisma.$transaction(async (tx) => {
+        if (vIds.length > 0) {
+          await tx.questionResponse.deleteMany({ where: { questionVersionId: { in: vIds } } });
+          await tx.assessmentResponse.deleteMany({ where: { questionVersionId: { in: vIds } } });
+          await tx.codeSubmission.deleteMany({ where: { questionVersionId: { in: vIds } } });
+          await tx.contestQuestion.deleteMany({ where: { questionVersionId: { in: vIds } } });
+          await tx.assessmentQuestion.deleteMany({ where: { questionVersionId: { in: vIds } } });
+        }
+        if (cpIds.length > 0) {
+          await tx.codingTestCase.deleteMany({ where: { codingProblemId: { in: cpIds } } });
+          await tx.codingProblem.deleteMany({ where: { id: { in: cpIds } } });
+        }
+        if (vIds.length > 0) {
+          await tx.questionVersion.deleteMany({ where: { id: { in: vIds } } });
+        }
+        await tx.practiceQuestion.deleteMany({ where: { id: { in: qIds } } });
+      }, {
+        maxWait: 20000,
+        timeout: 60000
+      });
+
+      console.log(`✓ Successfully purged ${neetcodeQuestions.length} legacy NeetCode 150 questions and all associated responses from PostgreSQL.`);
+    } else {
+      console.log('✓ No legacy NeetCode questions found in PostgreSQL database.');
+    }
+  } catch (err) {
+    console.warn('Notice: Could not purge legacy neetcode questions:', err.message);
+  }
+
+  // Synchronize difficulty-based marks on existing CodingProblems
+  try {
+    const easyUpdated = await prisma.$executeRawUnsafe(`
+      UPDATE "CodingProblem" cp
+      SET "maxMarks" = 20.0
+      FROM "QuestionVersion" qv
+      JOIN "PracticeQuestion" pq ON qv."questionId" = pq."id"
+      WHERE cp."questionVersionId" = qv."id"
+        AND pq."difficulty" = 'EASY'
+        AND cp."maxMarks" != 20.0;
+    `);
+    const medUpdated = await prisma.$executeRawUnsafe(`
+      UPDATE "CodingProblem" cp
+      SET "maxMarks" = 50.0
+      FROM "QuestionVersion" qv
+      JOIN "PracticeQuestion" pq ON qv."questionId" = pq."id"
+      WHERE cp."questionVersionId" = qv."id"
+        AND pq."difficulty" = 'MEDIUM'
+        AND cp."maxMarks" != 50.0;
+    `);
+    const hardUpdated = await prisma.$executeRawUnsafe(`
+      UPDATE "CodingProblem" cp
+      SET "maxMarks" = 100.0
+      FROM "QuestionVersion" qv
+      JOIN "PracticeQuestion" pq ON qv."questionId" = pq."id"
+      WHERE cp."questionVersionId" = qv."id"
+        AND pq."difficulty" = 'HARD'
+        AND cp."maxMarks" != 100.0;
+    `);
+    if (easyUpdated > 0 || medUpdated > 0 || hardUpdated > 0) {
+      console.log(`✓ Synchronized difficulty marks: ${easyUpdated} Easy (20pts), ${medUpdated} Medium (50pts), ${hardUpdated} Hard (100pts)`);
+    }
+  } catch (err) {
+    console.warn('Note: Could not run difficulty sync SQL:', err.message);
+  }
+
+  // Log current database question counts
+  try {
+    const totalInDb = await prisma.practiceQuestion.count();
+    const codingInDb = await prisma.practiceQuestion.count({ where: { type: 'CODING' } });
+    const mcqInDb = await prisma.practiceQuestion.count({ where: { type: { in: ['APTITUDE', 'TECHNICAL'] } } });
+    console.log(`Database Status before sync: ${totalInDb} total questions (${codingInDb} Coding, ${mcqInDb} MCQ/Aptitude)`);
+  } catch (_) {}
+
   const questionsToSeed = loadDataFiles();
   console.log(`Total questions in dataset: ${questionsToSeed.length}`);
 
@@ -112,6 +214,9 @@ async function seed() {
           const versionId = newQ.versions[0].id;
           const cp = q.codingProblem;
 
+          const defaultMarks = q.difficulty === 'HARD' ? 100.0 : q.difficulty === 'MEDIUM' ? 50.0 : 20.0;
+          const assignedMaxMarks = cp.maxMarks ? Number(cp.maxMarks) : defaultMarks;
+
           await tx.codingProblem.create({
             data: {
               questionVersionId: versionId,
@@ -120,12 +225,12 @@ async function seed() {
               constraints: cp.constraints || null,
               timeLimitMs: cp.timeLimitMs || 2000,
               memoryLimitKb: cp.memoryLimitKb || 128000,
-              maxMarks: cp.maxMarks || 100.0,
+              maxMarks: assignedMaxMarks,
               testCases: {
                 create: (cp.testCases || []).map((tc, idx) => ({
                   input: tc.input || '',
                   expectedOutput: tc.expectedOutput || '',
-                  weight: tc.weight !== undefined ? tc.weight : 25.0,
+                  weight: tc.weight !== undefined ? tc.weight : (assignedMaxMarks / Math.max(1, (cp.testCases || []).length)),
                   isHidden: Boolean(tc.isHidden),
                   order: tc.order || idx + 1
                 }))

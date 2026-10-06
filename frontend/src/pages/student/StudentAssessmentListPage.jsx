@@ -26,23 +26,31 @@ export function StudentAssessmentListPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [assessments, setAssessments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [assessments, setAssessments] = useState(() => practiceService.getCachedAvailableAssessments() || []);
+  const [loading, setLoading] = useState(() => !(practiceService.getCachedAvailableAssessments()?.length > 0));
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [typeFilter, setTypeFilter] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchAssessments = async () => {
-    setLoading(true);
+  const fetchAssessments = async ({ forceRefresh = false } = {}) => {
+    if (forceRefresh) {
+      setIsRefreshing(true);
+    } else if (assessments.length === 0) {
+      setLoading(true);
+    }
     setError(null);
     try {
-      const data = await practiceService.getAvailableAssessments();
+      const data = await practiceService.getAvailableAssessments({ forceRefresh });
       setAssessments(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Failed to load assessments:", err);
-      setError(err.message || "Unable to retrieve assessments.");
+      if (assessments.length === 0) {
+        setError(err.message || "Unable to retrieve assessments.");
+      }
     } finally {
       setLoading(false);
+      setIsRefreshing(false);
     }
   };
 
@@ -90,11 +98,11 @@ export function StudentAssessmentListPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={fetchAssessments}
-            disabled={loading}
+            onClick={() => fetchAssessments({ forceRefresh: true })}
+            disabled={isRefreshing}
             className="flex items-center gap-2 border-slate-200 hover:bg-slate-50 text-slate-700 shadow-xs"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin text-indigo-600" : ""}`} />
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-indigo-600" : ""}`} />
             Refresh
           </Button>
         </div>

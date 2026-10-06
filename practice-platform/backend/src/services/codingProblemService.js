@@ -31,13 +31,16 @@ async function createCodingProblem(versionId, data) {
     throw new AppError(`CodingProblem already exists for QuestionVersion: ${versionId}`, 409);
   }
 
+  const difficulty = version.question?.difficulty || 'MEDIUM';
+  const defaultDifficultyMarks = difficulty === 'HARD' ? 100.0 : difficulty === 'MEDIUM' ? 50.0 : 20.0;
+
   const {
     inputFormat,
     outputFormat,
     constraints,
     timeLimitMs = 2000,
     memoryLimitKb = 128000,
-    maxMarks = 100.0
+    maxMarks = defaultDifficultyMarks
   } = data;
 
   const codingProblem = await prisma.codingProblem.create({
@@ -48,7 +51,7 @@ async function createCodingProblem(versionId, data) {
       constraints: constraints || null,
       timeLimitMs,
       memoryLimitKb,
-      maxMarks
+      maxMarks: Number(maxMarks)
     },
     include: {
       testCases: true

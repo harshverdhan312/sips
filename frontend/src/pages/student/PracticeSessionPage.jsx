@@ -19,6 +19,7 @@ import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
 import { Modal } from "../../components/common/Modal";
+import { ProblemStatement } from "../../components/common/ProblemStatement";
 import { practiceService } from "../../services/practiceService";
 import {
   normalizeOptions,
@@ -296,8 +297,8 @@ export function PracticeSessionPage() {
                   {currentQuestion.title}
                 </h2>
               )}
-              <div className="text-sm sm:text-base text-slate-800 whitespace-pre-line leading-relaxed font-normal bg-slate-50/60 p-4 rounded-2xl border border-slate-100">
-                {currentQuestion.statement}
+              <div className="bg-slate-50/60 p-4 rounded-2xl border border-slate-100">
+                <ProblemStatement statement={currentQuestion.statement} />
               </div>
             </div>
 

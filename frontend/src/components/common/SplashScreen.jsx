@@ -1,10 +1,28 @@
 import React, { useState, useEffect } from "react";
 
-export function SplashScreen({ minDuration = 1100, onComplete }) {
-  const [isVisible, setIsVisible] = useState(true);
+export function SplashScreen({ minDuration = 350, onComplete }) {
+  const [isVisible, setIsVisible] = useState(() => {
+    try {
+      if (typeof window !== "undefined" && window.sessionStorage) {
+        return !sessionStorage.getItem("sips_splash_shown");
+      }
+    } catch (e) {
+      // fallback
+    }
+    return false;
+  });
   const [isFading, setIsFading] = useState(false);
 
   useEffect(() => {
+    if (!isVisible) {
+      if (onComplete) onComplete();
+      return;
+    }
+
+    try {
+      sessionStorage.setItem("sips_splash_shown", "1");
+    } catch (e) {}
+
     const fadeTimer = setTimeout(() => {
       setIsFading(true);
     }, minDuration);
@@ -12,13 +30,13 @@ export function SplashScreen({ minDuration = 1100, onComplete }) {
     const removeTimer = setTimeout(() => {
       setIsVisible(false);
       if (onComplete) onComplete();
-    }, minDuration + 300);
+    }, minDuration + 200);
 
     return () => {
       clearTimeout(fadeTimer);
       clearTimeout(removeTimer);
     };
-  }, [minDuration, onComplete]);
+  }, [isVisible, minDuration, onComplete]);
 
   if (!isVisible) return null;
 
@@ -29,9 +47,6 @@ export function SplashScreen({ minDuration = 1100, onComplete }) {
       }`}
       aria-label="SIPS Loading Splash"
     >
-      {/* Ambient background glow */}
-      <div className="absolute top-1/3 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-
       <div className="relative flex flex-col items-center px-4">
         <img
           src="/branding/sips-logo-full.png"

@@ -479,22 +479,29 @@ function loadLocalGlobalQuestions() {
       const data = JSON.parse(fs.readFileSync(appsPath, 'utf8'));
       if (Array.isArray(data)) {
         data.forEach(item => {
+          const q = item.question || {};
+          const title = (q.title || item.title || item.latestTitle || item.name || '').trim();
+          const statement = (q.statement || item.statement || item.problemStatement || item.description || '').trim();
+          const category = (q.category || item.category || 'DSA').trim();
+          const subcategory = (q.subcategory || item.subcategory || 'Fundamentals').trim();
+          const difficulty = (q.difficulty || item.difficulty || 'MEDIUM').toUpperCase();
+
           questions.push({
             id: item.id || `apps_${item.externalId || Math.random().toString(36).substr(2, 9)}`,
             externalId: item.externalId || item.slug,
             type: 'CODING',
             format: 'CODING_PROBLEM',
-            category: item.category || 'Algorithms',
-            subcategory: item.subcategory || 'Coding',
-            difficulty: item.difficulty || 'MEDIUM',
+            category: category,
+            subcategory: subcategory,
+            difficulty: difficulty,
             status: item.status || 'ACTIVE',
-            sourceType: 'BENCHMARK',
-            sourceNamespace: 'codeparrot/apps',
+            sourceType: 'CURATED',
+            sourceNamespace: item.source?.namespace || 'apps-benchmark',
             tags: item.tags || [],
             isGlobal: true,
             collegeId: null,
-            latestTitle: item.title || item.latestTitle || item.name,
-            statement: item.statement || item.problemStatement || item.description,
+            latestTitle: title,
+            statement: statement,
             createdAt: item.createdAt || new Date().toISOString()
           });
         });
@@ -502,37 +509,6 @@ function loadLocalGlobalQuestions() {
     }
   } catch (e) {
     logger.warn('Failed to load APPS questions for fallback:', e.message);
-  }
-
-  try {
-    const neetcodePath = path.join(baseDir, 'coding/neetcode_150_coding_questions.json');
-    if (fs.existsSync(neetcodePath)) {
-      const data = JSON.parse(fs.readFileSync(neetcodePath, 'utf8'));
-      if (Array.isArray(data)) {
-        data.forEach(item => {
-          questions.push({
-            id: item.id || `nc_${item.externalId || Math.random().toString(36).substr(2, 9)}`,
-            externalId: item.externalId || item.slug,
-            type: 'CODING',
-            format: 'CODING_PROBLEM',
-            category: item.category || 'Data Structures',
-            subcategory: item.subcategory || 'Coding',
-            difficulty: item.difficulty || 'MEDIUM',
-            status: item.status || 'ACTIVE',
-            sourceType: 'CURATED',
-            sourceNamespace: 'neetcode-150',
-            tags: item.tags || [],
-            isGlobal: true,
-            collegeId: null,
-            latestTitle: item.title || item.latestTitle || item.name,
-            statement: item.statement || item.problemStatement || item.description,
-            createdAt: item.createdAt || new Date().toISOString()
-          });
-        });
-      }
-    }
-  } catch (e) {
-    logger.warn('Failed to load NeetCode questions for fallback:', e.message);
   }
 
   try {
@@ -840,3 +816,211 @@ exports.activateGlobalQuestion = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Failed to activate global question.' });
   }
 };
+
+/**
+ * DELETE /api/super-admin/questions/:id
+ * Delete a global question
+ */
+exports.deleteGlobalQuestion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const practiceUrl = process.env.PRACTICE_PLATFORM_URL || 'http://localhost:5050';
+
+    try {
+      const response = await fetch(`${practiceUrl}/api/admin/questions/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': req.headers.authorization || '',
+          'Content-Type': 'application/json'
+        },
+        signal: AbortSignal.timeout(4000)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return res.json(data);
+      }
+    } catch (_) {
+      // Fallback
+    }
+
+    if (inMemoryGlobalQuestions) {
+      inMemoryGlobalQuestions = inMemoryGlobalQuestions.filter(q => q.id !== id && q.externalId !== id);
+    }
+
+    return res.json({
+      success: true,
+      message: `Question '${id}' deleted successfully.`
+    });
+  } catch (error) {
+    logger.error('Error deleting global question:', error);
+    return res.status(500).json({ success: false, message: 'Failed to delete global question.' });
+  }
+};
+
+/**
+ * POST /api/super-admin/questions/bulk-delete
+ * Bulk delete global questions
+ */
+exports.bulkDeleteGlobalQuestions = async (req, res) => {
+  try {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ success: false, message: 'Array of question IDs is required.' });
+    }
+
+    const practiceUrl = process.env.PRACTICE_PLATFORM_URL || 'http://localhost:5050';
+
+    try {
+      const response = await fetch(`${practiceUrl}/api/admin/questions/bulk-delete`, {
+        method: 'POST',
+        headers: {
+          'Authorization': req.headers.authorization || '',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ ids }),
+        signal: AbortSignal.timeout(6000)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return res.json(data);
+      }
+    } catch (_) {
+      // Fallback
+    }
+
+    if (inMemoryGlobalQuestions) {
+      const idSet = new Set(ids);
+      inMemoryGlobalQuestions = inMemoryGlobalQuestions.filter(q => !idSet.has(q.id) && !idSet.has(q.externalId));
+    }
+
+    return res.json({
+      success: true,
+      deletedCount: ids.length,
+      message: `Successfully deleted ${ids.length} question(s).`
+    });
+  } catch (error) {
+    logger.error('Error bulk deleting global questions:', error);
+    return res.status(500).json({ success: false, message: 'Failed to bulk delete questions.' });
+  }
+};
+
+/**
+ * POST /api/super-admin/questions/bulk-activate
+ * Bulk activate global questions
+ */
+exports.bulkActivateGlobalQuestions = async (req, res) => {
+  try {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ success: false, message: 'Array of question IDs is required.' });
+    }
+
+    const practiceUrl = process.env.PRACTICE_PLATFORM_URL || 'http://localhost:5050';
+
+    try {
+      const response = await fetch(`${practiceUrl}/api/admin/questions/bulk-activate`, {
+        method: 'POST',
+        headers: {
+          'Authorization': req.headers.authorization || '',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ ids }),
+        signal: AbortSignal.timeout(6000)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return res.json(data);
+      }
+    } catch (_) {
+      // Fallback
+    }
+
+    if (inMemoryGlobalQuestions) {
+      const idSet = new Set(ids);
+      inMemoryGlobalQuestions.forEach(q => {
+        if (idSet.has(q.id) || idSet.has(q.externalId)) {
+          q.status = 'ACTIVE';
+        }
+      });
+    }
+
+    return res.json({
+      success: true,
+      activatedCount: ids.length,
+      message: `Successfully activated ${ids.length} question(s) to the Practice Hub.`
+    });
+  } catch (error) {
+    logger.error('Error bulk activating global questions:', error);
+    return res.status(500).json({ success: false, message: 'Failed to bulk activate questions.' });
+  }
+};
+
+/**
+ * POST /api/super-admin/questions/bulk-archive
+ * Bulk archive global questions
+ */
+exports.bulkArchiveGlobalQuestions = async (req, res) => {
+  try {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ success: false, message: 'Array of question IDs is required.' });
+    }
+
+    const practiceUrl = process.env.PRACTICE_PLATFORM_URL || 'http://localhost:5050';
+
+    try {
+      const response = await fetch(`${practiceUrl}/api/admin/questions/bulk-archive`, {
+        method: 'POST',
+        headers: {
+          'Authorization': req.headers.authorization || '',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ ids }),
+        signal: AbortSignal.timeout(6000)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return res.json(data);
+      }
+    } catch (_) {
+      // Fallback
+    }
+
+    if (inMemoryGlobalQuestions) {
+      const idSet = new Set(ids);
+      inMemoryGlobalQuestions.forEach(q => {
+        if (idSet.has(q.id) || idSet.has(q.externalId)) {
+          q.status = 'ARCHIVED';
+        }
+      });
+    }
+
+    return res.json({
+      success: true,
+      archivedCount: ids.length,
+      message: `Successfully archived ${ids.length} question(s).`
+    });
+  } catch (error) {
+    logger.error('Error bulk archiving global questions:', error);
+    return res.status(500).json({ success: false, message: 'Failed to bulk archive questions.' });
+  }
+};
+
+/**
+ * GET /api/super-admin/email-status
+ * Live diagnostic check for SMTP configuration and connectivity
+ */
+exports.getEmailStatus = async (req, res) => {
+  try {
+    const status = await emailService.verifySmtpConnection();
+    return res.json({ success: true, ...status });
+  } catch (error) {
+    logger.error('Error verifying email status:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+};
+

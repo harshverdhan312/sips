@@ -1063,6 +1063,86 @@ async function getPracticeStreak(studentId) {
   };
 }
 
+/**
+ * Retrieve set of solved and attempted question IDs for the authenticated student
+ */
+async function getCodingSolveStatus(studentId) {
+  if (!studentId) {
+    return { solvedQuestionIds: [], attemptedQuestionIds: [], totalSolved: 0, totalAttempted: 0 };
+  }
+
+  const sId = studentId.trim();
+
+  const [submissions, practiceAttempts] = await Promise.all([
+    prisma.codeSubmission.findMany({
+      where: {
+        studentId: sId,
+        mode: 'SUBMIT'
+      },
+      select: {
+        status: true,
+        testsPassed: true,
+        testsTotal: true,
+        questionVersion: {
+          select: {
+            questionId: true
+          }
+        }
+      }
+    }),
+    prisma.practiceAttempt.findMany({
+      where: {
+        studentId: sId,
+        status: 'SUBMITTED'
+      },
+      select: {
+        score: true,
+        totalMarks: true,
+        responses: {
+          select: {
+            isCorrect: true,
+            questionVersion: {
+              select: {
+                questionId: true
+              }
+            }
+          }
+        }
+      }
+    })
+  ]);
+
+  const solvedSet = new Set();
+  const attemptedSet = new Set();
+
+  for (const s of submissions) {
+    const qId = s.questionVersion?.questionId;
+    if (!qId) continue;
+    attemptedSet.add(qId);
+    if (s.status === 'ACCEPTED' || (s.testsTotal > 0 && s.testsPassed === s.testsTotal)) {
+      solvedSet.add(qId);
+    }
+  }
+
+  for (const pa of practiceAttempts) {
+    for (const r of pa.responses) {
+      const qId = r.questionVersion?.questionId;
+      if (!qId) continue;
+      attemptedSet.add(qId);
+      if (r.isCorrect || (Number(pa.totalMarks) > 0 && Number(pa.score) >= Number(pa.totalMarks))) {
+        solvedSet.add(qId);
+      }
+    }
+  }
+
+  return {
+    solvedQuestionIds: Array.from(solvedSet),
+    attemptedQuestionIds: Array.from(attemptedSet),
+    totalSolved: solvedSet.size,
+    totalAttempted: attemptedSet.size
+  };
+}
+
 module.exports = {
   createPracticeAttempt,
   getPracticeAttemptById,
@@ -1073,6 +1153,7 @@ module.exports = {
   getPracticeHistory,
   getPracticeProgress,
   getPracticeStreak,
+  getCodingSolveStatus,
   shuffleArray,
   normalizeTopicName
 };

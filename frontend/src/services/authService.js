@@ -56,7 +56,7 @@ export const authService = {
     const data = await api.post('/api/auth/change-password', {
       currentPassword,
       newPassword
-    });
+    }, { auth: true });
     return data;
   }
 };

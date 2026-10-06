@@ -109,3 +109,16 @@ exports.getPracticeStreak = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getCodingSolveStatus = async (req, res, next) => {
+  try {
+    const studentId = req.user?.id;
+    if (!studentId) {
+      return success(res, { solvedQuestionIds: [], attemptedQuestionIds: [], totalSolved: 0, totalAttempted: 0 });
+    }
+    const status = await practiceService.getCodingSolveStatus(studentId);
+    return success(res, status, 'Coding solve status retrieved successfully', 200);
+  } catch (err) {
+    next(err);
+  }
+};

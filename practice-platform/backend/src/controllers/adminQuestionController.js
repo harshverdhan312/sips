@@ -3,6 +3,68 @@ const adminQuestionService = require('../services/adminQuestionService');
 const { success } = require('../utils/response');
 
 /**
+ * Handle single question creation
+ * POST /api/admin/questions
+ */
+async function createQuestion(req, res, next) {
+  try {
+    const data = req.body;
+    const context = {
+      collegeId: req.user?.role === 'SUPERADMIN' || data.isGlobal ? null : (req.user?.collegeId || null),
+      userId: req.user?.id || null,
+      role: req.user?.role || null
+    };
+
+    const isCoding = (data.type === 'CODING' || data.format === 'CODING');
+    const difficulty = (data.difficulty || 'MEDIUM').toUpperCase();
+    const defaultMarks = difficulty === 'HARD' ? 100 : difficulty === 'MEDIUM' ? 50 : 20;
+
+    const item = data.question ? data : {
+      type: isCoding ? 'CODING' : 'MCQ',
+      format: data.format || (isCoding ? 'CODING' : 'MULTIPLE_CHOICE'),
+      difficulty: difficulty,
+      category: data.category || 'General',
+      subcategory: data.subcategory || null,
+      tags: Array.isArray(data.tags) ? data.tags : [],
+      sourceType: data.sourceType || 'MANUAL',
+      sourceNamespace: data.sourceNamespace || 'custom',
+      externalId: data.externalId || null,
+      collegeId: context.collegeId,
+      question: {
+        title: data.title || '',
+        statement: data.statement || '',
+        options: data.options || null,
+        correctAnswer: data.correctAnswer !== undefined ? data.correctAnswer : null,
+        explanation: data.explanation || null
+      },
+      coding: isCoding ? {
+        inputFormat: data.inputFormat || data.codingProblem?.inputFormat || null,
+        outputFormat: data.outputFormat || data.codingProblem?.outputFormat || null,
+        constraints: data.constraints || data.codingProblem?.constraints || null,
+        timeLimitMs: data.timeLimitMs || data.codingProblem?.timeLimitMs || 2000,
+        memoryLimitKb: data.memoryLimitKb || data.codingProblem?.memoryLimitKb || 128000,
+        maxMarks: data.maxMarks || data.codingProblem?.maxMarks || defaultMarks,
+        starterCode: data.starterCode || data.codingProblem?.starterCode || null,
+        testCases: data.testCases || data.codingProblem?.testCases || []
+      } : null
+    };
+
+    const result = await bulkImportService.importQuestions([item], context);
+    if (result.errors && result.errors.length > 0 && result.inserted === 0 && result.versioned === 0) {
+      return res.status(400).json({
+        success: false,
+        message: result.errors[0]?.reason || 'Failed to create question',
+        errors: result.errors
+      });
+    }
+
+    return success(res, result, 'Question created successfully', 201);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
  * Handle bulk question import
  * POST /api/admin/questions/bulk-import
  */
@@ -110,19 +172,56 @@ async function archiveQuestion(req, res, next) {
 }
 
 /**
- * POST /api/admin/questions
- * Create a new question (single question creation)
+ * DELETE /api/admin/questions/:questionId
+ * Delete a question and cascade child records
  */
-async function createQuestion(req, res, next) {
+async function deleteQuestion(req, res, next) {
   try {
-    const isSuper = ['SUPERADMIN', 'SUPER_ADMIN', 'ADMIN'].includes((req.user?.role || '').toUpperCase()) && !req.user?.collegeId;
-    const data = {
-      ...req.body,
-      collegeId: isSuper ? (req.body.isGlobal ? null : (req.body.collegeId || null)) : (req.user?.collegeId || null),
-      createdBy: req.user?.id || req.user?.username || 'admin'
-    };
-    const question = await questionService.createQuestion(data);
-    return success(res, question, 'Question created successfully', 201);
+    const { questionId } = req.params;
+    const result = await adminQuestionService.deleteQuestion(questionId, req.user);
+    return success(res, null, result.message, 200);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * POST /api/admin/questions/bulk-delete
+ * Bulk delete questions
+ */
+async function bulkDelete(req, res, next) {
+  try {
+    const { ids } = req.body;
+    const result = await adminQuestionService.bulkDeleteQuestions(ids, req.user);
+    return success(res, result, result.message, 200);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * POST /api/admin/questions/bulk-activate
+ * Bulk activate questions
+ */
+async function bulkActivate(req, res, next) {
+  try {
+    const { ids } = req.body;
+    const result = await adminQuestionService.bulkActivateQuestions(ids, req.user);
+    return success(res, result, result.message, 200);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * POST /api/admin/questions/bulk-archive
+ * Bulk archive questions
+ */
+async function bulkArchive(req, res, next) {
+  try {
+    const { ids } = req.body;
+    const result = await adminQuestionService.bulkArchiveQuestions(ids, req.user);
+    return success(res, result, result.message, 200);
   } catch (error) {
     next(error);
   }
@@ -135,5 +234,9 @@ module.exports = {
   getQuestionById,
   getQuestionVersion,
   activateQuestion,
-  archiveQuestion
+  archiveQuestion,
+  deleteQuestion,
+  bulkDelete,
+  bulkActivate,
+  bulkArchive
 };

@@ -24,6 +24,12 @@ export function AuthProvider({ children }) {
     if (user && localStorage.getItem("sips_token")) {
       localStorage.setItem("sips_auth_user", JSON.stringify(user));
       setRole(user.role);
+
+      // Long-term optimized pre-warming: Wake up Practice Platform backend only when an authenticated user session is active
+      try {
+        const practiceUrl = import.meta.env.VITE_PRACTICE_API_URL || "http://localhost:5050";
+        fetch(`${practiceUrl.replace(/\/+$/, "")}/health`, { method: "GET" }).catch(() => {});
+      } catch (e) {}
     } else {
       localStorage.removeItem("sips_auth_user");
       setRole(null);

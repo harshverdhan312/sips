@@ -85,13 +85,21 @@ export const isAuthEndpoint = (endpoint, options = {}) => {
   if (options.isAuthRequest !== undefined) {
     return Boolean(options.isAuthRequest);
   }
+  if (options.auth === true) {
+    return false;
+  }
   if (options.auth === false) {
     return true;
   }
   if (!endpoint || typeof endpoint !== 'string') return false;
   const path = endpoint.toLowerCase();
+
+  // Authenticated endpoints under /auth/ (e.g. change-password) require Bearer token
+  if (path.includes('/change-password') || path.includes('/update-password') || path.includes('/auth/me')) {
+    return false;
+  }
+
   return (
-    path.includes('/auth/') ||
     path.includes('/login') ||
     path.includes('/onboard') ||
     path.includes('/register')

@@ -28,23 +28,31 @@ export function ContestListPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [contests, setContests] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [contests, setContests] = useState(() => practiceService.getCachedAvailableContests() || []);
+  const [loading, setLoading] = useState(() => !(practiceService.getCachedAvailableContests()?.length > 0));
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [statusFilter, setStatusFilter] = useState("ALL"); // "ALL" | "LIVE" | "UPCOMING"
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchContests = async () => {
-    setLoading(true);
+  const fetchContests = async ({ forceRefresh = false } = {}) => {
+    if (forceRefresh) {
+      setIsRefreshing(true);
+    } else if (contests.length === 0) {
+      setLoading(true);
+    }
     setError(null);
     try {
-      const data = await practiceService.getAvailableContests();
+      const data = await practiceService.getAvailableContests({ forceRefresh });
       setContests(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Failed to load available contests:", err);
-      setError(err.message || "Unable to retrieve institutional placement assessments.");
+      if (contests.length === 0) {
+        setError(err.message || "Unable to retrieve institutional placement assessments.");
+      }
     } finally {
       setLoading(false);
+      setIsRefreshing(false);
     }
   };
 
@@ -108,8 +116,8 @@ export function ContestListPage() {
             variant="outline"
             size="sm"
             icon={RefreshCw}
-            loading={loading}
-            onClick={fetchContests}
+            loading={isRefreshing}
+            onClick={() => fetchContests({ forceRefresh: true })}
           >
             Refresh
           </Button>
@@ -129,8 +137,8 @@ export function ContestListPage() {
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
           {[
             { id: "ALL", label: "All Assessments" },
-            { id: "LIVE", label: "🔴 Live Now" },
-            { id: "UPCOMING", label: "📅 Scheduled / Upcoming" }
+            { id: "LIVE", label: "Live Active" },
+            { id: "UPCOMING", label: "Scheduled / Upcoming" }
           ].map((tab) => (
             <button
               key={tab.id}
