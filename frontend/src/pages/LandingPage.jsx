@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Zap,
@@ -47,6 +47,15 @@ export function LandingPage() {
     phone: "",
     studentsCount: "1000-2500"
   });
+
+  useEffect(() => {
+    // Silent pre-warming ping to wake up backend instances
+    try {
+      const apiUrl = (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_API_URL) || "";
+      const endpoint = apiUrl ? `${apiUrl.replace(/\/+$/, "")}/api/health` : "/api/health";
+      fetch(endpoint, { method: "GET" }).catch(() => {});
+    } catch (e) {}
+  }, []);
 
   const handleDemoSubmit = (e) => {
     e.preventDefault();
