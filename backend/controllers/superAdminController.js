@@ -479,22 +479,29 @@ function loadLocalGlobalQuestions() {
       const data = JSON.parse(fs.readFileSync(appsPath, 'utf8'));
       if (Array.isArray(data)) {
         data.forEach(item => {
+          const q = item.question || {};
+          const title = (q.title || item.title || item.latestTitle || item.name || '').trim();
+          const statement = (q.statement || item.statement || item.problemStatement || item.description || '').trim();
+          const category = (q.category || item.category || 'DSA').trim();
+          const subcategory = (q.subcategory || item.subcategory || 'Fundamentals').trim();
+          const difficulty = (q.difficulty || item.difficulty || 'MEDIUM').toUpperCase();
+
           questions.push({
             id: item.id || `apps_${item.externalId || Math.random().toString(36).substr(2, 9)}`,
             externalId: item.externalId || item.slug,
             type: 'CODING',
             format: 'CODING_PROBLEM',
-            category: item.category || 'Algorithms',
-            subcategory: item.subcategory || 'Coding',
-            difficulty: item.difficulty || 'MEDIUM',
+            category: category,
+            subcategory: subcategory,
+            difficulty: difficulty,
             status: item.status || 'ACTIVE',
-            sourceType: 'BENCHMARK',
-            sourceNamespace: 'codeparrot/apps',
+            sourceType: 'CURATED',
+            sourceNamespace: item.source?.namespace || 'apps-benchmark',
             tags: item.tags || [],
             isGlobal: true,
             collegeId: null,
-            latestTitle: item.title || item.latestTitle || item.name,
-            statement: item.statement || item.problemStatement || item.description,
+            latestTitle: title,
+            statement: statement,
             createdAt: item.createdAt || new Date().toISOString()
           });
         });
@@ -502,37 +509,6 @@ function loadLocalGlobalQuestions() {
     }
   } catch (e) {
     logger.warn('Failed to load APPS questions for fallback:', e.message);
-  }
-
-  try {
-    const neetcodePath = path.join(baseDir, 'coding/neetcode_150_coding_questions.json');
-    if (fs.existsSync(neetcodePath)) {
-      const data = JSON.parse(fs.readFileSync(neetcodePath, 'utf8'));
-      if (Array.isArray(data)) {
-        data.forEach(item => {
-          questions.push({
-            id: item.id || `nc_${item.externalId || Math.random().toString(36).substr(2, 9)}`,
-            externalId: item.externalId || item.slug,
-            type: 'CODING',
-            format: 'CODING_PROBLEM',
-            category: item.category || 'Data Structures',
-            subcategory: item.subcategory || 'Coding',
-            difficulty: item.difficulty || 'MEDIUM',
-            status: item.status || 'ACTIVE',
-            sourceType: 'CURATED',
-            sourceNamespace: 'neetcode-150',
-            tags: item.tags || [],
-            isGlobal: true,
-            collegeId: null,
-            latestTitle: item.title || item.latestTitle || item.name,
-            statement: item.statement || item.problemStatement || item.description,
-            createdAt: item.createdAt || new Date().toISOString()
-          });
-        });
-      }
-    }
-  } catch (e) {
-    logger.warn('Failed to load NeetCode questions for fallback:', e.message);
   }
 
   try {
