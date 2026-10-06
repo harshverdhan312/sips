@@ -45,6 +45,7 @@ function normalizeTopicName(topic) {
   const clean = String(topic)
     .trim()
     .toUpperCase()
+    .replace(/[,]+/g, '')
     .replace(/[_\s-]+/g, ' ')
     .trim();
 
@@ -53,15 +54,36 @@ function normalizeTopicName(topic) {
   if (clean === 'SYLLOGISM' || clean === 'SYLLOGISMS') return 'SYLLOGISMS';
   if (clean === 'SEATING ARRANGEMENT' || clean === 'SEATING ARRANGEMENTS') return 'SEATING ARRANGEMENT';
   if (clean === 'TIME AND WORK' || clean === 'TIME & WORK') return 'TIME AND WORK';
-  if (clean === 'SPEED TIME DISTANCE' || clean === 'SPEED, TIME AND DISTANCE' || clean === 'SPEED TIME AND DISTANCE') return 'SPEED TIME DISTANCE';
+  if (clean === 'SPEED TIME DISTANCE' || clean === 'SPEED TIME AND DISTANCE') return 'SPEED TIME DISTANCE';
   if (clean === 'RATIO PROPORTION' || clean === 'RATIOS AND PROPORTIONS' || clean === 'RATIO & PROPORTION') return 'RATIO AND PROPORTION';
   if (clean === 'PERMUTATION COMBINATION' || clean === 'PERMUTATIONS AND COMBINATIONS') return 'PERMUTATIONS AND COMBINATIONS';
-  if (clean === 'SIMPLE INTEREST' || clean === 'COMPOUND INTEREST' || clean === 'SIMPLE AND COMPOUND INTEREST') return 'INTEREST';
-  if (clean === 'PERCENTAGES' || clean === 'PERCENTAGES AND PROFIT LOSS' || clean === 'PROFIT LOSS') return 'PERCENTAGES AND PROFIT LOSS';
+  if (clean === 'PERCENTAGES' || clean === 'PERCENTAGE') return 'PERCENTAGES';
+  if (clean === 'PROFIT LOSS' || clean === 'PROFIT & LOSS' || clean === 'PROFIT AND LOSS') return 'PROFIT LOSS';
+  if (clean === 'SIMPLE INTEREST') return 'SIMPLE INTEREST';
+  if (clean === 'COMPOUND INTEREST') return 'COMPOUND INTEREST';
+  if (clean === 'SIMPLE AND COMPOUND INTEREST') return 'SIMPLE INTEREST';
+  if (clean === 'PERCENTAGES AND PROFIT LOSS') return 'PERCENTAGES';
   if (clean === 'IDIOMS' || clean === 'IDIOMS PHRASES' || clean === 'IDIOMS AND PHRASES') return 'IDIOMS AND PHRASES';
   if (clean === 'SENTENCE CORRECTION' || clean === 'SENTENCE COMPLETION') return 'SENTENCE CORRECTION';
-  if (clean === 'SYNONYMS ANTONYMS' || clean === 'ANTONYMS & SYNONYMS') return 'SYNONYMS AND ANTONYMS';
+  if (clean === 'SYNONYMS ANTONYMS' || clean === 'ANTONYMS & SYNONYMS' || clean === 'SYNONYMS AND ANTONYMS') return 'SYNONYMS AND ANTONYMS';
   if (clean === 'SERIES COMPLETION' || clean === 'NUMBER SERIES') return 'NUMBER SERIES';
+  if (clean === 'LETTER SERIES') return 'LETTER SERIES';
+  if (clean === 'BLOOD RELATIONS' || clean === 'BLOOD RELATION') return 'BLOOD RELATIONS';
+  if (clean === 'CLOCKS AND CALENDARS' || clean === 'CLOCKS & CALENDARS') return 'CLOCKS AND CALENDARS';
+  if (clean === 'RANKING ORDERING' || clean === 'RANKING AND ORDERING') return 'RANKING ORDERING';
+  if (clean === 'ODD ONE OUT') return 'ODD ONE OUT';
+  if (clean === 'STATEMENT CONCLUSION' || clean === 'STATEMENT AND CONCLUSION') return 'STATEMENT CONCLUSION';
+  if (clean === 'LOGICAL OPERATORS') return 'LOGICAL OPERATORS';
+  if (clean === 'SET RELATIONS') return 'SET RELATIONS';
+  if (clean === 'NUMBER SYSTEMS AND PROGRESSIONS' || clean === 'NUMBER SYSTEMS') return 'NUMBER SYSTEMS';
+  if (clean === 'BAR GRAPHS' || clean === 'BAR GRAPH') return 'BAR GRAPHS';
+  if (clean === 'LINE GRAPHS' || clean === 'LINE GRAPH') return 'LINE GRAPHS';
+  if (clean === 'TABULAR DATA' || clean === 'TABLE CHARTS' || clean === 'TABULAR') return 'TABULAR DATA';
+  if (clean === 'PIE CHARTS' || clean === 'PIE CHART') return 'PIE CHARTS';
+  if (clean === 'RADAR CHARTS' || clean === 'RADAR CHART') return 'RADAR CHARTS';
+  if (clean === 'ONE WORD SUBSTITUTION') return 'ONE WORD SUBSTITUTION';
+  if (clean === 'FILL IN THE BLANKS') return 'FILL IN THE BLANKS';
+  if (clean === 'SPOTTING ERRORS') return 'SPOTTING ERRORS';
 
   return clean;
 }
@@ -69,7 +91,7 @@ function normalizeTopicName(topic) {
 async function createPracticeAttempt(data, options = {}) {
   validateCreatePracticeAttempt(data);
 
-  const { studentId, collegeId, type, category, difficulty, questionCount = 10, questionId } = data;
+  const { studentId, collegeId, type, category, subcategory, topic, difficulty, questionCount = 10, questionId } = data;
   const randomFn = (options && typeof options.randomFn === 'function') ? options.randomFn : Math.random;
 
   const where = {
@@ -91,6 +113,11 @@ async function createPracticeAttempt(data, options = {}) {
     } else {
       where.category = { contains: category, mode: 'insensitive' };
     }
+  }
+  const targetedSubcategory = subcategory || topic;
+  if (targetedSubcategory) {
+    const cleanSub = String(targetedSubcategory).trim();
+    where.subcategory = { contains: cleanSub, mode: 'insensitive' };
   }
   if (difficulty) {
     const upperDiff = String(difficulty).toUpperCase();
@@ -211,35 +238,101 @@ async function createPracticeAttempt(data, options = {}) {
       };
   const currentDist = { EASY: 0, MEDIUM: 0, HARD: 0 };
 
-  // 4. Round-Robin Selection: Cycle through topics until required count is reached
+  // 4. Topic-Balanced Selection (Maximum Dispersion)
+  // Ensures:
+  // - When available topics >= questionCount, every single question in the session is from a distinct topic.
+  // - When questionCount > available topics (e.g. DI with 5 topics and 10 questions), questions of the same topic
+  //   are interleaved across cycles and NEVER appear consecutively.
   const selectedQuestions = [];
-  const topics = Object.keys(byTopic);
-  shuffleArray(topics, randomFn);
-  let topicIdx = 0;
+  const topicKeys = Object.keys(byTopic);
+  shuffleArray(topicKeys, randomFn);
 
-  while (selectedQuestions.length < questionCount && topics.length > 0) {
-    const topic = topics[topicIdx % topics.length];
-    const arr = byTopic[topic];
-    if (arr && arr.length > 0) {
+  let activeTopics = [...topicKeys];
+  let cycle = 0;
+  let lastTopicPicked = null;
+
+  while (selectedQuestions.length < questionCount && activeTopics.length > 0) {
+    // For each cycle through topics, shuffle the order of topics to prevent predictable sequences
+    const currentCycleTopics = [...activeTopics];
+    shuffleArray(currentCycleTopics, randomFn);
+
+    // If starting a new cycle and the first topic equals the last picked topic from the previous cycle, swap it
+    if (cycle > 0 && currentCycleTopics.length > 1 && currentCycleTopics[0] === lastTopicPicked) {
+      const swapIdx = 1 + Math.floor(randomFn() * (currentCycleTopics.length - 1));
+      const temp = currentCycleTopics[0];
+      currentCycleTopics[0] = currentCycleTopics[swapIdx];
+      currentCycleTopics[swapIdx] = temp;
+    }
+
+    const deferredInCycle = [];
+    for (const topic of currentCycleTopics) {
+      if (selectedQuestions.length >= questionCount) break;
+
+      const arr = byTopic[topic];
+      if (!arr || arr.length === 0) continue;
+
       let pickIdx = -1;
       if (!isExplicitDifficulty) {
-        pickIdx = arr.findIndex((q) => (currentDist[q.difficulty] || 0) < (targetCounts[q.difficulty] || 0));
-      }
-      if (pickIdx === -1) {
+        // Prioritize rare deficits like HARD (target 20%) if available
+        if ((currentDist.HARD || 0) < (targetCounts.HARD || 0)) {
+          pickIdx = arr.findIndex((q) => q.difficulty === 'HARD');
+        }
+        if (pickIdx === -1) {
+          pickIdx = arr.findIndex((q) => (currentDist[q.difficulty] || 0) < (targetCounts[q.difficulty] || 0));
+        }
+      } else {
         pickIdx = 0;
       }
-      const [picked] = arr.splice(pickIdx, 1);
-      selectedQuestions.push(picked);
-      currentDist[picked.difficulty] = (currentDist[picked.difficulty] || 0) + 1;
-    } else {
-      // Topic exhausted, remove from rotation
-      const removeIndex = topics.indexOf(topic);
-      if (removeIndex !== -1) {
-        topics.splice(removeIndex, 1);
+
+      if (pickIdx !== -1) {
+        const [picked] = arr.splice(pickIdx, 1);
+        selectedQuestions.push(picked);
+        currentDist[picked.difficulty] = (currentDist[picked.difficulty] || 0) + 1;
+        lastTopicPicked = topic;
+
+        if (arr.length === 0) {
+          const remIdx = activeTopics.indexOf(topic);
+          if (remIdx !== -1) activeTopics.splice(remIdx, 1);
+        }
+      } else {
+        deferredInCycle.push(topic);
       }
-      continue;
     }
-    topicIdx++;
+
+    // Pick from deferred topics for any remaining slots in this cycle before advancing to the next cycle
+    for (const topic of deferredInCycle) {
+      if (selectedQuestions.length >= questionCount) break;
+
+      const arr = byTopic[topic];
+      if (arr && arr.length > 0) {
+        let pickIdx = -1;
+        if (!isExplicitDifficulty) {
+          if ((currentDist.HARD || 0) < (targetCounts.HARD || 0)) {
+            pickIdx = arr.findIndex((q) => q.difficulty === 'HARD');
+          }
+          if (pickIdx === -1) {
+            pickIdx = arr.findIndex((q) => (currentDist[q.difficulty] || 0) < (targetCounts[q.difficulty] || 0));
+          }
+          if (pickIdx === -1 && (currentDist.HARD || 0) >= (targetCounts.HARD || 0)) {
+            pickIdx = arr.findIndex((q) => q.difficulty !== 'HARD');
+          }
+        }
+        if (pickIdx === -1) {
+          pickIdx = 0;
+        }
+
+        const [picked] = arr.splice(pickIdx, 1);
+        selectedQuestions.push(picked);
+        currentDist[picked.difficulty] = (currentDist[picked.difficulty] || 0) + 1;
+        lastTopicPicked = topic;
+
+        if (arr.length === 0) {
+          const remIdx = activeTopics.indexOf(topic);
+          if (remIdx !== -1) activeTopics.splice(remIdx, 1);
+        }
+      }
+    }
+    cycle++;
   }
 
   // 5. Handle Edge Cases: If topics run out before hitting count, pick randomly from remaining unused questions in pool
@@ -249,9 +342,6 @@ async function createPracticeAttempt(data, options = {}) {
     shuffleArray(remaining, randomFn);
     selectedQuestions.push(...remaining.slice(0, questionCount - selectedQuestions.length));
   }
-
-  // Final shuffle of selected questions so the session doesn't strictly present topics in pick order
-  shuffleArray(selectedQuestions, randomFn);
 
   // 9. Lock versions & create attempt
   const selectedVersions = selectedQuestions.map((q) => q.versions[0]);
@@ -1064,5 +1154,6 @@ module.exports = {
   getPracticeProgress,
   getPracticeStreak,
   getCodingSolveStatus,
-  shuffleArray
+  shuffleArray,
+  normalizeTopicName
 };
