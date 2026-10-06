@@ -103,14 +103,32 @@ export function CodingArenaPage() {
   const { attemptId } = useParams();
   const navigate = useNavigate();
 
+  // Instant in-memory cache hydration for 0ms initial render
+  const cachedData = practiceService.getCachedDeliveredQuestions(attemptId);
+  const cachedQuestion = cachedData?.questions?.[0] || null;
+
   // Attempt & Problem State
-  const [loading, setLoading] = useState(true);
+  const [question, setQuestion] = useState(cachedQuestion);
+  const [loading, setLoading] = useState(!cachedQuestion);
   const [error, setError] = useState(null);
-  const [question, setQuestion] = useState(null);
 
   // Editor State
-  const [language, setLanguage] = useState("python");
-  const [sourceCodeByLang, setSourceCodeByLang] = useState(STARTER_TEMPLATES);
+  const [language, setLanguage] = useState(() => {
+    if (cachedQuestion?.currentAnswer?.language) {
+      return cachedQuestion.currentAnswer.language;
+    }
+    return "python";
+  });
+  const [sourceCodeByLang, setSourceCodeByLang] = useState(() => {
+    if (cachedQuestion?.currentAnswer?.sourceCode) {
+      const lang = cachedQuestion.currentAnswer.language || "python";
+      return {
+        ...STARTER_TEMPLATES,
+        [lang]: cachedQuestion.currentAnswer.sourceCode
+      };
+    }
+    return STARTER_TEMPLATES;
+  });
   const [copiedInputIndex, setCopiedInputIndex] = useState(null);
   const [showResetModal, setShowResetModal] = useState(false);
 
@@ -136,7 +154,9 @@ export function CodingArenaPage() {
 
   // Load Attempt and Delivered Question
   const loadArena = useCallback(async () => {
-    setLoading(true);
+    if (!question) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const data = await practiceService.getDeliveredQuestions(attemptId);
@@ -158,11 +178,13 @@ export function CodingArenaPage() {
       }
     } catch (err) {
       console.error("Failed to load coding arena:", err);
-      setError(err.message || "Failed to load coding challenge.");
+      if (!question) {
+        setError(err.message || "Failed to load coding challenge.");
+      }
     } finally {
       setLoading(false);
     }
-  }, [attemptId]);
+  }, [attemptId, question]);
 
   useEffect(() => {
     loadArena();

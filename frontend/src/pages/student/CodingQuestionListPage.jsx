@@ -26,10 +26,18 @@ import { practiceService } from "../../services/practiceService";
 export function CodingQuestionListPage() {
   const navigate = useNavigate();
 
-  const [questions, setQuestions] = useState([]);
-  const [solvedIds, setSolvedIds] = useState(new Set());
-  const [attemptedIds, setAttemptedIds] = useState(new Set());
-  const [loading, setLoading] = useState(true);
+  // Instant in-memory cache hydration - 0ms perceived lag on mount & back navigation
+  const [questions, setQuestions] = useState(() => practiceService.getCachedCodingQuestions() || []);
+  const [solvedIds, setSolvedIds] = useState(() => {
+    const cachedStatus = practiceService.getCachedCodingSolveStatus();
+    return new Set(cachedStatus?.solvedQuestionIds || []);
+  });
+  const [attemptedIds, setAttemptedIds] = useState(() => {
+    const cachedStatus = practiceService.getCachedCodingSolveStatus();
+    return new Set(cachedStatus?.attemptedQuestionIds || []);
+  });
+  const [loading, setLoading] = useState(() => !(practiceService.getCachedCodingQuestions()?.length > 0));
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [startingQuestionId, setStartingQuestionId] = useState(null);
   const [startError, setStartError] = useState(null);
@@ -40,23 +48,34 @@ export function CodingQuestionListPage() {
   const [selectedSubcategory, setSelectedSubcategory] = useState("ALL");
   const [selectedStatus, setSelectedStatus] = useState("ALL"); // ALL | SOLVED | UNSOLVED
 
-  const fetchQuestionsAndStatus = async () => {
-    setLoading(true);
+  const fetchQuestionsAndStatus = async ({ forceRefresh = false } = {}) => {
+    if (forceRefresh) {
+      setIsRefreshing(true);
+    } else if (questions.length === 0) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const [questionsData, statusData] = await Promise.all([
-        practiceService.getCodingQuestions(),
-        practiceService.getCodingSolveStatus()
+        practiceService.getCodingQuestions({}, { forceRefresh }),
+        practiceService.getCodingSolveStatus({ forceRefresh })
       ]);
 
-      setQuestions(Array.isArray(questionsData) ? questionsData : []);
-      setSolvedIds(new Set(statusData?.solvedQuestionIds || []));
-      setAttemptedIds(new Set(statusData?.attemptedQuestionIds || []));
+      if (Array.isArray(questionsData)) {
+        setQuestions(questionsData);
+      }
+      if (statusData) {
+        setSolvedIds(new Set(statusData?.solvedQuestionIds || []));
+        setAttemptedIds(new Set(statusData?.attemptedQuestionIds || []));
+      }
     } catch (err) {
       console.error("Failed to load coding questions & status:", err);
-      setError(err.message || "Unable to fetch coding questions from the Practice service.");
+      if (questions.length === 0) {
+        setError(err.message || "Unable to fetch coding questions from the Practice service.");
+      }
     } finally {
       setLoading(false);
+      setIsRefreshing(false);
     }
   };
 
@@ -183,8 +202,8 @@ export function CodingQuestionListPage() {
             variant="outline"
             size="sm"
             icon={RefreshCw}
-            loading={loading}
-            onClick={fetchQuestionsAndStatus}
+            loading={isRefreshing}
+            onClick={() => fetchQuestionsAndStatus({ forceRefresh: true })}
           >
             Refresh
           </Button>
