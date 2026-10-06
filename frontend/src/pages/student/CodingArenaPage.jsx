@@ -362,6 +362,7 @@ export function CodingArenaPage() {
 
   const codingProblem = question.codingProblem || {};
   const publicTestCases = codingProblem.testCases || [];
+  const problemMaxMarks = (question.difficulty === "HARD" ? 100 : question.difficulty === "MEDIUM" ? 50 : 20);
 
   return (
     <div className="space-y-4 animate-in fade-in duration-300">
@@ -388,7 +389,7 @@ export function CodingArenaPage() {
             <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
               <span>{question.category}</span>
               {question.subcategory && <span>• {question.subcategory}</span>}
-              <span>• Max Marks: <strong className="text-indigo-600 font-bold">{codingProblem.maxMarks !== undefined ? codingProblem.maxMarks : (question.difficulty === 'HARD' ? 100 : question.difficulty === 'MEDIUM' ? 50 : 20)} pts</strong></span>
+              <span>• Max Marks: <strong className="text-indigo-600 font-bold">{problemMaxMarks} pts</strong></span>
             </div>
           </div>
         </div>
@@ -713,7 +714,7 @@ export function CodingArenaPage() {
                   </div>
                   {executionResult.mode === "SUBMIT" && (
                     <div className="text-indigo-600 font-extrabold bg-indigo-50 px-2.5 py-1 rounded-md">
-                      Score: {executionResult.earnedMarks} / {codingProblem.maxMarks !== undefined ? codingProblem.maxMarks : (question.difficulty === 'HARD' ? 100 : question.difficulty === 'MEDIUM' ? 50 : 20)} pts
+                      Score: {executionResult.earnedMarks} / {problemMaxMarks} pts
                     </div>
                   )}
                   {executionResult.executionTimeMs !== undefined && (

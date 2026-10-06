@@ -89,6 +89,42 @@ async function seed() {
     console.warn('Notice: Could not purge legacy neetcode questions:', err.message);
   }
 
+  // Synchronize difficulty-based marks on existing CodingProblems
+  try {
+    const easyUpdated = await prisma.$executeRawUnsafe(`
+      UPDATE "CodingProblem" cp
+      SET "maxMarks" = 20.0
+      FROM "QuestionVersion" qv
+      JOIN "PracticeQuestion" pq ON qv."questionId" = pq."id"
+      WHERE cp."questionVersionId" = qv."id"
+        AND pq."difficulty" = 'EASY'
+        AND cp."maxMarks" != 20.0;
+    `);
+    const medUpdated = await prisma.$executeRawUnsafe(`
+      UPDATE "CodingProblem" cp
+      SET "maxMarks" = 50.0
+      FROM "QuestionVersion" qv
+      JOIN "PracticeQuestion" pq ON qv."questionId" = pq."id"
+      WHERE cp."questionVersionId" = qv."id"
+        AND pq."difficulty" = 'MEDIUM'
+        AND cp."maxMarks" != 50.0;
+    `);
+    const hardUpdated = await prisma.$executeRawUnsafe(`
+      UPDATE "CodingProblem" cp
+      SET "maxMarks" = 100.0
+      FROM "QuestionVersion" qv
+      JOIN "PracticeQuestion" pq ON qv."questionId" = pq."id"
+      WHERE cp."questionVersionId" = qv."id"
+        AND pq."difficulty" = 'HARD'
+        AND cp."maxMarks" != 100.0;
+    `);
+    if (easyUpdated > 0 || medUpdated > 0 || hardUpdated > 0) {
+      console.log(`✓ Synchronized difficulty marks: ${easyUpdated} Easy (20pts), ${medUpdated} Medium (50pts), ${hardUpdated} Hard (100pts)`);
+    }
+  } catch (err) {
+    console.warn('Note: Could not run difficulty sync SQL:', err.message);
+  }
+
   // Log current database question counts
   try {
     const totalInDb = await prisma.practiceQuestion.count();
