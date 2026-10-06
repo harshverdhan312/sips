@@ -274,26 +274,30 @@ async function executeCode(payload, { isAdmin = false } = {}) {
   const memoryLimitKb = Math.min(codingProblem.memoryLimitKb, config.limits.maxMemoryLimitKb);
   const judge0LangId = judge0Service.getLanguageId(language);
 
-  // 6. Create Parent CodeSubmission record in Database
-  const submission = await prisma.codeSubmission.create({
-    data: {
-      studentId: studentId.trim(),
-      questionVersionId,
-      practiceAttemptId: practiceAttemptId || null,
-      contestAttemptId: contestAttemptId || null,
-      assessmentAttemptId: assessmentAttemptId || null,
-      mode: executionMode,
-      language: language.toLowerCase().trim(),
-      sourceCode,
-      status: 'RUNNING',
-      testsPassed: 0,
-      testsTotal: selectedTestCases.length,
-      earnedMarks: 0.0
-    }
+  // 6. Phase 1: Create Parent CodeSubmission in its own transaction
+  const submission = await prisma.$transaction(async (tx) => {
+    return tx.codeSubmission.create({
+      data: {
+        studentId: studentId.trim(),
+        questionVersionId,
+        practiceAttemptId: practiceAttemptId || null,
+        contestAttemptId: contestAttemptId || null,
+        assessmentAttemptId: assessmentAttemptId || null,
+        mode: executionMode,
+        language: language.toLowerCase().trim(),
+        sourceCode,
+        status: 'RUNNING',
+        testsPassed: 0,
+        testsTotal: selectedTestCases.length,
+        earnedMarks: 0.0
+      }
+    });
   });
 
+  const submissionId = submission.id;
+
   try {
-    // 7. Dispatch Batch to Judge0
+    // 7. Phase 2: Dispatch Batch to Judge0 (outside any transaction)
     const batchPayload = selectedTestCases.map((tc) => ({
       source_code: sourceCode,
       language_id: judge0LangId,
@@ -305,27 +309,30 @@ async function executeCode(payload, { isAdmin = false } = {}) {
 
     const tokenResults = await judge0Service.submitBatch(batchPayload);
 
-    // 8. Create CodeSubmissionTestResult placeholder records
-    const createdTestResults = [];
-    for (let i = 0; i < selectedTestCases.length; i++) {
-      const tc = selectedTestCases[i];
-      const tokenObj = tokenResults[i] || {};
-      const tr = await prisma.codeSubmissionTestResult.create({
-        data: {
-          submissionId: submission.id,
-          testCaseId: tc.id,
-          judge0Token: tokenObj.token || null,
-          status: 'RUNNING',
-          passed: false,
-          earnedWeight: 0.0,
-          order: tc.order,
-          isHidden: tc.isHidden
-        }
-      });
-      createdTestResults.push({ ...tr, testCase: tc });
-    }
+    // 8. Phase 3: Create CodeSubmissionTestResult placeholders in their own transaction using submissionId
+    const createdTestResults = await prisma.$transaction(async (tx) => {
+      const results = [];
+      for (let i = 0; i < selectedTestCases.length; i++) {
+        const tc = selectedTestCases[i];
+        const tokenObj = tokenResults[i] || {};
+        const tr = await tx.codeSubmissionTestResult.create({
+          data: {
+            submissionId,
+            testCaseId: tc.id,
+            judge0Token: tokenObj.token || null,
+            status: 'RUNNING',
+            passed: false,
+            earnedWeight: 0.0,
+            order: tc.order,
+            isHidden: tc.isHidden
+          }
+        });
+        results.push({ ...tr, testCase: tc });
+      }
+      return results;
+    });
 
-    // 9. Poll Judge0 for Results
+    // 9. Phase 4: Poll Judge0 for Results (completely outside any transaction)
     const tokensToPoll = tokenResults.map((t) => t.token).filter(Boolean);
     let pollAttempts = 0;
     let finishedResults = [];
@@ -364,7 +371,7 @@ async function executeCode(payload, { isAdmin = false } = {}) {
       }
     }
 
-    // 11. Process and Persist Each Test Result
+    // 11. Process and compute test results in memory
     let testsPassedCount = 0;
     let totalWeightSum = 0.0;
     let earnedWeightSum = 0.0;
@@ -375,7 +382,7 @@ async function executeCode(payload, { isAdmin = false } = {}) {
     let hasMemoryLimit = false;
     let hasSystemError = false;
 
-    const finalTestResults = [];
+    const testResultUpdates = [];
 
     for (let i = 0; i < createdTestResults.length; i++) {
       const tr = createdTestResults[i];
@@ -399,7 +406,6 @@ async function executeCode(payload, { isAdmin = false } = {}) {
         testStatus = 'COMPILATION_ERROR';
         testPassed = false;
       } else if (raw.status_id === 3) {
-        // Direct Judge0 Accepted
         testPassed = true;
         testStatus = 'ACCEPTED';
       } else if (raw.status_id === 5) {
@@ -412,7 +418,6 @@ async function executeCode(payload, { isAdmin = false } = {}) {
         testStatus = 'SYSTEM_ERROR';
         hasSystemError = true;
       } else {
-        // Check output comparison
         const isMatch = compareCodeOutputs(raw.stdout, tc.expectedOutput);
         if (isMatch) {
           testPassed = true;
@@ -431,24 +436,17 @@ async function executeCode(payload, { isAdmin = false } = {}) {
         earnedWeightSum += testWeight;
       }
 
-      const updatedTr = await prisma.codeSubmissionTestResult.update({
-        where: { id: tr.id },
-        data: {
-          status: testStatus,
-          passed: testPassed,
-          executionTimeMs: timeTakenMs,
-          memoryUsedKb: memoryKb,
-          stdout: raw.stdout || null,
-          stderr: raw.stderr || null,
-          compileOutput: raw.compile_output || null,
-          earnedWeight
-        },
-        include: {
-          testCase: true
-        }
+      testResultUpdates.push({
+        id: tr.id,
+        status: testStatus,
+        passed: testPassed,
+        executionTimeMs: timeTakenMs,
+        memoryUsedKb: memoryKb,
+        stdout: raw.stdout || null,
+        stderr: raw.stderr || null,
+        compileOutput: raw.compile_output || null,
+        earnedWeight
       });
-
-      finalTestResults.push(updatedTr);
     }
 
     // 12. Determine Aggregate Parent Status & Calculate Marks
@@ -481,8 +479,6 @@ async function executeCode(payload, { isAdmin = false } = {}) {
       }
 
       earnedMarks = (earnedWeightSum / totalWeightSum) * maxMarks;
-
-      // Round to 2 decimal places
       earnedMarks = Math.round(earnedMarks * 100) / 100;
 
       if (testsPassedCount === selectedTestCases.length) {
@@ -496,109 +492,126 @@ async function executeCode(payload, { isAdmin = false } = {}) {
       } else {
         aggregateStatus = 'WRONG_ANSWER';
       }
+    }
 
-      // Update PracticeAttempt QuestionResponse record if in practice context
-      if (practiceAttemptId) {
-        await prisma.questionResponse.updateMany({
-          where: {
-            practiceAttemptId,
-            questionVersionId
-          },
+    // 13. Phase 5: Persist Test Results, Question Responses, and Parent CodeSubmission in its own transaction using submissionId
+    const finalSubmission = await prisma.$transaction(async (tx) => {
+      for (const update of testResultUpdates) {
+        await tx.codeSubmissionTestResult.update({
+          where: { id: update.id },
           data: {
-            isCorrect: aggregateStatus === 'ACCEPTED',
-            marksAwarded: earnedMarks,
-            answeredAt: new Date()
+            status: update.status,
+            passed: update.passed,
+            executionTimeMs: update.executionTimeMs,
+            memoryUsedKb: update.memoryUsedKb,
+            stdout: update.stdout,
+            stderr: update.stderr,
+            compileOutput: update.compileOutput,
+            earnedWeight: update.earnedWeight
           }
         });
       }
 
-      // Upsert ContestAttempt QuestionResponse record if in contest context
-      if (contestAttemptId) {
-        const existingContestResp = await prisma.questionResponse.findFirst({
-          where: { contestAttemptId, questionVersionId }
-        });
-        if (existingContestResp) {
-          await prisma.questionResponse.update({
-            where: { id: existingContestResp.id },
+      if (executionMode === 'SUBMIT') {
+        if (practiceAttemptId) {
+          await tx.questionResponse.updateMany({
+            where: {
+              practiceAttemptId,
+              questionVersionId
+            },
             data: {
               isCorrect: aggregateStatus === 'ACCEPTED',
               marksAwarded: earnedMarks,
-              answerData: { language, sourceCode },
               answeredAt: new Date()
             }
           });
-        } else {
-          await prisma.questionResponse.create({
-            data: {
-              contestAttemptId,
-              questionVersionId,
-              isCorrect: aggregateStatus === 'ACCEPTED',
-              marksAwarded: earnedMarks,
-              answerData: { language, sourceCode },
-              answeredAt: new Date()
-            }
+        }
+
+        if (contestAttemptId) {
+          const existingContestResp = await tx.questionResponse.findFirst({
+            where: { contestAttemptId, questionVersionId }
           });
+          if (existingContestResp) {
+            await tx.questionResponse.update({
+              where: { id: existingContestResp.id },
+              data: {
+                isCorrect: aggregateStatus === 'ACCEPTED',
+                marksAwarded: earnedMarks,
+                answerData: { language, sourceCode },
+                answeredAt: new Date()
+              }
+            });
+          } else {
+            await tx.questionResponse.create({
+              data: {
+                contestAttemptId,
+                questionVersionId,
+                isCorrect: aggregateStatus === 'ACCEPTED',
+                marksAwarded: earnedMarks,
+                answerData: { language, sourceCode },
+                answeredAt: new Date()
+              }
+            });
+          }
+        }
+
+        if (assessmentAttemptId && assessmentQuestion) {
+          const existingAssessmentResp = await tx.assessmentResponse.findFirst({
+            where: { assessmentAttemptId, assessmentQuestionId: assessmentQuestion.id }
+          });
+          if (existingAssessmentResp) {
+            await tx.assessmentResponse.update({
+              where: { id: existingAssessmentResp.id },
+              data: {
+                isCorrect: aggregateStatus === 'ACCEPTED',
+                marksAwarded: earnedMarks,
+                answerData: { language, sourceCode, submissionId },
+                answeredAt: new Date()
+              }
+            });
+          } else {
+            await tx.assessmentResponse.create({
+              data: {
+                assessmentAttemptId,
+                assessmentQuestionId: assessmentQuestion.id,
+                questionVersionId,
+                isCorrect: aggregateStatus === 'ACCEPTED',
+                marksAwarded: earnedMarks,
+                answerData: { language, sourceCode, submissionId },
+                answeredAt: new Date()
+              }
+            });
+          }
         }
       }
 
-      // Upsert AssessmentAttempt AssessmentResponse record if in assessment context
-      if (assessmentAttemptId && assessmentQuestion) {
-        const existingAssessmentResp = await prisma.assessmentResponse.findFirst({
-          where: { assessmentAttemptId, assessmentQuestionId: assessmentQuestion.id }
-        });
-        if (existingAssessmentResp) {
-          await prisma.assessmentResponse.update({
-            where: { id: existingAssessmentResp.id },
-            data: {
-              isCorrect: aggregateStatus === 'ACCEPTED',
-              marksAwarded: earnedMarks,
-              answerData: { language, sourceCode, submissionId: submission.id },
-              answeredAt: new Date()
-            }
-          });
-        } else {
-          await prisma.assessmentResponse.create({
-            data: {
-              assessmentAttemptId,
-              assessmentQuestionId: assessmentQuestion.id,
-              questionVersionId,
-              isCorrect: aggregateStatus === 'ACCEPTED',
-              marksAwarded: earnedMarks,
-              answerData: { language, sourceCode, submissionId: submission.id },
-              answeredAt: new Date()
-            }
-          });
+      return tx.codeSubmission.update({
+        where: { id: submissionId },
+        data: {
+          status: aggregateStatus,
+          testsPassed: testsPassedCount,
+          testsTotal: selectedTestCases.length,
+          earnedMarks,
+          executionTimeMs: maxExecutionTime,
+          memoryUsedKb: maxMemoryUsed,
+          compileOutput: compilationError
+        },
+        include: {
+          testResults: {
+            include: {
+              testCase: true
+            },
+            orderBy: { order: 'asc' }
+          }
         }
-      }
-    }
-
-    // 13. Update Parent CodeSubmission in Database
-    const finalSubmission = await prisma.codeSubmission.update({
-      where: { id: submission.id },
-      data: {
-        status: aggregateStatus,
-        testsPassed: testsPassedCount,
-        testsTotal: selectedTestCases.length,
-        earnedMarks,
-        executionTimeMs: maxExecutionTime,
-        memoryUsedKb: maxMemoryUsed,
-        compileOutput: compilationError
-      },
-      include: {
-        testResults: {
-          include: {
-            testCase: true
-          },
-          orderBy: { order: 'asc' }
-        }
-      }
+      });
     });
 
     return serializeCodeSubmissionResponse(finalSubmission, { isAdmin });
   } catch (err) {
-    // If Judge0 submission or polling fails with unhandled error, ensure submission record is marked SYSTEM_ERROR
+    // If Judge0 submission, polling or persistence fails, mark submission SYSTEM_ERROR using submissionId
     await prisma.codeSubmission.update({
-      where: { id: submission.id },
+      where: { id: submissionId },
       data: { status: 'SYSTEM_ERROR' }
     }).catch(() => {});
     throw err;
