@@ -3,6 +3,68 @@ const adminQuestionService = require('../services/adminQuestionService');
 const { success } = require('../utils/response');
 
 /**
+ * Handle single question creation
+ * POST /api/admin/questions
+ */
+async function createQuestion(req, res, next) {
+  try {
+    const data = req.body;
+    const context = {
+      collegeId: req.user?.role === 'SUPERADMIN' || data.isGlobal ? null : (req.user?.collegeId || null),
+      userId: req.user?.id || null,
+      role: req.user?.role || null
+    };
+
+    const isCoding = (data.type === 'CODING' || data.format === 'CODING');
+    const difficulty = (data.difficulty || 'MEDIUM').toUpperCase();
+    const defaultMarks = difficulty === 'HARD' ? 100 : difficulty === 'MEDIUM' ? 50 : 20;
+
+    const item = data.question ? data : {
+      type: isCoding ? 'CODING' : 'MCQ',
+      format: data.format || (isCoding ? 'CODING' : 'MULTIPLE_CHOICE'),
+      difficulty: difficulty,
+      category: data.category || 'General',
+      subcategory: data.subcategory || null,
+      tags: Array.isArray(data.tags) ? data.tags : [],
+      sourceType: data.sourceType || 'MANUAL',
+      sourceNamespace: data.sourceNamespace || 'custom',
+      externalId: data.externalId || null,
+      collegeId: context.collegeId,
+      question: {
+        title: data.title || '',
+        statement: data.statement || '',
+        options: data.options || null,
+        correctAnswer: data.correctAnswer !== undefined ? data.correctAnswer : null,
+        explanation: data.explanation || null
+      },
+      coding: isCoding ? {
+        inputFormat: data.inputFormat || data.codingProblem?.inputFormat || null,
+        outputFormat: data.outputFormat || data.codingProblem?.outputFormat || null,
+        constraints: data.constraints || data.codingProblem?.constraints || null,
+        timeLimitMs: data.timeLimitMs || data.codingProblem?.timeLimitMs || 2000,
+        memoryLimitKb: data.memoryLimitKb || data.codingProblem?.memoryLimitKb || 128000,
+        maxMarks: data.maxMarks || data.codingProblem?.maxMarks || defaultMarks,
+        starterCode: data.starterCode || data.codingProblem?.starterCode || null,
+        testCases: data.testCases || data.codingProblem?.testCases || []
+      } : null
+    };
+
+    const result = await bulkImportService.importQuestions([item], context);
+    if (result.errors && result.errors.length > 0 && result.inserted === 0 && result.versioned === 0) {
+      return res.status(400).json({
+        success: false,
+        message: result.errors[0]?.reason || 'Failed to create question',
+        errors: result.errors
+      });
+    }
+
+    return success(res, result, 'Question created successfully', 201);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
  * Handle bulk question import
  * POST /api/admin/questions/bulk-import
  */
