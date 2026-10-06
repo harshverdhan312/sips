@@ -31,6 +31,25 @@ function loadDataFiles() {
 
 async function seed() {
   console.log('--- Seeding SIPS Practice Questions & Coding Banks ---');
+
+  // 1. Purge legacy NeetCode 150 questions if present in database
+  try {
+    const deletedNeetcode = await prisma.practiceQuestion.deleteMany({
+      where: {
+        OR: [
+          { sourceNamespace: 'neetcode-150' },
+          { externalId: { startsWith: 'nc-' } },
+          { sourceUrl: { contains: 'neetcode' } }
+        ]
+      }
+    });
+    if (deletedNeetcode.count > 0) {
+      console.log(`✓ Purged ${deletedNeetcode.count} legacy NeetCode 150 questions from PostgreSQL.`);
+    }
+  } catch (err) {
+    console.warn('Notice: Could not purge legacy neetcode questions:', err.message);
+  }
+
   const questionsToSeed = loadDataFiles();
   console.log(`Total questions in dataset: ${questionsToSeed.length}`);
 
