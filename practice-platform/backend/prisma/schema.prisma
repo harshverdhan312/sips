@@ -222,6 +222,7 @@ model PracticeAttempt {
   submittedAt  DateTime?
   score        Decimal                @default(0.00) @db.Decimal(10, 2)
   totalMarks   Decimal                @default(0.00) @db.Decimal(10, 2)
+  questionVersionIds String[]         @default([])
   createdAt    DateTime               @default(now())
   updatedAt    DateTime               @updatedAt
 

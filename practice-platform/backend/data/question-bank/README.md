@@ -9,7 +9,14 @@ data/question-bank/
 ├── schema/
 │   └── questions.schema.json         # JSON Schema specification for question payloads
 ├── aptitude/
-│   └── aptitude_questions.json       # 10 Curated Aptitude MCQs (Quantitative, Logical, Verbal, DI)
+│   ├── quants/
+│   │   └── aptitude_questions.json   # 505 Curated Quantitative Aptitude MCQs
+│   ├── logical/
+│   │   └── logical_questions.json    # 503 Logical Reasoning MCQs
+│   ├── verbal/
+│   │   └── verbal_questions.json     # 501 Verbal Ability MCQs
+│   └── data_interpretation/
+│       └── data_interpretation_questions.json # 501 Data Interpretation MCQs
 ├── technical/
 │   └── technical_questions.json      # 10 Curated Technical MCQs (DSA, DBMS, OS, Networks, OOP, Languages)
 ├── mixed/
