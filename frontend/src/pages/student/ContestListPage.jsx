@@ -129,8 +129,8 @@ export function ContestListPage() {
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
           {[
             { id: "ALL", label: "All Assessments" },
-            { id: "LIVE", label: "🔴 Live Now" },
-            { id: "UPCOMING", label: "📅 Scheduled / Upcoming" }
+            { id: "LIVE", label: "Live Active" },
+            { id: "UPCOMING", label: "Scheduled / Upcoming" }
           ].map((tab) => (
             <button
               key={tab.id}

@@ -308,7 +308,7 @@ export function ContestLeaderboardPage() {
                       key={entry.attemptId}
                       className={cn(
                         "transition-colors hover:bg-slate-50/80",
-                        isCurrentStudent && "bg-indigo-50/60 font-semibold text-indigo-950 border-l-4 border-l-indigo-600"
+                        isCurrentStudent && "bg-indigo-50/80 font-semibold text-indigo-950 ring-1 ring-indigo-200"
                       )}
                     >
                       <td className="py-3.5 px-4 text-center font-bold">

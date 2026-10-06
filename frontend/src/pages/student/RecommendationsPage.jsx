@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Sparkles,
+  Target,
   Layers,
   BookOpen,
   Briefcase,
@@ -21,7 +21,7 @@ export function RecommendationsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-            <Sparkles className="w-8 h-8 text-indigo-600" />
+            <Target className="w-8 h-8 text-indigo-600" />
             Career Recommendations
           </h1>
           <p className="text-sm text-slate-500 mt-1">
@@ -32,8 +32,8 @@ export function RecommendationsPage() {
 
       {/* Honest Unavailable State Card */}
       <Card className="p-12 text-center max-w-xl mx-auto border-slate-200 shadow-sm">
-        <div className="w-16 h-16 rounded-3xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-4">
-          <Sparkles className="w-8 h-8" />
+        <div className="w-16 h-16 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-4">
+          <Target className="w-8 h-8" />
         </div>
         <h3 className="text-xl font-extrabold text-slate-900 mb-2">
           Career Recommendations Aren't Available Yet

@@ -112,8 +112,6 @@ export function ContestResultPage() {
 
       {/* Main Score Hero Card */}
       <Card className="p-8 text-center bg-gradient-to-br from-indigo-900 via-slate-900 to-indigo-950 text-white relative overflow-hidden shadow-md">
-        <div className="absolute top-0 right-0 transform translate-x-12 -translate-y-12 w-64 h-64 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
-
         <div className="relative z-10 space-y-4">
           <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center mx-auto text-amber-400">
             <Trophy className="w-8 h-8" />

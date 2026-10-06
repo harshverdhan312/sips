@@ -68,6 +68,11 @@ import { CollegeApprovalsPage } from "../pages/superadmin/CollegeApprovalsPage";
 import { InstitutionsDirectoryPage } from "../pages/superadmin/InstitutionsDirectoryPage";
 import { GlobalQuestionBankPage } from "../pages/superadmin/GlobalQuestionBankPage";
 
+// Legal & Policy Pages
+import { PrivacyPolicyPage } from "../pages/legal/PrivacyPolicyPage";
+import { TermsOfServicePage } from "../pages/legal/TermsOfServicePage";
+import { DataSecurityPage } from "../pages/legal/DataSecurityPage";
+
 import { DepartmentProfilePage } from "../pages/admin/DepartmentProfilePage";
 
 export function AppRoutes() {
@@ -77,6 +82,9 @@ export function AppRoutes() {
     <Routes>
       {/* Public Marketing & Gateway Layer */}
       <Route path="/" element={<LandingPage />} />
+      <Route path="/privacy" element={<PrivacyPolicyPage />} />
+      <Route path="/terms" element={<TermsOfServicePage />} />
+      <Route path="/security" element={<DataSecurityPage />} />
 
       {/* Public Login & Registration */}
       <Route path="/login" element={<LoginPage />} />
