@@ -34,21 +34,68 @@ async function seed() {
 
   // 1. Purge legacy NeetCode 150 questions if present in database
   try {
-    const deletedNeetcode = await prisma.practiceQuestion.deleteMany({
+    const neetcodeQuestions = await prisma.practiceQuestion.findMany({
       where: {
         OR: [
           { sourceNamespace: 'neetcode-150' },
           { externalId: { startsWith: 'nc-' } },
           { sourceUrl: { contains: 'neetcode' } }
         ]
+      },
+      select: {
+        id: true,
+        versions: {
+          select: {
+            id: true,
+            codingProblem: {
+              select: { id: true }
+            }
+          }
+        }
       }
     });
-    if (deletedNeetcode.count > 0) {
-      console.log(`✓ Purged ${deletedNeetcode.count} legacy NeetCode 150 questions from PostgreSQL.`);
+
+    if (neetcodeQuestions.length > 0) {
+      const qIds = neetcodeQuestions.map(q => q.id);
+      const vIds = neetcodeQuestions.flatMap(q => q.versions.map(v => v.id));
+      const cpIds = neetcodeQuestions.flatMap(q => q.versions.map(v => v.codingProblem?.id).filter(Boolean));
+
+      await prisma.$transaction(async (tx) => {
+        if (vIds.length > 0) {
+          await tx.questionResponse.deleteMany({ where: { questionVersionId: { in: vIds } } });
+          await tx.assessmentResponse.deleteMany({ where: { questionVersionId: { in: vIds } } });
+          await tx.codeSubmission.deleteMany({ where: { questionVersionId: { in: vIds } } });
+          await tx.contestQuestion.deleteMany({ where: { questionVersionId: { in: vIds } } });
+          await tx.assessmentQuestion.deleteMany({ where: { questionVersionId: { in: vIds } } });
+        }
+        if (cpIds.length > 0) {
+          await tx.testCase.deleteMany({ where: { codingProblemId: { in: cpIds } } });
+          await tx.codingProblem.deleteMany({ where: { id: { in: cpIds } } });
+        }
+        if (vIds.length > 0) {
+          await tx.questionVersion.deleteMany({ where: { id: { in: vIds } } });
+        }
+        await tx.practiceQuestion.deleteMany({ where: { id: { in: qIds } } });
+      }, {
+        maxWait: 20000,
+        timeout: 60000
+      });
+
+      console.log(`✓ Successfully purged ${neetcodeQuestions.length} legacy NeetCode 150 questions and all associated responses from PostgreSQL.`);
+    } else {
+      console.log('✓ No legacy NeetCode questions found in PostgreSQL database.');
     }
   } catch (err) {
     console.warn('Notice: Could not purge legacy neetcode questions:', err.message);
   }
+
+  // Log current database question counts
+  try {
+    const totalInDb = await prisma.practiceQuestion.count();
+    const codingInDb = await prisma.practiceQuestion.count({ where: { type: 'CODING' } });
+    const mcqInDb = await prisma.practiceQuestion.count({ where: { type: { in: ['APTITUDE', 'TECHNICAL'] } } });
+    console.log(`Database Status before sync: ${totalInDb} total questions (${codingInDb} Coding, ${mcqInDb} MCQ/Aptitude)`);
+  } catch (_) {}
 
   const questionsToSeed = loadDataFiles();
   console.log(`Total questions in dataset: ${questionsToSeed.length}`);
