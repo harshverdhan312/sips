@@ -15,5 +15,6 @@ router.get('/practice/attempts/:attemptId/result', studentAuth, practiceControll
 router.get('/practice/history', studentAuth, practiceController.getPracticeHistory);
 router.get('/practice/progress', studentAuth, practiceController.getPracticeProgress);
 router.get('/practice/streak', studentAuth, practiceController.getPracticeStreak);
+router.get('/practice/coding-status', studentAuth, practiceController.getCodingSolveStatus);
 
 module.exports = router;

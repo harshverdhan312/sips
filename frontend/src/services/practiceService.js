@@ -147,6 +147,19 @@ export const practiceService = {
   },
 
   /**
+   * Get student's solved and attempted coding question IDs
+   */
+  async getCodingSolveStatus() {
+    try {
+      const res = await practiceApi.get('/api/practice/coding-status');
+      return res?.data || res || { solvedQuestionIds: [], attemptedQuestionIds: [], totalSolved: 0, totalAttempted: 0 };
+    } catch (e) {
+      console.warn('Could not fetch coding solve status:', e);
+      return { solvedQuestionIds: [], attemptedQuestionIds: [], totalSolved: 0, totalAttempted: 0 };
+    }
+  },
+
+  /**
    * Get question details by ID (includes versions)
    */
   async getQuestionDetails(questionId) {
