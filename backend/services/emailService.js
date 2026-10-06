@@ -91,7 +91,7 @@ SIPS Super Administration Team
     logger.info(`[EmailService] College approval email dispatched to ${to} (${collegeName}) with username '${username}'`);
 
     // Try sending real email via nodemailer if configured
-    await this._dispatchSmtpEmail({
+    const dispatchResult = await this._dispatchSmtpEmail({
       to,
       subject,
       text: textBody,
@@ -100,7 +100,10 @@ SIPS Super Administration Team
 
     return {
       success: true,
-      messageId: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
+      delivered: Boolean(dispatchResult?.success),
+      simulated: Boolean(dispatchResult?.simulated),
+      error: dispatchResult?.error || null,
+      messageId: dispatchResult?.messageId || `msg_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
       to,
       subject
     };
@@ -138,15 +141,48 @@ SIPS Super Administration Team
     this.sentEmails.push(emailRecord);
     logger.info(`[EmailService] College rejection notice sent to ${to} (${collegeName})`);
 
+    const htmlBody = `
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
+  <div style="text-align: center; margin-bottom: 24px;">
+    <h2 style="color: #0f172a; margin: 0; font-size: 24px;">Skill Intelligence & Placement System</h2>
+    <p style="color: #64748b; font-size: 14px; margin-top: 4px;">Institutional Application Status Update</p>
+  </div>
+  
+  <p style="color: #1e293b; font-size: 16px;">Dear <strong>${collegeName}</strong> Administrator,</p>
+  
+  <p style="color: #475569; font-size: 15px; line-height: 1.6;">
+    Thank you for your interest in joining the Skill Intelligence & Placement System (SIPS).
+    After reviewing your institutional application, our Super Administration team was unable to approve it at this time.
+  </p>
+  
+  <div style="background-color: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 18px; margin: 20px 0;">
+    <h4 style="color: #9f1239; margin-top: 0; margin-bottom: 8px; font-size: 14px; text-transform: uppercase;">Reason / Feedback:</h4>
+    <p style="color: #881337; margin: 0; font-size: 14px; line-height: 1.5;">${reason || 'Additional verification or institutional accreditation details required.'}</p>
+  </div>
+
+  <p style="color: #475569; font-size: 14px; line-height: 1.5;">
+    If you believe this decision was made in error or if you have updated verification documentation, please reply directly to this email or contact <a href="mailto:support@sips.edu" style="color: #4f46e5;">support@sips.edu</a>.
+  </p>
+  
+  <p style="color: #94a3b8; font-size: 13px; margin-top: 30px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+    SIPS Super Administration Team
+  </p>
+</div>
+    `.trim();
+
     // Try sending real email via nodemailer if configured
-    await this._dispatchSmtpEmail({
+    const dispatchResult = await this._dispatchSmtpEmail({
       to,
       subject,
-      text: textBody
+      text: textBody,
+      html: htmlBody
     });
 
     return {
       success: true,
+      delivered: Boolean(dispatchResult?.success),
+      simulated: Boolean(dispatchResult?.simulated),
+      error: dispatchResult?.error || null,
       to,
       subject
     };
@@ -156,12 +192,17 @@ SIPS Super Administration Team
    * Internal dispatcher for real SMTP email delivery (via nodemailer)
    */
   async _dispatchSmtpEmail({ to, subject, text, html }) {
-    const smtpUser = process.env.SMTP_USER;
-    const smtpPass = process.env.SMTP_PASS;
+    const smtpUser = (process.env.SMTP_USER || '').trim();
+    let smtpPass = (process.env.SMTP_PASS || '').trim();
 
     if (!smtpUser || !smtpPass) {
       logger.info(`[EmailService] SMTP_USER or SMTP_PASS not set in environment. Running in simulated mode (email logged in sentEmails).`);
       return { success: false, simulated: true, reason: 'SMTP credentials not configured' };
+    }
+
+    // Google App Passwords often contain spaces (e.g. "abcd efgh ijkl mnop") - auto-strip them
+    if (smtpUser.includes('@gmail.com') || (process.env.SMTP_HOST || '').includes('gmail')) {
+      smtpPass = smtpPass.replace(/\s+/g, '');
     }
 
     try {
@@ -174,42 +215,52 @@ SIPS Super Administration Team
       }
 
       const isGmail = (process.env.SMTP_HOST || '').includes('gmail') || (!process.env.SMTP_HOST && smtpUser.includes('@gmail.com'));
-      
-      const transportConfig = isGmail
-        ? {
-            service: 'gmail',
-            auth: {
-              user: smtpUser,
-              pass: smtpPass
-            },
-            tls: {
-              rejectUnauthorized: false
-            }
-          }
-        : {
-            host: process.env.SMTP_HOST || 'smtp.gmail.com',
-            port: parseInt(process.env.SMTP_PORT, 10) || 587,
-            secure: process.env.SMTP_PORT === '465',
-            auth: {
-              user: smtpUser,
-              pass: smtpPass
-            },
-            tls: {
-              rejectUnauthorized: false
-            }
-          };
+      const port = parseInt(process.env.SMTP_PORT, 10) || (isGmail ? 465 : 587);
+      const isSecure = port === 465;
+
+      const transportConfig = {
+        host: process.env.SMTP_HOST || (isGmail ? 'smtp.gmail.com' : 'localhost'),
+        port: port,
+        secure: isSecure,
+        auth: {
+          user: smtpUser,
+          pass: smtpPass
+        },
+        connectionTimeout: 7000,
+        greetingTimeout: 7000,
+        socketTimeout: 9000,
+        tls: {
+          rejectUnauthorized: false
+        }
+      };
 
       const transporter = nodemailer.createTransport(transportConfig);
 
-      const fromAddress = process.env.SMTP_FROM || `SIPS Administration <${smtpUser}>`;
+      // Sanitize fromAddress: remove raw newlines that break SMTP headers
+      let rawFrom = (process.env.SMTP_FROM || '').replace(/[\r\n]+/g, ' ').trim();
+      let fromAddress;
+      if (!rawFrom) {
+        fromAddress = `"SIPS Central Administration" <${smtpUser}>`;
+      } else if (!rawFrom.includes('<') && rawFrom.includes('@')) {
+        fromAddress = `"SIPS Central Administration" <${rawFrom}>`;
+      } else {
+        fromAddress = rawFrom;
+      }
 
-      const info = await transporter.sendMail({
+      // Strict timeout wrapper for sendMail to prevent unhandled socket hangs
+      const sendPromise = transporter.sendMail({
         from: fromAddress,
         to,
         subject,
         text,
         html: html || undefined
       });
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('SMTP delivery timed out after 8 seconds')), 8000)
+      );
+
+      const info = await Promise.race([sendPromise, timeoutPromise]);
 
       logger.info(`[EmailService] Live SMTP email successfully delivered to ${to} (MessageId: ${info?.messageId})`);
       return { success: true, messageId: info?.messageId };
@@ -219,6 +270,55 @@ SIPS Super Administration Team
         response: err.response
       });
       return { success: false, error: err.message, code: err.code };
+    }
+  }
+
+  /**
+   * Diagnostic verification helper for Super Admin to test SMTP status
+   */
+  async verifySmtpConnection() {
+    const smtpUser = (process.env.SMTP_USER || '').trim();
+    let smtpPass = (process.env.SMTP_PASS || '').trim();
+
+    if (!smtpUser || !smtpPass) {
+      return { configured: false, message: 'SMTP_USER or SMTP_PASS environment variables are missing.' };
+    }
+
+    if (smtpUser.includes('@gmail.com') || (process.env.SMTP_HOST || '').includes('gmail')) {
+      smtpPass = smtpPass.replace(/\s+/g, '');
+    }
+
+    try {
+      const nodemailer = require('nodemailer');
+      const isGmail = (process.env.SMTP_HOST || '').includes('gmail') || (!process.env.SMTP_HOST && smtpUser.includes('@gmail.com'));
+      const port = parseInt(process.env.SMTP_PORT, 10) || (isGmail ? 465 : 587);
+      const isSecure = port === 465;
+
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST || (isGmail ? 'smtp.gmail.com' : 'localhost'),
+        port: port,
+        secure: isSecure,
+        auth: {
+          user: smtpUser,
+          pass: smtpPass
+        },
+        connectionTimeout: 6000,
+        greetingTimeout: 6000,
+        socketTimeout: 8000,
+        tls: {
+          rejectUnauthorized: false
+        }
+      });
+
+      const verifyPromise = transporter.verify();
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('SMTP verification timed out after 6 seconds')), 6000)
+      );
+
+      await Promise.race([verifyPromise, timeoutPromise]);
+      return { configured: true, connected: true, user: smtpUser, port, isSecure };
+    } catch (err) {
+      return { configured: true, connected: false, error: err.message, code: err.code };
     }
   }
 

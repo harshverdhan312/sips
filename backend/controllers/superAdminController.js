@@ -840,3 +840,18 @@ exports.activateGlobalQuestion = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Failed to activate global question.' });
   }
 };
+
+/**
+ * GET /api/super-admin/email-status
+ * Live diagnostic check for SMTP configuration and connectivity
+ */
+exports.getEmailStatus = async (req, res) => {
+  try {
+    const status = await emailService.verifySmtpConnection();
+    return res.json({ success: true, ...status });
+  } catch (error) {
+    logger.error('Error verifying email status:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+};
+

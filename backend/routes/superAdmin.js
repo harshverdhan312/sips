@@ -24,4 +24,7 @@ router.post('/questions', superAdminController.createGlobalQuestion);
 router.post('/questions/:id/archive', superAdminController.archiveGlobalQuestion);
 router.post('/questions/:id/activate', superAdminController.activateGlobalQuestion);
 
+// Diagnostic SMTP status check
+router.get('/email-status', superAdminController.getEmailStatus);
+
 module.exports = router;
