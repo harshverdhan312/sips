@@ -765,7 +765,8 @@ export function PracticeHubPage() {
             </div>
 
             <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-xs text-slate-600 space-y-1">
-              <p className="font-semibold text-slate-800">Session Rules:</p>
+              <p className="font-semibold text-slate-800">Session Structure:</p>
+              <p>• <strong>Topic Diversity:</strong> Questions are balanced across distinct subtopics with no adjacent topic clustering.</p>
               <p>• Questions are presented one at a time with instant answer saving.</p>
               <p>• Explanations and answer keys will be revealed after final submission.</p>
               <p>• Server calculates your official score upon completion.</p>

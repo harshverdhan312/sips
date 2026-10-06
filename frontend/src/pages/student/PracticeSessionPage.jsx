@@ -254,10 +254,15 @@ export function PracticeSessionPage() {
           <Card className="p-6 sm:p-8 border-slate-200 shadow-sm relative overflow-hidden">
             {/* Question Header */}
             <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-4 mb-5">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="px-3 py-1 rounded-xl bg-indigo-50 text-indigo-700 text-xs font-extrabold border border-indigo-100">
                   Question {currentIndex + 1} of {totalQuestions}
                 </span>
+                {currentQuestion.subcategory && (
+                  <Badge variant="primary" size="xs">
+                    {currentQuestion.subcategory.replace(/_/g, " ")}
+                  </Badge>
+                )}
                 <Badge variant="neutral" size="xs">
                   {currentQuestion.format ? currentQuestion.format.replace(/_/g, " ") : "MCQ"}
                 </Badge>
