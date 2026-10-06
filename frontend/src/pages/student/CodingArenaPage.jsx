@@ -23,6 +23,7 @@ import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
 import { Modal } from "../../components/common/Modal";
+import { ProblemStatement } from "../../components/common/ProblemStatement";
 import { practiceService } from "../../services/practiceService";
 
 const STARTER_TEMPLATES = {
@@ -443,18 +444,16 @@ export function CodingArenaPage() {
             {/* TAB 1: Problem Details */}
             {activeLeftTab === "problem" && (
               <div className="overflow-y-auto pr-1 space-y-5 flex-1 max-h-[600px]">
-                {/* Statement */}
+                {/* Rich Problem Statement & Formatted Sections */}
                 <div>
                   <h4 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-2">
-                    Description
+                    Description & Specifications
                   </h4>
-                  <div className="text-xs sm:text-sm text-slate-700 whitespace-pre-line leading-relaxed font-normal">
-                    {question.statement}
-                  </div>
+                  <ProblemStatement statement={question.statement} />
                 </div>
 
-                {/* Input Format */}
-                {codingProblem.inputFormat && (
+                {/* Additional Input Format if custom */}
+                {codingProblem.inputFormat && !codingProblem.inputFormat.toLowerCase().includes("standard input via stdin") && (
                   <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
                     <h5 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                       <Terminal className="w-3.5 h-3.5 text-indigo-600" />
@@ -466,8 +465,8 @@ export function CodingArenaPage() {
                   </div>
                 )}
 
-                {/* Output Format */}
-                {codingProblem.outputFormat && (
+                {/* Additional Output Format if custom */}
+                {codingProblem.outputFormat && !codingProblem.outputFormat.toLowerCase().includes("standard output via stdout") && (
                   <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
                     <h5 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                       <Code2 className="w-3.5 h-3.5 text-indigo-600" />

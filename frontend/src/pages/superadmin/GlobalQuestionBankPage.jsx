@@ -34,6 +34,7 @@ import { useNotifications } from "../../context/NotificationContext";
 import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
+import { ProblemStatement } from "../../components/common/ProblemStatement";
 
 export function GlobalQuestionBankPage() {
   const { showSuccess, showError } = useNotifications();
@@ -1008,9 +1009,9 @@ export function GlobalQuestionBankPage() {
 
             <div className="p-6 space-y-4 overflow-y-auto flex-1 text-xs">
               <div>
-                <p className="text-slate-400 uppercase font-bold text-[10px] mb-1.5">Problem Statement</p>
-                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-800 whitespace-pre-wrap font-mono leading-relaxed text-xs">
-                  {selectedQuestion.statement || "No statement text provided."}
+                <p className="text-slate-400 uppercase font-bold text-[10px] mb-1.5">Problem Statement & Format</p>
+                <div className="p-4 rounded-xl bg-white border border-slate-200/90 shadow-2xs">
+                  <ProblemStatement statement={selectedQuestion.statement} />
                 </div>
               </div>
 

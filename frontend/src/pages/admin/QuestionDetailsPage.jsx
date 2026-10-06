@@ -27,6 +27,7 @@ import { practiceService } from "../../services/practiceService";
 import { Badge } from "../../components/common/Badge";
 import { Button } from "../../components/common/Button";
 import { Modal } from "../../components/common/Modal";
+import { ProblemStatement } from "../../components/common/ProblemStatement";
 import { useNotifications } from "../../context/NotificationContext";
 
 export function QuestionDetailsPage() {
@@ -356,8 +357,8 @@ export function QuestionDetailsPage() {
               </div>
             </div>
 
-            <div className="prose prose-slate max-w-none text-sm text-slate-700 leading-relaxed whitespace-pre-line">
-              {selectedVersion.statement}
+            <div className="text-sm text-slate-700 leading-relaxed">
+              <ProblemStatement statement={selectedVersion.statement} />
             </div>
 
             {codingProblem.constraints && (
@@ -491,8 +492,8 @@ export function QuestionDetailsPage() {
               </h2>
             </div>
 
-            <div className="prose prose-slate max-w-none text-sm text-slate-800 leading-relaxed font-medium">
-              {selectedVersion.statement}
+            <div className="text-sm text-slate-800 leading-relaxed">
+              <ProblemStatement statement={selectedVersion.statement} />
             </div>
 
             {/* Options List */}
