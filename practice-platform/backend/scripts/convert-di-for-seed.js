@@ -36,7 +36,9 @@ const converted = raw.map(item => {
     options: item.question.options,
     correctAnswer: item.question.correctAnswer,
     explanation: item.question.explanation,
-    metadata: item.question.metadata
+    metadata: item.question.graphUrl
+      ? { graphUrl: item.question.graphUrl, ...(item.question.metadata || {}) }
+      : (item.question.metadata || null)
   };
 });
 

@@ -201,7 +201,8 @@ async function seed() {
                 statement: q.statement,
                 options: q.options || null,
                 correctAnswer: q.correctAnswer || null,
-                explanation: q.explanation || null
+                explanation: q.explanation || null,
+                metadata: q.metadata || null
               }
             }
           },
