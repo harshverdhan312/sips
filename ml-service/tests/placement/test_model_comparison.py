@@ -2,6 +2,8 @@ import pandas as pd
 import pytest
 from sklearn.pipeline import Pipeline
 
+from src.data.split import create_profile_groups
+
 from src.placement.model_comparison import (
     CANDIDATE_FEATURE_SETS,
     build_candidate_model,
@@ -145,4 +147,71 @@ def test_candidate_model_rejects_unknown_model():
         build_candidate_model(
             "unsupported",
             CANDIDATE_FEATURE_SETS["reduced"],
+        )
+
+
+def test_profile_groups_use_selected_features():
+    rows = pd.DataFrame(
+        {
+            "Age": [21, 21],
+            "Internships": [1, 1],
+            "CGPA": [7, 7],
+            "Hostel": [0, 1],
+            "HistoryOfBacklogs": [0, 0],
+            "Stream": [
+                "Computer Science",
+                "Computer Science",
+            ],
+        }
+    )
+
+    groups_without_hostel = create_profile_groups(
+        rows,
+        features=[
+            "Age",
+            "Internships",
+            "CGPA",
+            "HistoryOfBacklogs",
+            "Stream",
+        ],
+    )
+    groups_with_hostel = create_profile_groups(
+        rows,
+        features=[
+            "Age",
+            "Internships",
+            "CGPA",
+            "Hostel",
+            "HistoryOfBacklogs",
+            "Stream",
+        ],
+    )
+
+    assert groups_without_hostel.nunique() == 1
+    assert groups_with_hostel.nunique() == 2
+
+
+def test_profile_groups_reject_empty_feature_list(
+    placement_rows,
+):
+    with pytest.raises(
+        ValueError,
+        match="At least one grouping feature is required",
+    ):
+        create_profile_groups(
+            placement_rows,
+            features=[],
+        )
+
+
+def test_profile_groups_reject_missing_columns(
+    placement_rows,
+):
+    with pytest.raises(
+        ValueError,
+        match="Missing grouping features",
+    ):
+        create_profile_groups(
+            placement_rows,
+            features=["CGPA", "UnknownFeature"],
         )

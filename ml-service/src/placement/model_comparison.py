@@ -231,7 +231,7 @@ def evaluate_candidate_cv(
     selected = validate_candidate_features(features)
     X = df[selected]
     y = df["PlacedOrNot"]
-    groups = create_profile_groups(df)
+    groups = create_profile_groups(df, features=selected)
 
     cv = StratifiedGroupKFold(
         n_splits=n_splits,

@@ -121,7 +121,7 @@ def run_candidate_comparison() -> dict:
         "random_state": 42,
         "cross_validation": (
             "5-fold StratifiedGroupKFold using "
-            "full production-feature profiles"
+            "each candidate's selected-feature profiles"
         ),
         "dataset": {
             "total_rows": len(df),

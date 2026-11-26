@@ -1,7 +1,8 @@
 purpose: Development-only placement model and feature comparison
 selection_metric: mean group-CV ROC-AUC
 random_state: 42
-cross_validation: 5-fold StratifiedGroupKFold using full production-feature profiles
+cross_validation: 5-fold StratifiedGroupKFold using each candidate's selected-feature
+  profiles
 dataset:
   total_rows: 2966
   training_rows: 2119
@@ -20,22 +21,22 @@ results:
   - Age
   - Internships
   - CGPA
-  - HistoryOfBacklogs
+  - Hostel
   - Stream
   feature_count: 5
   rows: 965
-  accuracy_mean: 0.814484
-  accuracy_std: 0.01591
-  f1_mean: 0.828782
-  f1_std: 0.016649
-  roc_auc_mean: 0.90791
-  roc_auc_std: 0.006584
-  pr_auc_mean: 0.943542
-  pr_auc_std: 0.002732
-  brier_score_mean: 0.116599
-  brier_score_std: 0.00452
+  accuracy_mean: 0.829014
+  accuracy_std: 0.012705
+  f1_mean: 0.841901
+  f1_std: 0.014361
+  roc_auc_mean: 0.910343
+  roc_auc_std: 0.013378
+  pr_auc_mean: 0.944439
+  pr_auc_std: 0.008466
+  brier_score_mean: 0.116453
+  brier_score_std: 0.009801
   dataset: deduplicated_sensitivity
-  feature_set: no_hostel
+  feature_set: no_backlogs
 - model: xgboost
   features:
   - Age
@@ -58,27 +59,7 @@ results:
   brier_score_std: 0.004118
   dataset: deduplicated_sensitivity
   feature_set: full
-- model: xgboost
-  features:
-  - Age
-  - Internships
-  - CGPA
-  - Stream
-  feature_count: 4
-  rows: 965
-  accuracy_mean: 0.827988
-  accuracy_std: 0.012742
-  f1_mean: 0.840676
-  f1_std: 0.011889
-  roc_auc_mean: 0.906632
-  roc_auc_std: 0.005957
-  pr_auc_mean: 0.942633
-  pr_auc_std: 0.001709
-  brier_score_mean: 0.118076
-  brier_score_std: 0.00324
-  dataset: deduplicated_sensitivity
-  feature_set: reduced
-- model: xgboost
+- model: random_forest
   features:
   - Age
   - Internships
@@ -87,16 +68,16 @@ results:
   - Stream
   feature_count: 5
   rows: 965
-  accuracy_mean: 0.823859
-  accuracy_std: 0.009009
-  f1_mean: 0.837124
-  f1_std: 0.008417
-  roc_auc_mean: 0.906418
-  roc_auc_std: 0.007925
-  pr_auc_mean: 0.942741
-  pr_auc_std: 0.002645
-  brier_score_mean: 0.118368
-  brier_score_std: 0.003849
+  accuracy_mean: 0.817636
+  accuracy_std: 0.030378
+  f1_mean: 0.831939
+  f1_std: 0.029197
+  roc_auc_mean: 0.904179
+  roc_auc_std: 0.018137
+  pr_auc_mean: 0.940198
+  pr_auc_std: 0.010876
+  brier_score_mean: 0.121989
+  brier_score_std: 0.010989
   dataset: deduplicated_sensitivity
   feature_set: no_backlogs
 - model: random_forest
@@ -108,18 +89,38 @@ results:
   - Stream
   feature_count: 5
   rows: 965
-  accuracy_mean: 0.819687
-  accuracy_std: 0.021384
-  f1_mean: 0.833342
-  f1_std: 0.018134
-  roc_auc_mean: 0.905369
-  roc_auc_std: 0.006799
-  pr_auc_mean: 0.942198
-  pr_auc_std: 0.004402
-  brier_score_mean: 0.120023
-  brier_score_std: 0.006437
+  accuracy_mean: 0.821725
+  accuracy_std: 0.015886
+  f1_mean: 0.837131
+  f1_std: 0.012855
+  roc_auc_mean: 0.903713
+  roc_auc_std: 0.019595
+  pr_auc_mean: 0.941305
+  pr_auc_std: 0.010182
+  brier_score_mean: 0.120058
+  brier_score_std: 0.01276
   dataset: deduplicated_sensitivity
   feature_set: no_hostel
+- model: xgboost
+  features:
+  - Age
+  - Internships
+  - CGPA
+  - Stream
+  feature_count: 4
+  rows: 965
+  accuracy_mean: 0.824906
+  accuracy_std: 0.025443
+  f1_mean: 0.838554
+  f1_std: 0.025931
+  roc_auc_mean: 0.90267
+  roc_auc_std: 0.026907
+  pr_auc_mean: 0.940182
+  pr_auc_std: 0.016793
+  brier_score_mean: 0.118666
+  brier_score_std: 0.016915
+  dataset: deduplicated_sensitivity
+  feature_set: reduced
 - model: random_forest
   features:
   - Age
@@ -147,120 +148,84 @@ results:
   - Age
   - Internships
   - CGPA
-  - Hostel
-  - Stream
-  feature_count: 5
-  rows: 965
-  accuracy_mean: 0.821754
-  accuracy_std: 0.013016
-  f1_mean: 0.835978
-  f1_std: 0.013615
-  roc_auc_mean: 0.899084
-  roc_auc_std: 0.009424
-  pr_auc_mean: 0.938153
-  pr_auc_std: 0.006551
-  brier_score_mean: 0.125248
-  brier_score_std: 0.00486
-  dataset: deduplicated_sensitivity
-  feature_set: no_backlogs
-- model: random_forest
-  features:
-  - Age
-  - Internships
-  - CGPA
   - Stream
   feature_count: 4
   rows: 965
-  accuracy_mean: 0.815531
-  accuracy_std: 0.02447
-  f1_mean: 0.829491
-  f1_std: 0.022
-  roc_auc_mean: 0.898161
-  roc_auc_std: 0.004776
-  pr_auc_mean: 0.937813
-  pr_auc_std: 0.00463
-  brier_score_mean: 0.126002
-  brier_score_std: 0.004378
+  accuracy_mean: 0.822801
+  accuracy_std: 0.029138
+  f1_mean: 0.837221
+  f1_std: 0.029501
+  roc_auc_mean: 0.902353
+  roc_auc_std: 0.036616
+  pr_auc_mean: 0.938886
+  pr_auc_std: 0.022735
+  brier_score_mean: 0.121589
+  brier_score_std: 0.020312
   dataset: deduplicated_sensitivity
   feature_set: reduced
 - model: xgboost
   features:
+  - Age
   - Internships
   - CGPA
-  - Hostel
   - HistoryOfBacklogs
   - Stream
   feature_count: 5
   rows: 965
-  accuracy_mean: 0.790617
-  accuracy_std: 0.030018
-  f1_mean: 0.805723
-  f1_std: 0.027538
-  roc_auc_mean: 0.875049
-  roc_auc_std: 0.01712
-  pr_auc_mean: 0.923027
-  pr_auc_std: 0.012128
-  brier_score_mean: 0.136092
-  brier_score_std: 0.00949
+  accuracy_mean: 0.82274
+  accuracy_std: 0.016507
+  f1_mean: 0.835989
+  f1_std: 0.014582
+  roc_auc_mean: 0.901739
+  roc_auc_std: 0.020796
+  pr_auc_mean: 0.941208
+  pr_auc_std: 0.009097
+  brier_score_mean: 0.118942
+  brier_score_std: 0.011775
   dataset: deduplicated_sensitivity
-  feature_set: no_age
-- model: random_forest
-  features:
-  - Internships
-  - CGPA
-  - Hostel
-  - HistoryOfBacklogs
-  - Stream
-  feature_count: 5
-  rows: 965
-  accuracy_mean: 0.767807
-  accuracy_std: 0.030546
-  f1_mean: 0.787031
-  f1_std: 0.030144
-  roc_auc_mean: 0.863187
-  roc_auc_std: 0.018113
-  pr_auc_mean: 0.91559
-  pr_auc_std: 0.011836
-  brier_score_mean: 0.144522
-  brier_score_std: 0.009716
-  dataset: deduplicated_sensitivity
-  feature_set: no_age
+  feature_set: no_hostel
 - model: xgboost
   features:
   - Internships
   - CGPA
-  feature_count: 2
+  - Hostel
+  - HistoryOfBacklogs
+  - Stream
+  feature_count: 5
   rows: 965
-  accuracy_mean: 0.793698
-  accuracy_std: 0.01951
-  f1_mean: 0.798173
-  f1_std: 0.023832
-  roc_auc_mean: 0.852154
-  roc_auc_std: 0.016573
-  pr_auc_mean: 0.902963
-  pr_auc_std: 0.012887
-  brier_score_mean: 0.139172
-  brier_score_std: 0.008491
+  accuracy_mean: 0.780643
+  accuracy_std: 0.043135
+  f1_mean: 0.804042
+  f1_std: 0.038556
+  roc_auc_mean: 0.871155
+  roc_auc_std: 0.040807
+  pr_auc_mean: 0.91852
+  pr_auc_std: 0.023731
+  brier_score_mean: 0.138273
+  brier_score_std: 0.021198
   dataset: deduplicated_sensitivity
-  feature_set: minimal
+  feature_set: no_age
 - model: random_forest
   features:
   - Internships
   - CGPA
-  feature_count: 2
+  - Hostel
+  - HistoryOfBacklogs
+  - Stream
+  feature_count: 5
   rows: 965
-  accuracy_mean: 0.791588
-  accuracy_std: 0.027873
-  f1_mean: 0.794887
-  f1_std: 0.030786
-  roc_auc_mean: 0.843811
-  roc_auc_std: 0.01972
-  pr_auc_mean: 0.89904
-  pr_auc_std: 0.01454
-  brier_score_mean: 0.140944
-  brier_score_std: 0.011666
+  accuracy_mean: 0.790102
+  accuracy_std: 0.034596
+  f1_mean: 0.792532
+  f1_std: 0.046446
+  roc_auc_mean: 0.861393
+  roc_auc_std: 0.044503
+  pr_auc_mean: 0.914597
+  pr_auc_std: 0.024271
+  brier_score_mean: 0.141236
+  brier_score_std: 0.017709
   dataset: deduplicated_sensitivity
-  feature_set: minimal
+  feature_set: no_age
 - model: logistic
   features:
   - Age
@@ -288,20 +253,41 @@ results:
   - Age
   - Internships
   - CGPA
+  - Hostel
+  - Stream
+  feature_count: 5
+  rows: 965
+  accuracy_mean: 0.72435
+  accuracy_std: 0.02872
+  f1_mean: 0.766165
+  f1_std: 0.024976
+  roc_auc_mean: 0.836461
+  roc_auc_std: 0.021834
+  pr_auc_mean: 0.892088
+  pr_auc_std: 0.01552
+  brier_score_mean: 0.167379
+  brier_score_std: 0.013937
+  dataset: deduplicated_sensitivity
+  feature_set: no_backlogs
+- model: logistic
+  features:
+  - Age
+  - Internships
+  - CGPA
   - HistoryOfBacklogs
   - Stream
   feature_count: 5
   rows: 965
-  accuracy_mean: 0.725452
-  accuracy_std: 0.020489
-  f1_mean: 0.766229
-  f1_std: 0.018532
-  roc_auc_mean: 0.842371
-  roc_auc_std: 0.013529
-  pr_auc_mean: 0.898349
-  pr_auc_std: 0.006342
-  brier_score_mean: 0.164856
-  brier_score_std: 0.008075
+  accuracy_mean: 0.721227
+  accuracy_std: 0.031088
+  f1_mean: 0.764762
+  f1_std: 0.028183
+  roc_auc_mean: 0.834381
+  roc_auc_std: 0.038342
+  pr_auc_mean: 0.892226
+  pr_auc_std: 0.026747
+  brier_score_mean: 0.166755
+  brier_score_std: 0.01885
   dataset: deduplicated_sensitivity
   feature_set: no_hostel
 - model: logistic
@@ -312,39 +298,18 @@ results:
   - Stream
   feature_count: 4
   rows: 965
-  accuracy_mean: 0.718187
-  accuracy_std: 0.02053
-  f1_mean: 0.761265
-  f1_std: 0.016567
-  roc_auc_mean: 0.839446
-  roc_auc_std: 0.015453
-  pr_auc_mean: 0.897199
-  pr_auc_std: 0.007243
-  brier_score_mean: 0.166091
-  brier_score_std: 0.009451
+  accuracy_mean: 0.719136
+  accuracy_std: 0.047762
+  f1_mean: 0.762279
+  f1_std: 0.031804
+  roc_auc_mean: 0.832186
+  roc_auc_std: 0.047203
+  pr_auc_mean: 0.891816
+  pr_auc_std: 0.027997
+  brier_score_mean: 0.169393
+  brier_score_std: 0.026415
   dataset: deduplicated_sensitivity
   feature_set: reduced
-- model: logistic
-  features:
-  - Age
-  - Internships
-  - CGPA
-  - Hostel
-  - Stream
-  feature_count: 5
-  rows: 965
-  accuracy_mean: 0.723379
-  accuracy_std: 0.021668
-  f1_mean: 0.766353
-  f1_std: 0.016208
-  roc_auc_mean: 0.838502
-  roc_auc_std: 0.015592
-  pr_auc_mean: 0.896093
-  pr_auc_std: 0.007864
-  brier_score_mean: 0.165617
-  brier_score_std: 0.009987
-  dataset: deduplicated_sensitivity
-  feature_set: no_backlogs
 - model: logistic
   features:
   - Internships
@@ -354,36 +319,114 @@ results:
   - Stream
   feature_count: 5
   rows: 965
-  accuracy_mean: 0.723261
-  accuracy_std: 0.022087
-  f1_mean: 0.76607
-  f1_std: 0.025627
-  roc_auc_mean: 0.83699
-  roc_auc_std: 0.013741
-  pr_auc_mean: 0.897862
-  pr_auc_std: 0.007741
-  brier_score_mean: 0.167111
-  brier_score_std: 0.00887
+  accuracy_mean: 0.719843
+  accuracy_std: 0.06709
+  f1_mean: 0.762302
+  f1_std: 0.051667
+  roc_auc_mean: 0.827399
+  roc_auc_std: 0.03383
+  pr_auc_mean: 0.890152
+  pr_auc_std: 0.017106
+  brier_score_mean: 0.170164
+  brier_score_std: 0.02052
   dataset: deduplicated_sensitivity
   feature_set: no_age
+- model: xgboost
+  features:
+  - Internships
+  - CGPA
+  feature_count: 2
+  rows: 965
+  accuracy_mean: 0.780777
+  accuracy_std: 0.065166
+  f1_mean: 0.766656
+  f1_std: 0.099846
+  roc_auc_mean: 0.825529
+  roc_auc_std: 0.071021
+  pr_auc_mean: 0.84824
+  pr_auc_std: 0.075733
+  brier_score_mean: 0.152129
+  brier_score_std: 0.033038
+  dataset: deduplicated_sensitivity
+  feature_set: minimal
+- model: random_forest
+  features:
+  - Internships
+  - CGPA
+  feature_count: 2
+  rows: 965
+  accuracy_mean: 0.789716
+  accuracy_std: 0.060642
+  f1_mean: 0.781545
+  f1_std: 0.088669
+  roc_auc_mean: 0.825529
+  roc_auc_std: 0.071021
+  pr_auc_mean: 0.84824
+  pr_auc_std: 0.075733
+  brier_score_mean: 0.159225
+  brier_score_std: 0.021108
+  dataset: deduplicated_sensitivity
+  feature_set: minimal
 - model: logistic
   features:
   - Internships
   - CGPA
   feature_count: 2
   rows: 965
-  accuracy_mean: 0.689207
-  accuracy_std: 0.045288
-  f1_mean: 0.745801
-  f1_std: 0.025357
-  roc_auc_mean: 0.825195
-  roc_auc_std: 0.016551
-  pr_auc_mean: 0.883484
-  pr_auc_std: 0.0093
-  brier_score_mean: 0.170484
-  brier_score_std: 0.009262
+  accuracy_mean: 0.669858
+  accuracy_std: 0.146389
+  f1_mean: 0.741681
+  f1_std: 0.072497
+  roc_auc_mean: 0.79929
+  roc_auc_std: 0.073868
+  pr_auc_mean: 0.827201
+  pr_auc_std: 0.067127
+  brier_score_mean: 0.195662
+  brier_score_std: 0.056893
   dataset: deduplicated_sensitivity
   feature_set: minimal
+- model: xgboost
+  features:
+  - Age
+  - Internships
+  - CGPA
+  - HistoryOfBacklogs
+  - Stream
+  feature_count: 5
+  rows: 2542
+  accuracy_mean: 0.882381
+  accuracy_std: 0.013739
+  f1_mean: 0.886397
+  f1_std: 0.015383
+  roc_auc_mean: 0.941302
+  roc_auc_std: 0.018202
+  pr_auc_mean: 0.96098
+  pr_auc_std: 0.010607
+  brier_score_mean: 0.087418
+  brier_score_std: 0.010119
+  dataset: raw
+  feature_set: no_hostel
+- model: random_forest
+  features:
+  - Age
+  - Internships
+  - CGPA
+  - HistoryOfBacklogs
+  - Stream
+  feature_count: 5
+  rows: 2542
+  accuracy_mean: 0.879627
+  accuracy_std: 0.012567
+  f1_mean: 0.885252
+  f1_std: 0.013245
+  roc_auc_mean: 0.936765
+  roc_auc_std: 0.021928
+  pr_auc_mean: 0.958305
+  pr_auc_std: 0.011531
+  brier_score_mean: 0.092247
+  brier_score_std: 0.012663
+  dataset: raw
+  feature_set: no_hostel
 - model: xgboost
   features:
   - Age
@@ -393,18 +436,59 @@ results:
   - Stream
   feature_count: 5
   rows: 2542
-  accuracy_mean: 0.881194
-  accuracy_std: 0.013539
-  f1_mean: 0.885878
-  f1_std: 0.012824
-  roc_auc_mean: 0.934508
-  roc_auc_std: 0.0153
-  pr_auc_mean: 0.958275
-  pr_auc_std: 0.007801
-  brier_score_mean: 0.09111
-  brier_score_std: 0.007884
+  accuracy_mean: 0.881527
+  accuracy_std: 0.028702
+  f1_mean: 0.886477
+  f1_std: 0.029181
+  roc_auc_mean: 0.936586
+  roc_auc_std: 0.017658
+  pr_auc_mean: 0.958374
+  pr_auc_std: 0.01154
+  brier_score_mean: 0.09044
+  brier_score_std: 0.016421
   dataset: raw
   feature_set: no_backlogs
+- model: random_forest
+  features:
+  - Age
+  - Internships
+  - CGPA
+  - Hostel
+  - Stream
+  feature_count: 5
+  rows: 2542
+  accuracy_mean: 0.883123
+  accuracy_std: 0.021161
+  f1_mean: 0.888831
+  f1_std: 0.019581
+  roc_auc_mean: 0.93502
+  roc_auc_std: 0.013069
+  pr_auc_mean: 0.957675
+  pr_auc_std: 0.008854
+  brier_score_mean: 0.092185
+  brier_score_std: 0.012304
+  dataset: raw
+  feature_set: no_backlogs
+- model: random_forest
+  features:
+  - Age
+  - Internships
+  - CGPA
+  - Stream
+  feature_count: 4
+  rows: 2542
+  accuracy_mean: 0.876162
+  accuracy_std: 0.014705
+  f1_mean: 0.884263
+  f1_std: 0.015602
+  roc_auc_mean: 0.934708
+  roc_auc_std: 0.010107
+  pr_auc_mean: 0.956532
+  pr_auc_std: 0.007288
+  brier_score_mean: 0.093742
+  brier_score_std: 0.00648
+  dataset: raw
+  feature_set: reduced
 - model: xgboost
   features:
   - Age
@@ -435,78 +519,16 @@ results:
   - Stream
   feature_count: 4
   rows: 2542
-  accuracy_mean: 0.880016
-  accuracy_std: 0.012269
-  f1_mean: 0.884865
-  f1_std: 0.011723
-  roc_auc_mean: 0.933762
-  roc_auc_std: 0.015804
-  pr_auc_mean: 0.957447
-  pr_auc_std: 0.008504
-  brier_score_mean: 0.090738
-  brier_score_std: 0.008516
-  dataset: raw
-  feature_set: reduced
-- model: xgboost
-  features:
-  - Age
-  - Internships
-  - CGPA
-  - HistoryOfBacklogs
-  - Stream
-  feature_count: 5
-  rows: 2542
-  accuracy_mean: 0.880025
-  accuracy_std: 0.009474
-  f1_mean: 0.884672
-  f1_std: 0.009508
-  roc_auc_mean: 0.932279
-  roc_auc_std: 0.015359
-  pr_auc_mean: 0.957143
-  pr_auc_std: 0.008219
-  brier_score_mean: 0.090393
-  brier_score_std: 0.008923
-  dataset: raw
-  feature_set: no_hostel
-- model: random_forest
-  features:
-  - Age
-  - Internships
-  - CGPA
-  - Hostel
-  - Stream
-  feature_count: 5
-  rows: 2542
-  accuracy_mean: 0.870213
-  accuracy_std: 0.024432
-  f1_mean: 0.877265
-  f1_std: 0.023574
-  roc_auc_mean: 0.929986
-  roc_auc_std: 0.011687
-  pr_auc_mean: 0.954623
-  pr_auc_std: 0.007814
-  brier_score_mean: 0.097784
-  brier_score_std: 0.010414
-  dataset: raw
-  feature_set: no_backlogs
-- model: random_forest
-  features:
-  - Age
-  - Internships
-  - CGPA
-  - Stream
-  feature_count: 4
-  rows: 2542
-  accuracy_mean: 0.860352
-  accuracy_std: 0.031751
-  f1_mean: 0.868813
-  f1_std: 0.026159
-  roc_auc_mean: 0.927128
-  roc_auc_std: 0.010746
-  pr_auc_mean: 0.953557
-  pr_auc_std: 0.006814
-  brier_score_mean: 0.10015
-  brier_score_std: 0.01091
+  accuracy_mean: 0.88061
+  accuracy_std: 0.025009
+  f1_mean: 0.884769
+  f1_std: 0.026813
+  roc_auc_mean: 0.933251
+  roc_auc_std: 0.024036
+  pr_auc_mean: 0.956261
+  pr_auc_std: 0.014496
+  brier_score_mean: 0.09073
+  brier_score_std: 0.016983
   dataset: raw
   feature_set: reduced
 - model: random_forest
@@ -531,27 +553,6 @@ results:
   brier_score_std: 0.00882
   dataset: raw
   feature_set: full
-- model: random_forest
-  features:
-  - Age
-  - Internships
-  - CGPA
-  - HistoryOfBacklogs
-  - Stream
-  feature_count: 5
-  rows: 2542
-  accuracy_mean: 0.871727
-  accuracy_std: 0.020052
-  f1_mean: 0.878446
-  f1_std: 0.015611
-  roc_auc_mean: 0.924126
-  roc_auc_std: 0.012547
-  pr_auc_mean: 0.953757
-  pr_auc_std: 0.006494
-  brier_score_mean: 0.097809
-  brier_score_std: 0.009543
-  dataset: raw
-  feature_set: no_hostel
 - model: xgboost
   features:
   - Internships
@@ -561,73 +562,37 @@ results:
   - Stream
   feature_count: 5
   rows: 2542
-  accuracy_mean: 0.846963
-  accuracy_std: 0.021786
-  f1_mean: 0.847213
-  f1_std: 0.021985
-  roc_auc_mean: 0.899671
-  roc_auc_std: 0.016898
-  pr_auc_mean: 0.936134
-  pr_auc_std: 0.00884
-  brier_score_mean: 0.112874
-  brier_score_std: 0.010994
+  accuracy_mean: 0.85131
+  accuracy_std: 0.025894
+  f1_mean: 0.850596
+  f1_std: 0.029088
+  roc_auc_mean: 0.903926
+  roc_auc_std: 0.029107
+  pr_auc_mean: 0.933779
+  pr_auc_std: 0.019524
+  brier_score_mean: 0.109745
+  brier_score_std: 0.01901
   dataset: raw
   feature_set: no_age
 - model: random_forest
   features:
   - Internships
   - CGPA
-  feature_count: 2
-  rows: 2542
-  accuracy_mean: 0.854838
-  accuracy_std: 0.021996
-  f1_mean: 0.854697
-  f1_std: 0.023763
-  roc_auc_mean: 0.895371
-  roc_auc_std: 0.011463
-  pr_auc_mean: 0.92589
-  pr_auc_std: 0.009337
-  brier_score_mean: 0.11094
-  brier_score_std: 0.01138
-  dataset: raw
-  feature_set: minimal
-- model: xgboost
-  features:
-  - Internships
-  - CGPA
-  feature_count: 2
-  rows: 2542
-  accuracy_mean: 0.855231
-  accuracy_std: 0.023123
-  f1_mean: 0.855546
-  f1_std: 0.024253
-  roc_auc_mean: 0.890777
-  roc_auc_std: 0.01216
-  pr_auc_mean: 0.923826
-  pr_auc_std: 0.009322
-  brier_score_mean: 0.112027
-  brier_score_std: 0.012875
-  dataset: raw
-  feature_set: minimal
-- model: random_forest
-  features:
-  - Internships
-  - CGPA
   - Hostel
   - HistoryOfBacklogs
   - Stream
   feature_count: 5
   rows: 2542
-  accuracy_mean: 0.823725
-  accuracy_std: 0.031347
-  f1_mean: 0.830651
-  f1_std: 0.028994
-  roc_auc_mean: 0.889455
-  roc_auc_std: 0.026732
-  pr_auc_mean: 0.929405
-  pr_auc_std: 0.01408
-  brier_score_mean: 0.127337
-  brier_score_std: 0.019979
+  accuracy_mean: 0.853691
+  accuracy_std: 0.023102
+  f1_mean: 0.853442
+  f1_std: 0.025583
+  roc_auc_mean: 0.89879
+  roc_auc_std: 0.020684
+  pr_auc_mean: 0.932075
+  pr_auc_std: 0.015244
+  brier_score_mean: 0.110939
+  brier_score_std: 0.01426
   dataset: raw
   feature_set: no_age
 - model: logistic
@@ -639,38 +604,18 @@ results:
   - Stream
   feature_count: 5
   rows: 2542
-  accuracy_mean: 0.771493
-  accuracy_std: 0.034499
-  f1_mean: 0.794816
-  f1_std: 0.028722
-  roc_auc_mean: 0.871476
-  roc_auc_std: 0.033297
-  pr_auc_mean: 0.913096
-  pr_auc_std: 0.023184
-  brier_score_mean: 0.148822
-  brier_score_std: 0.021988
+  accuracy_mean: 0.760789
+  accuracy_std: 0.070983
+  f1_mean: 0.789523
+  f1_std: 0.045244
+  roc_auc_mean: 0.871833
+  roc_auc_std: 0.026449
+  pr_auc_mean: 0.9113
+  pr_auc_std: 0.021576
+  brier_score_mean: 0.152511
+  brier_score_std: 0.020648
   dataset: raw
   feature_set: no_hostel
-- model: logistic
-  features:
-  - Age
-  - Internships
-  - CGPA
-  - Stream
-  feature_count: 4
-  rows: 2542
-  accuracy_mean: 0.766386
-  accuracy_std: 0.039561
-  f1_mean: 0.791413
-  f1_std: 0.032576
-  roc_auc_mean: 0.870536
-  roc_auc_std: 0.033192
-  pr_auc_mean: 0.912719
-  pr_auc_std: 0.022149
-  brier_score_mean: 0.148911
-  brier_score_std: 0.021885
-  dataset: raw
-  feature_set: reduced
 - model: logistic
   features:
   - Age
@@ -702,18 +647,38 @@ results:
   - Stream
   feature_count: 5
   rows: 2542
-  accuracy_mean: 0.762831
-  accuracy_std: 0.041283
-  f1_mean: 0.788625
-  f1_std: 0.034198
-  roc_auc_mean: 0.868678
-  roc_auc_std: 0.034699
-  pr_auc_mean: 0.910001
-  pr_auc_std: 0.023991
-  brier_score_mean: 0.149872
-  brier_score_std: 0.0236
+  accuracy_mean: 0.756482
+  accuracy_std: 0.016937
+  f1_mean: 0.782685
+  f1_std: 0.021782
+  roc_auc_mean: 0.866561
+  roc_auc_std: 0.017711
+  pr_auc_mean: 0.908685
+  pr_auc_std: 0.012798
+  brier_score_mean: 0.15172
+  brier_score_std: 0.010222
   dataset: raw
   feature_set: no_backlogs
+- model: logistic
+  features:
+  - Age
+  - Internships
+  - CGPA
+  - Stream
+  feature_count: 4
+  rows: 2542
+  accuracy_mean: 0.755191
+  accuracy_std: 0.050134
+  f1_mean: 0.783875
+  f1_std: 0.036776
+  roc_auc_mean: 0.865386
+  roc_auc_std: 0.015212
+  pr_auc_mean: 0.905615
+  pr_auc_std: 0.009392
+  brier_score_mean: 0.152633
+  brier_score_std: 0.013757
+  dataset: raw
+  feature_set: reduced
 - model: logistic
   features:
   - Internships
@@ -723,33 +688,69 @@ results:
   - Stream
   feature_count: 5
   rows: 2542
-  accuracy_mean: 0.764427
-  accuracy_std: 0.038128
-  f1_mean: 0.789688
-  f1_std: 0.031724
-  roc_auc_mean: 0.864295
-  roc_auc_std: 0.03502
-  pr_auc_mean: 0.910063
-  pr_auc_std: 0.023809
-  brier_score_mean: 0.151108
-  brier_score_std: 0.022606
+  accuracy_mean: 0.767257
+  accuracy_std: 0.059971
+  f1_mean: 0.796526
+  f1_std: 0.042028
+  roc_auc_mean: 0.857097
+  roc_auc_std: 0.028434
+  pr_auc_mean: 0.900739
+  pr_auc_std: 0.023109
+  brier_score_mean: 0.155007
+  brier_score_std: 0.026361
   dataset: raw
   feature_set: no_age
+- model: xgboost
+  features:
+  - Internships
+  - CGPA
+  feature_count: 2
+  rows: 2542
+  accuracy_mean: 0.855414
+  accuracy_std: 0.07765
+  f1_mean: 0.826476
+  f1_std: 0.10748
+  roc_auc_mean: 0.852518
+  roc_auc_std: 0.099852
+  pr_auc_mean: 0.826932
+  pr_auc_std: 0.148638
+  brier_score_mean: 0.123013
+  brier_score_std: 0.063564
+  dataset: raw
+  feature_set: minimal
 - model: logistic
   features:
   - Internships
   - CGPA
   feature_count: 2
   rows: 2542
-  accuracy_mean: 0.775413
-  accuracy_std: 0.036694
-  f1_mean: 0.795904
-  f1_std: 0.033763
-  roc_auc_mean: 0.860462
-  roc_auc_std: 0.037178
-  pr_auc_mean: 0.903977
-  pr_auc_std: 0.022957
-  brier_score_mean: 0.149822
-  brier_score_std: 0.021405
+  accuracy_mean: 0.692253
+  accuracy_std: 0.213437
+  f1_mean: 0.70097
+  f1_std: 0.213945
+  roc_auc_mean: 0.83878
+  roc_auc_std: 0.077647
+  pr_auc_mean: 0.822537
+  pr_auc_std: 0.142499
+  brier_score_mean: 0.198561
+  brier_score_std: 0.070848
+  dataset: raw
+  feature_set: minimal
+- model: random_forest
+  features:
+  - Internships
+  - CGPA
+  feature_count: 2
+  rows: 2542
+  accuracy_mean: 0.830159
+  accuracy_std: 0.126119
+  f1_mean: 0.771722
+  f1_std: 0.212602
+  roc_auc_mean: 0.826585
+  roc_auc_std: 0.064123
+  pr_auc_mean: 0.819071
+  pr_auc_std: 0.137958
+  brier_score_mean: 0.140055
+  brier_score_std: 0.061337
   dataset: raw
   feature_set: minimal
