@@ -14,7 +14,8 @@ import {
   Loader2, 
   Code,
   Sparkles,
-  BookOpen
+  BookOpen,
+  ShieldCheck
 } from "lucide-react";
 import { studentService } from "../../services/studentService";
 import { resolveAssetUrl } from "../../services/api";
