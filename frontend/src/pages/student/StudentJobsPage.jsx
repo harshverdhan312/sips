@@ -16,7 +16,8 @@ import {
   Check,
   RefreshCw,
   BookOpen,
-  Play
+  Play,
+  Target
 } from "lucide-react";
 import { studentService } from "../../services/studentService";
 import { practiceService } from "../../services/practiceService";
