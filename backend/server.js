@@ -76,30 +76,47 @@ app.use('/uploads', async (req, res, next) => {
       try {
         const decoded = jwt.verify(token, config.jwtSecret);
         const filename = path.basename(reqPath);
+        const role = (decoded.role || '').toUpperCase();
 
         let authorized = false;
-        if (!memoryDb.isMongoConnected()) {
-          if (decoded.role === 'STUDENT') {
+        if (role === 'SUPERADMIN' || role === 'SUPER_ADMIN' || role === 'ADMIN' || decoded.isSuperAdmin) {
+          authorized = true;
+        } else if (!memoryDb.isMongoConnected()) {
+          if (role === 'STUDENT') {
             const student = memoryDb.findStudentById(decoded.id);
-            if (student && student.resumeUrl && path.basename(student.resumeUrl) === filename) {
-              authorized = true;
+            if (student && student.resumeUrl) {
+              if (path.basename(student.resumeUrl.split('?')[0]) === filename) {
+                authorized = true;
+              }
+              if (student.resumeUrl.startsWith('http://') || student.resumeUrl.startsWith('https://')) {
+                return res.redirect(student.resumeUrl);
+              }
             }
-          } else if (decoded.role === 'COLLEGE_ADMIN') {
+          } else if (role === 'COLLEGE_ADMIN' || role === 'INSTITUTION_ADMIN' || role === 'DEPARTMENT_ADMIN') {
             const students = memoryDb.getStudentsByCollege(decoded.collegeId);
-            if (students.some(s => s.resumeUrl && path.basename(s.resumeUrl) === filename)) {
+            if (students.some(s => s.resumeUrl && path.basename(s.resumeUrl.split('?')[0]) === filename)) {
               authorized = true;
             }
           }
         } else if (StudentModel) {
-          if (decoded.role === 'STUDENT') {
-            const student = await StudentModel.findOne({ _id: decoded.id, collegeId: decoded.collegeId });
-            if (student && student.resumeUrl && path.basename(student.resumeUrl) === filename) {
-              authorized = true;
+          if (role === 'STUDENT') {
+            const student = await StudentModel.findById(decoded.id);
+            if (student && student.resumeUrl) {
+              if (path.basename(student.resumeUrl.split('?')[0]) === filename) {
+                authorized = true;
+              }
+              // If student's resume is hosted on Cloudinary / remote URL, redirect directly
+              if (student.resumeUrl.startsWith('http://') || student.resumeUrl.startsWith('https://')) {
+                return res.redirect(student.resumeUrl);
+              }
             }
-          } else if (decoded.role === 'COLLEGE_ADMIN') {
+          } else if (role === 'COLLEGE_ADMIN' || role === 'INSTITUTION_ADMIN' || role === 'DEPARTMENT_ADMIN') {
             const student = await StudentModel.findOne({ collegeId: decoded.collegeId, resumeUrl: { $regex: filename } });
             if (student) {
               authorized = true;
+              if (student.resumeUrl.startsWith('http://') || student.resumeUrl.startsWith('https://')) {
+                return res.redirect(student.resumeUrl);
+              }
             }
           }
         }
@@ -118,6 +135,31 @@ app.use('/uploads', async (req, res, next) => {
     }
 
     // Direct unauthenticated or unauthorized access to PDF resumes is strictly blocked with 404
+    if (req.accepts && req.accepts('html')) {
+      return res.status(404).send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Resume Unavailable - SIPS</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background-color: #f8fafc; color: #1e293b; }
+    .card { background: white; border-radius: 1rem; border: 1px solid #e2e8f0; padding: 2.5rem; max-width: 440px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    h2 { margin-top: 0; font-size: 1.25rem; color: #0f172a; }
+    p { font-size: 0.875rem; color: #64748b; line-height: 1.5; margin-bottom: 1.5rem; }
+    a { display: inline-block; background-color: #4f46e5; color: white; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-weight: 600; text-decoration: none; font-size: 0.875rem; }
+    a:hover { background-color: #4338ca; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Resume File Unavailable</h2>
+    <p>The requested resume file is no longer stored on the server. If this is your resume, please sign in to SIPS and re-upload your PDF resume.</p>
+    <a href="/student/profile">Back to Profile</a>
+  </div>
+</body>
+</html>`);
+    }
+
     return res.status(404).json({ success: false, message: 'File not found or not accessible.' });
   }
 

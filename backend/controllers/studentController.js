@@ -885,10 +885,7 @@ exports.getResume = async (req, res, next) => {
     if (!memoryDb.isMongoConnected()) {
       student = memoryDb.findStudentById(req.user.id);
     } else {
-      student = await Student.findOne({
-        _id: req.user.id,
-        collegeId: req.collegeId
-      }).select('resumeUrl name');
+      student = await Student.findById(req.user.id).select('resumeUrl name');
     }
 
     if (!student || !student.resumeUrl) {

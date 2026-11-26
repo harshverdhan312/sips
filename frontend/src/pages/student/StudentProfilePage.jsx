@@ -636,6 +636,31 @@ export function StudentProfilePage() {
     setDetectedSkillsList(detectedSkillsList.filter(s => s !== skillToRemove));
   };
 
+  const handleViewResume = async () => {
+    if (!student?.resumeUrl) return;
+    const targetUrl = resolveAssetUrl(student.resumeUrl);
+
+    // If already hosted on Cloudinary or external CDN, open directly
+    if (/^https?:\/\//i.test(targetUrl) && !targetUrl.includes(window.location.host)) {
+      window.open(targetUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    // Verify if backend /uploads asset is reachable before opening
+    try {
+      const token = localStorage.getItem("sips_token");
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await fetch(targetUrl, { method: "HEAD", headers });
+      if (res.ok) {
+        window.open(targetUrl, "_blank", "noopener,noreferrer");
+      } else {
+        showError("The resume file is no longer available on the server. Please click 'Replace PDF Resume' to upload your latest resume.");
+      }
+    } catch {
+      window.open(targetUrl, "_blank", "noopener,noreferrer");
+    }
+  };
+
   const handleResumeDelete = async () => {
     if (!window.confirm("Are you sure you want to remove your resume? Your resume-derived skill evaluations will be reset.")) {
       return;
@@ -1585,7 +1610,9 @@ export function StudentProfilePage() {
             </div>
             <div>
               <h4 className="font-bold text-slate-900 text-sm">
-                {student.resumeUrl ? student.resumeUrl.split("/").pop() : "No Resume Uploaded"}
+                {student.resumeUrl
+                  ? (student.name ? `${student.name.replace(/\s+/g, "_")}_Resume.pdf` : (student.resumeUrl.split("/").pop() || "Resume.pdf"))
+                  : "No Resume Uploaded"}
               </h4>
               <p className="text-xs text-slate-500 mt-0.5">
                 {student.resumeUrl ? "Stored on placement server • Ready for campus drives" : "Upload PDF format (Max 5MB)"}
@@ -1596,15 +1623,14 @@ export function StudentProfilePage() {
           <div className="flex flex-wrap items-center gap-2">
             {student.resumeUrl && (
               <>
-                <a
-                  href={resolveAssetUrl(student.resumeUrl)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors"
+                <button
+                  type="button"
+                  onClick={handleViewResume}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors cursor-pointer"
                 >
                   <Eye className="w-3.5 h-3.5 text-indigo-600" />
                   View Resume
-                </a>
+                </button>
                 <button
                   type="button"
                   disabled={uploadingResume}
