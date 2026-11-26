@@ -1,6 +1,7 @@
 const config = require('../config');
 const AppError = require('../utils/appError');
 const logger = require('../utils/logger');
+const placementPredictor = require('./placementPredictor');
 
 /**
  * Centralized ML Service HTTP Client
@@ -69,6 +70,8 @@ class MLService {
           throw new AppError('ML Service authentication failed.', 502);
         } else if (response.status === 404) {
           throw new AppError('ML Service endpoint not found.', 502);
+        } else if (response.status === 429) {
+          throw new AppError(`ML Service rate limit encountered (429): ${errorMessage}`, 429);
         } else if (response.status >= 500) {
           throw new AppError('ML Service encountered an internal server error.', 502);
         } else {
@@ -285,45 +288,64 @@ class MLService {
       );
     }
 
-    const data = await this._request('/placement/predict', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+    try {
+      const data = await this._request('/placement/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-    if (!data || typeof data !== 'object') {
-      throw new AppError('ML Service returned invalid placement prediction schema.', 502);
+      if (!data || typeof data !== 'object') {
+        throw new AppError('ML Service returned invalid placement prediction schema.', 502);
+      }
+
+      // Support FastAPI response format (placement_probability, predicted_class, predicted_label)
+      const hasProbability = typeof data.placement_probability === 'number' || typeof data.probability === 'number';
+      const hasClass = typeof data.predicted_class === 'number' || typeof data.prediction === 'number';
+
+      if (!hasProbability && !hasClass) {
+        throw new AppError('ML Service returned invalid placement prediction schema.', 502);
+      }
+
+      const placementProbability = typeof data.placement_probability === 'number'
+        ? data.placement_probability
+        : (typeof data.probability === 'number' ? data.probability : (data.prediction === 1 ? 1.0 : 0.0));
+
+      const predictedClass = typeof data.predicted_class === 'number'
+        ? data.predicted_class
+        : (typeof data.prediction === 'number' ? data.prediction : (placementProbability >= (data.decision_threshold || 0.5) ? 1 : 0));
+
+      const decisionThreshold = typeof data.decision_threshold === 'number' ? data.decision_threshold : 0.5;
+      const predictedLabel = data.predicted_label || (predictedClass === 1 ? 'Placed' : 'Not Placed');
+      const modelVersion = data.model_version || '1.0.0';
+
+      return {
+        placement_probability: placementProbability,
+        decision_threshold: decisionThreshold,
+        predicted_class: predictedClass,
+        predicted_label: predictedLabel,
+        model_version: modelVersion,
+        prediction: predictedClass,
+        probability: placementProbability
+      };
+    } catch (err) {
+      // Re-throw client-side or schema validation errors so invalid input correctly returns 422
+      if (err.statusCode === 422 || err.isValidationError) {
+        throw err;
+      }
+
+      logger.warn('Remote ML placement service request failed, activating calibrated local predictor fallback:', {
+        error: err.message,
+        statusCode: err.statusCode
+      });
+
+      try {
+        return placementPredictor.predictPlacement(payload);
+      } catch (fallbackErr) {
+        logger.error('Local placement predictor fallback failed:', { error: fallbackErr.message });
+        throw err;
+      }
     }
-
-    // Support FastAPI response format (placement_probability, predicted_class, predicted_label)
-    const hasProbability = typeof data.placement_probability === 'number' || typeof data.probability === 'number';
-    const hasClass = typeof data.predicted_class === 'number' || typeof data.prediction === 'number';
-
-    if (!hasProbability && !hasClass) {
-      throw new AppError('ML Service returned invalid placement prediction schema.', 502);
-    }
-
-    const placementProbability = typeof data.placement_probability === 'number'
-      ? data.placement_probability
-      : (typeof data.probability === 'number' ? data.probability : (data.prediction === 1 ? 1.0 : 0.0));
-
-    const predictedClass = typeof data.predicted_class === 'number'
-      ? data.predicted_class
-      : (typeof data.prediction === 'number' ? data.prediction : (placementProbability >= (data.decision_threshold || 0.5) ? 1 : 0));
-
-    const decisionThreshold = typeof data.decision_threshold === 'number' ? data.decision_threshold : 0.5;
-    const predictedLabel = data.predicted_label || (predictedClass === 1 ? 'Placed' : 'Not Placed');
-    const modelVersion = data.model_version || '1.0.0';
-
-    return {
-      placement_probability: placementProbability,
-      decision_threshold: decisionThreshold,
-      predicted_class: predictedClass,
-      predicted_label: predictedLabel,
-      model_version: modelVersion,
-      prediction: predictedClass,
-      probability: placementProbability
-    };
   }
 }
 
