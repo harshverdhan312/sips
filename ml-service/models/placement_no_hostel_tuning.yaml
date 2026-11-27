@@ -1,0 +1,27 @@
+purpose: Tune the five-feature placement candidate without Hostel
+selection_metric: mean training group-CV ROC-AUC
+features: &id001
+- Age
+- Internships
+- CGPA
+- HistoryOfBacklogs
+- Stream
+grouping_features: *id001
+random_state: 42
+training_rows: 2119
+unused_validation_rows: 423
+unused_historical_test_rows: 424
+best_cv_roc_auc: 0.945808
+best_train_roc_auc: 0.965277
+best_parameters:
+  classifier__subsample: 0.7
+  classifier__reg_lambda: 5
+  classifier__reg_alpha: 0.0
+  classifier__n_estimators: 200
+  classifier__min_child_weight: 1
+  classifier__max_depth: 5
+  classifier__learning_rate: 0.05
+  classifier__colsample_bytree: 1.0
+notes:
+- Validation and historical test outcomes were not used during tuning.
+- Groups were formed from the five actual candidate input features.

@@ -1,0 +1,80 @@
+model:
+  name: SIPS Placement Predictor
+  candidate_version: 2.0.0
+  algorithm: XGBoost
+  calibration: none
+  decision_threshold: 0.5
+features:
+- Age
+- Internships
+- CGPA
+- HistoryOfBacklogs
+- Stream
+excluded_features:
+- Hostel
+- Gender
+best_parameters:
+  classifier__subsample: 0.7
+  classifier__reg_lambda: 5
+  classifier__reg_alpha: 0.0
+  classifier__n_estimators: 200
+  classifier__min_child_weight: 1
+  classifier__max_depth: 5
+  classifier__learning_rate: 0.05
+  classifier__colsample_bytree: 1.0
+development_rows: 2542
+historical_test_rows: 424
+metrics:
+  accuracy: 0.839623
+  precision: 0.932292
+  recall: 0.764957
+  f1: 0.840376
+  roc_auc: 0.908659
+  pr_auc: 0.940752
+  brier_score: 0.108907
+  log_loss: 0.331664
+  ece: 0.037461
+  confusion_matrix:
+    true_negative: 177
+    false_positive: 13
+    false_negative: 55
+    true_positive: 179
+subgroup_audit:
+  gender:
+    Female:
+      rows: 68
+      accuracy: 0.838235
+      precision: 0.911765
+      recall: 0.794872
+      f1: 0.849315
+    Male:
+      rows: 356
+      accuracy: 0.839888
+      precision: 0.936709
+      recall: 0.758974
+      f1: 0.838527
+  age_group:
+    19-20:
+      rows: 86
+      accuracy: 0.872093
+      precision: 0.909091
+      recall: 0.851064
+      f1: 0.879121
+    21-22:
+      rows: 279
+      accuracy: 0.827957
+      precision: 0.947368
+      recall: 0.72
+      f1: 0.818182
+    23-30:
+      rows: 59
+      accuracy: 0.847458
+      precision: 0.911765
+      recall: 0.837838
+      f1: 0.873239
+limitations:
+- The historical test partition was previously inspected during experimentation.
+- Results are specific to the available proof-of-concept dataset.
+- CGPA 8 and 9 have unusually deterministic outcomes in this dataset.
+- Subgroup results may be unstable where subgroup sample sizes are small.
+- Predictions are guidance and not placement guarantees.

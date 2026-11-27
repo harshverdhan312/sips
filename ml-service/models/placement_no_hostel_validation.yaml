@@ -1,0 +1,65 @@
+purpose: Select probability calibration using reserved validation data
+features:
+- Age
+- Internships
+- CGPA
+- HistoryOfBacklogs
+- Stream
+decision_threshold: 0.5
+training_rows: 2119
+validation_rows: 423
+unused_historical_test_rows: 424
+best_parameters:
+  classifier__subsample: 0.7
+  classifier__reg_lambda: 5
+  classifier__reg_alpha: 0.0
+  classifier__n_estimators: 200
+  classifier__min_child_weight: 1
+  classifier__max_depth: 5
+  classifier__learning_rate: 0.05
+  classifier__colsample_bytree: 1.0
+results:
+  no_hostel_uncalibrated:
+    accuracy: 0.843972
+    precision: 0.97191
+    recall: 0.739316
+    f1: 0.839806
+    roc_auc: 0.908029
+    pr_auc: 0.938743
+    brier_score: 0.110023
+    log_loss: 0.334541
+    ece: 0.040863
+  no_hostel_isotonic:
+    accuracy: 0.846336
+    precision: 0.972067
+    recall: 0.74359
+    f1: 0.842615
+    roc_auc: 0.904954
+    pr_auc: 0.936261
+    brier_score: 0.111741
+    log_loss: 0.337774
+    ece: 0.047034
+  no_hostel_sigmoid:
+    accuracy: 0.841608
+    precision: 0.961326
+    recall: 0.74359
+    f1: 0.838554
+    roc_auc: 0.907193
+    pr_auc: 0.938085
+    brier_score: 0.109932
+    log_loss: 0.339323
+    ece: 0.059816
+  current_production:
+    accuracy: 0.839243
+    precision: 0.977011
+    recall: 0.726496
+    f1: 0.833333
+    roc_auc: 0.897843
+    pr_auc: 0.932604
+    brier_score: 0.115937
+    log_loss: 0.348771
+    ece: 0.041023
+notes:
+- The historical test set was not used in this comparison.
+- Lower Brier score, log loss, and ECE indicate better probability quality.
+- The decision threshold remained fixed at 0.50 for this comparison.
